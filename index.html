@@ -1132,7 +1132,7 @@ function wellToScreen(wx,wy){const [rz,oy]=roomView();return [(wx-WCAM.x)*rz+W/2
    EQUIPMENT & THE SPELLBOOK
    Every hero can wear five things: main hand, off hand, head, chest, boots.
    ===================================================================== */
-const SLOTS=[['head','Head'],['chest','Body'],['boots','Boots'],['main','Main Hand'],['off','Off Hand']];
+const SLOTS=[['head','Head'],['chest','Body'],['boots','Boots'],['main','Main Hand'],['off','Off Hand'],['charm','Charm']];
 const ITEMS={
   staff:{name:"Apprentice's Staff",slot:'main',stats:{atk:1},desc:"A crooked willow staff with a crystal tied on with string. It sparkles... sometimes."},
   cloak:{name:'Apprentice Cloak',slot:'chest',stats:{def:1},desc:"Hand-stitched by Master Lum. The sleeves are still much too long."},
@@ -1148,7 +1148,7 @@ const ITEMS={
   potion:{name:'Healing Draught',kind:'use',heal:5,short:'Restores 5 HP',desc:"A rosy potion that tastes like strawberries and sunshine. Restores 5 HP."},
   spark:{name:'Spark Powder',kind:'use',dmg:3,short:'Throw for 3 damage',desc:"A pinch of crackling star-dust. Thrown in battle, it bursts for 3 damage (more with Magic)."}};
 const STAT_NAME={atk:'Attack',def:'Defense',mag:'Magic',spd:'Speed'};
-const PARTY={cosmic:{main:'staff',off:null,head:null,chest:'cloak',boots:'boots'},
+const PARTY={cosmic:{main:'staff',off:null,head:null,chest:'cloak',boots:'boots',charm:null},
              lum:{main:null,off:null,head:null,chest:null,boots:null}};
 const BAG=[];let bucketTaken=false,gotEquip=false;
 const MENU={open:false,a:0,sel:null,hits:[],S:1,ox:0,oy:0,note:'',noteT:0,newItems:0};
@@ -1231,6 +1231,7 @@ function drawIcon(c,id,x,y,s,ghost){c.save();c.translate(x,y);const G=ghost?'rgb
       c.beginPath();c.rect(-len/2,-s*.055,len,s*.11);c.fill();c.stroke();for(const e of [-1,1]){for(const k of [-1,1]){c.beginPath();c.arc(e*len/2,k*s*.075,s*.085,0,TAU);c.fill();c.stroke();}}
       c.fillRect(-len/2+s*.02,-s*.05,len-s*.04,s*.1);if(!G){c.strokeStyle='rgba(120,100,70,.35)';c.beginPath();c.moveTo(-len/2+s*.08,s*.02);c.lineTo(len/2-s*.08,s*.02);c.stroke();}c.restore();};
     if(!G)drawGlow(c,0,0,s*.55,'190,160,255',.25+.1*Math.sin(T*2.5));bone(-.7,s*.78);bone(.7,s*.78);}
+  else if(id==='charmghost'){c.strokeStyle=G||'#b58a3e';c.lineWidth=s*.05;c.beginPath();c.moveTo(-s*.2,-s*.38);c.quadraticCurveTo(0,-s*.12,s*.2,-s*.38);c.stroke();c.fillStyle=G||'#c9953e';c.beginPath();c.moveTo(0,-s*.14);c.lineTo(s*.2,s*.1);c.lineTo(0,s*.38);c.lineTo(-s*.2,s*.1);c.closePath();c.fill();}
   else if(id==='slimeparts'){if(G){c.fillStyle=G;c.beginPath();c.arc(0,0,s*.4,0,TAU);c.fill();}else{for(const [dx,dy,r_,col] of [[-s*.18,s*.12,.26,'120,200,150'],[s*.16,s*.16,.22,'110,190,170'],[0,-s*.14,.28,'150,225,170']]){const g=c.createRadialGradient(dx-s*.08,dy-s*.1,1,dx,dy,s*r_);g.addColorStop(0,`rgba(230,255,235,.95)`);g.addColorStop(.5,`rgba(${col},.9)`);g.addColorStop(1,`rgba(40,110,90,.9)`);c.fillStyle=g;c.beginPath();c.ellipse(dx,dy,s*r_,s*r_*.85,0,0,TAU);c.fill();c.strokeStyle='rgba(40,100,80,.7)';c.lineWidth=s*.025;c.stroke();c.fillStyle='rgba(255,255,255,.8)';c.beginPath();c.arc(dx-s*r_*.35,dy-s*r_*.35,s*.04,0,TAU);c.fill();}
     c.fillStyle='rgba(170,120,220,.8)';c.beginPath();c.ellipse(s*.02,-s*.12,s*.07,s*.03,.5,0,TAU);c.fill();}}
   else if(id==='hpowder'&&!G&&ready(IMG.icon_pouch_rose)){const im=IMG.icon_pouch_rose,h=s*1.12,w=h*im.naturalWidth/im.naturalHeight;c.drawImage(im,-w/2,-h*.54,w,h);}
@@ -1240,7 +1241,7 @@ function drawIcon(c,id,x,y,s,ghost){c.save();c.translate(x,y);const G=ghost?'rgb
   else if(id==='shield'){c.beginPath();c.moveTo(0,-s*.5);c.quadraticCurveTo(s*.32,-s*.38,s*.42,-s*.42);c.quadraticCurveTo(s*.44,s*.2,0,s*.55);c.quadraticCurveTo(-s*.44,s*.2,-s*.42,-s*.42);c.quadraticCurveTo(-s*.32,-s*.38,0,-s*.5);c.fillStyle=G||'#8a7a6a';c.fill();}
   else if(id==='hat'){c.beginPath();c.moveTo(-s*.5,s*.3);c.quadraticCurveTo(0,s*.12,s*.5,s*.3);c.quadraticCurveTo(s*.2,s*.12,s*.12,-s*.1);c.lineTo(-s*.1,-s*.6);c.lineTo(-s*.18,-s*.05);c.quadraticCurveTo(-s*.24,s*.14,-s*.5,s*.3);c.fillStyle=G||'#6a5a8a';c.fill();}
   c.restore();}
-const SLOT_GHOST={head:'hat',chest:'cloak',boots:'boots',main:'staff',off:'shield'};
+const SLOT_GHOST={head:'hat',chest:'cloak',boots:'boots',main:'staff',off:'shield',charm:'charmghost'};
 
 /* ---------- HUD: the spellbook button and the "you found something" toast ---------- */
 const BOOKBTN={x:30,y:30,r:19};
@@ -1308,8 +1309,8 @@ function drawMenu(dt){MENU.a=clamp(MENU.a+(MENU.open?dt*5:-dt*6),0,1);if(MENU.a<
   if(ready(catlas)){const sp=.74,dw=CFW*sp,dh=CFH*sp,fr=bladeFr(16);c.save();c.translate(fx,fyFeet);const b=Math.sin(T*2.3);c.scale(1-.004*b,1+.009*b);c.translate(-dw/2,-dh*(264/270));c.drawImage(cosSheet(),fr*CFW,0,CFW,CFH,0,0,dw,dh);
     c.scale(sp,sp);if(PARTY.cosmic.head==='bucket')drawBucketHat(c,fr);c.restore();}
   // slots around him, with dotted threads to where each piece is worn
-  const SR=27,anchors={head:[fx-4,dollTop+40],chest:[fx-8,dollTop+110],boots:[fx-14,fyFeet-14],main:[fx+44,dollTop+92],off:[fx-34,dollTop+120]};
-  const pos={head:[px+50,dollTop+28],chest:[px+50,dollTop+104],boots:[px+50,dollTop+180],main:[px+pw-50,dollTop+60],off:[px+pw-50,dollTop+148]};
+  const SR=27,anchors={head:[fx-4,dollTop+40],chest:[fx-8,dollTop+110],boots:[fx-14,fyFeet-14],main:[fx+44,dollTop+92],off:[fx-34,dollTop+120],charm:[fx-2,dollTop+76]};
+  const pos={head:[px+50,dollTop+28],chest:[px+50,dollTop+104],boots:[px+50,dollTop+180],main:[px+pw-50,dollTop+28],off:[px+pw-50,dollTop+104],charm:[px+pw-50,dollTop+180]};
   c.setLineDash([2,4]);c.strokeStyle='rgba(120,90,50,.45)';c.lineWidth=1.2;for(const k in pos){const [sx,sy]=pos[k],[ax,ay]=anchors[k];c.beginPath();c.moveTo(sx+(sx<fx?SR:-SR),sy);c.quadraticCurveTo((sx+ax)/2,sy,ax,ay);c.stroke();c.fillStyle='rgba(120,90,50,.5)';c.beginPath();c.arc(ax,ay,2,0,TAU);c.fill();}c.setLineDash([]);
   for(const [k,label] of SLOTS){const [sx,sy]=pos[k],id=PARTY.cosmic[k],sel=MENU.sel&&MENU.sel.kind==='slot'&&MENU.sel.slot===k;
     c.fillStyle='rgba(90,60,30,.15)';c.beginPath();c.arc(sx+1,sy+2,SR,0,TAU);c.fill();
