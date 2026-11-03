@@ -852,13 +852,13 @@ function updateGusts(dt){const g=Math.pow(Math.max(0,Math.sin(T*.35-cam.x*.0015)
 const INTRO={on:true,t:0,lumShown:false,cosRun:false,talking:false,ui:0,fade:1};
 const INTRO_LINE="At the edge of the world sits a tiny magic shop, where a hermit seeking peace finds herself sharing a quiet life with an unexpected apprentice.";
 const INTRO_TALK=[
-  ['Lum',"Good morning, Cosmic. Nice to see you start your daily duties so early."],
-  ['Cosmic',"Master Lum! Something's been nibbling the moonmint!"],
-  ['Lum',"Hmm. Shiny trails everywhere, and half the duskberries gone..."],
-  ['Lum',"If this keeps up, there won't be a single leaf left for powders or potions..."],
-  ['Cosmic',"Let me take care of it! I'll find every last slime. I can do it, I promise!"],
-  ['Lum',"Very well. Search the grounds, keep your eyes open, and don't poke anything that glows."],
-  ['Cosmic',"I won't let you down!"]];
+  ['Lum',"Good morning, Cosmic."],
+  ['Cosmic',"Master Lum! Something's been eating all the moonmint!"],
+  ['Lum',"Hmm. Shiny trails everywhere, and half the duskberries gone... slimes!"],
+  ['Lum',"If the slimes are not stopped, there won't be a single leaf for us to make powders or potions..."],
+  ['Cosmic',"Let me take care of it! I can do it. I promise!"],
+  ['Lum',"Very well, Cosmic. Search the garden and keep your eyes open. Even slimes can be dangerous…"],
+  ['Cosmic',"I won't let you down."]];
 const ease=t=>t<=0?0:t>=1?1:t*t*(3-2*t);
 function beginIntro(){audioInit();INTRO.waiting=false;}
 function introStart(){INTRO.on=true;INTRO.t=0;INTRO.lumShown=false;lum.x=0;lum.y=4;lum.face=1;cos.x=6;cos.y=560;cos.state='idle';cos.wait=999;cos.run=false;
