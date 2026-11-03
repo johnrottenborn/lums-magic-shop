@@ -2756,11 +2756,16 @@ function drawUI(){drawUIinner();drawChoice();drawSceneFade();drawWipe();}
 let menuLast=performance.now();
 function drawUIinner(){const _n=performance.now(),_dt=Math.min(.05,(_n-menuLast)/1000);menuLast=_n;drawIntroOverlay();drawSoundBtn();if(INTRO.on&&!INTRO.talking)return;if(!INTRO.on&&!WEV.end){ctx.save();UI_FADE=INTRO.ui;drawUI_();drawBookBtn();drawToast();ctx.restore();UI_FADE=1;drawMenu(_dt);}if(INTRO.on&&INTRO.talking){drawSay();}}
 let UI_FADE=1;
+const STICKUI={a:1,idle:0,touch:(()=>{try{return matchMedia('(pointer: coarse)').matches||navigator.maxTouchPoints>0;}catch(e){return false;}})()};
+addEventListener('pointerdown',e=>{if(e.pointerType==='touch')STICKUI.touch=true;else if(e.pointerType==='mouse'&&!navigator.maxTouchPoints)STICKUI.touch=false;},{capture:true});
 function drawUI_(){drawHints();
+  {const n_=performance.now(),d_=Math.min(.1,(n_-(STICKUI.last||n_))/1000);STICKUI.last=n_;if(stick.id!==null){STICKUI.idle=0;STICKUI.a=Math.min(1,STICKUI.a+d_*8);}else{STICKUI.idle+=d_;if(STICKUI.idle>1.5)STICKUI.a=Math.max(0,STICKUI.a-d_/1.2);}}
+  if(!STICKUI.touch||STICKUI.a<=0){}else{ctx.save();ctx.globalAlpha*=STICKUI.a;
   if(stick.id!==null){const dx=stick.x-stick.bx,dy=stick.y-stick.by,d=Math.hypot(dx,dy),m=Math.min(d,stick.R);const kx=stick.bx+(d?dx/d*m:0),ky=stick.by+(d?dy/d*m:0);
     ctx.fillStyle='rgba(255,255,255,.14)';ctx.strokeStyle='rgba(255,255,255,.6)';ctx.lineWidth=2;ctx.beginPath();ctx.arc(stick.bx,stick.by,stick.R,0,TAU);ctx.fill();ctx.stroke();
     const kg=ctx.createRadialGradient(kx-6,ky-6,2,kx,ky,24);kg.addColorStop(0,'rgba(255,255,255,.98)');kg.addColorStop(1,'rgba(225,240,215,.85)');ctx.fillStyle=kg;ctx.beginPath();ctx.arc(kx,ky,22,0,TAU);ctx.fill();}
   else{const gx=Math.max(18,W*.05)+stick.R,gy=BTN.a.y;ctx.strokeStyle='rgba(255,255,255,.45)';ctx.setLineDash([4,6]);ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(gx,gy,stick.R,0,TAU);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle='rgba(255,255,255,.3)';ctx.beginPath();ctx.arc(gx,gy,20,0,TAU);ctx.fill();}
+  ctx.restore();}
   const A=BTN.a,B=BTN.b,ax=A.x+(A.shake?Math.sin(A.shake*60)*3:0);
   drawBtn(A,ax,['#d4f3ff','#3aa3e8','#1d4f9a'],'');drawNearDots();
   if(lum.cool>0){ctx.fillStyle='rgba(10,30,60,.22)';ctx.beginPath();ctx.moveTo(ax,A.y);ctx.arc(ax,A.y,A.r,-Math.PI/2,-Math.PI/2+TAU*lum.cool/COOL);ctx.closePath();ctx.fill();}
