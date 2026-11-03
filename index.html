@@ -2526,7 +2526,7 @@ function drawChapterSelect(){const dt=1/60;CHSEL.t+=dt;CHSEL.noteT=Math.max(0,CH
       const g=ctx.createLinearGradient(0,y+h*.35,0,y+h);g.addColorStop(0,'rgba(20,16,30,0)');g.addColorStop(1,'rgba(20,16,30,.78)');ctx.fillStyle=g;ctx.fillRect(bx,y,bw,h);
       ctx.textAlign='left';ctx.fillStyle='#fdf6e4';ctx.font='700 26px "Alegreya SC", Georgia, serif';ctx.fillText('Prologue',bx+18,y+h-46);
       for(let k=0;k<5;k++)drawStar(bx+30+k*30,y+h-18,11,clamp(best-k,0,1));
-      ctx.textAlign='right';ctx.font='italic 13px Alegreya, Georgia, serif';ctx.fillStyle='rgba(253,246,228,.8)';ctx.fillText(best?'best run':'',bx+bw-16,y+h-18);}
+}
     else{const g=ctx.createLinearGradient(bx,y,bx,y+h);g.addColorStop(0,'#efe4cc');g.addColorStop(1,'#dccaa4');ctx.fillStyle=g;ctx.fillRect(bx,y,bw,h);
       ctx.strokeStyle='rgba(120,90,50,.18)';ctx.lineWidth=1;for(let k=0;k<8;k++){ctx.beginPath();ctx.moveTo(bx,y+h*(k+.5)/8);ctx.bezierCurveTo(bx+bw*.3,y+h*(k+.2)/8,bx+bw*.7,y+h*(k+.8)/8,bx+bw,y+h*(k+.5)/8);ctx.stroke();}
       ctx.textAlign='left';ctx.fillStyle='#3a2c1a';ctx.font='700 24px "Alegreya SC", Georgia, serif';ctx.fillText(c.title,bx+18,y+h*.42);ctx.font='italic 16px Alegreya, Georgia, serif';ctx.fillStyle='#6a5232';ctx.fillText(c.sub,bx+18,y+h*.72);}
