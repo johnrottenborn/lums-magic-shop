@@ -2441,8 +2441,8 @@ function newGame(){try{localStorage.removeItem(SAVE_KEY);}catch(e){}beginIntro()
 function continueGame(){const d=readSave();if(!d){newGame();return;}audioInit();try{applySave(d);}catch(e){console.error(e);}FADE.a=1;FADE.dir=-1;sfxPage&&sfxPage(1);}
 function titleTap(x,y){if(CHSEL.on){chselTap(x,y);return;}for(const h of TITLE.hits)if(x>h.x&&x<h.x+h.w&&y>h.y&&y<h.y+h.h){
     if(h.id==='cont'){continueGame();return;}
-    if(h.id==='new'){const pg=readProg();if(pg.prologue&&pg.prologue.done){openChapterSelect();return;}if(readSave()&&performance.now()-TITLE.confirm>3500){TITLE.confirm=performance.now();sfxPage&&sfxPage(.6);return;}newGame();return;}}}
-function titleKey(){if(CHSEL.on){chselKey('Enter');return;}if(readSave())continueGame();else{const pg=readProg();if(pg.prologue&&pg.prologue.done)openChapterSelect();else newGame();}}
+    if(h.id==='new'){const pg=readProg();if((PLAYTEST||pg.prologue&&pg.prologue.done)){openChapterSelect();return;}if(readSave()&&performance.now()-TITLE.confirm>3500){TITLE.confirm=performance.now();sfxPage&&sfxPage(.6);return;}newGame();return;}}}
+function titleKey(){if(CHSEL.on){chselKey('Enter');return;}if(readSave())continueGame();else{const pg=readProg();if((PLAYTEST||pg.prologue&&pg.prologue.done))openChapterSelect();else newGame();}}
 function drawTitleMenu(){const has=!!readSave(),bw=Math.min(240,W-80),bh=50,x=W/2-bw/2;let y=H*.56;TITLE.hits=[];ctx.save();ctx.textAlign='center';ctx.textBaseline='middle';
   const btn=(id,label,primary)=>{const pulse=primary?.5+.5*Math.sin(T*2.4):0;ctx.fillStyle=primary?'#2f2a3a':'rgba(47,42,58,.08)';ctx.strokeStyle='rgba(47,42,58,.55)';ctx.lineWidth=1.5;rr(x,y,bw,bh,bh/2);ctx.fill();ctx.stroke();
     if(primary){ctx.strokeStyle=`rgba(196,154,78,${(.35+.4*pulse).toFixed(3)})`;ctx.lineWidth=2;rr(x-3,y-3,bw+6,bh+6,bh/2+3);ctx.stroke();}
@@ -2588,6 +2588,7 @@ async function shareResults(){try{const c=makeResultCard();const blob=await new 
 const PROG_KEY='lums-magic-shop-progress';
 function readProg(){try{return JSON.parse(localStorage.getItem(PROG_KEY)||'{}')||{};}catch(e){return {};}}
 function recordPrologue(stars,badges,keep){try{const p=readProg();p.prologue=p.prologue||{};p.prologue.done=1;p.prologue.best=Math.max(p.prologue.best||0,stars);p.prologue.badges=p.prologue.badges||{};for(const b of badges||[])if(b.got)p.prologue.badges[b.id]=1;const KR={duskflower:1,moonmint:2,mooncharm:3},cur=p.prologue.keepsake&&KR[p.prologue.keepsake.id]?p.prologue.keepsake:null;if(keep&&(!cur||KR[cur.id]<KR[keep.id]))p.prologue.keepsake=keep;else p.prologue.keepsake=cur;localStorage.setItem(PROG_KEY,JSON.stringify(p));}catch(e){}}
+const PLAYTEST=true; // playtest build: Chapter 1 is always reachable from New Game
 const CHSEL={on:false,sel:0,confirm:null,note:'',noteT:0,hits:[],t:0};
 const CHAPTERS=[{id:'prologue',title:'Prologue'},{id:'ch1',title:'Chapter 1',sub:'Working Title'}];
 function openChapterSelect(){CHSEL.on=true;CHSEL.sel=0;CHSEL.confirm=null;CHSEL.t=0;sfxPage&&sfxPage(.8);}
