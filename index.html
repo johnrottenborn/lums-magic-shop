@@ -1793,7 +1793,7 @@ function setupStudy(){SINT.length=0;SINT.push({x:175,y:722,reach:85,onInteract:(
   L(595,585,80,["The shelves go all the way up. Master Lum would need a ladder. Or a levitation spell. I bet she has a levitation spell."]);
   L(740,712,110,["Bubbling potions, glowing crystals, and a book left open... like someone stepped away in the middle of something.","The page shows a drawing of a slime getting bigger, and bigger, and BIGGER. I don't like this book."]);
   L(905,575,80,["A cabinet with a hundred tiny drawers. 'Eye of newt'... 'moonmint'... 'buttons'... 'more buttons'."]);
-  L(985,568,60,["Another bucket! ...No. One bucket helmet is plenty."]);
+  SINT.push({x:985,y:568,reach:60,onInteract:()=>say(bucketTaken?"Another bucket! ...No. One bucket helmet is plenty.":"An old bucket stuffed with dried roots. Hmm... a sturdy bucket like this would make a pretty good helmet.")});
   L(1085,612,90,["The fire's still warm. Someone was here not long ago...","Dried herbs and two glowing crystals on the mantle. It smells like lavender and woodsmoke."]);
   L(1100,700,95,["A giant spellbook on a stand. The writing glows when I lean close... I can't read a single word. Yet!"]);
   L(1225,680,85,["A little lantern and an old scroll. It's a map of the garden! Someone circled the well and drew a tiny crown beside it."]);
