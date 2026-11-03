@@ -2128,7 +2128,7 @@ function setupBedroom(){BEDINT.length=0;
 function enterBedroom(){SCENE='bed';lum.x=1240;lum.y=650;lum.face=-1;lum.vx=lum.vy=0;lum.state='idle';WCAM.x=900;WTITLE.t=0;if(!NIGHT.on){BED.night=0;BED.sleeping=false;}setupBedroom();}
 const NIGHT={on:false,cut:false,rain:false,end:0,rainSrc:null};
 function goToSleep(){WEVENT.on=true;goScene(()=>{BED.night=1;BED.sleeping=true;BED.cosAwake=false;BED.t=0;lum.vx=lum.vy=0;WCAM.x=760;NIGHT.on=true;HEROES.cosmic.hp=HEROES.cosmic.maxHp;
-  setTimeout(()=>{BED.glow=1;sfxEerie();talk([['???',"Wake up, little apprentice... Take the blade, and cut a path out of this cage of flowers."]],false,()=>{
+  setTimeout(()=>{BED.glow=1;sfxEerie();talk([['???',"Wake up, little apprentice... Take the blade, and cut a path out of this magical garden."]],false,()=>{
     setTimeout(()=>{BED.cosAwake=true;BED.glow=0;lum.x=930;lum.y=744;lum.face=-1;lum.state='idle';WEVENT.on=false;
       talk([['Cosmic',"...That voice again. It wants me to leave? Tonight?"],['Cosmic',"Master Lum is fast asleep. If I'm quiet, she'll never know..."]],false,()=>{GOAL.tag='NEW TASK';GOAL.text='Take the blade and cut a path out of the garden';HINT.goalT=0;});},900);});},4200);});}
 function drawNightShade(px,py,dark){const [sx,sy]=(SCENE==='garden'||SCENE==='woods')?[(px-cam.x)*zoom+W/2,(py-60-cam.y)*zoom+H/2]:wellToScreen(px,py-80);
