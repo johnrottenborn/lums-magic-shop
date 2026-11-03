@@ -2512,7 +2512,8 @@ function drawResults(t){if(!RESULTS.r){RESULTS.r=prologueScore();RESULTS.badges=
   y+=84;
   // keepsake
   ctx.globalAlpha=a*clamp((t-3.8)/.5,0,1);ctx.textAlign='center';ctx.font='italic 13px Alegreya, Georgia, serif';ctx.fillStyle='rgba(232,226,242,.7)';ctx.fillText('Keepsake for Chapter 1',W/2,y);y+=19;
-  ctx.font='700 15px "Alegreya SC", Georgia, serif';ctx.fillStyle='#ffe2a0';ctx.fillText(RESULTS.keep.name,W/2,y);ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,W/2-ctx.measureText(RESULTS.keep.name).width/2-12,y-5,8,'255,220,150',.8);ctx.restore();y+=20;
+  if(RESULTS.keep){ctx.font='700 15px "Alegreya SC", Georgia, serif';ctx.fillStyle='#ffe2a0';ctx.fillText(RESULTS.keep.name,W/2,y);ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,W/2-ctx.measureText(RESULTS.keep.name).width/2-12,y-5,8,'255,220,150',.8);ctx.restore();}
+  else{const bk=bestKeepsake();ctx.font='italic 14px Alegreya, Georgia, serif';ctx.fillStyle='rgba(232,226,242,.6)';ctx.fillText(bk?`You still carry ${bk.name}`:'Earn 3 stars or more to receive one',W/2,y);}y+=20;
   // buttons
   if(t>3.6){const ba=Math.min(1,(t-3.6)*2),bh=44,gap=12,bw2=(pw-gap)/2,by=Math.min(H-bh-14,y+6);ctx.globalAlpha=ba;
     [['Share Results',true,shareResults],['Back to Title',false,backToTitle]].forEach(([lab,pri,fn],k)=>{const x=px+k*(bw2+gap);const g=ctx.createLinearGradient(0,by,0,by+bh);if(pri){g.addColorStop(0,'#f0c060');g.addColorStop(1,'#c88a2a');}else{g.addColorStop(0,'rgba(232,226,242,.18)');g.addColorStop(1,'rgba(232,226,242,.08)');}
@@ -2521,7 +2522,10 @@ function drawResults(t){if(!RESULTS.r){RESULTS.r=prologueScore();RESULTS.badges=
   ctx.restore();}
 const RESULTS={r:null,hits:[],msg:'',msgT:0};
 function earnedBadges(R){const S_=STATS;return [{id:'treasure',name:'Treasure Hunter',got:R.fnd>=HIDDEN.length},{id:'shield',name:'Untouchable',got:S_.kos===0},{id:'hourglass',name:'Quick Study',got:S_.time<=1200},{id:'target',name:'Perfect Timing',got:S_.atk>=3&&S_.nice/S_.atk>=.9},{id:'crown',name:'Royal Slayer',got:!!S_.kingSlain}];}
-function keepsakeFor(st){return st>=5?{id:'mooncharm',name:"Lum's Moon Charm",tier:4}:st>=4?{id:'moonmint',name:'Silver Moonmint Sprig',tier:3}:st>=3?{id:'duskflower',name:'Pressed Duskberry Blossom',tier:2}:st>=2?{id:'feather',name:'Lucky Owl Feather',tier:1}:{id:'button',name:"Cosmic's Lost Button",tier:0};}
+function keepsakeFor(st){return st>=5?{id:'mooncharm',name:"Lum's Moon Charm",tier:3}:st>=4?{id:'moonmint',name:'Silver Moonmint Sprig',tier:2}:st>=3?{id:'duskflower',name:'Pressed Duskberry Blossom',tier:1}:null;}
+/* Chapter 1 opens with the best keepsake ever earned in the Prologue already in the Charm slot */
+function bestKeepsake(){const p=readProg();return (p.prologue&&p.prologue.keepsake)||null;}
+function equipStartingKeepsake(){const k=bestKeepsake();if(k)PARTY.cosmic.charm=k.id;}
 function starChime(i){if(!SND.ready)return;const t=SND.ctx.currentTime;const n=[76,79,83,86,88][i];bell(t,NOTE(n),.09,1.6,SND.sfx,(i-2)*.25);bell(t+.03,NOTE(n+12),.04,1.2,SND.sfx,(i-2)*.25);}
 function sealThud(){if(!SND.ready)return;const t=SND.ctx.currentTime;noiseHit(t,.15,'lowpass',400,1,.4,SND.sfx,120);[74,78,81,86].forEach((n,k)=>bell(t+.08+k*.07,NOTE(n),.08,1.8,SND.sfx,0));}
 function drawBadge(id,got){const c=ctx;c.save();const g=c.createRadialGradient(-6,-8,2,0,0,24);g.addColorStop(0,got?'#fff3cc':'#a8a0b4');g.addColorStop(1,got?'#c9953e':'#5e5868');c.fillStyle=g;c.beginPath();c.arc(0,0,22,0,TAU);c.fill();c.strokeStyle=got?'#ffe7a0':'#8a8298';c.lineWidth=2;c.stroke();
@@ -2559,7 +2563,7 @@ async function shareResults(){try{const c=makeResultCard();const blob=await new 
 /* ---------- chapter select (unlocked after finishing the prologue) ---------- */
 const PROG_KEY='lums-magic-shop-progress';
 function readProg(){try{return JSON.parse(localStorage.getItem(PROG_KEY)||'{}')||{};}catch(e){return {};}}
-function recordPrologue(stars,badges,keep){try{const p=readProg();p.prologue=p.prologue||{};p.prologue.done=1;p.prologue.best=Math.max(p.prologue.best||0,stars);p.prologue.badges=p.prologue.badges||{};for(const b of badges||[])if(b.got)p.prologue.badges[b.id]=1;if(keep&&(!p.prologue.keepsake||p.prologue.keepsake.tier<keep.tier))p.prologue.keepsake=keep;localStorage.setItem(PROG_KEY,JSON.stringify(p));}catch(e){}}
+function recordPrologue(stars,badges,keep){try{const p=readProg();p.prologue=p.prologue||{};p.prologue.done=1;p.prologue.best=Math.max(p.prologue.best||0,stars);p.prologue.badges=p.prologue.badges||{};for(const b of badges||[])if(b.got)p.prologue.badges[b.id]=1;const KR={duskflower:1,moonmint:2,mooncharm:3},cur=p.prologue.keepsake&&KR[p.prologue.keepsake.id]?p.prologue.keepsake:null;if(keep&&(!cur||KR[cur.id]<KR[keep.id]))p.prologue.keepsake=keep;else p.prologue.keepsake=cur;localStorage.setItem(PROG_KEY,JSON.stringify(p));}catch(e){}}
 const CHSEL={on:false,sel:0,confirm:null,note:'',noteT:0,hits:[],t:0};
 const CHAPTERS=[{id:'prologue',title:'Prologue'},{id:'ch1',title:'Chapter 1',sub:'Working Title'}];
 function openChapterSelect(){CHSEL.on=true;CHSEL.sel=0;CHSEL.confirm=null;CHSEL.t=0;sfxPage&&sfxPage(.8);}
