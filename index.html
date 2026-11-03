@@ -2142,12 +2142,13 @@ function drawRain(dt){if(!NIGHT.rain)return;ctx.save();ctx.setTransform(DPR,0,0,
   ctx.fillStyle='rgba(30,40,70,.12)';ctx.fillRect(0,0,W,H);ctx.restore();}
 function startRain(){NIGHT.rain=true;if(!SND.ready||NIGHT.rainSrc)return;const c=SND.ctx,s=c.createBufferSource();s.buffer=SND.white;s.loop=true;const f=c.createBiquadFilter();f.type='bandpass';f.frequency.value=1600;f.Q.value=.5;
   const lp=c.createBiquadFilter();lp.type='lowpass';lp.frequency.value=5200;const g=c.createGain();g.gain.setValueAtTime(0,c.currentTime);g.gain.linearRampToValueAtTime(.16,c.currentTime+2.5);s.connect(f);f.connect(lp);lp.connect(g);g.connect(SND.amb);s.start();NIGHT.rainSrc=s;}
+function addHedgeDoor(){if(INTERACTABLES.some(o=>o.hedgeDoor))return;INTERACTABLES.push({x:20,y:1665,reach:80,door:true,hedgeDoor:1,onInteract:()=>goScene(()=>enterWoods())});}
 function cutHedge(){if(NIGHT.cut)return;lum.state='cast';lum.at=0;lum.face=1;shake=10;
   if(SND.ready){const t=SND.ctx.currentTime;noiseHit(t,.35,'bandpass',2600,1.2,.35,SND.sfx,600);noiseHit(t+.05,.5,'lowpass',500,1,.3,SND.sfx);for(let i=0;i<5;i++)noiseHit(t+.12+i*.06,.15,'bandpass',1200+i*300,2,.15,SND.sfx);}
   for(let i=ESTATE.length-1;i>=0;i--){const o=ESTATE[i];if((o.t==='shrub'||o.t==='img')&&Math.abs(o.x-20)<120&&o.y>1575&&o.y<1720)ESTATE.splice(i,1);}
   for(let i=0;i<40;i++)PARTS.push({type:'bpetal',x:rnd(-80,120),y:rnd(1570,1640),z:rnd(20,80),vx:rnd(-90,90),vy:rnd(-30,40),vz:rnd(40,160),life:0,max:rnd(2,4),s:rnd(3,6),rot:rnd(0,TAU),vr:rnd(-8,8),col:Math.random()<.6?'#4f7a3a':'#6e9a4a',leaf:1});
   for(let i=0;i<24;i++)PARTS.push({type:'fiz',x:rnd(-60,100),y:rnd(1560,1620),z:rnd(30,90),vx:rnd(-60,60),vy:rnd(-20,20),vz:rnd(40,140),life:0,max:rnd(.6,1.2),s:rnd(2,3.5)});
-  NIGHT.slash=1;NIGHT.cut=true;
+  NIGHT.slash=1;NIGHT.cut=true;addHedgeDoor();
   setTimeout(()=>{startRain();sfxEerie();talk([['???',"Yes, child... do not turn back!"]],false,()=>{GOAL.tag='NEW TASK';GOAL.text='Follow the path beyond the garden';HINT.goalT=0;});},700);}
 function drawSleeper(img,hx,hy,sc,rot,lump,breath,phase){const im=IMG[img];if(!ready(im))return;
   const b=Math.sin(T*1.4+phase);
@@ -2379,7 +2380,7 @@ function canSave(){return PC==='cosmic'&&!INTRO.on&&!INTRO.waiting&&!BATTLE.on&&
 function snapshot(){return {v:1,t:Date.now(),scene:SCENE,x:lum.x,y:lum.y,face:lum.face,bag:[...BAG],mats:{...MATS},party:JSON.parse(JSON.stringify(PARTY)),hp:HEROES.cosmic.hp,goal:{tag:GOAL.tag,text:GOAL.text},tut:TUT.stage,
   f:{bucketTaken,gotEquip,slimesDone,slimesSpawned,wellVisited,gardenDone,sslimesSpawned,mimicState,studyVisited,shedChestOpen,shedSpawned,shedVisited,pondSlimesSpawned,pondDone,shroudTaken,pondVisited,shopTalk,restTalk,skelDone,sayCount,slugTalk,slimeTalk,poolTalk},
   left:{well:WSLIMES.length,study:SSLIMES.length,shed:SHSLIMES.length,pond:PSLIMES.length,slugs:SLUGS.length,skels:WSKELS.length},
-  night:{on:NIGHT.on,cut:NIGHT.cut,rain:NIGHT.rain},stats:STATS,wev:{mid:WEV.mid,circle:WEV.circle,cem:WEV.cem,entered:WEV.entered||0},shopDoor,pondReturn};}
+  night:{on:NIGHT.on,cut:NIGHT.cut,rain:NIGHT.rain,nudged:NIGHT.nudged||0},stats:STATS,wev:{mid:WEV.mid,circle:WEV.circle,cem:WEV.cem,entered:WEV.entered||0},shopDoor,pondReturn};}
 function saveGame(){try{localStorage.setItem(SAVE_KEY,JSON.stringify(snapshot()));}catch(e){}}
 function autosave(dt){SAVEC.t+=dt;if(SAVEC.t>1&&canSave()){SAVEC.t=0;saveGame();}
   // rooms fill with foes when first entered; on a continued game, trim them back to what was left
@@ -2396,8 +2397,8 @@ function applySave(d){const f=d.f||{};if(d.stats)Object.assign(STATS,d.stats,{fo
   if(L_.slugs!=null)SLUGS.splice(L_.slugs);
   Object.assign(WEV,d.wev||{});
   if(d.night&&d.night.on){NIGHT.on=true;BED.night=1;BED.sleeping=true;BED.cosAwake=true;BED.slept=true;
-    if(d.night.cut){NIGHT.cut=true;for(let i=ESTATE.length-1;i>=0;i--){const o=ESTATE[i];if((o.t==='shrub'||o.t==='img')&&Math.abs(o.x-20)<120&&o.y>1575&&o.y<1720)ESTATE.splice(i,1);}}
-    if(d.night.rain){NIGHT.rain=true;setTimeout(()=>{NIGHT.rainSrc=null;startRain();},600);}}
+    if(d.night.cut){NIGHT.cut=true;addHedgeDoor();for(let i=ESTATE.length-1;i>=0;i--){const o=ESTATE[i];if((o.t==='shrub'||o.t==='img')&&Math.abs(o.x-20)<120&&o.y>1575&&o.y<1720)ESTATE.splice(i,1);}}
+    NIGHT.nudged=d.night.nudged||0;if(d.night.rain){NIGHT.rain=true;setTimeout(()=>{NIGHT.rainSrc=null;startRain();},600);}}
   if(d.shopDoor)shopDoor=d.shopDoor;if(d.pondReturn)pondReturn=d.pondReturn;
   const sc=d.scene||'garden';
   if(sc==='well')enterWell();else if(sc==='study')enterStudy();else if(sc==='shed')enterShed();else if(sc==='pond')enterPond();else if(sc==='shop')enterShop();else if(sc==='bed')enterBedroom();
@@ -2553,7 +2554,7 @@ function update(dt){
   if(Math.random()<dt*9)PARTS.push({type:'msmoke',x:CHIM.x+rnd(-12,12),y:CHIM.y,z:0,vx:0,vy:-rnd(24,34),vz:0,life:0,max:rnd(4.5,6.5),s:rnd(7,10),seed:rnd(0,TAU)});
   if(Math.random()<dt*1.6)PARTS.push({type:'mstar',x:CHIM.x+rnd(-30,30),y:CHIM.y-rnd(10,60),z:0,vx:rnd(-6,6),vy:-rnd(12,22),vz:0,life:0,max:rnd(2,3.5),s:rnd(2.5,4.5)});
   for(const [px,py] of [[480,266],[536,330],[1125,312]])if(Math.random()<dt*.9)PARTS.push({type:'smoke',x:hx(px)+rnd(-4,4),y:hy(py),z:0,vx:rnd(-3,3),vy:-rnd(12,18),vz:0,life:0,max:rnd(3,4.5),s:rnd(4,6)});
-  if(!cos.hidden&&!(INTRO.on&&INTRO.cosHere))updateCosmic(dt);lum.quipT=Math.max(0,(lum.quipT||0)-dt);TOAST.t+=dt;if(SCENE==='garden'&&NIGHT.cut&&lum.y>1690&&!FADE.dir&&!DLG.active){goScene(()=>enterWoods());}if(SCENE==='woods'){updateWoods(dt);updateSkels(dt);updateFokalur(dt);}autosave(dt);updateStorm(dt);NIGHT.slash=Math.max(0,(NIGHT.slash||0)-dt*2);{const ok=!DLG.active&&!MENU.open&&!INTRO.on&&!FADE.dir&&!BATTLE.pending&&!WEVENT.on;const n=ok?nearInteract():null;if(n)NEAR=n;nearA=clamp(nearA+(n?dt*6:-dt*6),0,1);if(!n&&nearA<=0)NEAR=null;}TUT.t+=dt;updateHints(dt);updateSlugs(dt);if(SCENE==='garden'){updateSlimeList(GSLIMES,dt,gardenFree);lum.bumpT=Math.max(0,(lum.bumpT||0)-dt);}updateFairies(dt);updateWisps(dt);if(SCENE==='garden')updateGusts(dt);updateBirds(dt);updateFish(dt);
+  if(!cos.hidden&&!(INTRO.on&&INTRO.cosHere))updateCosmic(dt);lum.quipT=Math.max(0,(lum.quipT||0)-dt);TOAST.t+=dt;if(SCENE==='garden'&&NIGHT.on&&!NIGHT.cut&&!NIGHT.nudged&&!DLG.active&&!WEVENT.on&&!FADE.dir&&!MENU.open&&!CHOICE.on){NIGHT.outT=(NIGHT.outT||0)+dt;if(NIGHT.outT>45){NIGHT.nudged=1;sfxEerie();talk([['???',"Hurry! Wield my blade and slice through the overgrown path…"]]);}}if(SCENE==='woods'){updateWoods(dt);updateSkels(dt);updateFokalur(dt);}autosave(dt);updateStorm(dt);NIGHT.slash=Math.max(0,(NIGHT.slash||0)-dt*2);{const ok=!DLG.active&&!MENU.open&&!INTRO.on&&!FADE.dir&&!BATTLE.pending&&!WEVENT.on;const n=ok?nearInteract():null;if(n)NEAR=n;nearA=clamp(nearA+(n?dt*6:-dt*6),0,1);if(!n&&nearA<=0)NEAR=null;}TUT.t+=dt;updateHints(dt);updateSlugs(dt);if(SCENE==='garden'){updateSlimeList(GSLIMES,dt,gardenFree);lum.bumpT=Math.max(0,(lum.bumpT||0)-dt);}updateFairies(dt);updateWisps(dt);if(SCENE==='garden')updateGusts(dt);updateBirds(dt);updateFish(dt);
   if(!EST_COBBLE&&ready(IMG.cobble_strip)&&estR)buildEstateGround(estR);
   if(DLG.active){DLG.t+=dt;const L=DLG.lines[DLG.i][1].length;if(DLG.t>3.4+L*.04)dlgNext();}
   {const rate=wellMagic>0?30:1.6;let n=dt*rate;while(n>0){if(Math.random()<n)PARTS.push({type:'wsp',x:WELL.x+rnd(-26,26),y:WELL.y-WELL_TOP+rnd(-4,6),z:0,vx:rnd(-8,8),vy:-rnd(14,wellMagic>0?60:26),vz:0,life:0,max:rnd(1.4,2.6),s:wellMagic>0?rnd(2,3.6):rnd(1.2,2.2)});n-=1;}}
