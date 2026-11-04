@@ -2473,7 +2473,7 @@ function drawFokalur(){const t=WEV.foka,h=280;let n=Math.floor(T*4)%4;if(t<.5)n=
 const SAVE_KEY='lums-magic-shop-save-v1';const TITLE={hits:[],confirm:-1e9};const SAVEC={t:0};const LOADTRIM={};
 function readSave(){try{const s=localStorage.getItem(SAVE_KEY);return s?JSON.parse(s):null;}catch(e){return null;}}
 function canSave(){return PLAYER()&&!MIX.on&&!INTRO.on&&!INTRO.waiting&&!BATTLE.on&&!BATTLE.pending&&!WIPE.dir&&!DLG.active&&!CHOICE.on&&!FADE.dir&&!WEVENT.on&&!busy()&&!WEV.fk&&!WEV.seal&&!(BED.sleeping&&!BED.cosAwake)&&!Object.keys(LOADTRIM).length;}
-function snapshot(){return {v:1,t:Date.now(),scene:SCENE,dunRoom:DUN.room,x:lum.x,y:lum.y,face:lum.face,bag:[...BAG],mats:{...MATS},party:JSON.parse(JSON.stringify(PARTY)),hp:HEROES[HERO].hp,goal:{tag:GOAL.tag,text:GOAL.text},tut:TUT.stage,
+function snapshot(){return {v:1,sv:SAVE_VER,t:Date.now(),scene:SCENE,dunRoom:DUN.room,x:lum.x,y:lum.y,face:lum.face,bag:[...BAG],mats:{...MATS},party:JSON.parse(JSON.stringify(PARTY)),hp:HEROES[HERO].hp,goal:{tag:GOAL.tag,text:GOAL.text},tut:TUT.stage,
   f:{kingState,bucketTaken,gotEquip,slimesDone,slimesSpawned,wellVisited,gardenDone,sslimesSpawned,mimicState,studyVisited,shedChestOpen,shedSpawned,shedVisited,pondSlimesSpawned,pondDone,shroudTaken,pondVisited,shopTalk,restTalk,skelDone,sayCount,slugTalk,slimeTalk,poolTalk},
   left:{well:WSLIMES.length,study:SSLIMES.length,shed:SHSLIMES.length,pond:PSLIMES.length,slugs:SLUGS.filter(g=>g.kind!=='slugking').length,skels:WSKELS.length},
   ch:CH,c1:{...C1,endCard:0,title:0},powders:{...POWDERS},wf:WFOES.map(g=>g.id),c1built:woodsC1Built,
@@ -2505,7 +2505,25 @@ function applySave(d){if(d.ch===1){applySaveC1(d);return;}const f=d.f||{};if(d.s
   TUT.stage=d.tut||0;GOAL.tag='TASK';GOAL.text=(d.goal&&d.goal.text)||GOAL.text;HINT.goalT=0;
   if(sc==='woods'&&skelDone>=3)setTimeout(fokalurEvent,1500);}
 function newGame(){try{localStorage.removeItem(SAVE_KEY);}catch(e){}beginIntro();}
-function continueGame(){const d=readSave();if(!d){newGame();return;}audioInit();try{applySave(d);}catch(e){console.error(e);}FADE.a=1;FADE.dir=-1;sfxPage&&sfxPage(1);}
+/* save versioning: bump SAVE_VER whenever a change could break older saves, and add a step to MIGRATIONS */
+const SAVE_VER=2;
+const MIGRATIONS={
+  1:d=>{/* v1 -> v2: the Little Tin Lantern was removed */},
+};
+function migrateSave(d){d.sv=d.sv||1;while(d.sv<SAVE_VER){try{MIGRATIONS[d.sv]&&MIGRATIONS[d.sv](d);}catch(e){console.error('migrate',d.sv,e);}d.sv++;}
+  // always: drop anything that no longer exists in the game
+  d.bag=(d.bag||[]).filter(id=>ITEMS[id]);if(d.mats)for(const k in d.mats)if(!ITEMS[k])delete d.mats[k];
+  if(d.party)for(const who in d.party)for(const sl in d.party[who]){const id=d.party[who][sl];if(id&&!ITEMS[id])d.party[who][sl]=null;}
+  return d;}
+function safeSpot(){const ok=(f)=>{try{return f(lum.x,lum.y);}catch(e){return true;}};
+  if(SCENE==='garden'){if(!ok(gardenFree)){lum.x=0;lum.y=160;}}
+  else if(SCENE==='woods'){if(!ok(woodsFree)){lum.x=70;lum.y=630;}}
+  else if(SCENE==='dun'){if(!ok(dunFree)){const P={1:[560,650],2:[200,600],3:[290,560],4:[700,730],5:[700,740]}[DUN.room]||[560,650];lum.x=P[0];lum.y=P[1];}}
+  else if(SCENE==='vhut'){if(!ok(vhutFree)){lum.x=400;lum.y=735;}}
+  else{const f=roomFree();if(f&&!ok(f)){if(SCENE==='shop')enterShop();else if(SCENE==='bed')enterBedroom();else{SCENE='garden';lum.x=0;lum.y=160;}}}
+  cam.x=lum.x;cam.y=lum.y-50;WCAM.x=lum.x;}
+function continueGame(){const d=readSave();if(!d){newGame();return;}audioInit();migrateSave(d);
+  try{applySave(d);safeSpot();}catch(e){console.error(e);try{if(d.ch===1){SCENE='garden';lum.x=0;lum.y=160;cam.x=0;cam.y=110;}}catch(e2){}}FADE.a=1;FADE.dir=-1;sfxPage&&sfxPage(1);}
 function titleTap(x,y){if(CHSEL.on){chselTap(x,y);return;}for(const h of TITLE.hits)if(x>h.x&&x<h.x+h.w&&y>h.y&&y<h.y+h.h){
     if(h.id==='cont'){continueGame();return;}
     if(h.id==='new'){const pg=readProg();if((PLAYTEST||pg.prologue&&pg.prologue.done)){openChapterSelect();return;}if(readSave()&&performance.now()-TITLE.confirm>3500){TITLE.confirm=performance.now();sfxPage&&sfxPage(.6);return;}newGame();return;}}}
