@@ -2270,7 +2270,7 @@ function roadDist(x,y){let best=1e9;for(let i=0;i<ROAD.length-1;i++){const [ax,a
 function spurDist(x,y){let best=1e9;for(let i=0;i<SPUR.length-1;i++){const [ax,ay]=SPUR[i],[bx,by]=SPUR[i+1],dx=bx-ax,dy=by-ay,t=clamp(((x-ax)*dx+(y-ay)*dy)/(dx*dx+dy*dy),0,1),d=Math.hypot(x-ax-dx*t,y-ay-dy*t);if(d<best)best=d;}return best;}
 function woodsOpen(x,y){return roadDist(x,y)<88||spurDist(x,y)<44||(Math.abs(x-GATE.x+4)<52&&y>GATE.y-70&&y<CEM.y0+20)||(x>CEM.x0&&x<CEM.x1&&y>CEM.y0&&y<CEM.y1);}
 const WDOBST=[];
-function woodsFree(x,y){if(x<20||x>WOODS_W-30||y<200||y>WOODS_H-60)return false;if(!woodsOpen(x,y))return false;for(const o of WDOBST)if(((x-o.x)/o.rx)**2+((y-o.y)/o.ry)**2<1)return false;return true;}
+function woodsFree(x,y){if(x<20||x>WOODS_W-30||y<200||y>WOODS_H-60)return false;if(!woodsOpen(x,y))return false;for(const o of WDOBST)if(((x-o.x)/o.rx)**2+((y-o.y)/o.ry)**2<1)return false;if(x>HUT.x-235&&x<HUT.x+210&&y>HUT.y-330&&y<HUT.y+16)return false;return true;}
 function solveWoods(px,py,nx,ny){if(woodsFree(nx,ny))return [nx,ny];if(woodsFree(nx,py))return [nx,py];if(woodsFree(px,ny))return [px,ny];return [px,py];}
 function buildWoods(){if(woodsBuilt)return;woodsBuilt=true;let k=0;const h=(a,b)=>hash(a,b,4421);
   const BIRCH=['birch1','birch2','birch3'];
@@ -2297,7 +2297,7 @@ function buildWoods(){if(woodsBuilt)return;woodsBuilt=true;let k=0;const h=(a,b)
   const OPEN=[1,6,8];let gi=0;
   for(let row=0;row<3;row++)for(let col=0;col<4;col++){const x=CEM.x0+390+col*128+(row%2)*40,y=CEM.y0+90+row*140;const o={t:'grave',img:'grave10',x,y,s:.4,mound:OPEN.includes(gi)};gi++;WGRAVES.push(o);WOBJ.push(o);WDOBST.push({x,y:y-6,rx:32,ry:12});}
   // two towering obelisks keep watch over the graves
-  for(const [x,y,sc] of [[HUT.x-480,HUT.y-55,1.8],[CEM.x1-290,CEM.y1+140,1.8]]){const o={t:'grave',img:'grave6',x,y,s:sc,big:1};WOBJ.push(o);WDOBST.push({x,y:y-8,rx:44*sc/1.05,ry:18*sc/1.05});}
+  for(const [x,y,sc] of [[HUT.x-480,HUT.y-55,1.8]]){const o={t:'grave',img:'grave6',x,y,s:sc,big:1};WOBJ.push(o);WDOBST.push({x,y:y-8,rx:44*sc/1.05,ry:18*sc/1.05});}
   // dead trees around the graveyard
   // the graveyard's edge: the gate in the middle, a line of drained shrubs and old stones either side
   WOBJ.push({t:'gate',x:GATE.x,y:GATE.y});
