@@ -1883,7 +1883,7 @@ const shedH=y=>163+(clamp(y,590,730)-608)*.21;
 const SHINT=[],SHSLIMES=[];let shedChestOpen=false;let shedSpawned=false,shedVisited=false;
 function setupShed(){SHINT.length=0;{const [x,y]=sp_(560,1010);SHINT.push({x,y,reach:60,onInteract:()=>goScene(()=>enterGardenFromShed())});}const L=(sx,sy,reach,lines)=>{const [x,y]=sp_(sx,sy);let i=0;SHINT.push({x,y,reach,onInteract:()=>say(lines[(i++)%lines.length])});};
   L(400,870,70,["Shelves and shelves of seedlings. Some of them are glowing! Master Lum, what are you growing in here?","This little one has blue sparkly leaves. I'm calling it Sprout. Hi, Sprout."]);
-  {const [x,y]=sp_(290,930);SHINT.push({x,y,reach:70,onInteract:()=>{if(shedChestOpen){say("Empty now. Just a little dust and the smell of mint.");return;}if(!BAG.includes('shedkey')){say("Locked");return;}
+  {const [x,y]=sp_(290,930);SHINT.push({x,y,reach:70,grab:()=>!shedChestOpen&&BAG.includes('shedkey'),onInteract:()=>{if(shedChestOpen){say("Empty now. Just a little dust and the smell of mint.");return;}if(!BAG.includes('shedkey')){say("Locked");return;}
     talk([['Cosmic',"Click! The key fits!"],['Cosmic',"Boots! Green garden boots! They're exactly my size!"]],false,()=>{shedChestOpen=true;BAG.splice(BAG.indexOf('shedkey'),1);delete MATS.shedkey;giveItem('gboots');});}});}
   L(600,880,80,["A potting bench with a little brass scale, a trowel, and a seed packet that says 'DO NOT PLANT INDOORS'.","There's a spellbook on the bench, open to a page about growing moonmint. Someone's been taking notes in the margins."]);
   L(560,880,70,["A big sack of potting soil. It smells like rain and earthworms. Good earthworms."]);
@@ -3326,7 +3326,8 @@ function drawNearDots(){if(nearA<=0||DLG.active)return;let sx,sy;const hy=lum.y-
   ctx.fillStyle='rgba(60,50,30,.18)';ctx.beginPath();ctx.ellipse(bx+1,by+3,25,17,0,0,TAU);ctx.fill();
   ctx.fillStyle='#fffdf6';ctx.strokeStyle='rgba(60,50,40,.45)';ctx.lineWidth=1.6;ctx.beginPath();ctx.ellipse(bx,by,24,16,0,0,TAU);ctx.fill();ctx.stroke();
   ctx.beginPath();ctx.moveTo(bx-8,by+13);ctx.lineTo(bx-13,by+24);ctx.lineTo(bx-1,by+14);ctx.fill();
-  if(NEAR&&NEAR.fire&&canLumMix())drawMortar(ctx,bx,by+1,.95);
+  if(isGrab(NEAR))drawGrabHand(ctx,bx,by);
+  else if(NEAR&&NEAR.fire&&canLumMix())drawMortar(ctx,bx,by+1,.95);
   else if(isDoor(NEAR)){const dw=11,dh=19,dx=bx-dw/2,dyb=by+dh/2-1,ope=.5+.5*Math.sin(T*3);
     ctx.fillStyle='#2a2622';ctx.beginPath();ctx.moveTo(dx,dyb);ctx.lineTo(dx,dyb-dh+dw/2);ctx.arc(bx,dyb-dh+dw/2,dw/2,Math.PI,0);ctx.lineTo(dx+dw,dyb);ctx.closePath();ctx.fill();
     ctx.strokeStyle='rgba(255,253,246,.28)';ctx.lineWidth=.9;ctx.beginPath();ctx.moveTo(bx-1.8,dyb-1);ctx.lineTo(bx-1.8,dyb-dh+4);ctx.moveTo(bx+1.8,dyb-1);ctx.lineTo(bx+1.8,dyb-dh+4);ctx.stroke();
@@ -3334,6 +3335,15 @@ function drawNearDots(){if(nearA<=0||DLG.active)return;let sx,sy;const hy=lum.y-
     ctx.fillStyle='#2a2622';ctx.fillRect(dx-2,dyb-.4,dw+4,1.6);}
   else{ctx.fillStyle='#2a2622';for(let i=-1;i<=1;i++){const j=Math.max(0,Math.sin(T*5-i*.9))*2.2;ctx.beginPath();ctx.arc(bx+i*8,by-j,2.8,0,TAU);ctx.fill();}}
   ctx.restore();}
+function isGrab(o){if(!o)return false;if(o.grab)return o.grab();if(o.forage)return CH>0&&!o.forage.picked;return !!o.bucket||(!!o.cloth&&!shroudTaken);}
+function drawGrabHand(c,x,y){c.save();c.translate(x,y+1);c.fillStyle='#2a2622';c.lineJoin='round';
+  // palm
+  c.beginPath();c.moveTo(-7,1);c.quadraticCurveTo(-8,9,-2,10);c.lineTo(4,10);c.quadraticCurveTo(9,9,8,2);c.lineTo(8,-2);c.lineTo(-7,-2);c.closePath();c.fill();
+  // four fingers curling down to grab
+  for(let i=0;i<4;i++){const fx=-6+i*4.1,h=[6,8,8,6][i],g=Math.max(0,Math.sin(T*4))*1.5;c.beginPath();c.roundRect?c.roundRect(fx-1.7,-2-h+g,3.4,h+2,1.7):c.rect(fx-1.7,-2-h+g,3.4,h+2);c.fill();}
+  // thumb
+  c.beginPath();c.moveTo(-6,3);c.quadraticCurveTo(-12,1,-11,-4);c.quadraticCurveTo(-10,-6,-8,-4);c.quadraticCurveTo(-8,0,-5,0);c.closePath();c.fill();
+  c.restore();}
 function isDoor(o){if(!o||!o.onInteract)return false;if(CH>0&&o._noDoorC1===undefined)o._noDoorC1=/wellInteract|pondInteract/.test(o.onInteract.toString());if(CH>0&&o._noDoorC1)return false;if(o._door===undefined){let src=o.onInteract.toString();if(/^\(\)=>[A-Za-z]+\(/.test(src)||/^[A-Za-z]+$/.test(src)){}o._door=o.door??/goScene|tryEnterShop|wellInteract|pondInteract|Leave the underwater/.test(src);}return o._door;}
 function drawBtn(b,x,col,label){
   const s=1-.08*(b.down?1:0)+.06*b.pulse;ctx.save();ctx.translate(x,b.y);ctx.scale(s,s);ctx.globalAlpha=(b.down?.78:.5)*UI_FADE;
