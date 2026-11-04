@@ -3475,7 +3475,7 @@ function drawUI_(){drawHints();
   const A=BTN.a,B=BTN.b,ax=A.x+(A.shake?Math.sin(A.shake*60)*3:0);
   drawBtn(A,ax,['#d4f3ff','#3aa3e8','#1d4f9a'],'');drawNearDots();
   if(lum.cool>0){ctx.fillStyle='rgba(10,30,60,.22)';ctx.beginPath();ctx.moveTo(ax,A.y);ctx.arc(ax,A.y,A.r,-Math.PI/2,-Math.PI/2+TAU*lum.cool/COOL);ctx.closePath();ctx.fill();}
-  ctx.globalAlpha=.8;ctx.font='700 9px "Alegreya SC", Georgia, serif';ctx.textAlign='center';ctx.lineWidth=3;ctx.strokeStyle='rgba(40,70,35,.5)';ctx.fillStyle='#fff';
+  ctx.globalAlpha=.8*UI_FADE;ctx.font='700 9px "Alegreya SC", Georgia, serif';ctx.textAlign='center';ctx.lineWidth=3;ctx.strokeStyle='rgba(40,70,35,.5)';ctx.fillStyle='#fff';
   for(const [t,x,y] of [[PC==='cosmic'?'SPELL':CH>0?'POWDER':'WATER',A.x,A.y+A.r+13]]){ctx.strokeText(t,x,y);ctx.fillText(t,x,y);}ctx.globalAlpha=1;
   drawSay();
   if(battleFlash>0){ctx.fillStyle=`rgba(255,255,255,${(battleFlash*.6).toFixed(3)})`;ctx.fillRect(0,0,W,H);}
