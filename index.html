@@ -2885,7 +2885,7 @@ function drawBattleC1Foe(f){const S=bS(),B=BATTLE,x=f.x+f.ox,y=f.y+f.oy,sh=f.typ
   ctx.fillStyle=`rgba(10,10,20,${(.32*al).toFixed(3)})`;ctx.beginPath();ctx.ellipse(x,y-2,H_*(sh==='wisp'?.32:.22),H_*.05,0,0,TAU);ctx.fill();
   const [an,fi]=c1FoeFrame(f);let yy=y;if(sh==='wisp')yy-=12*S+Math.sin(T*2.2+f.ph)*5*S;if(sh==='rskel')yy-=10*S+Math.sin(T*1.8+f.ph)*5*S;if(sh==='bat'){yy-=70*S+Math.sin(T*3+f.ph)*8*S;if(f.dead)yy+=Math.min(1,f.dead/.8)*70*S;}
   ctx.save();if(sh==='reaper'&&f.dead){const u=Math.min(1,f.dead/1.4);ctx.translate(0,u*30*S);ctx.globalAlpha=1-u*.6;}
-  c1Frame(ctx,__s,an,fi,x+(f.hit>0?Math.sin(f.hit*50)*4:0),yy,H_,sh==='wisp',al,f.hit);ctx.restore();
+  c1Frame(ctx,__s,an,fi,x+(f.hit>0?Math.sin(f.hit*50)*4:0),yy,H_,sh==='wisp'||sh==='spider',al,f.hit);ctx.restore();
   if(sh==='reaper'&&f.dead){ctx.save();ctx.globalCompositeOperation='lighter';for(let k=0;k<10;k++){const u=(f.dead*.8+k*.1)%1;drawGlow(ctx,x+Math.sin(k*2.1+f.dead*3)*40*S,y-u*180*S,(10-u*8)*S,'190,140,255',.6*(1-u)*al);}ctx.restore();}
   if(sh==='reaper'&&!f.dead){ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,x-30*S,y-H_*.82,(f.charged?40:20)*S,f.charged?'190,120,255':'210,240,210',.35+.15*Math.sin(T*5));ctx.restore();}
   if(f.weak>0&&!f.dead){ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,x,y-H_*.5,H_*.4,'150,220,110',.18);ctx.restore();}
