@@ -2372,7 +2372,7 @@ function drawHollow(o){const im=IMG.hollow;if(!ready(im))return;const k=HOLLOW.s
   // cold air breathing out of the hollow
   ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,o.x,o.y-50,40,'150,180,220',.08+.05*Math.sin(T*1.3));ctx.restore();}
 function hollowInteract(){if(PC==='cosmic'){say("A hollow in the old oak. Cold air is breathing out of it… nope. Not tonight.");return;}
-  if(!C1.hollowSeen){C1.hollowSeen=1;talk([['Lum',"A hollow in the old oak… and it goes down. Deep down."],['Lum',"Cosmic? Are you down there?"],['Lum',"…No answer. But he's just the sort to go exploring somewhere like this. I'd better look."]],false,()=>goScene(()=>enterDun(1,560,650,1)));return;}
+  if(!C1.hollowSeen){C1.hollowSeen=1;talk([['Lum',"A hollow in the old oak… and it goes deep down..."],['Lum',"Cosmic? Are you down there?"]],false,()=>goScene(()=>enterDun(1,560,650,1)));return;}
   goScene(()=>enterDun(1,560,650,1));}
 function drawHut(o){const im=IMG.hut;if(!ready(im))return;const k=HUT.k,w=im.naturalWidth*k,h=im.naturalHeight*k,x=o.x-429*k,y=o.y-880*k;ctx.save();ctx.translate(o.x,0);ctx.scale(-1,1);ctx.translate(-o.x,0);ctx.drawImage(im,x,y,w,h);
   ctx.save();ctx.globalCompositeOperation='lighter';const f=.8+.12*Math.sin(T*6)+.08*Math.sin(T*11);drawGlow(ctx,x+134*k,y+560*k,40,'255,190,110',.5*f);drawGlow(ctx,x+134*k,y+560*k,10,'255,230,170',.8*f);drawGlow(ctx,x+690*k,y+560*k,26,'255,200,120',.18*f);
@@ -2813,10 +2813,10 @@ function buildBoots(){BOOTS=[];const P=[...ROAD.filter(p=>p[0]<2000),...SPUR,[20
 function drawBoots(x0,x1){if(!BOOTS)buildBoots();ctx.fillStyle='rgba(70,48,28,.55)';for(const [x,y,a,k] of BOOTS){if(x<x0-20||x>x1+20)continue;ctx.save();ctx.translate(x,y);ctx.rotate(a);ctx.beginPath();ctx.ellipse(0,0,6.5,3.2,0,0,TAU);ctx.fill();ctx.beginPath();ctx.ellipse(-7,0,3,2.6,0,0,TAU);ctx.fill();ctx.restore();}}
 const HUTDOOR={get x(){return HUT.x-(359-429)*HUT.k},get y(){return HUT.y+18}};
 function enterWoodsC1(){buildWoods();buildWoodsC1();SCENE='woods';lum.x=70;lum.y=630;lum.face=1;lum.vx=lum.vy=0;lum.state='idle';cam.x=lum.x+120;cam.y=lum.y-50;WTITLE.t=0;
-  if(!C1.woodsSeen){C1.woodsSeen=1;setTimeout(()=>talk([['Lum',"The Whispering Wood… I haven't set foot out here in years."],['Lum',"The air feels wrong. Heavy. Like the woods are holding their breath."]]),4700);}}
+  if(!C1.woodsSeen){C1.woodsSeen=1;setTimeout(()=>talk([['Lum',"I haven't set foot out here in aeons…"]]),4700);}}
 function updateWoodsC1(){if(DLG.active||WEVENT.on||FADE.dir||BATTLE.on)return;
-  if(!C1.tracksSeen&&lum.x>230){C1.tracksSeen=1;talk([['Lum',"Muddy boot prints… small ones."],['Lum',"These are Cosmic's boots. I'd know those scuffed heels anywhere."],['Lum',"What were you doing all the way out here, you silly boy?"]]);GOAL.tag='TASK';GOAL.text="Follow Cosmic's tracks";HINT.goalT=0;}
-  if(!C1.cemSeen&&lum.y>GATE.y+40){C1.cemSeen=1;talk([['Lum',"The graves… they've been torn open from the inside."],['Lum',"And the tracks lead right through the middle of it all. What happened here last night?"]]);GOAL.tag='TASK';GOAL.text='Search the graveyard';HINT.goalT=0;}
+  if(!C1.tracksSeen&&lum.x>230){C1.tracksSeen=1;talk([['Lum',"Muddy tracks…"],['Lum',"What were you doing all the way out here, Cosmic?"]]);GOAL.tag='TASK';GOAL.text="Follow Cosmic's tracks";HINT.goalT=0;}
+  if(!C1.cemSeen&&lum.y>GATE.y+40){C1.cemSeen=1;talk([['Lum',"The tracks lead right here…"],['Lum',"What happened here last night?"]]);GOAL.tag='TASK';GOAL.text='Search the graveyard';HINT.goalT=0;}
   if(lum.x>2560&&!BAG.includes('lantern')){lum.x=2530;lum.vx=0;talk([['Lum',"The road ahead disappears into the dark of Stranglethorn Forest."],['Lum',"I can't see a thing past those first trees. I'll need a stronger light than this."]]);return;}
   if(lum.x>2560&&!C1.endSeen){C1.endSeen=1;talk([['Lum',"The road leads east… into Stranglethorn Forest."],['Lum',"Hold on, Cosmic. I'm coming."]],false,()=>{C1.endCard=.001;});}}
 function hutDoorC1(){if(C1.vane>=2){if(VANE)return;goScene(enterVHut);return;}
