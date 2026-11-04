@@ -2273,7 +2273,7 @@ const WEV={mid:0,circle:0,cem:0,back:0,end:0};
 function roadDist(x,y){let best=1e9;for(let i=0;i<ROAD.length-1;i++){const [ax,ay]=ROAD[i],[bx,by]=ROAD[i+1],dx=bx-ax,dy=by-ay,t=clamp(((x-ax)*dx+(y-ay)*dy)/(dx*dx+dy*dy),0,1),d=Math.hypot(x-ax-dx*t,y-ay-dy*t);if(d<best)best=d;}return best;}
 function spurDist(x,y){let best=1e9;for(let i=0;i<SPUR.length-1;i++){const [ax,ay]=SPUR[i],[bx,by]=SPUR[i+1],dx=bx-ax,dy=by-ay,t=clamp(((x-ax)*dx+(y-ay)*dy)/(dx*dx+dy*dy),0,1),d=Math.hypot(x-ax-dx*t,y-ay-dy*t);if(d<best)best=d;}return best;}
 const hollowPathX=y=>1990+Math.sin((y-CLEAR.y)/(640-CLEAR.y)*Math.PI*2.2)*60;
-function nearHollow(x,y){return (x>1600&&x<2420&&y>CLEAR.y-60&&y<570)||(((x-CLEAR.x)/(CLEAR.rx+260))**2+((y-CLEAR.y-80)/(CLEAR.ry+190))**2<1)||(y>CLEAR.y&&y<560&&Math.abs(x-hollowPathX(y))<270);}
+function nearHollow(x,y){return (x>1700&&x<2320&&y>CLEAR.y-60&&y<560)||((x-CLEAR.x)/250)**2+((y-CLEAR.y)/120)**2<1||false&&(((x-CLEAR.x)/(CLEAR.rx+260))**2+((y-CLEAR.y-80)/(CLEAR.ry+190))**2<1)||(y>CLEAR.y&&y<560&&Math.abs(x-hollowPathX(y))<270);}
 function woodsOpen(x,y){return roadDist(x,y)<88||(((x-CLEAR.x)/CLEAR.rx)**2+((y-CLEAR.y)/CLEAR.ry)**2<1&&y>HOLLOW.y+12)||(x>1720&&x<2300&&y>HOLLOW.y+12&&y<640)||spurDist(x,y)<44||(Math.abs(x-GATE.x+4)<52&&y>GATE.y-70&&y<CEM.y0+20)||(x>CEM.x0&&x<CEM.x1&&y>CEM.y0&&y<CEM.y1);}
 const WDOBST=[];
 function woodsFree(x,y){if(x<20||x>WOODS_W-30||y<WTOP+60||y>WOODS_H-60)return false;if(!woodsOpen(x,y))return false;for(const o of WDOBST)if(((x-o.x)/o.rx)**2+((y-o.y)/o.ry)**2<1)return false;if(x>HUT.x-235&&x<HUT.x+210&&y>HUT.y-330&&y<HUT.y+16)return false;return true;}
@@ -2308,12 +2308,18 @@ function buildWoods(){if(woodsBuilt)return;woodsBuilt=true;let k=0;const h=(a,b)
   // the graveyard's edge: the gate in the middle, a line of drained shrubs and old stones either side
   WOBJ.push({t:'gate',x:GATE.x,y:GATE.y});
   // the gravekeeper's hut, tucked in the west corner
+  {let q=0;for(let y=-170;y<=500;y+=95)for(const [x0,sd] of [[1560,-1],[2470,1]]){q++;const x=x0+sd*(h(q,31)*40),r=h(q,32)*.7;
+    if(r<.55){const img=BIRCH[(h(q,33)*3)|0],es=(.6+h(q,34)*.3)*(img==='birch1'?1:1.3);WOBJ.push({t:'birch',img,x,y:y+h(q,35)*30,s:es,flip:sd>0,ph:h(q,36)*TAU});}
+    else WOBJ.push({t:'willow',x,y:y+h(q,35)*30,s:.5+h(q,34)*.18,flip:sd<0,ph:h(q,36)*TAU});
+    const i=(h(q,37)*SHR.length)|0;WOBJ.push({t:'shrub',k:i,x:x-sd*120,y:y+50,s:SHR[i].s*.7,flip:h(q,38)<.5,ph:h(q,39)*TAU});}}
+  WFORAGE.length=0;for(const [x,y,i] of [[1930,300,6],[2120,60,0],[2190,430,4]]){WOBJ.push({t:'shrub',k:i,x,y,s:SHR[i].s*.85,flip:x>2000,ph:x*.01});WDOBST.push({x,y:y-4,rx:34,ry:12});WFORAGE.push({x,y,id:FORAGE_MAP[i],n:2,picked:0});}
   WOBJ.push({t:'hollow',x:HOLLOW.x,y:HOLLOW.y});WDOBST.push({x:HOLLOW.x+10,y:HOLLOW.y,rx:170,ry:26});
   WOBJ.push({t:'hut',x:HUT.x,y:HUT.y});WDOBST.push({x:HUT.x-20,y:HUT.y-34,rx:190,ry:52});for(const [dx,rx] of [[-78,16],[70,18],[-150,70],[140,70]])WDOBST.push({x:GATE.x+dx,y:GATE.y-(dx>0?8:0),rx,ry:14});
   for(let x=CEM.x0-60;x<=CEM.x1+60;x+=52){if(Math.abs(x-GATE.x)<235)continue;k++;const y=GATE.y+4+(h(k,1)-.5)*16;if(h(k,2)<.55){const i=(h(k,3)*10)|0;WOBJ.push({t:'shrub',img:'drained'+i,ax:DRN[i].ax,drips:[],x,y,s:.4+h(k,4)*.12,flip:h(k,5)<.5,ph:h(k,6)*TAU,drained:1,soaked:0});}else WOBJ.push({t:'img',img:['rock1','rock2','rock3','rock4'][(h(k,3)*4)|0],x,y,ax:.5,ay:.72,s:.45+h(k,4)*.3,shadow:1,flip:h(k,5)<.5});}
   for(const [x,y] of [[CEM.x0-90,CEM.y1+130],[CEM.x1+80,CEM.y1+110]]){k++;WOBJ.push({t:'willow',x,y,s:.6,flip:h(k,1)<.5,ph:h(k,2)*TAU,dead:1});}
   WINTS.length=0;
   WINTS.push({x:HOLLOW.x,y:HOLLOW.y+28,reach:62,door:true,onInteract:hollowInteract});
+  for(const f of WFORAGE)WINTS.push({x:f.x,y:f.y,reach:76,lum:true,forage:f,onInteract:()=>{if(CH>0)pickForage(f);else say("Berries! Master Lum would love these… but not tonight.");}});
   WINTS.push({x:HUT.x-(359-429)*HUT.k,y:HUT.y+18,reach:70,door:true,onInteract:()=>CH===1?hutDoorC1():say(["The gravekeeper's hut. The door's locked tight, and there's a rune glowing on it.","A lantern's still burning in there... but nobody answers when I knock."][(sayCount++)%2])});
   for(const g of WGRAVES)WINTS.push({x:g.x,y:g.y+18,reach:55,onInteract:()=>say(["The names on this grave are worn away. Just a little carved star, and the date... it's so old.","Someone left a dried flower here. A long, long time ago."][(sayCount++)%2])});}
 function enterWoods(){buildWoods();SCENE='woods';lum.x=70;lum.y=630;lum.face=1;lum.vx=lum.vy=0;lum.state='idle';cam.x=lum.x+120;cam.y=lum.y-50;WTITLE.t=0;
@@ -2324,8 +2330,6 @@ function updateWoods(dt){if(DLG.active||WEVENT.on||FADE.dir)return;
   
   if(lum.y>GATE.y+40&&!WEV.cem){WEV.cem=1;WEVENT.on=true;sfxEerie();talk([['Cosmic',"I should turn back…"],['???',"Step forward, child. This is where you prove your worth to me."],['???',"Destroy everything."]],false,()=>{WEVENT.on=false;spawnSkels();setTimeout(()=>talk([['Cosmic',"The graves are opening… Skeletons!"],['Cosmic',"You have the blade. You can do this."]]),2600);});}}
 function drawHollow(o){const im=IMG.hollow;if(!ready(im))return;const k=HOLLOW.s;
-  // a worn little trail from the road up to the old oak
-  ctx.save();ctx.fillStyle='rgba(92,70,46,.28)';for(let i=0;i<16;i++){const t=i/15,y=610+(HOLLOW.y+50-610)*t,x=y>CLEAR.y?hollowPathX(y):HOLLOW.x+(hollowPathX(CLEAR.y)-HOLLOW.x)*(y-HOLLOW.y-50)/(CLEAR.y-HOLLOW.y-50);ctx.beginPath();ctx.ellipse(x,y,40-t*10,14,0,0,TAU);ctx.fill();}ctx.restore();
   ctx.drawImage(im,o.x-HOLLOW.ix*k,o.y-HOLLOW.iy*k,im.naturalWidth*k,im.naturalHeight*k);
   // cold air breathing out of the hollow
   ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,o.x,o.y-50,40,'150,180,220',.08+.05*Math.sin(T*1.3));ctx.restore();}
@@ -2371,7 +2375,7 @@ function drawWoods(){const vw=W/zoom,vh=H/zoom,x0=cam.x-vw/2-40,y0=cam.y-vh/2-40
   // drifting ground mist
   ctx.save();ctx.globalCompositeOperation='lighter';for(const m of WMIST){const x=m.x+Math.sin(T*.1*m.sp/10+m.ph)*60;drawGlow(ctx,x,m.y,m.r,'150,160,190',.08+.04*Math.sin(T*.5+m.ph));}ctx.restore();
   ctx.setTransform(DPR,0,0,DPR,0,0);
-  if(CH===1){if(!CAPTURE.on)drawNightShade(lum.x,lum.y,.2);drawC1EndCard();}else{drawNightShade(lum.x,lum.y,.74);drawRain(1/60);drawStorm();}
+  if(CH===1){drawForage(WFORAGE);if(!CAPTURE.on)drawNightShade(lum.x,lum.y,.2);drawC1EndCard();}else{drawNightShade(lum.x,lum.y,.74);drawRain(1/60);drawStorm();}
   const vg=ctx.createRadialGradient(W/2,H*.45,Math.min(W,H)*.3,W/2,H*.45,Math.max(W,H)*.75);vg.addColorStop(0,'rgba(5,6,18,0)');vg.addColorStop(1,'rgba(5,6,18,.55)');ctx.fillStyle=vg;ctx.fillRect(0,0,W,H);
   if(WEV.flash>0){ctx.fillStyle=`rgba(255,235,240,${Math.min(1,WEV.flash).toFixed(3)})`;ctx.fillRect(0,0,W,H);}
   if(WEV.quake){ctx.fillStyle=`rgba(120,10,30,${(.12+.08*Math.sin(T*6)).toFixed(3)})`;ctx.fillRect(0,0,W,H);}
@@ -3005,7 +3009,7 @@ function drawC1IntroUI(){if(C1I.evil>0){const a=C1I.evil;ctx.save();const g=ctx.
 
 /* ---------- foraging in Lum's garden ---------- */
 const FORAGE_MAP={6:'duskberry',0:'dewberry',4:'emberberry'};
-const FORAGE=[];let forageBuilt=false;
+const FORAGE=[],WFORAGE=[];let forageBuilt=false;
 const LUMSHR=["Dewleaf. Its berries hold the morning's chill.","Sighbush. Cosmic swears it says hello to him. It's never said a word to me.","Cloudtier blossoms. Dried, they make a powder lighter than air.","Silvermint. One leaf in the kettle and the whole shop smells like spring.","Emberberries, warm as a hearth.","Heartvine. Cosmic keeps trying to make me a friendship charm from it.","Duskberries. They ripen best after a stormy night.","Starjuniper. Blue berries for seeing in the dark, red ones for courage.","Sugarplum spruce. Someone's been nibbling the pink berries again. I know who.","Lanternpine. Cosmic's favorite. He says the berries glow like tiny lanterns.","Whisperbranch. I promised Cosmic a wand from these twigs someday.","Rubyclover. It stains everything. Especially apprentices' sleeves."];
 const LUMHERB={lavender:"Lavender, for calm sleep. I could use some after last night.",rosemary:"Rosemary, for remembering. If only it helped me remember why that cut felt so familiar.",sage:"Silver sage. It smells like rain and old books.",mint:"Moonmint.",magic:"Bellglow blossoms. Pick one and its light goes out, so I never do."};
 function buildForage(){if(forageBuilt)return;forageBuilt=true;
@@ -3021,8 +3025,8 @@ function pickForage(f){if(f.picked){say(["I've picked this one clean. More will 
   f.picked=1;MATS[f.id]=(MATS[f.id]||0)+f.n;if(!BAG.includes(f.id))BAG.push(f.id);TOAST.t=0;TOAST.name=`${ITEMS[f.id].name} ×${f.n}`;TOAST.id=f.id;MENU.newItems++;sfxItem&&sfxItem();if(typeof SAVEC!=='undefined')SAVEC.t=99;
   for(let i=0;i<10;i++)PARTS.push({type:'fdust',x:f.x+rnd(-24,24),y:f.y,z:rnd(20,70),vx:rnd(-10,10),vy:rnd(-4,4),vz:rnd(10,30),life:0,max:rnd(.5,1),s:rnd(1,2),col:'255,240,190'});
   if(!C1.forageTip){C1.forageTip=1;talk([['Lum',FORAGE_LINE[f.id]],['Lum',"Lum's Magic Mixing needs nothing but a little heat. Any fire will do."]]);}else say(FORAGE_LINE[f.id]);}
-function drawForage(){if(CH<1||C1I.on)return;ctx.save();ctx.globalCompositeOperation='lighter';
-  for(const f of FORAGE){if(f.picked)continue;if(Math.abs(f.x-cam.x)>W/zoom/2+60||Math.abs(f.y-cam.y)>H/zoom/2+120)continue;
+function drawForage(list=FORAGE){if(CH<1||C1I.on)return;ctx.save();ctx.globalCompositeOperation='lighter';
+  for(const f of list){if(f.picked)continue;if(Math.abs(f.x-cam.x)>W/zoom/2+60||Math.abs(f.y-cam.y)>H/zoom/2+120)continue;
     for(let i=0;i<3;i++){const ph=T*1.6+i*2.1+f.x*.01,a=Math.max(0,Math.sin(ph));const gx=f.x+Math.cos(i*2.3+f.y)*(f.herb?26:22),gy=f.y-(f.herb?10:30)-Math.sin(i*1.7+f.x)*14;drawGlow(ctx,gx,gy,16,'255,226,140',.8*a);ctx.save();ctx.globalCompositeOperation='source-over';ctx.globalAlpha=a;ctx.fillStyle='#fffbe6';const r=7*a+2;ctx.beginPath();ctx.moveTo(gx,gy-r);ctx.quadraticCurveTo(gx,gy,gx+r,gy);ctx.quadraticCurveTo(gx,gy,gx,gy+r);ctx.quadraticCurveTo(gx,gy,gx-r,gy);ctx.quadraticCurveTo(gx,gy,gx,gy-r);ctx.fill();ctx.restore();}}
   ctx.restore();}
 
@@ -3156,7 +3160,7 @@ function update(dt){
   audioUpdate(dt);updateFade(dt);
   if(INTRO.on)updateIntro(dt);
   if(DLG.active&&DLG.withCosmic&&!cos.hidden){const s_=Math.sign(cos.x-lum.x)||1;if(lum.state==='idle'||lum.state==='idleUp'){lum.face=s_;if(lum.state==='idleUp')lum.state='idle';}if(cos.state==='idle')cos.face=-s_;}else INTRO.ui=Math.min(1,INTRO.ui+dt*1.5);
-  if(SCENE!==c1LastScene){if(SCENE==='garden'&&CH===1&&!C1I.on)resetForage();c1LastScene=SCENE;}
+  if(SCENE!==c1LastScene){if(SCENE==='garden'&&CH===1&&!C1I.on)resetForage();if(SCENE==='woods')for(const f of WFORAGE)f.picked=0;c1LastScene=SCENE;}
   {const P=CH>0&&DLG.active?(SCENE==='vhut'?VHVANE:SCENE==='woods'&&VANE?VANE:null):null;lum.talkSide=!!P&&(lum.state==='idle'||lum.state==='idleUp');if(lum.talkSide){lum.face=P.x<lum.x?-1:1;lum.state='idle';}}
   if(C1I.on)updateC1Intro(dt);
 }
