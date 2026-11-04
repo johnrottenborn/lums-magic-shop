@@ -2935,7 +2935,7 @@ function drawMix(){if(!MIX.on)return;MIX.hits=[];const dt=1/60;MIX.flash=Math.ma
    ===================================================================== */
 const C1I={on:false,t:0,st:0,w:0,evil:0,leafT:0,skipHit:null};
 function c1Talk(lines,next){talk(lines,false,()=>{C1I.st=next;C1I.w=0;});C1I.st=-1;}
-function c1IntroStart(){C1I.on=true;C1I.t=0;C1I.st=0;C1I.w=0;C1I.evil=0;C1I.leafT=0;WEVENT.on=true;SCENE='garden';
+function c1IntroStart(){C1I.on=true;C1I.titled=0;C1I.t=0;C1I.st=0;C1I.w=0;C1I.evil=0;C1I.leafT=0;WEVENT.on=true;SCENE='garden';
   lum.x=0;lum.y=4;lum.face=1;lum.state='idle';lum.vx=lum.vy=0;lum.alpha=0;INTRO.ui=0;HINT.goalT=99;GOAL.tag='';GOAL.text='';
   const vh=H/zoom;cam.x=20;cam.y=1700-vh/2;resetForage();}
 function c1Walk(tx,ty,sp,dt){const dx=tx-lum.x,dy=ty-lum.y,d=Math.hypot(dx,dy);if(d<3){lum.x=tx;lum.y=ty;return true;}const m=Math.min(d,sp*dt);lum.x+=dx/d*m;lum.y+=dy/d*m;
@@ -2948,7 +2948,7 @@ function updateC1Intro(dt){C1I.t+=dt;C1I.w+=dt;INTRO.ui=0;C1I.evil=Math.max(0,C1
   switch(C1I.st){
     case 0:{// the camera climbs the path to the shop
       const bot=1700-vh/2,end=clamp(14,top,1700-vh/2),k=ease((C1I.t-.8)/6.2);cam.x=20;cam.y=bot+(end-bot)*k;
-      if(C1I.t>1&&!C1.title)C1.title=.001;
+      if(C1I.t>1&&!C1I.titled){C1I.titled=1;C1.title=.001;}
       if(C1I.t>7.4){C1I.st=1;C1I.w=0;sfxPage&&sfxPage(.8);for(let i=0;i<14;i++)PARTS.push({type:'fdust',x:rnd(-22,22),y:6,z:rnd(10,110),vx:rnd(-8,8),vy:rnd(-2,4),vz:-rnd(4,16),life:0,max:rnd(.6,1.3),s:rnd(1,2),col:'255,226,170'});}break;}
     case 1:{lum.alpha=Math.min(1,C1I.w*3);if(c1Walk(0,70,70,dt)){c1Idle();lum.face=1;c1Talk([['Lum',"Good morning, Cosmic!"]],2);}break;}
     case 2:{c1Idle();if(C1I.w>1.6){C1I.st=3;C1I.w=0;}break;}
