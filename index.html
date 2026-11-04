@@ -1183,7 +1183,6 @@ const ITEMS={
   lumrobe:{name:"Starry Shop Cape",slot:'chest',stats:{def:1},desc:"Lum's favorite cape, dusted with embroidered moons and stars. She claims it's just for keeping warm."},
   foxboots:{name:'Vixenstep Boots',slot:'boots',stats:{def:1,spd:2},desc:"Light as a fox's step, dropped by the Elder Vixen in the watching dark. +1 DEF, +2 SPD."},
   crystalpouch:{name:'Crystal Powder Pouch',slot:'main',stats:{atk:2,mag:1},desc:"A pouch stitched with tiny crystals, found in a cobwebbed chest beneath the old oak. Powders thrown from it sting a little more. +2 ATK, +1 MAG."},
-  smalllantern:{name:'Little Tin Lantern',slot:'off',stats:{def:1},desc:"A small tin lantern from Vane's hut. Held in the off hand, it lights a little circle around you in dark places. +1 DEF."},
   vanecharm:{name:"Cross Necklace",slot:'charm',stats:{def:1,mag:1},desc:"Worn wooden beads and a little carved cross, polished smooth by years of thumbs. Someone must be missing it. +1 DEF, +1 MAG."},
   lantern:{name:"Gravekeeper's Lantern",kind:'key',desc:"Vane's old lantern. It has never once gone out. It will light the dark paths ahead."},
   duskberry:{name:'Duskberries',kind:'mat',desc:"Dark, sweet berries from Lum's garden. With a little heat they become a Healing Potion."},
@@ -1247,7 +1246,7 @@ function drawBucketHat(c,fr){const im=IMG.bucket_worn;if(!ready(im))return;const
   c.drawImage(im,-w/2,-h+3,w,h);
   c.restore();}
 /* little painted icons for the book */
-const IMGICON={foxboots:'icon4_boots_fur',vanecharm:'icon2_cross_wood',shedkey:'icon2_key_gold',crystalpouch:'icon_pouch_crystal',smalllantern:'tool_lantern_ornate',lantern:'tool_lantern',duskberry:'ing_duskberry',dewberry:'ing_dewberry',emberberry:'ing_emberberry',moonleaf:'ing_leavesB5',slimeparts:'ing_slime',boneparts:'ing_bones',thornsprig:'ing_twig',potion:'icon_potion',lumpouch:'icon_pouch_seal',lumrobe:'icon_cape_stars',mooncharm:'acc_moon_necklace',moonmint:'acc_moonstone_ring',duskflower:'acc_heart_ring'};
+const IMGICON={foxboots:'icon4_boots_fur',vanecharm:'icon2_cross_wood',shedkey:'icon2_key_gold',crystalpouch:'icon_pouch_crystal',lantern:'tool_lantern',duskberry:'ing_duskberry',dewberry:'ing_dewberry',emberberry:'ing_emberberry',moonleaf:'ing_leavesB5',slimeparts:'ing_slime',boneparts:'ing_bones',thornsprig:'ing_twig',potion:'icon_potion',lumpouch:'icon_pouch_seal',lumrobe:'icon_cape_stars',mooncharm:'acc_moon_necklace',moonmint:'acc_moonstone_ring',duskflower:'acc_heart_ring'};
 function drawIcon(c,id,x,y,s,ghost){c.save();c.translate(x,y);const G=ghost?'rgba(110,84,52,.22)':null;c.lineJoin='round';c.lineCap='round';
   if(!G&&IMGICON[id]&&ready(IMG[IMGICON[id]])){const im=IMG[IMGICON[id]],h=s*1.15,w=h*im.naturalWidth/im.naturalHeight,sc=Math.min(1,s*1.15/w);c.drawImage(im,-w*sc/2,-h*sc/2,w*sc,h*sc);c.restore();return;}
   if(id==='lantern'){c.strokeStyle='#3a2a18';c.lineWidth=s*.05;c.fillStyle=G||'#5a4428';c.beginPath();c.arc(0,-s*.38,s*.09,Math.PI,0);c.stroke();c.fillRect(-s*.2,-s*.32,s*.4,s*.08);c.fillRect(-s*.18,s*.3,s*.36,s*.08);
@@ -2846,14 +2845,13 @@ function vaneScene(){talk([
     C1.vane=2;C1.charmQ=1;if(PARTY.lum.charm==='vanecharm'||BAG.includes('vanecharm')){vaneNotice(vaneWalkIn);return;}
     talk([['Vane',"Maybe we can help each other out.. I seem to have lost my necklace."],
       ['Vane',"I think my fox friend ran off with it…"],
-      ['Vane',"It's an heirloom, and all I got for protection around here! Please bring it back to me, and my lantern is yours."],['Lum',"I'll keep an eye out."],
-      ['Vane',"There's a little tin lantern in my hut. It won't light much, but take it. Door's open."]],false,()=>{GOAL.tag='NEW TASK';GOAL.text="Find Vane's lucky cross";HINT.goalT=0;vaneWalkIn();});});}
+      ['Vane',"It's an heirloom, and all I got for protection around here! Please bring it back to me, and my lantern is yours."],['Lum',"I'll keep an eye out."]],false,()=>{GOAL.tag='NEW TASK';GOAL.text="Find Vane's lucky cross";HINT.goalT=0;vaneWalkIn();});});}
 function vaneWalkIn(){WEVENT.on=false;if(!VANE)return;VANE.st='walk';VANE.tx=HUTDOOR.x;VANE.ty=HUTDOOR.y+4;VANE.cb=()=>{VANE=null;sfxPage&&sfxPage(.6);};}
 function vaneNotice(after){talk([['Vane',"Wait… that's the cross! My lucky cross!"]],false,()=>
   askChoice("Return Vane's Lucky Cross?",[["Yes",()=>vaneTrade(after)],["No",()=>talk([['Vane',"…Ah. Well. If you change your mind, you know where to find me."]],false,()=>{GOAL.tag='TASK';GOAL.text="Return Vane's lucky cross";HINT.goalT=0;after&&after();})]]));}
 function vaneTrade(after){
   PARTY.lum.charm=null;{const i=BAG.indexOf('vanecharm');if(i>=0)BAG.splice(i,1);}syncMaxHp&&syncMaxHp();C1.charmQ=2;
-  talk([['Vane',"Thank you, Lum. You don't know what this means to an old man."],['Vane',"A deal's a deal. Here, take my lantern. It's brighter than that little tin one."]],false,()=>{giveItem('lantern');
+  talk([['Vane',"Thank you, Lum. You don't know what this means to an old man."],['Vane',"A deal's a deal. Here, take my lantern."]],false,()=>{giveItem('lantern');
     setTimeout(()=>talk([['Vane',"The paths ahead twist and tangle, and some places are darker than night."],['Lum',"Thank you, Vane."],['Vane',"Bring the boy home safe. And… mind the shadows."]],false,()=>{GOAL.tag='NEW TASK';GOAL.text='Head east toward Stranglethorn Forest';HINT.goalT=0;after&&after();}),900);});}
 function drawC1EndCard(){if(!C1.endCard)return;C1.endCard+=1/60;const t=C1.endCard,a=Math.min(1,t*1.5,(6-t)*1.2);if(t>6){C1.endCard=0;return;}ctx.save();ctx.setTransform(DPR,0,0,DPR,0,0);ctx.globalAlpha=Math.max(0,a);ctx.fillStyle='rgba(10,8,20,.6)';ctx.fillRect(0,H*.36-50,W,108);
   ctx.textAlign='center';ctx.fillStyle='#efe6ff';ctx.font='700 22px "Alegreya SC", Georgia, serif';ctx.fillText('Stranglethorn Forest',W/2,H*.36);ctx.font='italic 15px Alegreya, Georgia, serif';ctx.fillStyle='rgba(239,230,255,.8)';ctx.fillText('The playtest ends here — this path is still being written.',W/2,H*.36+30);ctx.restore();}
@@ -2930,14 +2928,13 @@ const VHINT=[];const VHEMB=[];
 function setupVHut(){VHINT.length=0;
   VHINT.push({x:400,y:768,reach:62,door:true,onInteract:()=>goScene(()=>{buildWoods();buildWoodsC1();SCENE='woods';lum.x=HUTDOOR.x+30;lum.y=HUTDOOR.y+46;lum.face=1;lum.state='idle';lum.vx=lum.vy=0;cam.x=lum.x+60;cam.y=lum.y-50;WTITLE.t=99;})});
   VHINT.push({x:468,y:505,reach:80,fire:true,onInteract:fireInteract});
-  VHINT.push({x:VHVANE.x,y:VHVANE.y,reach:72,onInteract:()=>{if(C1.charmQ===1&&(PARTY.lum.charm==='vanecharm'||BAG.includes('vanecharm'))){vaneNotice();return;}if(C1.charmQ===1){talk([['Vane',["Any sign of my lucky cross? That fox of mine loves the old oak north of the road.","Take the little tin lantern if you haven't. It's by the bed."][(C1.vtalk=(C1.vtalk||0)+1)%2]]]);return;}const L=[
+  VHINT.push({x:VHVANE.x,y:VHVANE.y,reach:72,onInteract:()=>{if(C1.charmQ===1&&(PARTY.lum.charm==='vanecharm'||BAG.includes('vanecharm'))){vaneNotice();return;}if(C1.charmQ===1){talk([['Vane',"Any sign of my lucky cross? That fox of mine loves the old oak north of the road."]]);return;}const L=[
     [['Vane',"The fire's yours whenever you need it. Grind away."]],
     [['Vane',"Slime, bone, bramble… you'd be amazed what this graveyard coughs up after a storm."]],
     [['Vane',"That bed's softer than it looks. Rest a spell if those woods got the better of you."]],
     [['Vane',"I used to talk to the kettle. Now I've got you. Big improvement. The kettle never laughs at my jokes."]],
     [['Vane',"Bring the boy home safe, Lum. And mind the shadows."]]];talk(L[(C1.vtalk=(C1.vtalk||0)+1)%L.length]);}});
   VHINT.push({x:552,y:705,reach:62,onInteract:()=>askChoice("Rest a while?",[["Yes",()=>{WEVENT.on=true;goScene(()=>{HEROES[HERO].hp=HEROES[HERO].maxHp;lum.x=515;lum.y=650;lum.face=-1;setTimeout(()=>{WEVENT.on=false;talk([['Vane',"Feel better? Told you. Softest bed this side of the world's edge."],['Lum',"Much better. Thank you, Vane."]]);if(typeof SAVEC!=='undefined')SAVEC.t=99;},900);});}],["No",()=>{}]])});
-  if(!C1.tinLantern&&!BAG.includes('smalllantern')&&PARTY.lum.off!=='smalllantern')VHINT.push({x:478,y:716,reach:60,grab:()=>!C1.tinLantern,onInteract:()=>{C1.tinLantern=1;giveItem('smalllantern');say("A little tin lantern. Vane said I could borrow it. I can hold it in my off hand.");const i=VHINT.findIndex(o=>o.grab);if(i>=0)VHINT.splice(i,1);}});
   const L=(x,y,reach,lines)=>{let i=0;VHINT.push({x,y,reach,onInteract:()=>say(lines[(i++)%lines.length])});};
   L(330,560,70,["A ledger of every grave, with little notes. \"Liked tulips.\" \"Hated tulips.\" \"Still owes me a coin.\"","Jars of dried herbs and grave-moss… a few of these would make lovely powders."]);
   L(288,700,64,["A wreath of garlic on the wall. For cooking… or for something else. I won't ask."]);}
@@ -2952,7 +2949,6 @@ function drawVHut(){const im=IMG.vanehut;if(!ready(im))return;const [rz]=roomVie
   if(Math.random()<.25)VHEMB.push({x:rnd(448,490),y:452,vy:rnd(-40,-22),vx:rnd(-6,6),t:0,m:rnd(.8,1.6)});
   for(let i=VHEMB.length-1;i>=0;i--){const e=VHEMB[i];e.t+=1/60;if(e.t>e.m){VHEMB.splice(i,1);continue;}e.x+=e.vx/60+Math.sin(T*3+i)*.2;e.y+=e.vy/60;drawGlow(ctx,e.x,e.y,3,'255,190,90',.8*(1-e.t/e.m));}
   ctx.restore();
-  if(!C1.tinLantern&&ready(IMG.tool_lantern_ornate)){const im=IMG.tool_lantern_ornate;ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,478,700,34,'255,210,140',.35+.08*Math.sin(T*6));ctx.restore();ctx.drawImage(im,456,672,44,44);}
   // Vane and Lum, sorted by depth
   const k=vhutH(lum.y)/151,kv=vhutH(VHVANE.y)/151;
   const dv=()=>{ctx.fillStyle='rgba(10,10,20,.25)';ctx.beginPath();ctx.ellipse(VHVANE.x,VHVANE.y+2,36*kv,8*kv,0,0,TAU);ctx.fill();c1Frame(ctx,'vane','idle',Math.floor(T*3),VHVANE.x,VHVANE.y+2,200*kv,lum.x>VHVANE.x,1,0);};
@@ -3169,7 +3165,7 @@ function drawDun(){const R=DROOMS[DUN.room],im=IMG['dun'+DUN.room];if(!ready(im)
   const k=dunH(lum.y)/151,here=DFOES.filter(g=>g.room===DUN.room);for(const g of here)if(g.y<=lum.y)drawDFoe(g);ctx.save();ctx.translate(lum.x,lum.y);ctx.scale(k,k);ctx.translate(-lum.x,-lum.y);drawLum();ctx.restore();for(const g of here)if(g.y>lum.y)drawDFoe(g);
   for(const p of PARTS)if(p.type==='fiz'||p.type==='puff'||p.type==='dust'){const k2=dunH(p.y)/151;ctx.save();ctx.translate(p.x,p.y);ctx.scale(k2,k2);ctx.translate(-p.x,-p.y);drawPartWell(p);ctx.restore();}
   // darkness: only the little lantern's circle (and any daylight from above) cuts through
-  ctx.setTransform(DPR,0,0,DPR,0,0);const lit=PARTY.lum.off==='smalllantern'||BAG.includes('lantern');const [sx,sy]=wellToScreen(lum.x,lum.y-70*k);const zr=rz*(lit?1:.45);
+  ctx.setTransform(DPR,0,0,DPR,0,0);const lit=BAG.includes('lantern');const [sx,sy]=wellToScreen(lum.x,lum.y-70*k);const zr=rz*(lit?1:.45);
   const r0=(BAG.includes('lantern')?120:70)*zr,r1=(BAG.includes('lantern')?260:170)*zr,R_=Math.hypot(W,H)*1.2,fl=1+.03*Math.sin(T*9);
   const g=ctx.createRadialGradient(sx,sy,0,sx,sy,R_);g.addColorStop(0,'rgba(4,5,10,0)');g.addColorStop(Math.min(.99,r0*fl/R_),'rgba(4,5,10,0)');g.addColorStop(Math.min(.995,r1*fl/R_),`rgba(4,5,10,${R.dark})`);g.addColorStop(1,`rgba(4,5,10,${R.dark})`);
   ctx.fillStyle=g;if(!CAPTURE.on)ctx.fillRect(0,0,W,H);
