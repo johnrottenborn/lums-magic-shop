@@ -2260,7 +2260,7 @@ function drawPath(P,x0,x1){const c=ctx;
 
 const ROAD_CTRL=[[-80,640],[260,602],[540,668],[830,612],[1090,572],[1400,636],[1720,590],[2020,606],[2350,642],[2780,612]];
 const ROAD=splinePts(ROAD_CTRL,30);
-const GATE={x:2050,y:790,k:.5};const HUT={x:2050-260,y:790+215,k:.34};
+const GATE={x:2050,y:790,k:.5};const HUT={x:2050-280,y:790+215,k:.44};
 const SPUR_CTRL=[[1996,612],[1984,676],[2026,738],[2040,800],[2046,862]];const SPUR=splinePts(SPUR_CTRL,16);
 const CIRCLE={x:1400,y:630,r:250},CEM={x0:GATE.x-460,x1:GATE.x+460,y0:GATE.y+28,y1:GATE.y+490},WOODS_W=2700,WOODS_H=1580;
 let ROADP=null,SPURP=null;
@@ -2297,12 +2297,12 @@ function buildWoods(){if(woodsBuilt)return;woodsBuilt=true;let k=0;const h=(a,b)
   const OPEN=[1,6,8];let gi=0;
   for(let row=0;row<3;row++)for(let col=0;col<4;col++){const x=CEM.x0+390+col*128+(row%2)*40,y=CEM.y0+90+row*140;const o={t:'grave',img:'grave10',x,y,s:.4,mound:OPEN.includes(gi)};gi++;WGRAVES.push(o);WOBJ.push(o);WDOBST.push({x,y:y-6,rx:32,ry:12});}
   // two towering obelisks keep watch over the graves
-  for(const [x,y,sc] of [[HUT.x-430,HUT.y-10,1.8],[CEM.x1-70,CEM.y0+215,1.05]]){const o={t:'grave',img:'grave6',x,y,s:sc,big:1};WOBJ.push(o);WDOBST.push({x,y:y-8,rx:44*sc/1.05,ry:18*sc/1.05});}
+  for(const [x,y,sc] of [[HUT.x-480,HUT.y-55,1.8],[CEM.x1-290,CEM.y1+140,1.8]]){const o={t:'grave',img:'grave6',x,y,s:sc,big:1};WOBJ.push(o);WDOBST.push({x,y:y-8,rx:44*sc/1.05,ry:18*sc/1.05});}
   // dead trees around the graveyard
   // the graveyard's edge: the gate in the middle, a line of drained shrubs and old stones either side
   WOBJ.push({t:'gate',x:GATE.x,y:GATE.y});
   // the gravekeeper's hut, tucked in the west corner
-  WOBJ.push({t:'hut',x:HUT.x,y:HUT.y});WDOBST.push({x:HUT.x-20,y:HUT.y-30,rx:150,ry:44});for(const [dx,rx] of [[-78,16],[70,18],[-150,70],[140,70]])WDOBST.push({x:GATE.x+dx,y:GATE.y-(dx>0?8:0),rx,ry:14});
+  WOBJ.push({t:'hut',x:HUT.x,y:HUT.y});WDOBST.push({x:HUT.x-20,y:HUT.y-34,rx:190,ry:52});for(const [dx,rx] of [[-78,16],[70,18],[-150,70],[140,70]])WDOBST.push({x:GATE.x+dx,y:GATE.y-(dx>0?8:0),rx,ry:14});
   for(let x=CEM.x0-60;x<=CEM.x1+60;x+=52){if(Math.abs(x-GATE.x)<235)continue;k++;const y=GATE.y+4+(h(k,1)-.5)*16;if(h(k,2)<.55){const i=(h(k,3)*10)|0;WOBJ.push({t:'shrub',img:'drained'+i,ax:DRN[i].ax,drips:[],x,y,s:.4+h(k,4)*.12,flip:h(k,5)<.5,ph:h(k,6)*TAU,drained:1,soaked:0});}else WOBJ.push({t:'img',img:['rock1','rock2','rock3','rock4'][(h(k,3)*4)|0],x,y,ax:.5,ay:.72,s:.45+h(k,4)*.3,shadow:1,flip:h(k,5)<.5});}
   for(const [x,y] of [[CEM.x0-90,CEM.y1+130],[CEM.x1+80,CEM.y1+110]]){k++;WOBJ.push({t:'willow',x,y,s:.6,flip:h(k,1)<.5,ph:h(k,2)*TAU,dead:1});}
   WINTS.length=0;
@@ -2333,7 +2333,7 @@ function drawGrave(o){const im=IMG[o.img];if(!ready(im))return;const w=im.natura
   if(o.mound){ctx.fillStyle='rgba(20,18,14,.35)';ctx.beginPath();ctx.ellipse(o.x,o.y+30,w*.45+10,16,0,0,TAU);ctx.fill();
   const g=ctx.createLinearGradient(0,o.y+10,0,o.y+44);g.addColorStop(0,'#6b5a42');g.addColorStop(1,'#4a3c2a');ctx.fillStyle=g;ctx.beginPath();ctx.ellipse(o.x,o.y+26,w*.42+8,14,0,0,TAU);ctx.fill();
   ctx.strokeStyle='rgba(30,22,14,.7)';ctx.lineWidth=1.4;ctx.stroke();ctx.fillStyle='rgba(110,140,80,.5)';for(let i=0;i<5;i++){ctx.beginPath();ctx.ellipse(o.x-w*.35+i*w*.18,o.y+22+(i%2)*6,4,2,0,0,TAU);ctx.fill();}}
-  ctx.fillStyle='rgba(20,25,20,.35)';ctx.beginPath();ctx.ellipse(o.x,o.y+2,w*.5,8,0,0,TAU);ctx.fill();
+  if(!o.big){ctx.fillStyle='rgba(20,25,20,.35)';ctx.beginPath();ctx.ellipse(o.x,o.y+2,w*.5,8,0,0,TAU);ctx.fill();}
   ctx.drawImage(im,o.x-w/2,o.y-h,w,h);}
 const WMIST=[];for(let i=0;i<26;i++)WMIST.push({x:rnd(0,WOODS_W),y:rnd(300,1100),sp:rnd(6,14),r:rnd(80,160),ph:rnd(0,TAU)});
 function drawWoods(){const vw=W/zoom,vh=H/zoom,x0=cam.x-vw/2-40,y0=cam.y-vh/2-40,x1=cam.x+vw/2+40,y1=cam.y+vh/2+120;
@@ -3355,7 +3355,7 @@ function start(data){
   if(resume){INTRO.on=false;INTRO.fade=0;INTRO.ui=1;becomeCosmic(lum.x,lum.y,1);HINT.on=false;HINT.goalT=99;}else{introStart();audioInit();INTRO.waiting=true;}
   requestAnimationFrame(frame);
 }
-window.__g={get INTERACTABLES(){return INTERACTABLES},C1I,skipC1Intro,FORAGE,pickForage,PARTS,enterWoodsC1,set LUMK(v){LUMK=v},enterVHut,MIX,openMix,doMix,RECIPES,get NEAR(){return NEAR},startChapter1,C1,WFOES,get REAPER(){return REAPER},get VANE(){return VANE},hutDoorC1,POWDERS,get CH(){return CH},spawnKing,kingArrives,get kingState(){return kingState},makeResultCard,CHSEL,recordPrologue,STATS,RESULTS,STORM,BATS,WSKELS,spawnSkels,fokalurEvent,get skelDone(){return skelDone},set skelDone(v){skelDone=v},enterWoods,woodsFree,WEV,NIGHT,cutHedge,goToSleep,enterGarden,enterBedroom,BED,bedFree,enterShop,SHOPLUM,shopFree,get restTalk(){return restTalk},PSLIMES,pondVoiceEvent,enterPond,pondFree,CHOICE,pickChoice,giveItem,get shedChestOpen(){return shedChestOpen},enterShed,SHSLIMES,shedFree,SHFLOOR,planStage,stageSlots,SSLIMES,get mimicState(){return mimicState},FOE_TYPES,enterStudy,studyFree,SFLOOR,GSLIMES,gardenFree,BATTLE,HEROES,MATS,startEncounter,battleAction,chooseMenu,WSLIMES,hitSlimes,defeatSlime,WEVENT,DLG,MENU,PARTY,BAG,TUT,takeBucket,openMenu,closeMenu,menuTap,get bucketTaken(){return bucketTaken},get SCENE(){return SCENE},WCAM,goScene,enterWell,SLUGS,lum,CK,BRIDGE,creekNearest,cos,INTRO,get PC(){return PC}};window.claude?.hot?.snapshot?.(()=>({lum:{x:lum.x,y:lum.y}}));
+window.__g={WOBJ,get INTERACTABLES(){return INTERACTABLES},C1I,skipC1Intro,FORAGE,pickForage,PARTS,enterWoodsC1,set LUMK(v){LUMK=v},enterVHut,MIX,openMix,doMix,RECIPES,get NEAR(){return NEAR},startChapter1,C1,WFOES,get REAPER(){return REAPER},get VANE(){return VANE},hutDoorC1,POWDERS,get CH(){return CH},spawnKing,kingArrives,get kingState(){return kingState},makeResultCard,CHSEL,recordPrologue,STATS,RESULTS,STORM,BATS,WSKELS,spawnSkels,fokalurEvent,get skelDone(){return skelDone},set skelDone(v){skelDone=v},enterWoods,woodsFree,WEV,NIGHT,cutHedge,goToSleep,enterGarden,enterBedroom,BED,bedFree,enterShop,SHOPLUM,shopFree,get restTalk(){return restTalk},PSLIMES,pondVoiceEvent,enterPond,pondFree,CHOICE,pickChoice,giveItem,get shedChestOpen(){return shedChestOpen},enterShed,SHSLIMES,shedFree,SHFLOOR,planStage,stageSlots,SSLIMES,get mimicState(){return mimicState},FOE_TYPES,enterStudy,studyFree,SFLOOR,GSLIMES,gardenFree,BATTLE,HEROES,MATS,startEncounter,battleAction,chooseMenu,WSLIMES,hitSlimes,defeatSlime,WEVENT,DLG,MENU,PARTY,BAG,TUT,takeBucket,openMenu,closeMenu,menuTap,get bucketTaken(){return bucketTaken},get SCENE(){return SCENE},WCAM,goScene,enterWell,SLUGS,lum,CK,BRIDGE,creekNearest,cos,INTRO,get PC(){return PC}};window.claude?.hot?.snapshot?.(()=>({lum:{x:lum.x,y:lum.y}}));
 window.claude?.hot?.ready?window.claude.hot.ready(start):start(window.claude?.hot?.data??{});
 })();
 </script>
