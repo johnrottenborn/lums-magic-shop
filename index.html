@@ -2926,7 +2926,6 @@ function setupVHut(){VHINT.length=0;
     [['Vane',"The fire's yours whenever you need it. Grind away."]],
     [['Vane',"Slime, bone, bramble… you'd be amazed what this graveyard coughs up after a storm."]],
     [['Vane',"Bring the boy home safe, Lum. And mind the shadows."]]];talk(L[(C1.vtalk=(C1.vtalk||0)+1)%L.length]);}});
-  VHINT.push({x:552,y:705,reach:62,onInteract:()=>askChoice("Rest a while?",[["Yes",()=>{WEVENT.on=true;goScene(()=>{HEROES[HERO].hp=HEROES[HERO].maxHp;lum.x=515;lum.y=650;lum.face=-1;setTimeout(()=>{WEVENT.on=false;talk([['Vane',"Feel better? Told you. Softest bed this side of the world's edge."],['Lum',"Much better. Thank you, Vane."]]);if(typeof SAVEC!=='undefined')SAVEC.t=99;},900);});}],["No",()=>{}]])});
   const L=(x,y,reach,lines)=>{let i=0;VHINT.push({x,y,reach,onInteract:()=>say(lines[(i++)%lines.length])});};
   L(330,560,70,["A ledger of every grave, with little notes. \"Liked tulips.\" \"Still owes me a coin.\"","Jars of dried herbs and grave-moss… a few of these would make lovely powders."]);
   L(288,700,64,["A wreath of garlic on the wall."]);}
