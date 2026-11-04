@@ -44,7 +44,7 @@ const game=document.getElementById('game'), cv=document.getElementById('c');let 
 const atlas=new Image(); atlas.src=ATLAS_SRC;
 const IMG={};for(const k in ASSET_SRC){IMG[k]=new Image();IMG[k].src=ASSET_SRC[k];}
 const ready=im=>im&&(im instanceof HTMLCanvasElement?im.width>0:im.complete&&im.naturalWidth>0);
-const FW=300,FH=280,SPR=0.6;
+const FW=300,FH=280,SPR=0.6;let LUMK=.85;
 let PC='lum';let CH=0,HERO='cosmic';const PLAYER=()=>PC==='cosmic'||CH>0;
 const LUM_ANIM={
   idle:{frames:[37],fps:1,blink:37,native:1},
@@ -53,7 +53,7 @@ const LUM_ANIM={
   walkDown:{frames:[37,38,39,40,41,42],fps:9,native:1},
   idleUp:{frames:[22],native:1},
   interact:{frames:[11],native:1},
-  cast:{frames:[12,13],native:1}
+  cast:{frames:[32,35],native:1}
 };
 const COS_BLADE={idle:{frames:[40],fps:1,blink:40,native:1},walk:{frames:[53,54,55,56,57,58],fps:10,native:1},walkUp:{frames:[48,49,50,51,52],fps:9,native:1},walkDown:{frames:[40,41,42,43],fps:7,native:1},idleUp:{frames:[48],native:1},interact:{frames:[44],native:1},cast:{frames:[59,61,63,66],native:1}};
 const bladeFr=(fr,who='cosmic')=>{if(!(PARTY[who]&&PARTY[who].main==='blade'))return fr;if(fr===16||fr===20||fr===21)return BATTLE.on?44:40;if(fr<=7)return 53+((fr*6/8)|0);if(fr===17||fr===18)return 60;if(fr===19)return 63;return fr;};
@@ -1125,7 +1125,8 @@ function drawWellRoom(){const im=IMG.wellroom;if(!ready(im))return;const rz=H/76
   const vg=ctx.createRadialGradient(W/2,H*.5,Math.min(W,H)*.3,W/2,H*.5,Math.max(W,H)*.75);vg.addColorStop(0,'rgba(10,14,24,0)');vg.addColorStop(1,'rgba(10,14,24,.45)');ctx.fillStyle=vg;ctx.fillRect(0,0,W,H);
   if(WTITLE.t<4.5&&!CAPTURE.on){const a=Math.min(1,WTITLE.t*1.5,(4.5-WTITLE.t)*1.2);ctx.save();ctx.globalAlpha=a;ctx.textAlign='center';ctx.fillStyle='rgba(10,14,24,.4)';ctx.fillRect(0,H*.3-40,W,80);
     ctx.fillStyle='#e9f4ff';ctx.font='700 26px "Alegreya SC", Georgia, serif';ctx.fillText('The Runic Conservatory',W/2,H*.3+4);ctx.font='italic 14px Alegreya, Georgia, serif';ctx.fillStyle='rgba(233,244,255,.8)';ctx.fillText('beneath the old well',W/2,H*.3+28);ctx.restore();}}
-function drawPartWell(o){const q=o.life/o.max;if(o.type==='fiz'){const a=1-q;drawGlow(ctx,o.x,o.y-o.z,o.s*3,'170,220,255',a*.6);}else if(o.type==='puff'){drawGlow(ctx,o.x,o.y-o.z,o.s,'200,200,210',.35*(1-q));}}
+function drawSparkPart(o,q){const a=1-q,y=o.y-o.z,tw=.6+.4*Math.sin(T*30+o.x);ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,o.x,y,o.s*4,o.col,a*.75);ctx.restore();ctx.fillStyle=`rgba(255,250,225,${(a*tw).toFixed(3)})`;ctx.beginPath();ctx.arc(o.x,y,o.s*.55,0,TAU);ctx.fill();}
+function drawPartWell(o){const q=o.life/o.max;if(o.type==='fiz'&&o.col){drawSparkPart(o,q);return;}if(o.type==='fiz'){const a=1-q;drawGlow(ctx,o.x,o.y-o.z,o.s*3,'170,220,255',a*.6);}else if(o.type==='puff'){drawGlow(ctx,o.x,o.y-o.z,o.s,'200,200,210',.35*(1-q));}}
 const SHOPZ=.82;function roomView(){const rz=H/768*(SCENE==='shop'?SHOPZ:1);return [rz,SCENE==='shop'?H-768*rz:0];}
 function wellToScreen(wx,wy){const [rz,oy]=roomView();return [(wx-WCAM.x)*rz+W/2,wy*rz+oy];}
 
@@ -2802,7 +2803,7 @@ function drawPowderMenu(){const B=BATTLE;if(B.phase!=='powders')return;B.itemHit
   ctx.font='italic 12px Alegreya, Georgia, serif';ctx.fillStyle='#8a7050';ctx.textAlign='center';ctx.fillText(tw('tap outside to go back','click outside or press Esc to go back'),W/2,y+h_-10);ctx.restore();}
 /* ---------- drawing Lum and the new foes in battle ---------- */
 function drawBattleLum(h){const S=bS(),sp=.6*S,x=h.x+h.ox,y=h.y+h.oy,B=BATTLE,me=B.heroes[B.cur]===h,ph=B.phase;if(!ready(atlas))return;
-  let fr=37;if(me&&(ph==='bonkRun'||ph==='bonkBack'||ph==='run'||ph==='fled'))fr=27+(Math.floor(B.t*10)%4);else if(me&&ph==='bonkWind')fr=12;else if(me&&ph==='bonkHit')fr=13;
+  let fr=37;if(me&&(ph==='bonkRun'||ph==='bonkBack'||ph==='run'||ph==='fled'))fr=27+(Math.floor(B.t*10)%4);else if(me&&ph==='bonkWind')fr=32;else if(me&&ph==='bonkHit')fr=35;
   ctx.save();ctx.translate(x,y+3);if(h.ko){const u=Math.min(1,B.t/.5);ctx.rotate(-u*1.2);}if(h.hurt>0)ctx.translate(Math.sin(h.hurt*60)*4,0);if(h.face<0)ctx.scale(-1,1);if(fr===37){const b=Math.sin(T*2.3);ctx.scale(1-.004*b,1+.009*b);}
   const dw=FW*sp,dh=FH*sp;ctx.drawImage(atlas,fr*FW,0,FW,FH,-dw/2,-dh*(274/280),dw,dh);ctx.restore();
   if(h.chill){ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,x,y-80*S,50*S,'160,210,255',.25+.1*Math.sin(T*4));ctx.restore();}
@@ -2962,7 +2963,7 @@ function update(dt){
     if(at>=1.4){lum.state='idle';lum.ft=0;}
   }else if(lum.state==='cast'&&CH>0){
     lum.at+=dt;const at=lum.at;lum.fi=at<.22?0:1;
-    if(at>=.22&&!lum.fizzed){lum.fizzed=1;const hx_=lum.x+lum.face*60,hy_=lum.y;for(let i=0;i<22;i++)PARTS.push({type:'fiz',x:hx_,y:hy_,z:80,vx:lum.face*rnd(20,120),vy:rnd(-40,40),vz:rnd(-10,110),life:0,max:rnd(.4,.9),s:rnd(1.5,3.2)});PARTS.push({type:'puff',x:hx_,y:hy_,z:80,vx:0,vy:0,vz:12,life:0,max:.9,s:12});sfxFizzle(true);hitSlimes(hx_,hy_);}
+    if(at>=.22&&!lum.fizzed){lum.fizzed=1;const hx_=lum.x+lum.face*44*LUMK,hy_=lum.y;for(let i=0;i<26;i++)PARTS.push({type:'fiz',col:'255,214,110',x:hx_,y:hy_,z:84*LUMK,vx:lum.face*rnd(20,120),vy:rnd(-40,40),vz:rnd(-10,110),life:0,max:rnd(.4,.9),s:rnd(1.5,3.2)});PARTS.push({type:'puff',x:hx_,y:hy_,z:84*LUMK,vx:0,vy:0,vz:12,life:0,max:.9,s:12});sfxFizzle(true);hitSlimes(hx_,hy_);}
     if(at>=.75){lum.state='idle';lum.ft=0;}
   }else if(lum.state==='cast'){
     lum.at+=dt;lum.fi=lum.at<CAST_T[0]?0:1;
@@ -3079,21 +3080,21 @@ function drawObj(o){
 let OCC=0;const ghostCv=document.createElement('canvas');ghostCv.width=300;ghostCv.height=280;const gctx=ghostCv.getContext('2d');
 function drawLumGhost(){if(!OCC||!ready(atlas))return;const a=ANIM[lum.state];let fr=a.frames[lum.state==='idle'?lum.fi%a.frames.length:lum.fi];if(lum.state==='idle'&&lum.blink>0)fr=a.blink;
   gctx.globalCompositeOperation='source-over';gctx.clearRect(0,0,300,280);gctx.drawImage(atlas,fr*FW,0,FW,FH,0,0,FW,FH);gctx.globalCompositeOperation='source-atop';gctx.fillStyle='rgba(225,236,255,.28)';gctx.fillRect(0,0,300,280);
-  const flip=lum.face!==a.native,dw=FW*SPR,dh=FH*SPR;ctx.save();ctx.globalAlpha=.78;ctx.translate(lum.x,lum.y+3);if(flip)ctx.scale(-1,1);ctx.drawImage(ghostCv,-dw/2,-dh*(274/280),dw,dh);ctx.restore();}
+  const flip=lum.face!==a.native,dw=FW*SPR,dh=FH*SPR;ctx.save();ctx.globalAlpha=.78;ctx.translate(lum.x,lum.y+3);if(PC!=='cosmic')ctx.scale(LUMK,LUMK);if(flip)ctx.scale(-1,1);ctx.drawImage(ghostCv,-dw/2,-dh*(274/280),dw,dh);ctx.restore();}
 function drawLum(){if(!INTRO.lumShown||CAPTURE.on)return;
   const a=ANIM[lum.state]||ANIM.idle;let fr=a.frames[lum.state==='idle'?lum.fi%a.frames.length:lum.fi];if(fr===undefined)fr=a.frames[0];
   if(lum.state==='idle'&&lum.blink>0)fr=a.blink;
   const flip=lum.face!==a.native;
   const moving=lum.state==='walk'||lum.state==='walkUp'||lum.state==='walkDown',ph=moving?Math.cos(lum.ft/a.frames.length*TAU*2):0;
   const sw=44*(1+.05*ph-.06*(lum.plant||0)),sa=(lum.wet?.12:.24)+.08*(lum.plant||0);
-  const C=PC==='cosmic',sws=C?.7:1;
+  const C=PC==='cosmic',sws=C?.7:LUMK;
   ctx.fillStyle=`rgba(40,62,30,${sa.toFixed(3)})`;ctx.beginPath();ctx.ellipse(lum.x,lum.y+2,sw*sws,12.5*sws,0,0,TAU);ctx.fill();
   ctx.fillStyle='rgba(30,50,25,.16)';ctx.beginPath();ctx.ellipse(lum.x,lum.y+2,sw*.55*sws,7*sws,0,0,TAU);ctx.fill();
   const IMG_=C?cosSheet():atlas,fw=C?CFW:FW,fh=C?CFH:FH,sp=C?CSPR:SPR,anc=C?264/270:274/280;
   if(!ready(IMG_))return;ctx.globalAlpha=lum.alpha??1;
   ctx.save();
   if(lum.wet){ctx.beginPath();ctx.rect(lum.x-200,lum.y-400,400,400-9);ctx.clip();}
-  ctx.translate(lum.x,lum.y+3);if(flip)ctx.scale(-1,1);
+  ctx.translate(lum.x,lum.y+3);if(!C)ctx.scale(LUMK,LUMK);if(flip)ctx.scale(-1,1);
   if(lum.state==='idle'||lum.state==='idleUp'){const b=Math.sin(T*2.3);ctx.scale(1-.004*b,1+.009*b);}
   const dw=fw*sp,dh=fh*sp;if(false){ctx.save();ctx.translate(-dw/2,-dh*anc);ctx.scale(sp,sp);drawWalkLegs(ctx,fr,moving?lum.ft/a.frames.length*TAU:0,moving,fr<=27);ctx.restore();}
   if(C&&moving){const sp_=lum.ft/a.frames.length*TAU;ctx.translate(0,-Math.abs(Math.sin(sp_))*1.5*sp);}
@@ -3154,6 +3155,7 @@ function render(){if(SCENE==='vhut'){drawVHut();if(CAPTURE.on)captureBackdrop();
     else if(p.type==='wsp'){const a=Math.sin(Math.PI*q);drawGlow(ctx,p.x,p.y,p.s*4.5,'175,215,255',a*.55);ctx.fillStyle=`rgba(255,255,255,${(a*.9).toFixed(3)})`;ctx.beginPath();ctx.arc(p.x,p.y,p.s*.55,0,TAU);ctx.fill();}
     else if(p.type==='msmoke'){const a=Math.sin(Math.PI*Math.min(1,q*1.4))*(1-q)*.5;drawGlow(ctx,p.x,p.y,p.s*2.4,q<.4?'190,215,255':'215,205,255',a);}
     else if(p.type==='mstar'){const a=Math.sin(Math.PI*q)*(.6+.4*Math.sin(T*9+p.x));ctx.fillStyle=`rgba(255,255,255,${a.toFixed(3)})`;ctx.beginPath();for(let k=0;k<8;k++){const ang=k/8*TAU,r_=k%2?p.s*.3:p.s;ctx.lineTo(p.x+Math.cos(ang)*r_,p.y+Math.sin(ang)*r_);}ctx.closePath();ctx.fill();drawGlow(ctx,p.x,p.y,p.s*3,'200,220,255',a*.5);}
+    else if(p.type==='fiz'&&p.col)drawSparkPart(p,q);
     else if(p.type==='fiz'){const a=1-q;drawGlow(ctx,p.x,p.y-p.z,p.s*3,'170,220,255',a*.6);ctx.fillStyle=`rgba(230,248,255,${a.toFixed(3)})`;ctx.fillRect(p.x-.8,p.y-p.z-.8,1.6,1.6);}
     else if(p.type==='puff'){drawGlow(ctx,p.x,p.y-p.z,p.s,'200,200,210',.35*(1-q));}
     else if(p.type==='fdust'){const a=Math.sin(Math.PI*q)*.8;drawGlow(ctx,p.x,p.y-p.z,p.s*3,p.col,a*.5);}
@@ -3191,7 +3193,7 @@ function bubbleAt(wx,wy,text,name,alpha,small){let sx=(wx-cam.x)*zoom+W/2,sy=(wy
 function drawSay(){
   if(lum.quipT>0&&!DLG.active){bubbleAt(lum.x,lum.y-150,lum.quip,null,Math.min(1,lum.quipT*3,(2.4-lum.quipT)*6),true);}
   if(DLG.active&&DLG.lines[DLG.i][0]==='???'){drawEerie(DLG.lines[DLG.i][1],DLG.t);return;}
-  if(DLG.active){const [who,text]=DLG.lines[DLG.i];const pcName=PC==='cosmic'?'Cosmic':'Lum';let sp=who===pcName||who==='Fokalur'?lum:who==='Vane'&&SCENE==='vhut'?VHVANE:who==='Vane'&&VANE?VANE:who==='Voice'?{x:HUTDOOR.x,y:HUTDOOR.y}:(who==='Cosmic'?cos:{x:0,y:-30});if(who==='Lum'&&PC==='cosmic')sp=SCENE==='shop'?SHOPLUM:{x:0,y:-30};BUBBLE_BASE=sp.y;const h=who==='Fokalur'?300:who==='Cosmic'?160:who==='Vane'?165:who==='Voice'?120:182;const a=Math.min(1,DLG.t*6);bubbleAt(sp.x,sp.y-h,text,who,a,false);BUBBLE_BASE=null;}
+  if(DLG.active){const [who,text]=DLG.lines[DLG.i];const pcName=PC==='cosmic'?'Cosmic':'Lum';let sp=who===pcName||who==='Fokalur'?lum:who==='Vane'&&SCENE==='vhut'?VHVANE:who==='Vane'&&VANE?VANE:who==='Voice'?{x:HUTDOOR.x,y:HUTDOOR.y}:(who==='Cosmic'?cos:{x:0,y:-30});if(who==='Lum'&&PC==='cosmic')sp=SCENE==='shop'?SHOPLUM:{x:0,y:-30};BUBBLE_BASE=sp.y;const h=who==='Fokalur'?300:who==='Cosmic'?160:who==='Vane'?165:who==='Voice'?120:(PC!=='cosmic'&&who==='Lum'?160:182);const a=Math.min(1,DLG.t*6);bubbleAt(sp.x,sp.y-h,text,who,a,false);BUBBLE_BASE=null;}
   else if(cos.bubble>0&&!cos.hidden){bubbleAt(cos.x,cos.y-150,cos.bubbleText,null,Math.min(1,cos.bubble*3,(2.4-cos.bubble)*6),true);}}
 function rr(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();}
 function drawUI(){drawUIinner();drawMix();drawChoice();drawSceneFade();drawWipe();}
@@ -3217,7 +3219,7 @@ function drawUI_(){drawHints();
   if(battleFlash>0){ctx.fillStyle=`rgba(255,255,255,${(battleFlash*.6).toFixed(3)})`;ctx.fillRect(0,0,W,H);}
 }
 /* the little ... bubble over Cosmic when there's something to look at; tap anywhere to look */
-function drawNearDots(){if(nearA<=0||DLG.active)return;let sx,sy;const hy=lum.y-158;
+function drawNearDots(){if(nearA<=0||DLG.active)return;let sx,sy;const hy=lum.y-(PC==='cosmic'?158:150*LUMK);
   if(SCENE==='garden'||SCENE==='woods'){sx=(lum.x-cam.x)*zoom+W/2;sy=(hy-cam.y)*zoom+H/2;}else{const k_=roomH(lum.y)/151;[sx,sy]=wellToScreen(lum.x,lum.y-(lum.y-hy)*k_);sy+=WOFF.y;}
   const e=1-Math.pow(1-nearA,3),bx=sx+14,by=sy-6-(1-e)*8+Math.sin(T*3)*1.5;ctx.save();ctx.globalAlpha=e;
   ctx.fillStyle='rgba(60,50,30,.18)';ctx.beginPath();ctx.ellipse(bx+1,by+3,25,17,0,0,TAU);ctx.fill();
@@ -3252,7 +3254,7 @@ function start(data){
   if(resume){INTRO.on=false;INTRO.fade=0;INTRO.ui=1;becomeCosmic(lum.x,lum.y,1);HINT.on=false;HINT.goalT=99;}else{introStart();audioInit();INTRO.waiting=true;}
   requestAnimationFrame(frame);
 }
-window.__g={enterVHut,MIX,openMix,doMix,RECIPES,get NEAR(){return NEAR},startChapter1,C1,WFOES,get REAPER(){return REAPER},get VANE(){return VANE},hutDoorC1,POWDERS,get CH(){return CH},spawnKing,kingArrives,get kingState(){return kingState},makeResultCard,CHSEL,recordPrologue,STATS,RESULTS,STORM,BATS,WSKELS,spawnSkels,fokalurEvent,get skelDone(){return skelDone},set skelDone(v){skelDone=v},enterWoods,woodsFree,WEV,NIGHT,cutHedge,goToSleep,enterGarden,enterBedroom,BED,bedFree,enterShop,SHOPLUM,shopFree,get restTalk(){return restTalk},PSLIMES,pondVoiceEvent,enterPond,pondFree,CHOICE,pickChoice,giveItem,get shedChestOpen(){return shedChestOpen},enterShed,SHSLIMES,shedFree,SHFLOOR,planStage,stageSlots,SSLIMES,get mimicState(){return mimicState},FOE_TYPES,enterStudy,studyFree,SFLOOR,GSLIMES,gardenFree,BATTLE,HEROES,MATS,startEncounter,battleAction,chooseMenu,WSLIMES,hitSlimes,defeatSlime,WEVENT,DLG,MENU,PARTY,BAG,TUT,takeBucket,openMenu,closeMenu,menuTap,get bucketTaken(){return bucketTaken},get SCENE(){return SCENE},WCAM,goScene,enterWell,SLUGS,lum,CK,BRIDGE,creekNearest,cos,INTRO,get PC(){return PC}};window.claude?.hot?.snapshot?.(()=>({lum:{x:lum.x,y:lum.y}}));
+window.__g={PARTS,enterWoodsC1,set LUMK(v){LUMK=v},enterVHut,MIX,openMix,doMix,RECIPES,get NEAR(){return NEAR},startChapter1,C1,WFOES,get REAPER(){return REAPER},get VANE(){return VANE},hutDoorC1,POWDERS,get CH(){return CH},spawnKing,kingArrives,get kingState(){return kingState},makeResultCard,CHSEL,recordPrologue,STATS,RESULTS,STORM,BATS,WSKELS,spawnSkels,fokalurEvent,get skelDone(){return skelDone},set skelDone(v){skelDone=v},enterWoods,woodsFree,WEV,NIGHT,cutHedge,goToSleep,enterGarden,enterBedroom,BED,bedFree,enterShop,SHOPLUM,shopFree,get restTalk(){return restTalk},PSLIMES,pondVoiceEvent,enterPond,pondFree,CHOICE,pickChoice,giveItem,get shedChestOpen(){return shedChestOpen},enterShed,SHSLIMES,shedFree,SHFLOOR,planStage,stageSlots,SSLIMES,get mimicState(){return mimicState},FOE_TYPES,enterStudy,studyFree,SFLOOR,GSLIMES,gardenFree,BATTLE,HEROES,MATS,startEncounter,battleAction,chooseMenu,WSLIMES,hitSlimes,defeatSlime,WEVENT,DLG,MENU,PARTY,BAG,TUT,takeBucket,openMenu,closeMenu,menuTap,get bucketTaken(){return bucketTaken},get SCENE(){return SCENE},WCAM,goScene,enterWell,SLUGS,lum,CK,BRIDGE,creekNearest,cos,INTRO,get PC(){return PC}};window.claude?.hot?.snapshot?.(()=>({lum:{x:lum.x,y:lum.y}}));
 window.claude?.hot?.ready?window.claude.hot.ready(start):start(window.claude?.hot?.data??{});
 })();
 </script>
