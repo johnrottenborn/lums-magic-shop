@@ -363,7 +363,7 @@ let NEAR=null,nearA=0;
 function tapScreen(){if(CHOICE.on||MIX.on||performance.now()<(CHOICE.until||0)||FADE.dir||MENU.open||BATTLE.pending||WIPE.dir||BATTLE.on)return;if(DLG.active){dlgNext();return;}if(NEAR&&!busy())pressB();}
 function pressB(){if(WEV.end>9.7){backToTitle();return;}if(FADE.dir||MENU.open||BATTLE.pending||WIPE.dir)return;if(INTRO.waiting){titleKey();return;}if(INTRO.on){introSkip();return;}BTN.b.pulse=1;if(DLG.active){dlgNext();return;}if(busy())return;
   if(SCENE==='garden')for(const g of SLUGS)if(Math.hypot(g.x-lum.x,g.y-lum.y)<70&&!DLG.active){lum.state='interact';lum.at=0;HINT.looked=1;g.shy=2.5;say(SLUG_LINES[(slugTalk++)%SLUG_LINES.length]);return;}
-  if(SCENE!=='garden')for(const g of roomSlimes())if(!g.dead&&Math.hypot(g.x-lum.x,g.y-lum.y)<90){lum.state='interact';lum.at=0;say(['It\'s shimmering at me. Menacingly.','I can see little sparks of magic swirling inside it... like it swallowed a piece of the pool.','Its tentacles keep reaching for my staff. No! Mine!'][(slimeTalk++)%3]);return;}
+  if(SCENE!=='garden')for(const g of roomSlimes())if(!g.dead&&Math.hypot(g.x-lum.x,g.y-lum.y)<90){lum.state='interact';lum.at=0;say(['It\'s shimmering at me. Menacingly.','I can see little sparks of magic swirling inside it… like it swallowed a piece of the pool.','Its tentacles keep reaching for my staff. No! Mine!'][(slimeTalk++)%3]);return;}
   let best=null,bd=1e9;for(const o of (SCENE==='well'?WINT:SCENE==='study'?SINT:SCENE==='shed'?SHINT:SCENE==='pond'?PINT:SCENE==='shop'?SHOPINT:SCENE==='bed'?BEDINT:SCENE==='vhut'?VHINT:SCENE==='dun'?DUNINT:SCENE==='woods'?WINTS:INTERACTABLES)){const d=Math.hypot(o.x-lum.x,o.y-lum.y);if(o.lum&&d<o.reach){best=o;break;}if(d<(o.reach||90)&&d<bd){bd=d;best=o;}}
   lum.state='interact';lum.at=0;
   if(best&&best.onInteract){best.onInteract();HINT.looked=1;}else{lum.bubble=1.1;}}
@@ -393,7 +393,7 @@ function landSpray(p){
   if(Math.random()<.06)PUDDLES.push({x:p.x,y:p.y,t:0,r:rnd(10,20)});
   for(const f of FOES)if(Math.hypot(f.x-p.x,f.y-p.y)<(f.r||30)){startBattle(f);break;}
   for(const d of DRAINED)if(Math.hypot(d.x-p.x,(d.y-p.y)*1.4)<60){if(d.soaked<=0){d.soaked=2.2;for(let k=0;k<10;k++)PARTS.push({type:'wsp',x:d.x+rnd(-30,30),y:d.y-rnd(20,90),z:0,vx:rnd(-8,8),vy:-rnd(14,34),vz:0,life:0,max:rnd(1,2),s:rnd(1.4,2.4)});
-      if(!d.toldWater&&!DLG.active){d.toldWater=1;say("It drank the water... but water alone won't bring its magic back.");}}break;}
+      if(!d.toldWater&&!DLG.active){d.toldWater=1;say("It drank the water… but water alone won't bring its magic back.");}}break;}
 }
 
 /* ambient spirit lights drifting over the meadow */
@@ -551,7 +551,7 @@ function placeEstate(){
       const set=PLANTS[r.kind];ESTATE.push({t:'plant',kind:r.kind,spr:set[(j*set.length)|0],x,y,ph:hash(seed,4,7)*TAU,flip:hash(seed,5,7)<.5,s:.9+hash(seed,6,7)*.25});}
     OBST.push({k:'rect',x0:Math.min(r.ax,r.ax+r.d[0]*r.L)-4,x1:Math.max(r.ax,r.ax+r.d[0]*r.L)+4,y0:r.ay-20,y1:r.ay+8});}
   ROWS.forEach((r,i)=>shrub(r.ax+r.d[0]*(r.L+48),r.ay+6,[3,0,5,11,4,2,6,7,8,9,10,1][i],.9));
-  const HERB={lavender:"Lavender. Master Lum puts it in my pillow so I stop talking in my sleep.",rosemary:"Rosemary, for remembering. She sneaks it into my tea before lessons. I can tell.",sage:"Silver sage. It smells like rain and old books.",mint:"Moonmint. The tips are all nibbled... the slimes were definitely here!",magic:"Bellglow blossoms. Master says if you pick them, the light goes out. So no picking."};
+  const HERB={lavender:"Lavender. Master Lum puts it in my pillow so I stop talking in my sleep.",rosemary:"Rosemary, for remembering. She sneaks it into my tea before lessons. I can tell.",sage:"Silver sage. It smells like rain and old books.",mint:"Moonmint. The tips are all nibbled… the slimes were definitely here!",magic:"Bellglow blossoms. Master says if you pick them, the light goes out. So no picking."};
   ROWS.forEach(r=>INTERACTABLES.push({x:r.ax+r.d[0]*20,y:r.ay+4,reach:58,onInteract:()=>say(HERB[r.kind])}));
   // roses line the path south, the shop sign greets visitors
   for(let y=540;y<=1420;y+=96)for(const sd of [-1,1]){const x=sd*70+(hash(y,sd+2,881)-.5)*8;if(inPond(x,y,-30))continue;ESTATE.push({t:'plant',kind:'rose',spr:PLANTS.rose[((y/96)|0)%4],x,y,ph:y*.01,flip:sd>0,s:.95});}
@@ -566,11 +566,11 @@ function placeEstate(){
   INTERACTABLES.push({x:530-40,y:560+36,reach:70,onInteract:()=>goScene(()=>enterShed())});
   // drained shrubs: a few clues that the slimes have been feeding
   DRAINED.length=0;
-  for(const [x,y,i,s_,line] of [[-440,500,1,.5,"This one's gone all pale and papery... like the magic got drunk right out of it. Slimes!"],
-      [180,650,4,.48,"Fresh slime on the branches! Still sticky. And a shiny trail heading toward the pond..."],
+  for(const [x,y,i,s_,line] of [[-440,500,1,.5,"This one's gone all pale and papery… like the magic got drunk right out of it. Slimes!"],
+      [180,650,4,.48,"Fresh slime on the branches! Still sticky. And a shiny trail heading toward the pond…"],
       [-300,900,0,.5,"It's still humming, really faintly. There's a little magic left in the roots. Hang in there!"],
       [600,980,3,.48,"No berries, no color, nothing. Poor thing. I'll find whoever did this."],
-      [-640,1300,9,.5,"Another one. They've been feeding all around the garden. This is a lot of slimes..."]]){
+      [-640,1300,9,.5,"Another one. They've been feeding all around the garden. This is a lot of slimes…"]]){
     const o={t:'shrub',img:'drained'+i,ax:DRN[i].ax,drips:DRN[i].d,x,y,s:s_,flip:hash(x|0,y|0,851)<.5,ph:hash(x|0,y|0,852)*TAU,drained:1,soaked:0};ESTATE.push(o);DRAINED.push(o);
     OBST.push({k:'ell',x,y:y-4,rx:34,ry:13});INTERACTABLES.push({x,y,reach:72,onInteract:()=>say(line)});}
   // the road south, and a marker where it meets the hedge
@@ -579,7 +579,7 @@ function placeEstate(){
   INTERACTABLES.push({x:WELL.x,y:WELL.y-10,reach:130,onInteract:wellInteract});
   INTERACTABLES.push({x:20,y:1528,reach:95,hedge:1,onInteract:()=>{if(NIGHT.cut)return;
     if(!NIGHT.on){say("The road ends in a wall of thick hedges. Beyond them is the dark forest. Master Lum says the garden ends here for a reason.");return;}
-    if(PARTY[HERO].main!=='blade'){say("The hedge is too thick to push through... The blade could cut it. I'd have to be holding it.");return;}
+    if(PARTY[HERO].main!=='blade'){say("The hedge is too thick to push through… The blade could cut it. I'd have to be holding it.");return;}
     cutHedge();}});
   INTERACTABLES.push({x:720,y:40,reach:90,onInteract:()=>say(["The stream comes all the way from the Whispering Wood. The water tastes a little like mint.","Master says never to follow the stream into the woods alone. So I won't. Probably."][(sayCount++)%2])});
   for(const a of [0,.8,1.6,2.4,3.2,4.0,4.71,5.5]){const x=POND.x+Math.cos(a)*(POND.rx*pondR(a)+26),y=POND.y+Math.sin(a)*(POND.ry*pondR(a)+22);INTERACTABLES.push({x,y,reach:84,onInteract:()=>pondInteract(x,y)});}
@@ -589,13 +589,13 @@ let sayCount=0,wishCount=0,wellMagic=0;
 const DRN=[{ax:.511,d:[[234,193],[230,183]]},{ax:.591,d:[[166,273],[42,213],[78,60],[288,54]]},{ax:.511,d:[]},{ax:.428,d:[[282,141],[278,116]]},{ax:.544,d:[[368,230],[92,226],[13,145]]},
   {ax:.476,d:[]},{ax:.447,d:[]},{ax:.636,d:[]},{ax:.471,d:[]},{ax:.486,d:[]}];
 const DRAINED=[];let slugTalk=0;
-const SLUG_LINES=["A slug! Ew... no, wait. It's kind of sparkly. Shoo! Leave Master's lettuce alone!","It pulled its eyes in. Are you sulking? You can't sulk, you're the one eating everything!","So shimmery... Are slugs supposed to glow? Something's strange about this garden.","Mister Slug, have you seen any slimes? ...He's not talking.","Look at that trail. It goes right past the moonmint. Suspicious."];
+const SLUG_LINES=["A slug! Ew… no, wait. It's kind of sparkly. Shoo! Leave Master's lettuce alone!","It pulled its eyes in. Are you sulking? You can't sulk, you're the one eating everything!","So shimmery… Are slugs supposed to glow? Something's strange about this garden.","Mister Slug, have you seen any slimes? …He's not talking.","Look at that trail. It goes right past the moonmint. Suspicious."];
 const SHR=[
  {n:'Dewleaf',l:"Dewleaf. The blue berries are always wet with dew, even at noon. Is that magic? It has to be magic.",ax:.494,s:.6},
  {n:'Sighbush',l:"Sighbush. If you listen close, it sighs when the wind blows. Hello, bush.",ax:.477,s:.62},
  {n:'Cloudtier',l:"Cloudtier. Master dries the blossoms into a powder lighter than air. I sneezed once and it went everywhere.",ax:.488,s:.58},
  {n:'Silvermint',l:"Silvermint. One leaf in the kettle and the whole shop smells like spring.",ax:.525,s:.58},
- {n:'Emberberry',l:"Emberberries! Warm to the touch. I burned my tongue on one last week. Never again. ...Maybe once more.",ax:.482,s:.56},
+ {n:'Emberberry',l:"Emberberries! Warm to the touch. I burned my tongue on one last week. Never again. …Maybe once more.",ax:.482,s:.56},
  {n:'Heartvine',l:"Heartvine. The little heart leaves go into friendship charms. I should make one for Master Lum.",ax:.447,s:.68},
  {n:'Duskberry',l:"Duskberries only ripen at twilight. Somebody ate half of them. Somebody slimy.",ax:.521,s:.56},
  {n:'Starjuniper',l:"Starjuniper. Blue berries for seeing in the dark, red ones for courage. I could use a red one right now.",ax:.503,s:.66},
@@ -794,14 +794,14 @@ function updateCosmic(dt){
   if(chatting){cos.state='idle';cos.face=lum.x<cos.x?-1:1;}
   cos.t+=dt;cos.bubble=Math.max(0,cos.bubble-dt);
   switch(cos.state){
-    case 'idle':cos.wait-=dt;if(cos.wait<=0&&!chatting){const r=Math.random();if(r<.62)cosPick();else if(r<.84){cos.state='sigh';cos.seqT=1.6;if(Math.random()<.5)cosQuip(['Hmm... bite marks.','Slime trail!','Sticky...','Not here either.'][(Math.random()*4)|0]);}else{cos.state='point';cos.seqT=.7;}}break;
+    case 'idle':cos.wait-=dt;if(cos.wait<=0&&!chatting){const r=Math.random();if(r<.62)cosPick();else if(r<.84){cos.state='sigh';cos.seqT=1.6;if(Math.random()<.5)cosQuip(['Hmm… bite marks.','Slime trail!','Sticky…','Not here either.'][(Math.random()*4)|0]);}else{cos.state='point';cos.seqT=.7;}}break;
     case 'walk':{const dx=cos.tx-cos.x,dy=cos.ty-cos.y,d=Math.hypot(dx,dy);if(d<6){cos.state='idle';cos.wait=rnd(1.4,3.6);break;}
       const sp=cos.run?165:72;let nx=cos.x+dx/d*sp*dt,ny=cos.y+dy/d*sp*dt;[nx,ny]=solveEstate(nx,ny);if(inStream(nx,ny,-6)){cosPick();break;}
       cos.x=nx;cos.y=ny;if(Math.abs(dx)>8)cos.face=dx<0?-1:1;cos.up=dy/d<-.55;cos.ft+=dt*CANIM.walk.fps*(cos.run?1.8:1);break;}
     case 'point':cos.seqT-=dt;if(cos.seqT<=0){cos.state='fizzle';sfxFizzle(Math.hypot(cos.x-lum.x,cos.y-lum.y)<520);cos.seqT=.7;
       const hx_=cos.x+cos.face*44,hy_=cos.y;for(let i=0;i<14;i++)PARTS.push({type:'fiz',x:hx_,y:hy_,z:72,vx:cos.face*rnd(10,70),vy:rnd(-30,30),vz:rnd(-10,90),life:0,max:rnd(.4,.9),s:rnd(1.5,3)});
       PARTS.push({type:'puff',x:hx_,y:hy_,z:72,vx:0,vy:0,vz:12,life:0,max:.9,s:10});}break;
-    case 'fizzle':cos.seqT-=dt;if(cos.seqT<=0){cos.state='sigh';cos.seqT=1.4;if(Math.random()<.7)cosQuip(['...aw.','Almost!','One day...','Fizzle again.'][(Math.random()*4)|0]);}break;
+    case 'fizzle':cos.seqT-=dt;if(cos.seqT<=0){cos.state='sigh';cos.seqT=1.4;if(Math.random()<.7)cosQuip(['…aw.','Almost!','One day…','Fizzle again.'][(Math.random()*4)|0]);}break;
     case 'sigh':cos.seqT-=dt;if(cos.seqT<=0){cos.state='idle';cos.wait=rnd(1,2.5);}break;
   }
 }
@@ -827,10 +827,10 @@ function talkCosmic(){
   if(!cos.talked){cos.talked=1;talk([
     ['Cosmic',"Master Lum! Something nibbled the moonmint again. There are tiny bite marks everywhere!"],
     ['Lum',"Slimes. They can't resist magic shrubs. Search the gardens around the shop and tell me what you find."],
-    ['Cosmic',"Yes, Master! ...Could you teach me one tiny spell first? Just a small one?"],
+    ['Cosmic',"Yes, Master! …Could you teach me one tiny spell first? Just a small one?"],
     ['Lum',"Not yet. A good apprentice learns to look before he learns to cast."],
     ['Cosmic',"Right. Looking. I'm very good at looking."]],true);return;}
-  const lines=["I found a shiny trail by the lavender. Slimes, definitely slimes!","I tried a spark spell again. Nothing happened. Well... a very small fizzle.","Do slimes like roses? I really hope they don't like roses.","I'll check behind the herb rows next, Master!","When you teach me magic, can my first spell be a big one?","The magic blossoms by the brook look half eaten. Poor things."];
+  const lines=["I found a shiny trail by the lavender. Slimes, definitely slimes!","I tried a spark spell again. Nothing happened. Well… a very small fizzle.","Do slimes like roses? I really hope they don't like roses.","I'll check behind the herb rows next, Master!","When you teach me magic, can my first spell be a big one?","The magic blossoms by the brook look half eaten. Poor things."];
   talk([['Cosmic',lines[(cos.talked++ -1)%lines.length]]],true);}
 
 /* ---------- garden fairies: tiny glowing sprites that flit between the flowers ---------- */
@@ -872,8 +872,8 @@ const INTRO_LINE="At the edge of the world sits a tiny magic shop, where a hermi
 const INTRO_TALK=[
   ['Lum',"Good morning, Cosmic."],
   ['Cosmic',"Master Lum! Something's been eating all the moonmint!"],
-  ['Lum',"Hmm. Shiny trails everywhere, and half the duskberries gone... slimes!"],
-  ['Lum',"If the slimes are not stopped, there won't be a single leaf for us to make powders or potions..."],
+  ['Lum',"Hmm. Shiny trails everywhere, and half the duskberries gone… slimes!"],
+  ['Lum',"If the slimes are not stopped, there won't be a single leaf for us to make powders or potions…"],
   ['Cosmic',"Let me take care of it! I can do it. I promise!"],
   ['Lum',"Very well, Cosmic. Search the garden and keep your eyes open. Even slimes can be dangerous…"],
   ['Cosmic',"I won't let you down."]];
@@ -1096,30 +1096,30 @@ const WOCC=[{base:600,clip:c=>{c.ellipse(690,606,224,86,0,0,TAU);}},{base:614,cl
 const WINT=[];let poolTalk=0;
 function setupWell(){WINT.length=0;
   const L=(x,y,reach,lines)=>{let i=0;WINT.push({x,y,reach,onInteract:()=>say(lines[(i++)%lines.length])});};
-  L(690,705,120,["The water is swirling with every color at once... This is it. This is where the magic is coming from!","If I lean in close I can hear it humming. Like the runes are singing to each other.","I can see the sky reflected down there... but it's the night sky. With stars. In the morning?!"]);
-  for(const [x,y] of [[470,620],[910,625],[560,525],[820,528],[600,690],[780,690]])L(x,y,85,["The water is swirling with every color at once... This is where the magic is coming from!","If I lean in close I can hear it humming. Like the runes are singing to each other.","I can see stars reflected down there. Stars! In the morning!"]);
+  L(690,705,120,["The water is swirling with every color at once… This is it. This is where the magic is coming from!","If I lean in close I can hear it humming. Like the runes are singing to each other.","I can see the sky reflected down there… but it's the night sky. With stars. In the morning?!"]);
+  for(const [x,y] of [[470,620],[910,625],[560,525],[820,528],[600,690],[780,690]])L(x,y,85,["The water is swirling with every color at once… This is where the magic is coming from!","If I lean in close I can hear it humming. Like the runes are singing to each other.","I can see stars reflected down there. Stars! In the morning!"]);
   L(380,575,95,["Master's old potion bottles! Some of them are still bubbling. Don't touch, Cosmic. Don't. Touch."]);
   L(460,520,80,["Glowing crystals growing right out of the wall. Master says they only grow where magic is strongest."]);
-  L(900,545,90,["A whole shelf of potions down here! Master Lum never told me about this room.","Moonlight tonic, ember draught, sleepy dust... and one that just says 'DO NOT'."]);
-  L(1070,630,90,["Scrolls, a mortar and pestle... someone's been studying down here.","This scroll has a drawing of a giant slime with a crown. Oh no. Oh no no no."]);
+  L(900,545,90,["A whole shelf of potions down here! Master Lum never told me about this room.","Moonlight tonic, ember draught, sleepy dust… and one that just says 'DO NOT'."]);
+  L(1070,630,90,["Scrolls, a mortar and pestle… someone's been studying down here.","This scroll has a drawing of a giant slime with a crown. Oh no. Oh no no no."]);
   L(1175,672,90,["THE RUNIC CONSERVATORY. A secret room! Under our well! This whole time!"]);
   WINT.push({x:195,y:700,reach:80,onInteract:()=>goScene(()=>enterGarden())});
   if(!bucketTaken)WINT.push({x:750,y:510,reach:62,bucket:1,onInteract:()=>takeBucket()});
-  WINT.push({x:676,y:510,reach:70,onInteract:()=>{if(studyVisited)goScene(()=>enterStudy());else talk([['Cosmic',"There's a shiny slime trail leading through that doorway..."],['Cosmic',"Okay. Brave apprentice. Very brave. Here I go."]],false,()=>goScene(()=>enterStudy()));}});
+  WINT.push({x:676,y:510,reach:70,onInteract:()=>{if(studyVisited)goScene(()=>enterStudy());else talk([['Cosmic',"There's a shiny slime trail leading through that doorway…"],['Cosmic',"Okay. Brave apprentice. Very brave. Here I go."]],false,()=>goScene(()=>enterStudy()));}});
   L(140,720,90,["The runes glow brighter when I get close. They're warm, like sunlight."]);
   L(1270,720,90,["This rune looks like a little door. Or a little house. Or a very square bird."]);
 }
 function takeBucket(){if(bucketTaken)return;bucketTaken=true;const i=WINT.findIndex(o=>o.bucket);if(i>=0)WINT.splice(i,1);const j=WOBST.findIndex(o=>o.bucket);if(j>=0)WOBST.splice(j,1);
   puff(750,490,14,'fiz',{sp:60,vz:160,z:20,life:.9,size:2.4});giveItem('bucket');if(!gotEquip){gotEquip=true;TUT.stage=1;TUT.t=0;}}
 function enterWell(){SCENE='well';lum.x=340;lum.y=705;lum.face=1;lum.vx=lum.vy=0;lum.state='idle';WCAM.x=330;setupWell();
-  spawnWellSlimes();for(const g of WSLIMES)g.calm=Math.max(g.calm||0,2.5);if(slimesDone<3){GOAL.tag='NEW TASK';GOAL.text='Defeat the slimes in the chamber';}HINT.goalT=0;WTITLE.t=0;if(!wellVisited){wellVisited=true;setTimeout(()=>playerQuip('Whoa... a secret room under the well?!'),900);}}
+  spawnWellSlimes();for(const g of WSLIMES)g.calm=Math.max(g.calm||0,2.5);if(slimesDone<3){GOAL.tag='NEW TASK';GOAL.text='Defeat the slimes in the chamber';}HINT.goalT=0;WTITLE.t=0;if(!wellVisited){wellVisited=true;setTimeout(()=>playerQuip('Whoa… a secret room under the well?!'),900);}}
 function enterGarden(){SCENE='garden';lum.x=WELL.x;lum.y=WELL.y+70;lum.face=1;lum.vx=lum.vy=0;lum.state='idle';cam.x=lum.x;cam.y=lum.y-50;}
 function wellInteract(){if(CH===1){say("The well is cold and silent. Whatever stirred down there is gone now.");return;}if(!wellVisited)talk([
-    ['Cosmic',"Whoa... the well is humming. I can feel it all the way in my fingertips!"],
+    ['Cosmic',"Whoa… the well is humming. I can feel it all the way in my fingertips!"],
     ['Cosmic',"Something magic is down there. Something big."],
-    ['Cosmic',"What if all the slugs and slimes are coming from one place? What if there's a... slime boss?!"],
+    ['Cosmic',"What if all the slugs and slimes are coming from one place? What if there's a… slime boss?!"],
     ['Cosmic',"If I take care of the boss, the whole garden is saved. And then Master Lum will HAVE to teach me magic!"],
-    ['Cosmic',"Okay. Deep breath. Here I go..."]],false,()=>goScene(()=>enterWell()));
+    ['Cosmic',"Okay. Deep breath. Here I go…"]],false,()=>goScene(()=>enterWell()));
   else talk([['Cosmic',"The well is still humming. Back down I go!"]],false,()=>goScene(()=>enterWell()));wellMagic=2.4;sfxWell();}
 const WTITLE={t:99};const WMOTES=[];for(let i=0;i<30;i++)WMOTES.push({x:rnd(100,1300),y:rnd(80,740),ph:rnd(0,TAU),sp:rnd(.3,.9),c:Math.random()<.6?'190,230,255':'230,210,255'});
 const CHANNELS=[[[545,650],[500,700],[430,740],[380,768]],[[838,650],[900,700],[960,740],[1000,768]],[[520,478],[545,500],[575,520]],[[360,585],[330,600],[300,610]]];
@@ -1166,7 +1166,7 @@ function wellToScreen(wx,wy){const [rz,oy]=roomView();return [(wx-WCAM.x)*rz+W/2
    ===================================================================== */
 const SLOTS=[['head','Head'],['chest','Body'],['boots','Boots'],['main','Main Hand'],['off','Off Hand'],['charm','Charm']];
 const ITEMS={
-  staff:{name:"Apprentice's Staff",slot:'main',stats:{atk:1},desc:"A crooked willow staff with a crystal tied on with string. It sparkles... sometimes."},
+  staff:{name:"Apprentice's Staff",slot:'main',stats:{atk:1},desc:"A crooked willow staff with a crystal tied on with string. It sparkles… sometimes."},
   cloak:{name:'Apprentice Cloak',slot:'chest',stats:{def:1},desc:"Hand-stitched by Master Lum. The sleeves are still much too long."},
   boots:{name:'Old Boots',slot:'boots',stats:{spd:1},desc:"Scuffed, patched and very comfy. Excellent for running away from slugs."},
   bucket:{name:'Wooden Bucket',slot:'head',stats:{def:2},desc:"Smells faintly of well water. Surprisingly sturdy, and it only covers your eyes a little."},
@@ -1193,7 +1193,7 @@ const ITEMS={
   mooncharm:{name:"Lum's Moon Charm",slot:'charm',stats:{atk:1,def:1},hp:2,desc:"A crescent moon on a silver chain, earned for a legendary Prologue. +1 ATK, +1 DEF, +2 max HP."},
   moonmint:{name:'Silver Moonmint Sprig',slot:'charm',stats:{def:1},hp:2,desc:"A sprig of moonmint pressed into a moonstone ring. +1 DEF, +2 max HP."},
   duskflower:{name:'Pressed Duskberry Blossom',slot:'charm',stats:{def:1},desc:"A tiny duskberry blossom set in a heart-shaped charm. +1 DEF."},
-  spark:{name:'Spark Powder',kind:'use',dmg:3,short:'Throw for 3 damage',desc:"A pinch of crackling star-dust. Thrown in battle, it bursts for 3 damage (more with Magic)."}};
+  spark:{name:'Spark Powder',kind:'use',dmg:3,short:'Throw for 3 damage',desc:"A pinch of crackling stardust. Thrown in battle, it bursts for 3 damage (more with Magic)."}};
 const STAT_NAME={atk:'Attack',def:'Defense',mag:'Magic',spd:'Speed'};
 const PARTY={cosmic:{main:'staff',off:null,head:null,chest:'cloak',boots:'boots',charm:null},
              lum:{main:'lumpouch',off:null,head:null,chest:'lumrobe',boots:null,charm:null}};
@@ -1208,13 +1208,13 @@ const CHEAD=[[117,66,54],[120,65,53],[118,66,53],[118,65,54],[120,65,54],[119,65
 
 function statLine(who){return heroStats(who);}
 function giveItem(id){BAG.push(id);if(typeof SAVEC!=='undefined')SAVEC.t=99;if(HIDDEN.some(([k])=>k===id))STATS.found[id]=1;TOAST.t=0;TOAST.name=ITEMS[id].name;TOAST.id=id;MENU.newItems++;sfxItem();}
-function equip(who,id){if((SCENE==='shop'||SCENE==='bed')&&id==='blade'){MENU.note="Cosmic: Not in here! I don't want Master Lum to find out about the sword...";MENU.noteT=3;return;}const it=ITEMS[id],cur=PARTY[who][it.slot];const i=BAG.indexOf(id);if(i<0)return;BAG.splice(i,1);if(cur)BAG.splice(i,0,cur);PARTY[who][it.slot]=id;syncMaxHp();sfxEquip();
+function equip(who,id){if((SCENE==='shop'||SCENE==='bed')&&id==='blade'){MENU.note="Cosmic: Not in here! I don't want Master Lum to find out about the sword…";MENU.noteT=3;return;}const it=ITEMS[id],cur=PARTY[who][it.slot];const i=BAG.indexOf(id);if(i<0)return;BAG.splice(i,1);if(cur)BAG.splice(i,0,cur);PARTY[who][it.slot]=id;syncMaxHp();sfxEquip();
   MENU.sel={kind:'slot',slot:it.slot};if(TUT.stage===3&&id==='bucket'){TUT.stage=4;TUT.t=0;}}
 function unequip(who,slot){const id=PARTY[who][slot];if(!id)return;if(BAG.length>=8){MENU.note='Your satchel is full!';MENU.noteT=2;return;}PARTY[who][slot]=null;syncMaxHp();BAG.push(id);MENU.sel={kind:'bag',i:BAG.length-1};sfxPage(.5);}
 function openMenu(){if(MENU.open||DLG.active||FADE.dir||INTRO.on||INTRO.waiting||busy())return;MENU.open=true;MENU.sel=null;MENU.newItems=0;sfxBook(true);lum.vx=lum.vy=0;stick.id=null;
   if(TUT.stage===1){TUT.stage=2;TUT.t=0;}}
 function closeMenu(){if(!MENU.open)return;MENU.open=false;SAVEC.t=99;sfxBook(false);
-  if(TUT.stage===4){TUT.stage=0;setTimeout(()=>say("How do I look? Very heroic, I bet. ...Is it on backwards?"),450);}
+  if(TUT.stage===4){TUT.stage=0;setTimeout(()=>say("How do I look? Very heroic, I bet. …Is it on backwards?"),450);}
   else if(TUT.stage>=2&&!PARTY[HERO].head){TUT.stage=1;TUT.t=0;}}
 
 /* the bucket, the right way up (for icons) or upside down (for wearing) */
@@ -1398,7 +1398,7 @@ function drawMenu(dt){MENU.a=clamp(MENU.a+(MENU.open?dt*5:-dt*6),0,1);if(MENU.a<
     c.fillStyle='#fffaf0';c.font='700 16px "Alegreya SC", Georgia, serif';c.textAlign='center';c.fillText(lab,bx+bw/2,by+24);c.textAlign='left';
     hit(bx,by,bw,bh,()=>{if(fromSlot)unequip(HERO,fromSlot);else if(it.slot)equip(HERO,id);else if(it.heal){const H_=HEROES[HERO];if(H_.hp>=H_.maxHp){MENU.note='Cosmic is already feeling great!';MENU.noteT=2;return;}const amt=healRoll(it);H_.hp=Math.min(H_.maxHp,H_.hp+amt);BAG.splice(MENU.sel.i,1);STATS.items++;MENU.sel=null;sfxItem();MENU.note=`Healed ${amt} HP!`;MENU.noteT=1.8;}});}
     if(TUT.stage===3&&id==='bucket'&&!fromSlot){c.save();const p=.5+.5*Math.sin(T*6);c.strokeStyle=`rgba(232,170,60,${(.6+.4*p).toFixed(3)})`;c.lineWidth=3;rr(bx-5-p*2,by-5-p*2,bw+10+p*4,bh+10+p*4,15);c.stroke();c.restore();tutArrow(c,bx+bw/2,by-8,1);}}
-  else{c.font='italic 14px Alegreya, Georgia, serif';c.fillStyle='#8a7050';c.textAlign='center';c.fillText(BAG.length?tw('Tap an item to read about it.','Click an item to read about it.'):'Your satchel is empty... for now.',BKW/2,y+40);}
+  else{c.font='italic 14px Alegreya, Georgia, serif';c.fillStyle='#8a7050';c.textAlign='center';c.fillText(BAG.length?tw('Tap an item to read about it.','Click an item to read about it.'):'Your satchel is empty… for now.',BKW/2,y+40);}
   }
   // tutorial words, written in the margin like a note from Lum
   const tip=TUT.stage===2?tw('Tap the Wooden Bucket in your satchel.','Click the Wooden Bucket in your satchel.'):TUT.stage===3?tw('Now tap Equip to wear it on your head.','Now click Equip to wear it on your head.'):TUT.stage===4?tw('Perfect fit! Tap the wax seal to close the book.','Perfect fit! Click the wax seal (or press I) to close the book.'):MENU.noteT>0?MENU.note:'';
@@ -1450,8 +1450,8 @@ function WELL_REST(dt){
   if(WEVENT.on){WEVENT.t+=dt;
     if(WEVENT.stage===0&&WEVENT.t>1.1){WEVENT.stage=1;WEVENT.t=0;QUAKE.t=0;QUAKE.dur=3.2;QUAKE.amp=9;sfxRumble();}
     if(WEVENT.stage===1&&WEVENT.t>2.6){WEVENT.stage=2;WEVENT.t=0;sfxEerie();
-      talk([['???',"Bravo, young one. You're much stronger than you know..."]],false,()=>{WEVENT.stage=3;WEVENT.t=0;
-        setTimeout(()=>talk([['Cosmic',"W-who said that?!"],['Cosmic',"...Master Lum? Is that you? This isn't funny!"]],false,()=>{WEVENT.on=false;GOAL.tag='NEW TASK';GOAL.text='Find the voice in the dark';HINT.goalT=0;}),700);});}}}
+      talk([['???',"Bravo, young one. You're much stronger than you know…"]],false,()=>{WEVENT.stage=3;WEVENT.t=0;
+        setTimeout(()=>talk([['Cosmic',"W-who said that?!"],['Cosmic',"…Master Lum? Is that you? This isn't funny!"]],false,()=>{WEVENT.on=false;GOAL.tag='NEW TASK';GOAL.text='Find the voice in the dark';HINT.goalT=0;}),700);});}}}
 function hitSlimes(hx,hy){for(const g of (SCENE==='garden'?SLUGS:roomSlimes())){if(g.dead||g.calm>0)continue;if(Math.hypot(g.x-hx,(g.y-hy)*1.6)<110){startEncounter(g,'first');return true;}}return false;}
 function hitSlimesOld(hx,hy){let any=false;for(const g of WSLIMES){if(g.dead)continue;if(Math.hypot(g.x-hx,(g.y-hy)*1.6)<95){any=true;g.hp--;g.hit=.35;g.angry=4;const a=Math.atan2(g.y-lum.y,g.x-lum.x);
   const kx=g.x+Math.cos(a)*70,ky=g.y+Math.sin(a)*40;g.hop={x0:g.x,y0:g.y,x1:wellFree(kx,ky)?kx:g.x,y1:wellFree(kx,ky)?ky:g.y,t:0,d:.4,kb:1};
@@ -1548,13 +1548,13 @@ function drawWipe(){if(WIPE.p<=0)return;const e=WIPE.p<1?(1-Math.cos(Math.PI*WIP
   ctx.restore();}
 
 /* ---------- starting and ending ---------- */
-function startEncounter(g,mode){if(BATTLE.on||WIPE.dir||WEVENT.on||g.dead||g.calm>0)return;BATTLE.capG=g;CAPTURE.want=true;BATTLE.pending=true;lum.vx=lum.vy=0;sfxEncounter();WIPE.label=mode==='first'?'First Strike!':g.kind==='bigvixen'?'The Elder Vixen awakens!':g.kind==='vixen'?'The Vixen bares her teeth!':g.kind==='slugking'?'The Slug King appears!':g.kind==='reaper'?'The Grave Reaper attacks!':`A wild ${FOE_TYPES[g.kind||'slime'].name.toLowerCase()} appears!`;
+function startEncounter(g,mode){if(BATTLE.on||WIPE.dir||WEVENT.on||g.dead||g.calm>0)return;BATTLE.capG=g;CAPTURE.want=true;BATTLE.pending=true;lum.vx=lum.vy=0;sfxEncounter();WIPE.label=mode==='first'?'First Strike!':g.kind==='bigvixen'?'The Elder Vixen awakens!':g.kind==='vixen'?'The Vixen bares her teeth!':g.kind==='slugking'?'The Slug King appears!':g.kind==='reaper'?'The Grave Reaper attacks!':`A wild ${FOE_TYPES[g.kind||'slime'].name} appears!`;
   pageTurn(()=>setupBattle(g,mode));}
 function setupBattle(g,mode){const B=BATTLE;B.on=true;B.pending=false;B.field=g;B.pops=[];B.spark=[];B.fx=[];B.hitstop=0;B.msg='';B.items=null;B.cur=0;B.menu=0;B.target=0;B.defending={};B.t=0;BMUS.on=true;
   B.heroes=PARTY_ORDER.map((id,i)=>({id,home:i,x:0,y:0,ox:0,oy:0,fr:16,face:1,hurt:0,ko:0}));
   const n=g.pack||1,kind=g.kind||'slime';B.foes=[];for(let i=0;i<n;i++){const T_=FOE_TYPES[kind];B.foes.push({type:kind,name:T_.name,hp:T_.hp,max:T_.hp,atk:T_.atk,def:T_.def,col:g.kind==='jelly'?['200,240,255','120,200,225','50,110,150']:(g.col||['190,240,255','150,210,230','60,110,130']),s:g.s*(i?.9:1),ox:0,oy:0,z:0,ph:rnd(0,TAU),blink:rnd(1,4),hit:0,angry:0,dead:0,face:-1,land:0,showHp:0});}
   layoutBattle();
-  if(mode==='first'){B.phase='firstStrike';B.t=0;}else if(mode==='ambush'){B.phase='banner';B.bannerText=`The ${FOE_TYPES[g.kind||'slime'].name.toLowerCase()} ${g.kind==='slime'||!g.kind?'pounces':'lunges'}!`;B.after='foeTurn';B.t=0;}else{B.phase='heroMenu';}
+  if(mode==='first'){B.phase='firstStrike';B.t=0;}else if(mode==='ambush'){B.phase='banner';B.bannerText=`The ${FOE_TYPES[g.kind||'slime'].name} ${g.kind==='slime'||!g.kind?'pounces':'lunges'}!`;B.after='foeTurn';B.t=0;}else{B.phase='heroMenu';}
   B.foeI=0;}
 const STAGE_Y=.66;
 function stageSlots(nH,nF){const S=bS(),fy=H*STAGE_Y,hs=[],fs=[];for(let i=0;i<nH;i++)hs.push([W*.26-i*22*S,fy+i*26*S]);
@@ -1589,10 +1589,10 @@ function endBattle(result){const B=BATTLE,g=B.field;BMUS.on=false;SAVEC.t=99;if(
   const G_=g.scene==='garden';
   if(result==='win'){pageTurn(()=>{B.on=false;const L_=g.scene==='dun'?DFOES:g.scene==='woods'?(CH===1?(g.kind==='reaper'?[]:WFOES):WSKELS):(g.kind==='slug'||g.kind==='slugking')?SLUGS:G_?GSLIMES:g.scene==='study'?SSLIMES:g.scene==='shed'?SHSLIMES:g.scene==='pond'?PSLIMES:WSLIMES,i=L_.indexOf(g);if(i>=0)L_.splice(i,1);
       for(let k=0;k<14;k++)PARTS.push({type:'fiz',x:g.x,y:g.y,z:30,vx:rnd(-60,60),vy:rnd(-20,20),vz:rnd(80,200),life:0,max:rnd(.6,1.2),s:rnd(2,3.5)});
-      if(g.kind==='slugking'){kingState=2;STATS.kingSlain=1;GOAL.tag='GARDEN SLUGS';GOAL.text='The Slug King is defeated!';HINT.goalT=0;setTimeout(()=>talk([['Cosmic',"I did it! I beat the Slug King!"],['Cosmic',"He left something behind... a ring? It's warm and squishy... and kind of beautiful."]],false,()=>giveItem('slimering')),1200);return;}
-      if(G_){gardenDone++;GOAL.tag='GARDEN SLUGS';GOAL.text=`${gardenDone} of 5 cleared`;HINT.goalT=0;if(gardenDone>=5)setTimeout(()=>talk([['Cosmic',"That's every slug in the garden! Master Lum's shrubs are safe!"],['Cosmic',"Huh? That last one left something shiny behind... a key! It has a little leaf on it."]],false,()=>{giveItem('shedkey');setTimeout(kingArrives,2500);}),1200);return;}
+      if(g.kind==='slugking'){kingState=2;STATS.kingSlain=1;GOAL.tag='GARDEN SLUGS';GOAL.text='The Slug King is defeated!';HINT.goalT=0;setTimeout(()=>talk([['Cosmic',"I did it! I beat the Slug King!"],['Cosmic',"He left something behind… a ring? It's warm and squishy… and kind of beautiful."]],false,()=>giveItem('slimering')),1200);return;}
+      if(G_){gardenDone++;GOAL.tag='GARDEN SLUGS';GOAL.text=`${gardenDone} of 5 cleared`;HINT.goalT=0;if(gardenDone>=5)setTimeout(()=>talk([['Cosmic',"That's every slug in the garden! Master Lum's shrubs are safe!"],['Cosmic',"Huh? That last one left something shiny behind… a key! It has a little leaf on it."]],false,()=>{giveItem('shedkey');setTimeout(kingArrives,2500);}),1200);return;}
       if(g.scene==='dun'){if(g.kind==='vixen'){C1.vixen=1;setTimeout(()=>talk([['Lum',"The thief fled!"]]),900);}
-        if(g.kind==='bigvixen'){C1.bigVixen=1;setTimeout(()=>talk([['Lum',"Lovely fox fur boots!"]],false,()=>giveItem('foxboots')),900);}return;}
+        if(g.kind==='bigvixen'){C1.bigVixen=1;setTimeout(()=>talk([['Lum',"Lovely fox-fur boots!"]],false,()=>giveItem('foxboots')),900);}return;}
       if(g.scene==='woods'&&CH===1){if(g.kind==='reaper'){C1.reaper=2;REAPER=null;GOAL.tag='TASK';GOAL.text="Knock on the gravekeeper's door";HINT.goalT=0;setTimeout(()=>talk([['Lum',"It's gone… Whoever's inside must be terrified."],['Lum',"I should knock again."]]),900);}return;}
       if(g.scene==='woods'){skelDone++;GOAL.tag=skelDone>=3?'THE DEAD ARE SILENT':'RISEN DEAD SLAIN';GOAL.text=`${skelDone} of 3`;HINT.goalT=0;if(skelDone>=3)setTimeout(fokalurEvent,1400);return;}
       if(g.kind==='mimic'){mimicState=2;setTimeout(()=>say("I beat a chest with TEETH! Wait until Master Lum hears about this!"),900);return;}if(g.scene==='pond'){pondDone++;if(pondDone>=2)setTimeout(pondVoiceEvent,900);return;}if(g.scene==='study'||g.scene==='shed')return;
@@ -1600,14 +1600,14 @@ function endBattle(result){const B=BATTLE,g=B.field;BMUS.on=false;SAVEC.t=99;if(
   else if(result==='flee'){pageTurn(()=>{B.on=false;g.calm=3.5;if(g.kind==='reaper'&&REAPER){REAPER.st='chase';REAPER.t=0;REAPER.calm=1.4;}g.angry=0;g.chase=false;lum.bumpT=3;const a=Math.atan2(lum.y-g.y,lum.x-g.x);for(let k=0;k<20;k++){const nx=lum.x+Math.cos(a)*6,ny=lum.y+Math.sin(a)*4;if((G_?gardenFree:roomFree())(nx,ny)){lum.x=nx;lum.y=ny;}}});}
   else if(result==='lose'&&g.scripted){FADE.white=true;goScene(()=>{B.on=false;FADE.white=false;for(const id of PARTY_ORDER)HEROES[id].hp=HEROES[id].maxHp;mimicState=1;
       SCENE='study';lum.x=440;lum.y=745;lum.face=1;lum.vx=lum.vy=0;lum.state='idle';WCAM.x=440;WOFF.y=0;for(const s_ of SSLIMES)s_.calm=8;
-      setTimeout(()=>{sfxEerie();talk([['???',"Try using this sword..."]],false,()=>{giveItem('blade');setTimeout(()=>talk([['Cosmic',"Wh-what? A sword just appeared in my hands!"],['Cosmic',"It's ancient... and it's humming. Maybe I should equip it in my spellbook."]]),700);});},900);});}
+      setTimeout(()=>{sfxEerie();talk([['???',"Try using this sword…"]],false,()=>{giveItem('blade');setTimeout(()=>talk([['Cosmic',"Wh-what? A sword just appeared in my hands!"],['Cosmic',"It's ancient… and it's humming. Maybe I should equip it in my spellbook."]]),700);});},900);});}
   else if(result==='lose'&&g.scene==='dun'){FADE.white=true;goScene(()=>{B.on=false;FADE.white=false;HEROES.lum.hp=HEROES.lum.maxHp;for(const f_ of DFOES)f_.calm=4;enterDun(1,560,650,1);setTimeout(()=>talk([['Lum',"Ugh… I need to be more careful down here."]]),900);});}
   else if(result==='lose'&&g.scene==='woods'&&CH===1){FADE.white=true;goScene(()=>{B.on=false;FADE.white=false;HEROES.lum.hp=HEROES.lum.maxHp;for(const f_ of WFOES)f_.calm=4;if(g.kind==='reaper'){C1.reaper=0;REAPER=null;}
       lum.x=70;lum.y=630;lum.face=1;lum.vx=lum.vy=0;lum.state='idle';cam.x=lum.x+120;cam.y=lum.y-50;setTimeout(()=>talk([['Lum',"Ugh… I'm not as nimble as I used to be."],['Lum',"I can't give up. Not while Cosmic is out there."]]),900);});}
   else if(result==='lose'&&g.scene==='woods'){FADE.white=true;goScene(()=>{B.on=false;FADE.white=false;for(const id of PARTY_ORDER)HEROES[id].hp=HEROES[id].maxHp;for(const s_ of WSKELS)s_.calm=4;lum.x=GATE.x;lum.y=GATE.y+70;lum.face=1;lum.vx=lum.vy=0;lum.state='idle';
-      setTimeout(()=>{sfxEerie();talk([['???',"Get up, child. You are not finished."],['Cosmic',"Ugh... everything hurts."]]);},900);});}
+      setTimeout(()=>{sfxEerie();talk([['???',"Get up, child. You are not finished."],['Cosmic',"Ugh… everything hurts."]]);},900);});}
   else if(result==='lose'){FADE.white=true;goScene(()=>{B.on=false;FADE.white=false;for(const id of PARTY_ORDER)HEROES[id].hp=HEROES[id].maxHp;g.calm=2;g.angry=0;
-      SCENE='garden';lum.x=0;lum.y=64;lum.face=1;lum.vx=lum.vy=0;lum.state='idle';cam.x=0;cam.y=14;if(!G_){GOAL.tag='TASK';GOAL.text='Head back down the well';HINT.goalT=0;}setTimeout(()=>talk([['Cosmic',"...Huh? I'm back at Lum's Magic Shop?"],['Cosmic',"Was that all a bad dream? It felt so real... and so sticky."]]),900);});}}
+      SCENE='garden';lum.x=0;lum.y=64;lum.face=1;lum.vx=lum.vy=0;lum.state='idle';cam.x=0;cam.y=14;if(!G_){GOAL.tag='TASK';GOAL.text='Head back down the well';HINT.goalT=0;}setTimeout(()=>talk([['Cosmic',"…Huh? I'm back at Lum's Magic Shop?"],['Cosmic',"Was that all a bad dream? It felt so real… and so sticky."]]),900);});}}
 
 /* ---------- the turn engine ---------- */
 const MENU_OPTS_C=[['bonk','Staff'],['items','Items'],['defend','Defend'],['run','Run']],MENU_OPTS_L=[['powder','Powders'],['items','Items'],['defend','Defend'],['run','Run']];const MENU_OPTS_LB=[['burst','Starfall'],...MENU_OPTS_L];const menuOpts=()=>HERO==='lum'?((C1.combo||0)>=3?MENU_OPTS_LB:MENU_OPTS_L):MENU_OPTS_C;
@@ -1802,7 +1802,7 @@ function drawCommandUI(){const B=BATTLE,S=bS();drawBladeSlash();
     ctx.save();ctx.strokeStyle=`rgba(255,240,180,${(.4+.6*w).toFixed(3)})`;ctx.lineWidth=3;ctx.beginPath();ctx.arc(cx,cy,r,0,TAU);ctx.stroke();
     const on=w>.8&&w<=1.02;drawGlow(ctx,cx,cy,on?40*S:24*S,'255,220,120',on?.9:.4);ctx.fillStyle=on?'#fff6c8':'#e8c060';ctx.beginPath();for(let k=0;k<10;k++){const a=k/10*TAU-Math.PI/2,rr_=k%2?7*S:16*S;ctx.lineTo(cx+Math.cos(a)*rr_,cy+Math.sin(a)*rr_);}ctx.closePath();ctx.fill();ctx.restore();
     if(!B.tut.bonk)tutText(tw('Tap just as the ring touches the star!','Press Space just as the ring touches the star!'));}
-  if((B.phase==='foeWind'||B.phase==='foeLeap')&&!B.tut.guard)tutText(`${tw('Tap','Press Space')} just before the ${B.foes[B.foeI]?B.foes[B.foeI].name.toLowerCase():'enemy'} hits to guard!`);
+  if((B.phase==='foeWind'||B.phase==='foeLeap')&&!B.tut.guard)tutText(`${tw('Tap','Press Space')} just before the ${B.foes[B.foeI]?B.foes[B.foeI].name:'enemy'} hits to guard!`);
   if(B.phase==='run'){const h=B.heroes[B.cur],c=B.cmd,w=150*S,x=W/2-w/2,y=H*.75;ctx.fillStyle='rgba(20,20,30,.6)';rr(x-4,y-4,w+8,22,11);ctx.fill();ctx.fillStyle=c.fill>=.6?'#7ee08a':'#f2d58a';rr(x,y,w*c.fill,14,7);ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x+w*.6,y-6);ctx.lineTo(x+w*.6,y+20);ctx.stroke();
     tutText(tw('Tap tap tap as fast as you can to run away!','Mash Space as fast as you can to run away!'));}}
 function drawBladeSlash(){const B=BATTLE;if(PARTY[HERO].main!=='blade'||(B.phase!=='bonkHit'&&!(B.phase==='bonkWind'&&B.t>=B.windD)))return;const f=B.foes[B.target];if(!f)return;const S=bS(),u=B.phase==='bonkHit'?Math.min(1,B.t/.3):0,cx=f.x+f.ox,cy=f.y-50*S;
@@ -1830,7 +1830,7 @@ function drawBattleMenu(){const B=BATTLE,S=bS();B.menuHits=[];B.itemHits=[];
   if(B.phase==='items'){const use=BAG.filter(id=>ITEMS[id].kind==='use');const w=Math.min(W-40,320),x=(W-w)/2,y=H*.55,h_=Math.max(120,use.length*46+70);
     ctx.save();ctx.fillStyle='rgba(20,10,10,.3)';rr(x+2,y+4,w,h_,14);ctx.fill();ctx.fillStyle='#f6ecd2';rr(x,y,w,h_,14);ctx.fill();ctx.strokeStyle='#c49a4e';ctx.lineWidth=1.5;ctx.stroke();
     ctx.fillStyle='#6a4a28';ctx.font='700 14px "Alegreya SC", Georgia, serif';ctx.textAlign='center';ctx.fillText('Potions & Powders',W/2,y+26);
-    if(!use.length){ctx.font='italic 14px Alegreya, Georgia, serif';ctx.fillStyle='#8a7050';ctx.fillText("Nothing in your satchel yet...",W/2,y+60);ctx.fillText("Maybe the magic shop has something?",W/2,y+80);}
+    if(!use.length){ctx.font='italic 14px Alegreya, Georgia, serif';ctx.fillStyle='#8a7050';ctx.fillText("Nothing in your satchel yet…",W/2,y+60);ctx.fillText("Maybe the magic shop has something?",W/2,y+80);}
     use.forEach((id,i)=>{const yy=y+40+i*46;ctx.fillStyle='rgba(120,86,40,.12)';rr(x+12,yy,w-24,40,10);ctx.fill();if(!TOUCHUI()&&i===(B.itemSel||0)){ctx.strokeStyle='#e0a83a';ctx.lineWidth=2;ctx.stroke();}drawIcon(ctx,id,x+34,yy+20,26);ctx.fillStyle='#4a3420';ctx.textAlign='left';ctx.font='700 14px "Alegreya SC", Georgia, serif';ctx.fillText(ITEMS[id].name,x+58,yy+18);ctx.font='italic 12px Alegreya, Georgia, serif';ctx.fillStyle='#7a6040';ctx.fillText(ITEMS[id].short||'',x+58,yy+33);
       B.itemHits.push({x:x+12,y:yy,w:w-24,h:40,act:()=>useItem(id)});});
     ctx.font='italic 12px Alegreya, Georgia, serif';ctx.fillStyle='#8a7050';ctx.textAlign='center';ctx.fillText(tw('tap outside to go back','click outside or press Esc to go back'),W/2,y+h_-12);ctx.restore();}}
@@ -1851,7 +1851,7 @@ function drawBattleBanner(){const B=BATTLE,S=bS();
       ctx.fillStyle='#8a6a3a';ctx.font='700 10px "Alegreya SC", Georgia, serif';ctx.fillText(`THE ${B.foes[0].name.toUpperCase()} DROPPED`,W/2+18,yy+24);const lid=B.loot[0];drawGlow(ctx,x+38,yy+40,26,lid==='boneparts'?'200,170,255':'190,245,205',.6);drawIcon(ctx,lid,x+38,yy+40,34);
       ctx.fillStyle='#4f3c22';ctx.font='700 18px "Alegreya SC", Georgia, serif';ctx.fillText(`${ITEMS[B.loot[0]].name}  ×${B.loot.length}`,W/2+18,yy+48);}
     if(B.t>1.6){ctx.globalAlpha=.6+.4*Math.sin(T*4);ctx.font='italic 14px Alegreya, Georgia, serif';ctx.fillStyle='#fdf6e4';ctx.fillText(tw('tap to continue','click or press Space to continue'),W/2,H*.86);}ctx.restore();}
-  if(B.phase==='lose'){const a=Math.min(1,B.t/1.2);ctx.save();ctx.globalAlpha=a;ctx.textAlign='center';ctx.font=`italic ${Math.round(20*S)}px Alegreya, Georgia, serif`;ctx.fillStyle='#fdf6e4';ctx.shadowColor='rgba(0,0,0,.6)';ctx.shadowBlur=8;ctx.fillText('Cosmic is all out of breath...',W/2,H*.3);ctx.restore();}}
+  if(B.phase==='lose'){const a=Math.min(1,B.t/1.2);ctx.save();ctx.globalAlpha=a;ctx.textAlign='center';ctx.font=`italic ${Math.round(20*S)}px Alegreya, Georgia, serif`;ctx.fillStyle='#fdf6e4';ctx.shadowColor='rgba(0,0,0,.6)';ctx.shadowBlur=8;ctx.fillText('Cosmic is all out of breath…',W/2,H*.3);ctx.restore();}}
 
 /* ---------- battle music: a bouncy little march in D dorian ---------- */
 const BPROG=[[38,[62,65,69]],[34,[58,62,65]],[36,[60,64,67]],[33,[61,64,69]]];
@@ -1887,21 +1887,21 @@ const roomH=y=>SCENE==='study'?studyH(y):SCENE==='shed'?shedH(y):SCENE==='pond'?
 const roomSlimes=()=>SCENE==='woods'?(CH===1?WFOES:WSKELS):SCENE==='well'?WSLIMES:SCENE==='study'?SSLIMES:SCENE==='shed'?SHSLIMES:SCENE==='pond'?PSLIMES:[];
 const roomFree=()=>SCENE==='woods'?woodsFree:SCENE==='study'?studyFree:SCENE==='shed'?shedFree:SCENE==='pond'?pondFree:SCENE==='shop'?shopFree:SCENE==='bed'?bedFree:SCENE==='vhut'?vhutFree:SCENE==='dun'?dunFree:wellFree;
 function setupStudy(){SINT.length=0;SINT.push({x:175,y:722,reach:85,onInteract:()=>goScene(()=>enterWellFromStudy())});const L=(x,y,reach,lines)=>{let i=0;SINT.push({x,y,reach,onInteract:()=>say(lines[(i++)%lines.length])});};
-  L(470,632,95,["So many books! 'Moss and You', 'A Brief History of Toadstools', 'Advanced Napping'...","This one is called 'Slimes: A Gentle Guide'. Somebody dog-eared the chapter on feeding them. Hmm."]);
+  L(470,632,95,["So many books! 'Moss and You', 'A Brief History of Toadstools', 'Advanced Napping'…","This one is called 'Slimes: A Gentle Guide'. Somebody dog-eared the chapter on feeding them. Hmm."]);
   L(595,585,80,["The shelves go all the way up. Master Lum would need a ladder. Or a levitation spell. I bet she has a levitation spell."]);
-  L(740,712,110,["Bubbling potions, glowing crystals, and a book left open... like someone stepped away in the middle of something.","The page shows a drawing of a slime getting bigger, and bigger, and BIGGER. I don't like this book."]);
-  L(905,575,80,["A cabinet with a hundred tiny drawers. 'Eye of newt'... 'moonmint'... 'buttons'... 'more buttons'."]);
-  SINT.push({x:985,y:568,reach:60,onInteract:()=>say(bucketTaken?"Another bucket! ...No. One bucket helmet is plenty.":"An old bucket stuffed with dried roots. Hmm... a sturdy bucket like this would make a pretty good helmet.")});
-  L(1085,612,90,["The fire's still warm. Someone was here not long ago...","Dried herbs and two glowing crystals on the mantle. It smells like lavender and woodsmoke."]);
-  L(1100,700,95,["A giant spellbook on a stand. The writing glows when I lean close... I can't read a single word. Yet!"]);
+  L(740,712,110,["Bubbling potions, glowing crystals, and a book left open… like someone stepped away in the middle of something.","The page shows a drawing of a slime getting bigger, and bigger, and BIGGER. I don't like this book."]);
+  L(905,575,80,["A cabinet with a hundred tiny drawers. 'Eye of newt'… 'moonmint'… 'buttons'… 'more buttons'."]);
+  SINT.push({x:985,y:568,reach:60,onInteract:()=>say(bucketTaken?"Another bucket! …No. One bucket helmet is plenty.":"An old bucket stuffed with dried roots. Hmm… a sturdy bucket like this would make a pretty good helmet.")});
+  L(1085,612,90,["The fire's still warm. Someone was here not long ago…","Dried herbs and two glowing crystals on the mantel. It smells like lavender and woodsmoke."]);
+  L(1100,700,95,["A giant spellbook on a stand. The writing glows when I lean close… I can't read a single word. Yet!"]);
   L(1225,680,85,["A little lantern and an old scroll. It's a map of the garden! Someone circled the well and drew a tiny crown beside it."]);
   SINT.push({x:415,y:722,reach:85,onInteract:()=>{if(mimicState===2){say("Just a regular chest now. I think it's sulking.");return;}
     const fight=()=>startEncounter({kind:'mimic',scene:'study',x:415,y:705,s:1,calm:0,dead:0,scripted:mimicState===0},'ambush');
-    if(mimicState===0)talk([['Cosmic',"A sturdy old chest... locked tight. Maybe there's treasure inside!"],['Cosmic',"Wait. Is the lock... warm? Is it BREATHING?!"]],false,fight);
+    if(mimicState===0)talk([['Cosmic',"A sturdy old chest… locked tight. Maybe there's treasure inside!"],['Cosmic',"Wait. Is the lock… warm? Is it BREATHING?!"]],false,fight);
     else talk([['Cosmic',"Okay, chest. Round two. And this time I have a sword."]],false,fight);}});
   L(1285,735,85,["Tree roots growing straight through the stone. Something up above must be very, very old."]);}
 function enterStudy(){SCENE='study';spawnStudySlimes();for(const g of SSLIMES)g.calm=Math.max(g.calm||0,2.5);lum.x=330;lum.y=724;lum.face=1;lum.vx=lum.vy=0;lum.state='idle';WCAM.x=330;WTITLE.t=0;setupStudy();
-  if(!studyVisited){studyVisited=true;setTimeout(()=>playerQuip('A secret study... behind the secret room!'),1100);}}
+  if(!studyVisited){studyVisited=true;setTimeout(()=>playerQuip('A secret study… behind the secret room!'),1100);}}
 function enterWellFromStudy(){SCENE='well';lum.x=560;lum.y=530;lum.face=1;lum.vx=lum.vy=0;lum.state='idle';WCAM.x=676;setupWell();for(const g of WSLIMES)g.calm=Math.max(g.calm||0,2.5);}
 function updateRoomDoors(){}
 const SMOTES=[];for(let i=0;i<34;i++)SMOTES.push({x:rnd(420,1250),y:rnd(120,640),ph:rnd(0,TAU),sp:rnd(.2,.6)});
@@ -1949,15 +1949,15 @@ function setupShed(){SHINT.length=0;{const [x,y]=sp_(560,1010);SHINT.push({x,y,r
     shedChestOpen=true;BAG.splice(BAG.indexOf('shedkey'),1);delete MATS.shedkey;giveItem('gboots');}});}
   L(600,880,80,["A potting bench with a little brass scale, a trowel, and a seed packet that says 'DO NOT PLANT INDOORS'.","There's a spellbook on the bench, open to a page about growing moonmint. Someone's been taking notes in the margins."]);
   L(560,880,70,["A big sack of potting soil. It smells like rain and earthworms. Good earthworms."]);
-  L(840,870,70,["Rakes, shovels, a little pitchfork... Master Lum keeps everything so tidy. Except me. I'm the untidy part."]);
-  L(700,900,80,["Dried herbs hang from every beam: lavender, rosemary, bellflowers... It smells like Master Lum's tea in here.","Sunlight through the little window makes the whole shed glow gold."]);}
+  L(840,870,70,["Rakes, shovels, a little pitchfork… Master Lum keeps everything so tidy. Except me. I'm the untidy part."]);
+  L(700,900,80,["Dried herbs hang from every beam: lavender, rosemary, bellflowers… It smells like Master Lum's tea in here.","Sunlight through the little window makes the whole shed glow gold."]);}
 function spawnShedSlimes(){if(shedSpawned)return;shedSpawned=true;const [x,y]=sp_(690,945);SHSLIMES.push({kind:'jelly',scene:'shed',x,y,hx:x,hy:y,s:.9,col:SLIME_COL[2],z:0,vz:0,hop:null,wait:rnd(.5,2),hp:2,hit:0,angry:0,ph:rnd(0,TAU),blink:rnd(1,4),dead:0,face:-1,calm:2.5});}
 let SHBG=null;
 /* snapshot the garden around the shed, blurred, to sit behind the cutaway interior */
 function captureShedSurroundings(){const sv={cx:cam.x,cy:cam.y,sc:SCENE};SCENE='garden';cam.x=SHED_POS.x+20;cam.y=SHED_POS.y-110;
   CAPTURE.on=true;BATTLE.capG=null;render();SHBG=BBG;BBG=null;CAPTURE.on=false;cam.x=sv.cx;cam.y=sv.cy;SCENE=sv.sc;}
 function enterShed(){captureShedSurroundings();SCENE='shed';const [x,y]=sp_(520,935);lum.x=x;lum.y=y;lum.face=1;lum.vx=lum.vy=0;lum.state='idleUp';WCAM.x=x;WTITLE.t=0;setupShed();spawnShedSlimes();for(const g of SHSLIMES)g.calm=Math.max(g.calm||0,2.5);
-  if(!shedVisited){shedVisited=true;setTimeout(()=>playerQuip("Whoa... it's way cozier in here than I thought!"),1000);}}
+  if(!shedVisited){shedVisited=true;setTimeout(()=>playerQuip("Whoa… it's way cozier in here than I thought!"),1000);}}
 function enterGardenFromShed(){SCENE='garden';lum.x=SHED_POS.x-40;lum.y=SHED_POS.y+42;lum.face=1;lum.vx=lum.vy=0;lum.state='idle';cam.x=lum.x;cam.y=lum.y-50;}
 const SHMOTES=[];for(let i=0;i<26;i++)SHMOTES.push({x:rnd(420,960),y:rnd(120,620),ph:rnd(0,TAU),sp:rnd(.2,.6)});
 function drawShed(){const im=IMG.shedroom;if(!ready(im))return;const rz=H/768*ROOMZ;
@@ -1992,22 +1992,22 @@ const PSLIMES=[];let pondSlimesSpawned=false,pondDone=0;
 const PINT=[];let shroudTaken=false,pondVisited=false,pondReturn={x:POND.x,y:POND.y-POND.ry-40};
 const PEXIT={x:905,y:742};
 function setupPond(){PINT.length=0;
-  PINT.push({x:705,y:735,reach:120,onInteract:()=>talk([['Cosmic',"Wait... this statue..."],['Cosmic',"It looks exactly like Master Lum!"],['Cosmic',"But that's impossible. This temple must be hundreds of years old. Maybe thousands."]])});
-  if(!shroudTaken)PINT.push({x:455,y:700,reach:90,cloth:1,onInteract:()=>{shroudTaken=true;const i=PINT.findIndex(o=>o.cloth);if(i>=0)PINT.splice(i,1);giveItem('shroud');talk([['Cosmic',"It's the same blue as Master Lum's robes..."],['Cosmic',"Old and frayed... but strangely warm. Like it wants to be worn."]]);}});
+  PINT.push({x:705,y:735,reach:120,onInteract:()=>talk([['Cosmic',"Wait… this statue…"],['Cosmic',"It looks exactly like Master Lum!"],['Cosmic',"But that's impossible. This temple must be hundreds of years old. Maybe thousands."]])});
+  if(!shroudTaken)PINT.push({x:455,y:700,reach:90,cloth:1,onInteract:()=>{shroudTaken=true;const i=PINT.findIndex(o=>o.cloth);if(i>=0)PINT.splice(i,1);giveItem('shroud');talk([['Cosmic',"It's the same blue as Master Lum's robes…"],['Cosmic',"Old and frayed… but strangely warm. Like it wants to be worn."]]);}});
   PINT.push({x:250,y:660,reach:80,onInteract:()=>say("Old clay pots, crusted with shells. One of them has the same rune that's carved over Master Lum's door.")});
-  PINT.push({x:1150,y:655,reach:80,onInteract:()=>say("Through the arch... is that a shipwreck? In our POND? How big is this pond?!")});
+  PINT.push({x:1150,y:655,reach:80,onInteract:()=>say("Through the arch… is that a shipwreck? In our POND? How big is this pond?!")});
   PINT.push({x:PEXIT.x,y:PEXIT.y,reach:70,onInteract:()=>askChoice("Leave the underwater temple?",[["Leave",()=>goScene(()=>enterGardenFromPond())],["Stay",()=>{}]])});}
 function enterPond(){SCENE='pond';if(!pondSlimesSpawned){pondSlimesSpawned=true;for(const [x,y,s_] of [[330,665,.9],[1100,668,.95]])PSLIMES.push({kind:'jelly',scene:'pond',x,y,hx:x,hy:y,s:s_,col:SLIME_COL[2],z:0,vz:0,hop:null,wait:rnd(.5,2),hp:2,hit:0,angry:0,ph:rnd(0,TAU),blink:rnd(1,4),dead:0,face:-1});}for(const g of PSLIMES)g.calm=Math.max(g.calm||0,2.5);lum.x=700;lum.y=748;lum.face=1;lum.vx=lum.vy=0;lum.state='idleUp';WCAM.x=700;WTITLE.t=0;setupPond();
   if(!pondVisited){pondVisited=true;setTimeout(()=>playerQuip("I can breathe down here?! The pond magic must be protecting me!"),1100);}}
 function pondVoiceEvent(){WEVENT.on=true;QUAKE.t=0;QUAKE.dur=3;QUAKE.amp=8;sfxRumble();
   for(let i=0;i<40;i++)PBUBBLES.push({x:rnd(100,1300),y:rnd(600,800),sp:rnd(60,120),r:rnd(2,6),ph:rnd(0,TAU),burst:1});
-  setTimeout(()=>{sfxEerie();talk([['???',"She will never teach you the real power of magic..."]],false,()=>setTimeout(()=>talk([
-    ['Cosmic',"...That voice!"],
-    ['Cosmic',"I've watched Master Lum mix her powders a hundred times. Moonmint, bellglow, a pinch of stardust..."],
+  setTimeout(()=>{sfxEerie();talk([['???',"She will never teach you the real power of magic…"]],false,()=>setTimeout(()=>talk([
+    ['Cosmic',"…That voice!"],
+    ['Cosmic',"I've watched Master Lum mix her powders a hundred times. Moonmint, bellglow, a pinch of stardust…"],
     ['Cosmic',"But I've never once seen her actually cast a spell…"]],false,()=>{WEVENT.on=false;for(let i=PBUBBLES.length-1;i>=0;i--)if(PBUBBLES[i].burst)PBUBBLES.splice(i,1);}),700));},2600);}
 function enterGardenFromPond(){SCENE='garden';lum.x=pondReturn.x;lum.y=pondReturn.y;lum.face=1;lum.vx=lum.vy=0;lum.state='idle';cam.x=lum.x;cam.y=lum.y-50;}
 function pondInteract(px,py){if(CH===1){say("The koi are huddled at the very bottom of the pond… they're frightened of something.");return;}pondReturn={x:px,y:py};
-  if(!pondVisited)talk([['Cosmic',"The koi are all swimming in a circle... and the bottom of the pond is glowing."],['Cosmic',"There's something down there. Something big. Okay... deep breath!"]],false,()=>goScene(()=>enterPond()));
+  if(!pondVisited)talk([['Cosmic',"The koi are all swimming in a circle… and the bottom of the pond is glowing."],['Cosmic',"There's something down there. Something big. Okay… deep breath!"]],false,()=>goScene(()=>enterPond()));
   else talk([['Cosmic',"Back down to the sunken temple!"]],false,()=>goScene(()=>enterPond()));}
 /* a small two-button choice box */
 const CHOICE={on:false,q:'',opts:[],sel:0,hits:[]};
@@ -2132,12 +2132,12 @@ const SHOPLUM={x:885,y:520,face:1,walking:false,ft:0,wait:3,tgt:null,talkFace:fa
 const SHOPSPOTS=[[720,468],[880,468],[1035,468]];
 const SHOPFX=[];
 const healRoll=it=>Array.isArray(it.heal)?it.heal[0]+Math.floor(Math.random()*(it.heal[1]-it.heal[0]+1)):it.heal;
-function lumTalk(){if(CH===1){say(["The shop feels so quiet without Cosmic chattering away.","His apron is still hanging by the counter. He never once remembered to wear it.","The jars are all where they should be. Everything is, except him."][(shopTalk++)%3]);return;}if(NIGHT.on){say("The counter's empty. Master Lum is still asleep... I need to be quiet.");return;}SHOPLUM.walking=false;SHOPLUM.tgt=null;
-  if(BAG.includes('blade')&&!restTalk){talk([['Lum',"Welcome back, Cosmic. So... how did it go with the slimes and slugs?"],
-      ['Cosmic',"I've been chasing slimes and slugs all day, Master! Through the garden, under the well... places I never even knew were here!"],
+function lumTalk(){if(CH===1){say(["The shop feels so quiet without Cosmic chattering away.","His apron is still hanging by the counter. He never once remembered to wear it.","The jars are all where they should be. Everything is, except him."][(shopTalk++)%3]);return;}if(NIGHT.on){say("The counter's empty. Master Lum is still asleep… I need to be quiet.");return;}SHOPLUM.walking=false;SHOPLUM.tgt=null;
+  if(BAG.includes('blade')&&!restTalk){talk([['Lum',"Welcome back, Cosmic. So… how did it go with the slimes and slugs?"],
+      ['Cosmic',"I've been chasing slimes and slugs all day, Master! Through the garden, under the well… places I never even knew were here!"],
       ['Cosmic',"And you know what? This is the first time chores have ever felt like an adventure."],
       ['Cosmic',"I want to be a real adventurer someday. A powerful one!"],
-      ['Lum',"An adventurer, hm? ...Every great journey starts with muddy boots and a few sticky slimes."],
+      ['Lum',"An adventurer, hm? …Every great journey starts with muddy boots and a few sticky slimes."],
       ['Lum',"If that's the road you want, then I'll help you walk it. One step at a time."],
       ['Lum',"You worked hard today, Cosmic. You deserve a good rest."]],false,()=>{restTalk=true;GOAL.tag='TASK';GOAL.text='You\'ve earned a good rest';HINT.goalT=0;});return;}
   if(!BAG.includes('hpowder')){const n=1+(Math.random()<.5?1:0);
@@ -2153,13 +2153,13 @@ function setupShop(){SHOPINT.length=0;
   L(380,560,85,["Master Lum's grinder. The green powder smells like a thunderstorm in a meadow.","Every powder in this shop starts right here, one slow turn at a time."]);
   if(canLumMix())SHOPINT.push({x:470,y:545,reach:70,fire:true,onInteract:fireInteract});else L(470,545,70,["The little stove never goes out. Master says the fire is older than me. It purrs if you're nice to it."]);
   L(560,520,70,["The big brass still is bubbling away. Every so often it hiccups a tiny cloud shaped like a rabbit."]);
-  L(1150,560,70,["A globe of the whole world. Our shop is a teeny dot right at the very edge. Past it, the map just says... 'Here be quiet.'"]);
+  L(1150,560,70,["A globe of the whole world. Our shop is a teeny dot right at the very edge. Past it, the map just says… 'Here be quiet.'"]);
   L(1250,700,80,["A clockwork owl on the desk. It blinks when nobody's watching. I'm sure of it."]);
-  L(260,700,70,["Sacks and sacks of powders: sleep dust, glow dust, sneeze dust... I learned the hard way which is which."]);}
+  L(260,700,70,["Sacks and sacks of powders: sleep dust, glow dust, sneeze dust… I learned the hard way which is which."]);}
 function enterShop(door){SCENE='shop';shopDoor=door||shopDoor;lum.x=300;lum.y=700;lum.face=1;lum.vx=lum.vy=0;lum.state='idleUp';WCAM.x=500;WTITLE.t=0;setupShop();
   SHOPLUM.x=885;SHOPLUM.y=520;SHOPLUM.walking=false;SHOPLUM.wait=2;}
 function enterGardenFromShop(){SCENE='garden';lum.x=shopDoor.x;lum.y=shopDoor.y;lum.face=1;lum.vx=lum.vy=0;lum.state='idle';cam.x=lum.x;cam.y=lum.y-50;}
-function tryEnterShop(door){if(PARTY[HERO].main==='blade'){talk([['Cosmic',"Wait! I can't let Master Lum see this sword..."],['Cosmic',"I'd better tuck it away in my satchel before I go inside."]]);return;}goScene(()=>enterShop(door));}
+function tryEnterShop(door){if(PARTY[HERO].main==='blade'){talk([['Cosmic',"Wait! I can't let Master Lum see this sword…"],['Cosmic',"I'd better tuck it away in my satchel before I go inside."]]);return;}goScene(()=>enterShop(door));}
 function updateShopLum(dt){const L=SHOPLUM;const talking=DLG.active&&DLG.lines.some(l=>l[0]==='Lum');L.walking=false;
   if(talking){L.back=0;return;}
   L.wait-=dt;if(L.wait<=0){if(L.back){L.back=0;L.wait=rnd(3,6);}else{L.back=1;L.wait=rnd(1.6,2.6);
@@ -2216,8 +2216,8 @@ const BEDMOTES=[];for(let i=0;i<34;i++)BEDMOTES.push({x:rnd(380,900),y:rnd(40,56
 const BEDFLIES=[];for(let i=0;i<10;i++)BEDFLIES.push({x:rnd(90,210),y:rnd(220,400),ph:rnd(0,TAU)});
 function setupBedroom(){BEDINT.length=0;
   BEDINT.push({x:1268,y:622,reach:72,onInteract:()=>goScene(()=>{enterShop();lum.x=1250;lum.y=592;lum.face=-1;})});
-  BEDINT.push({x:900,y:740,reach:130,onInteract:()=>{if(NIGHT.on){say("I can't sleep now. The voice is waiting for me...");return;}if(BED.slept){say("All rested up! My bed is officially the comfiest place in the whole world.");return;}
-    askChoice("Rest for the night?",[["Rest",()=>talk([['Cosmic',"My bed! I could sleep for a hundred years..."],['Cosmic',"...but just one night will do. Goodnight, Master Lum."]],false,goToSleep)],["Not yet",()=>say("Maybe in a little bit. I'm not quite done with today.")]]);}});
+  BEDINT.push({x:900,y:740,reach:130,onInteract:()=>{if(NIGHT.on){say("I can't sleep now. The voice is waiting for me…");return;}if(BED.slept){say("All rested up! My bed is officially the comfiest place in the whole world.");return;}
+    askChoice("Rest for the night?",[["Rest",()=>talk([['Cosmic',"My bed! I could sleep for a hundred years…"],['Cosmic',"…but just one night will do. Goodnight, Master Lum."]],false,goToSleep)],["Not yet",()=>say("Maybe in a little bit. I'm not quite done with today.")]]);}});
   const L=(x,y,reach,lines)=>{let i=0;BEDINT.push({x,y,reach,onInteract:()=>say(lines[(i++)%lines.length])});};
   L(540,640,95,["Master Lum's bed. Every patch on her quilt has a tiny moon stitched into the corner.","She always says she's 'just resting her eyes.' She snores like a teakettle."]);
   L(205,680,100,["My treasure chest! A rock shaped like a frog, three marbles, and a feather I'm saving for a hat."]);
@@ -2227,9 +2227,9 @@ function setupBedroom(){BEDINT.length=0;
 function enterBedroom(){SCENE='bed';lum.x=1240;lum.y=650;lum.face=-1;lum.vx=lum.vy=0;lum.state='idle';WCAM.x=900;WTITLE.t=0;if(!NIGHT.on){BED.night=0;BED.sleeping=false;}setupBedroom();if(CH===1)c1Bedroom();}
 const NIGHT={on:false,cut:false,rain:false,end:0,rainSrc:null};
 function goToSleep(){WEVENT.on=true;goScene(()=>{BED.night=1;BED.sleeping=true;BED.cosAwake=false;BED.t=0;lum.vx=lum.vy=0;WCAM.x=760;NIGHT.on=true;HEROES[HERO].hp=HEROES[HERO].maxHp;
-  setTimeout(()=>{BED.glow=1;sfxEerie();talk([['???',"Wake up, little apprentice... Take the blade, and cut a path out of this magical garden."]],false,()=>{
+  setTimeout(()=>{BED.glow=1;sfxEerie();talk([['???',"Wake up, little apprentice… Take the blade, and cut a path out of this magical garden."]],false,()=>{
     setTimeout(()=>{BED.cosAwake=true;BED.glow=0;lum.x=930;lum.y=744;lum.face=-1;lum.state='idle';WEVENT.on=false;
-      talk([['Cosmic',"...That voice again. It wants me to leave? Tonight?"],['Cosmic',"Master Lum is fast asleep. If I'm quiet, she'll never know..."]],false,()=>{GOAL.tag='NEW TASK';GOAL.text='Take the blade and cut a path out of the garden';HINT.goalT=0;});},900);});},4200);});}
+      talk([['Cosmic',"…That voice again. It wants me to leave? Tonight?"],['Cosmic',"Master Lum is fast asleep. If I'm quiet, she'll never know…"]],false,()=>{GOAL.tag='NEW TASK';GOAL.text='Take the blade and cut a path out of the garden';HINT.goalT=0;});},900);});},4200);});}
 function drawNightShade(px,py,dark){const [sx,sy]=(SCENE==='garden'||SCENE==='woods')?[(px-cam.x)*zoom+W/2,(py-60-cam.y)*zoom+H/2]:wellToScreen(px,py-80);
   ctx.save();ctx.setTransform(DPR,0,0,DPR,0,0);const r=Math.min(W,H)*.55,g=ctx.createRadialGradient(sx,sy,r*.15,sx,sy,r);
   g.addColorStop(0,`rgba(10,14,40,${(dark*.35).toFixed(3)})`);g.addColorStop(1,`rgba(6,8,26,${dark.toFixed(3)})`);ctx.fillStyle=g;ctx.fillRect(0,0,W,H);ctx.restore();}
@@ -2248,7 +2248,7 @@ function cutHedge(){if(NIGHT.cut)return;lum.state='cast';lum.at=0;lum.face=1;sha
   for(let i=0;i<40;i++)PARTS.push({type:'bpetal',x:rnd(-80,120),y:rnd(1570,1640),z:rnd(20,80),vx:rnd(-90,90),vy:rnd(-30,40),vz:rnd(40,160),life:0,max:rnd(2,4),s:rnd(3,6),rot:rnd(0,TAU),vr:rnd(-8,8),col:Math.random()<.6?'#4f7a3a':'#6e9a4a',leaf:1});
   for(let i=0;i<24;i++)PARTS.push({type:'fiz',x:rnd(-60,100),y:rnd(1560,1620),z:rnd(30,90),vx:rnd(-60,60),vy:rnd(-20,20),vz:rnd(40,140),life:0,max:rnd(.6,1.2),s:rnd(2,3.5)});
   NIGHT.slash=1;NIGHT.cut=true;addHedgeDoor();
-  setTimeout(()=>{startRain();sfxEerie();talk([['???',"Yes, child... do not turn back!"]],false,()=>{GOAL.tag='NEW TASK';GOAL.text='Follow the path beyond the garden';HINT.goalT=0;});},700);}
+  setTimeout(()=>{startRain();sfxEerie();talk([['???',"Yes, child… do not turn back!"]],false,()=>{GOAL.tag='NEW TASK';GOAL.text='Follow the path beyond the garden';HINT.goalT=0;});},700);}
 function drawSleeper(img,hx,hy,sc,rot,lump,breath,phase){const im=IMG[img];if(!ready(im))return;
   const b=Math.sin(T*1.4+phase);
   // the quilt rising over a body underneath: soft light on top, shadow along the far side
@@ -2379,16 +2379,16 @@ function buildWoods(){if(woodsBuilt)return;woodsBuilt=true;let k=0;const h=(a,b)
   WINTS.length=0;
   WINTS.push({x:HOLLOW.x,y:HOLLOW.y+28,reach:62,door:true,onInteract:hollowInteract});
   for(const f of WFORAGE)WINTS.push({x:f.x,y:f.y,reach:76,lum:true,forage:f,onInteract:()=>{if(CH>0)pickForage(f);else say("Berries! Master Lum would love these… but not tonight.");}});
-  WINTS.push({x:HUT.x-(359-429)*HUT.k,y:HUT.y+18,reach:70,door:true,onInteract:()=>CH===1?hutDoorC1():say(["The gravekeeper's hut. The door's locked tight, and there's a rune glowing on it.","A lantern's still burning in there... but nobody answers when I knock."][(sayCount++)%2])});
-  for(const g of WGRAVES)WINTS.push({x:g.x,y:g.y+18,reach:55,onInteract:()=>{if(CH===1&&C1.reaper!==1&&Math.random()<1/3){graveRise(g);return;}say(["The names on this grave are worn away. Just a little carved star, and the date... it's so old.","Someone left a dried flower here. A long, long time ago."][(sayCount++)%2]);}});}
+  WINTS.push({x:HUT.x-(359-429)*HUT.k,y:HUT.y+18,reach:70,door:true,onInteract:()=>CH===1?hutDoorC1():say(["The gravekeeper's hut. The door's locked tight, and there's a rune glowing on it.","A lantern's still burning in there… but nobody answers when I knock."][(sayCount++)%2])});
+  for(const g of WGRAVES)WINTS.push({x:g.x,y:g.y+18,reach:55,onInteract:()=>{if(CH===1&&C1.reaper!==1&&Math.random()<1/3){graveRise(g);return;}say(["The names on this grave are worn away. Just a little carved star, and the date… it's so old.","Someone left a dried flower here. A long, long time ago."][(sayCount++)%2]);}});}
 function graveRise(g){WEVENT.on=true;shake=5;sfxRumble&&sfxRumble(1.2,.5);
   for(let i=0;i<16;i++)PARTS.push({type:'dust',x:g.x+rnd(-30,30),y:g.y+20,z:rnd(0,20),vx:rnd(-40,40),vy:rnd(-10,10),vz:rnd(40,120),life:0,max:rnd(.6,1.2),s:rnd(3,6)});
   const sk={kind:'rskel',scene:'woods',x:g.x+40,y:g.y+40,hx:g.x+40,hy:g.y+40,tx:g.x+40,ty:g.y+40,s:1,pack:1,calm:0,dead:0,t:0,ph:0,face:lum.x<g.x?-1:1,id:900+Math.floor(Math.random()*1e5),risen:1};WFOES.push(sk);
   talk([['Lum',"The ground is shifting… something's clawing its way out!"]],false,()=>{WEVENT.on=false;startEncounter(sk,'ambush');});}
 function enterWoods(){buildWoods();SCENE='woods';lum.x=70;lum.y=630;lum.face=1;lum.vx=lum.vy=0;lum.state='idle';cam.x=lum.x+120;cam.y=lum.y-50;WTITLE.t=0;
-  if(!WEV.entered){WEV.entered=1;setTimeout(()=>talk([['Cosmic',"It's so dark out here... I can't even see Lum's Magic Shop anymore."],['Cosmic',"I've never been past the hedge before. Not once."]]),4700);}}
+  if(!WEV.entered){WEV.entered=1;setTimeout(()=>talk([['Cosmic',"It's so dark out here… I can't even see Lum's Magic Shop anymore."],['Cosmic',"I've never been past the hedge before. Not once."]]),4700);}}
 function updateWoods(dt){if(DLG.active||WEVENT.on||FADE.dir)return;
-  if(lum.x<60&&!WEV.back){WEV.back=1;say("No... I can't go back now.");setTimeout(()=>WEV.back=0,4000);}
+  if(lum.x<60&&!WEV.back){WEV.back=1;say("No… I can't go back now.");setTimeout(()=>WEV.back=0,4000);}
   if(lum.x>700&&!WEV.mid){WEV.mid=1;sfxEerie();talk([['???',"Keep moving, child. Don't look back."]]);}
   
   if(lum.y>GATE.y+40&&!WEV.cem){WEV.cem=1;WEVENT.on=true;sfxEerie();talk([['Cosmic',"I should turn back…"],['???',"Step forward, child. This is where you prove your worth to me."],['???',"Destroy everything."]],false,()=>{WEVENT.on=false;spawnSkels();setTimeout(()=>talk([['Cosmic',"The graves are opening… Skeletons!"],['Cosmic',"You have the blade. You can do this."]]),2600);});}}
@@ -2397,7 +2397,7 @@ function drawHollow(o){const im=IMG.hollow;if(!ready(im))return;const k=HOLLOW.s
   // cold air breathing out of the hollow
   ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,o.x,o.y-50,40,'150,180,220',.08+.05*Math.sin(T*1.3));ctx.restore();}
 function hollowInteract(){if(PC==='cosmic'){say("A hollow in the old oak. Cold air is breathing out of it… nope. Not tonight.");return;}
-  if(!C1.hollowSeen){C1.hollowSeen=1;talk([['Lum',"A hollow in the old oak… and it goes deep down..."],['Lum',"Cosmic? Are you down there?"]],false,()=>goScene(()=>enterDun(1,560,650,1)));return;}
+  if(!C1.hollowSeen){C1.hollowSeen=1;talk([['Lum',"A hollow in the old oak… and it goes deep down…"],['Lum',"Cosmic? Are you down there?"]],false,()=>goScene(()=>enterDun(1,560,650,1)));return;}
   goScene(()=>enterDun(1,560,650,1));}
 function drawHut(o){const im=IMG.hut;if(!ready(im))return;const k=HUT.k,w=im.naturalWidth*k,h=im.naturalHeight*k,x=o.x-429*k,y=o.y-880*k;ctx.save();ctx.translate(o.x,0);ctx.scale(-1,1);ctx.translate(-o.x,0);ctx.drawImage(im,x,y,w,h);
   ctx.save();ctx.globalCompositeOperation='lighter';const f=.8+.12*Math.sin(T*6)+.08*Math.sin(T*11);drawGlow(ctx,x+134*k,y+560*k,40,'255,190,110',.5*f);drawGlow(ctx,x+134*k,y+560*k,10,'255,230,170',.8*f);drawGlow(ctx,x+690*k,y+560*k,26,'255,200,120',.18*f);
@@ -2442,7 +2442,7 @@ function drawWoods(){const vw=W/zoom,vh=H/zoom,x0=cam.x-vw/2-40,y0=cam.y-vh/2-40
   if(WEV.quake){ctx.fillStyle=`rgba(120,10,30,${(.12+.08*Math.sin(T*6)).toFixed(3)})`;ctx.fillRect(0,0,W,H);}
   if(WTITLE.t<4.5&&!CAPTURE.on){const a=Math.min(1,WTITLE.t*1.5,(4.5-WTITLE.t)*1.2);ctx.save();ctx.globalAlpha=a;ctx.textAlign='center';ctx.fillStyle='rgba(5,8,20,.45)';ctx.fillRect(0,H*.3-40,W,80);
     ctx.fillStyle='#e4e2f0';ctx.font='700 26px "Alegreya SC", Georgia, serif';ctx.fillText('The Whispering Wood',W/2,H*.3+4);ctx.font='italic 14px Alegreya, Georgia, serif';ctx.fillStyle='rgba(228,226,240,.8)';ctx.fillText('beyond the garden hedge',W/2,H*.3+28);ctx.restore();}
-  if(WEV.end){WEV.end+=1/60;const a=Math.min(1,WEV.end/2);ctx.save();ctx.fillStyle=`rgba(0,0,0,${a})`;ctx.fillRect(0,0,W,H);if(WEV.end>6.5){ctx.restore();drawResults(WEV.end-6.5);}else{ctx.globalAlpha=Math.max(0,Math.min(1,(WEV.end-2)/1.5,(6.5-WEV.end)/.8));ctx.textAlign='center';ctx.fillStyle='#e8e2f2';ctx.font='italic 20px Alegreya, Georgia, serif';ctx.fillText('And the world began to tremble...',W/2,H*.45);ctx.font='700 22px "Alegreya SC", Georgia, serif';ctx.fillStyle='rgba(232,226,242,.85)';ctx.fillText('End of Prologue',W/2,H*.45+40);ctx.restore();}}}
+  if(WEV.end){WEV.end+=1/60;const a=Math.min(1,WEV.end/2);ctx.save();ctx.fillStyle=`rgba(0,0,0,${a})`;ctx.fillRect(0,0,W,H);if(WEV.end>6.5){ctx.restore();drawResults(WEV.end-6.5);}else{ctx.globalAlpha=Math.max(0,Math.min(1,(WEV.end-2)/1.5,(6.5-WEV.end)/.8));ctx.textAlign='center';ctx.fillStyle='#e8e2f2';ctx.font='italic 20px Alegreya, Georgia, serif';ctx.fillText('And the world began to tremble…',W/2,H*.45);ctx.font='700 22px "Alegreya SC", Georgia, serif';ctx.fillStyle='rgba(232,226,242,.85)';ctx.fillText('End of Prologue',W/2,H*.45+40);ctx.restore();}}}
 
 /* ---------- the restless dead of the old graveyard ---------- */
 const WSKELS=[],SKDUST=[];let skelDone=0;const SKCW=640,SKCH=384,FKCW=260,FKCH=250;
@@ -2477,10 +2477,10 @@ function drawBattleSkel(f){const S=bS(),h=250*S*f.s,x=f.x+f.ox,y=f.y+f.oy;if(f.d
   if(BATTLE.phase==='target'&&BATTLE.foes[BATTLE.target]===f)tutArrow(ctx,f.x,f.y-h*.95,1);}
 /* the seal breaks */
 function fokalurEvent(){WEV.fk=1;WEVENT.on=true;sfxEerie();
-  talk([['???',"Yes... YES! Do you feel it, child? This is what real power feels like."],['Cosmic',"I... I did it. But my hands won't stop shaking..."],['???',"I command you to awaken me!"],['Cosmic',"Who are you?"],['???',"Awaken me now!"],['Cosmic',"I…"],['???',"Aaaah… the magic seal is weakening…"],['Cosmic',"What...? My arm... the blade won't let go of me...!"],['Cosmic',"Lum… I'm sorry!"]],false,()=>{WEV.seal=.001;sfxRumble(3,.7);});}
+  talk([['???',"Yes… YES! Do you feel it, child? This is what real power feels like."],['Cosmic',"I… I did it. But my hands won't stop shaking…"],['???',"I command you to awaken me!"],['Cosmic',"Who are you?"],['???',"Awaken me now!"],['Cosmic',"I…"],['???',"Aaaah… the magic seal is weakening…"],['Cosmic',"What…? My arm… the blade won't let go of me…!"],['Cosmic',"Lum… I'm sorry!"]],false,()=>{WEV.seal=.001;sfxRumble(3,.7);});}
 function updateFokalur(dt){if(WEV.seal){const t0=WEV.seal;WEV.seal+=dt;const t=WEV.seal;
     if(t0<2.6&&t>=2.6){WEV.flash=1;WEV.foka=.001;sfxRumble(2,1);if(SND.ready){const n=SND.ctx.currentTime;[38,45,50].forEach((m,i)=>bell(n+i*.05,NOTE(m),.15,3,SND.sfx,0));}}
-    if(t0<5.4&&t>=5.4)talk([['Fokalur',"Ahh... free at last after a thousand years."],['Fokalur',"Thank you, foolish apprentice. Your body will serve as a suitable vessel."],['Fokalur',"This world will soon be in ruin."]],false,()=>{WEV.quake=.001;sfxRumble(5,1.2);setTimeout(()=>sfxRumble(4,1),1800);});}
+    if(t0<5.4&&t>=5.4)talk([['Fokalur',"Ahh… free at last after a thousand years."],['Fokalur',"Thank you, foolish apprentice. Your body will serve as a suitable vessel."],['Fokalur',"This world will soon be in ruin."]],false,()=>{WEV.quake=.001;sfxRumble(5,1.2);setTimeout(()=>sfxRumble(4,1),1800);});}
   if(WEV.foka)WEV.foka+=dt;WEV.flash=Math.max(0,(WEV.flash||0)-dt*.7);
   if(WEV.quake){WEV.quake+=dt;for(const o of WSTONES)o.lean+=(o.ph>3?1:-1)*dt*.05*Math.min(1,WEV.quake/2);if(Math.random()<dt*40)SKDUST.push({x:lum.x+rnd(-400,400),y:lum.y+rnd(-400,300),vx:rnd(-20,20),vy:rnd(-60,0),t:0,max:rnd(.6,1.2)});if(WEV.quake>5.5&&!WEV.end)WEV.end=.001;}}
 function woodsShake(){let s=0;if(WEV.seal&&WEV.seal<2.6)s=WEV.seal*1.6;if(WEV.foka&&WEV.foka<.8)s=8*(1-WEV.foka/.8);if(WEV.quake)s=Math.min(14,4+WEV.quake*3);return s;}
@@ -2749,7 +2749,7 @@ function kingFrame(c,anim,i,x,y,h,flip,alpha,flash){const im=IMG.slugking;if(!re
 function kingSpot(){const C=[[-150,760],[300,960],[-330,560],[80,1180],[400,520]];let best=null,bd=-1;for(const [x,y] of C){const [sx,sy]=solveEstate(x,y);if(Math.hypot(sx-x,sy-y)>.5||inStream(x,y,-30)||inPond(x,y,-40))continue;const d=Math.hypot(x-lum.x,y-lum.y),sc_=d<230?9999+d:d;if(bd<0||sc_<bd){bd=sc_;best=[x,y];}}return best||slugSpot();}
 function spawnKing(rise){if(SLUGS.some(g=>g.kind==='slugking'))return;const [x,y]=kingSpot();SLUGS.push({kind:'slugking',scene:'garden',x,y,tx:x,ty:y,s:1,row:2,ft:0,state:'crawl',t:0,sp:9,trailT:0,ph:0,shy:0,flee:0,calm:rise?4:1.5,rise:rise?0:1,pack:1});kingState=1;}
 function kingArrives(){spawnKing(true);sfxRumble&&sfxRumble(1.6,.5);GOAL.tag='NEW TASK';GOAL.text='Defeat the Slug King';HINT.goalT=0;
-  setTimeout(()=>talk([['Cosmic',"Huh? The ground is... bubbling?"],['Cosmic',"A giant slug... wearing a crown?! That must be the Slug King!"]]),1800);}
+  setTimeout(()=>talk([['Cosmic',"Huh? The ground is… bubbling?"],['Cosmic',"A giant slug… wearing a crown?! That must be the Slug King!"]]),1800);}
 function drawKing(g){if(CAPTURE.on&&g===BATTLE.capG)return;const h=150;if(g.rise<1){g.rise=Math.min(1,g.rise+1/60/1.6);for(let k=0;k<2;k++)TRAIL.push({x:g.x+rnd(-50,50),y:g.y+rnd(-10,10),a:rnd(0,TAU),t:30});}
   const e=g.rise<1?1-Math.pow(1-g.rise,2):1,flip=Math.cos(g.hd||0)<0,moving=g.chase||g.state==='crawl';
   ctx.fillStyle='rgba(30,50,40,.25)';ctx.beginPath();ctx.ellipse(g.x,g.y+2,62*e,13*e,0,0,TAU);ctx.fill();
@@ -2867,13 +2867,13 @@ function hutDoorC1(){if(C1.vane>=2){if(VANE)return;goScene(enterVHut);return;}
   if(C1.reaper===1){say("Something is pounding on the door!");return;}
   // the Grave Reaper is gone: knock again and the gravekeeper finally answers
   C1.vane=1;WEVENT.on=true;
-  talk([['Voice',"Is it gone?"],['Lum',"I believe so. I'm Lum and I'm searching for my apprentice. Have you seen a blue haired boy?"]],false,()=>{
+  talk([['Voice',"Is it gone?"],['Lum',"I believe so. I'm Lum and I'm searching for my apprentice. Have you seen a blue-haired boy?"]],false,()=>{
     sfxPage&&sfxPage(1);VANE={step:{x:HUTDOOR.x+140,y:HUTDOOR.y+84},x:HUTDOOR.x,y:HUTDOOR.y+4,tx:HUTDOOR.x+62,ty:HUTDOOR.y+66,face:1,st:'walk',t:0,cb:()=>{VANE.face=lum.x<VANE.x?-1:1;lum.face=VANE.x<lum.x?-1:1;vaneScene();}};});}
 function vaneScene(){talk([
   ["Vane","Lum\u2026? Lum from the Magic Shop?"],
   ["Vane","I thought you were just part of some old story\u2026 never could find my way to your shop!"],
-  ["Vane","Anyways! Name's Vane and I'm the Gravekeeper. This place has been dead for ages. Heh."],
-  ["Vane","You must have heard that storm last night? Thunder shaking, wind howling..."],
+  ["Vane","Anyways! Name's Vane and I'm the gravekeeper. This place has been dead for ages. Heh."],
+  ["Vane","You must have heard that storm last night? Thunder shaking, wind howling…"],
   ["Vane","I locked the door and kept my trusty lantern burning till dawn."],
   ["Vane","And now a most unlikely visitor from the edge of the world, knocking on my door. Something is stirring\u2026 I can feel it in my bones."],
   ["Vane","But a blue-haired boy\u2026 aye. I saw him. Through the window, standing among the graves\u2026 and he had a red sword."],
@@ -2883,10 +2883,10 @@ function vaneScene(){talk([
   ["Vane","Quite possible\u2026 you're going after him, aren't you?"],
   ["Vane","We're mostly cut off from the rest of the world. There are dark places ahead and you won't make it through without light."]],false,()=>{
     C1.vane=2;C1.charmQ=1;if(PARTY.lum.charm==='vanecharm'||BAG.includes('vanecharm')){vaneNotice(vaneWalkIn);return;}
-    talk([["Vane","Maybe we can help each other out. I seem to have lost my necklace."],["Vane","If I had to guess, I dropped to the ground and my furry little friend scurried away with it\u2026"],["Vane","It's an heirloom, and all I got for protection around here! Please bring it back to me, and my lantern is yours."],["Lum","I'll keep an eye out."]],false,()=>{GOAL.tag='NEW TASK';GOAL.text="Find Vane's lost necklace";HINT.goalT=0;vaneWalkIn();});});}
+    talk([["Vane","Maybe we can help each other out. I seem to have lost my necklace."],["Vane","If I had to guess, I dropped it on the ground and my furry little friend scurried away with it\u2026"],["Vane","It's an heirloom, and all I got for protection around here! Please bring it back to me, and my lantern is yours."],["Lum","I'll keep an eye out."]],false,()=>{GOAL.tag='NEW TASK';GOAL.text="Find Vane's lost necklace";HINT.goalT=0;vaneWalkIn();});});}
 function vaneWalkIn(){WEVENT.on=false;if(!VANE)return;VANE.st='walk';VANE.tx=HUTDOOR.x;VANE.ty=HUTDOOR.y+4;VANE.cb=()=>{VANE=null;sfxPage&&sfxPage(.6);};}
 function vaneNotice(after){talk([['Vane',"Wait… that's the cross! My lucky cross!"]],false,()=>
-  askChoice("Return Vane's Lucky Cross?",[["Yes",()=>vaneTrade(after)],["No",()=>talk([['Vane',"…Ah. Well. If you change your mind, you know where to find me."]],false,()=>{GOAL.tag='TASK';GOAL.text="Return Vane's lucky cross";HINT.goalT=0;after&&after();})]]));}
+  askChoice("Return Vane's lucky cross?",[["Yes",()=>vaneTrade(after)],["No",()=>talk([['Vane',"…Ah. Well. If you change your mind, you know where to find me."]],false,()=>{GOAL.tag='TASK';GOAL.text="Return Vane's lucky cross";HINT.goalT=0;after&&after();})]]));}
 function vaneTrade(after){
   PARTY.lum.charm=null;{const i=BAG.indexOf('vanecharm');if(i>=0)BAG.splice(i,1);}syncMaxHp&&syncMaxHp();C1.charmQ=2;
   talk([['Vane',"Thank you, Lum. You don't know what this means to an old man."],['Vane',"In exchange… Here, take my lantern."]],false,()=>{giveItem('lantern');
@@ -3162,7 +3162,7 @@ function updateC1Intro(dt){C1I.t+=dt;C1I.w+=dt;INTRO.ui=0;C1I.evil=Math.max(0,C1
     case 3:{if(c1Walk(10,520,95,dt)){c1Idle();c1Talk([['Lum',"Cosmic! Your breakfast is getting cold!"]],4);}break;}
     case 4:{c1Idle();if(C1I.w>1.3)c1Talk([['Lum',"Cosmic!"]],5);break;}
     case 5:{c1Idle();lum.face=C1I.w<.5?-1:1;if(C1I.w>1.1)c1Talk([['Lum',"Cosmic?"]],6);break;}
-    case 6:{if(c1Walk(12,880,70,dt)){c1Idle();c1Talk([['Lum',"I wonder if he's on another adventure..."]],7);}break;}
+    case 6:{if(c1Walk(12,880,70,dt)){c1Idle();c1Talk([['Lum',"I wonder if he's on another adventure…"]],7);}break;}
     case 7:{c1Idle();if(C1I.w<dt*1.5){sfxGust();C1I.leafT=3.2;c1Leaves(10);}if(C1I.w>1.7){C1I.st=8;C1I.w=0;}break;}
     case 8:{if(c1Walk(14,1450,205,dt)){c1Idle();lum.face=1;C1I.st=9;C1I.w=0;C1I.evil=1;sfxEerie&&sfxEerie();shake=3;}break;}
     case 9:{c1Idle();if(C1I.w>1)c1Talk([['Lum',"My hedges… what could have done this?"]],10);break;}
@@ -3332,7 +3332,7 @@ function update(dt){
     if(at>=.55&&!lum.fizzed){lum.fizzed=1;const hx_=lum.x+lum.face*44,hy_=lum.y;for(let i=0;i<16;i++)PARTS.push({type:'fiz',x:hx_,y:hy_,z:72,vx:lum.face*rnd(10,80),vy:rnd(-30,30),vz:rnd(-10,100),life:0,max:rnd(.4,.9),s:rnd(1.5,3)});
       PARTS.push({type:'puff',x:hx_,y:hy_,z:72,vx:0,vy:0,vz:12,life:0,max:.9,s:10});sfxFizzle(true);casts++;hitSlimes(hx_,hy_);
       if(!BATTLE.pending)for(const g of SLUGS)if(Math.hypot(g.x-hx_,g.y-hy_)<160){g.flee=2.5;g.shy=0;g.state='crawl';const a=Math.atan2(g.y-hy_,g.x-hx_);g.tx=g.x+Math.cos(a)*150;g.ty=g.y+Math.sin(a)*100;}}
-    if(at>=.9&&!lum.quipped){lum.quipped=1;if(Math.random()<.6)playerQuip(['...aw.','Almost!','One day...','Fizzle again.','I felt something that time!','Come on, come on...'][(Math.random()*6)|0]);}
+    if(at>=.9&&!lum.quipped){lum.quipped=1;if(Math.random()<.6)playerQuip(['…aw.','Almost!','One day…','Fizzle again.','I felt something that time!','Come on, come on…'][(Math.random()*6)|0]);}
     if(at>=1.4){lum.state='idle';lum.ft=0;}
   }else if(lum.state==='cast'&&CH>0){
     lum.at+=dt;const at=lum.at;lum.fi=at<.22?0:1;
@@ -3555,7 +3555,7 @@ function render(){if(SCENE==='dun'){drawDun();if(CAPTURE.on)captureBackdrop();dr
   if(NIGHT.on&&!CAPTURE.on){drawNightShade(lum.x,lum.y,.7);if(NIGHT.slash>0){ctx.save();ctx.setTransform(DPR,0,0,DPR,0,0);ctx.fillStyle=`rgba(200,20,30,${(NIGHT.slash*.35).toFixed(3)})`;ctx.fillRect(0,0,W,H);ctx.restore();}drawRain(1/60);drawStorm();}
   if(CAPTURE.on)captureBackdrop();
   drawUI();
-  if(NIGHT.end){const a=Math.min(1,NIGHT.end/2);ctx.save();ctx.setTransform(DPR,0,0,DPR,0,0);ctx.fillStyle=`rgba(0,0,0,${a})`;ctx.fillRect(0,0,W,H);ctx.globalAlpha=Math.max(0,Math.min(1,(NIGHT.end-2)/1.5));ctx.textAlign='center';ctx.fillStyle='#e8e2f2';ctx.font='italic 20px Alegreya, Georgia, serif';ctx.fillText('The road beyond the garden...',W/2,H*.45);ctx.font='700 15px "Alegreya SC", Georgia, serif';ctx.fillStyle='rgba(232,226,242,.7)';ctx.fillText('to be continued',W/2,H*.45+34);ctx.restore();}
+  if(NIGHT.end){const a=Math.min(1,NIGHT.end/2);ctx.save();ctx.setTransform(DPR,0,0,DPR,0,0);ctx.fillStyle=`rgba(0,0,0,${a})`;ctx.fillRect(0,0,W,H);ctx.globalAlpha=Math.max(0,Math.min(1,(NIGHT.end-2)/1.5));ctx.textAlign='center';ctx.fillStyle='#e8e2f2';ctx.font='italic 20px Alegreya, Georgia, serif';ctx.fillText('The road beyond the garden…',W/2,H*.45);ctx.font='700 15px "Alegreya SC", Georgia, serif';ctx.fillStyle='rgba(232,226,242,.7)';ctx.fillText('to be continued',W/2,H*.45+34);ctx.restore();}
 }
 
 let BUBBLE_BASE=null;
