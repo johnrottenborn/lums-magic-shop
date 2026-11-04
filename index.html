@@ -335,7 +335,7 @@ function inputVec(){if(INTRO.on||FADE.dir||MENU.open||WEVENT.on||CHOICE.on||MIX.
 const busy=()=>lum.state==='cast'||lum.state==='interact';
 /* A: water magic. Any droplet that lands on a foe starts a battle. */
 function backToTitle(){if(backToTitle.go)return;backToTitle.go=1;FADE.dir=1;FADE.cb=()=>location.reload();}
-function pressA(){if(WEV.end>9.7){backToTitle();return;}if(CHOICE.on||MIX.on||FADE.dir||MENU.open||WEVENT.on||BATTLE.pending||WIPE.dir)return;if(INTRO.waiting){titleKey();return;}if(INTRO.on){introSkip();return;}if(DLG.active){dlgNext();return;}BTN.a.pulse=1;if(busy())return;if(lum.cool>0){BTN.a.shake=.3;return;}
+function pressA(){if(WEV.end>9.7){backToTitle();return;}if(DLG.active&&!CHOICE.on&&!MIX.on&&!FADE.dir&&!MENU.open&&!BATTLE.pending&&!WIPE.dir&&!INTRO.on&&!INTRO.waiting&&performance.now()>=(CHOICE.until||0)){dlgNext();return;}if(CHOICE.on||MIX.on||FADE.dir||MENU.open||WEVENT.on||BATTLE.pending||WIPE.dir)return;if(INTRO.waiting){titleKey();return;}if(INTRO.on){introSkip();return;}if(DLG.active){dlgNext();return;}BTN.a.pulse=1;if(busy())return;if(lum.cool>0){BTN.a.shake=.3;return;}
   lum.cool=PC==='cosmic'?1.5:COOL;lum.state='cast';lum.at=0;lum.sprayAcc=0;lum.fizzed=0;lum.quipped=0;HINT.cast=1;if(Math.abs(lum.aimx)>.2)lum.face=Math.sign(lum.aimx);}
 /* B: interact with the nearest NPC or object in reach. */
 function nearInteract(){if(!PLAYER()||busy())return null;
@@ -2774,7 +2774,7 @@ function updateWFoes(dt){if(SCENE!=='woods'||CH!==1)return;const ok=!DLG.active&
   // the Grave Reaper's charge at the hut door
   if(REAPER&&REAPER.scene){const R=REAPER;R.t+=dt;if(R.st==='rise'){R.rise=Math.min(1,(R.rise||0)+dt/1.4);if(R.rise>=1){R.st='walk';}}
     else if(R.st==='walk'){const tx=HUTDOOR.x+40,ty=HUTDOOR.y+18,dx=tx-R.x,dy=ty-R.y,d=Math.hypot(dx,dy);R.face=dx<0?-1:1;if(d<6){R.st='pound';R.t=0;}else{R.x+=dx/d*70*dt;R.y+=dy/d*70*dt;}}
-    else if(R.st==='pound'){if(((R.t*2.2)|0)!==((R.t*2.2-dt*2.2)|0)){shake=6;noiseHit&&SND.ready&&noiseHit(SND.ctx.currentTime,.12,'lowpass',300,1,.35,SND.sfx,90);}R.face=-1;if(R.t>2.4){R.st='turn';R.t=0;talk([['Lum',"Leave him alone!"]],false,()=>{R.st='chase';R.t=0;R.calm=0;});}}
+    else if(R.st==='pound'){if(((R.t*2.2)|0)!==((R.t*2.2-dt*2.2)|0)){shake=6;noiseHit&&SND.ready&&noiseHit(SND.ctx.currentTime,.12,'lowpass',300,1,.35,SND.sfx,90);}R.face=-1;if(R.t>2.4){R.st='turn';R.t=0;R.st='chase';R.t=0;R.calm=0;}}
     else if(R.st==='chase'){R.calm=Math.max(0,(R.calm||0)-dt);const dx=lum.x-R.x,dy=lum.y-R.y,d=Math.hypot(dx,dy);R.face=dx<0?-1:1;
       if(!DLG.active&&!MENU.open&&!FADE.dir&&!BATTLE.on&&!BATTLE.pending&&!WIPE.dir&&!R.calm){const sp=RUN_SPEED*1.35;if(d<62){R.st='fight';startEncounter(R,'ambush');}else{R.x+=dx/d*sp*dt;R.y+=dy/d*sp*dt;}}}}
   if(VANE){const V=VANE;V.t+=dt;if(V.st!=='walk'&&!V.cb)V.face=lum.x<V.x?-1:1;if(V.step){const sx=V.step.x-lum.x,sy=V.step.y-lum.y,sd=Math.hypot(sx,sy);if(sd>3){const m=Math.min(sd,90*dt);lum.x+=sx/sd*m;lum.y+=sy/sd*m;lum.state='walk';lum.face=sx<0?-1:1;}else{lum.state='idle';lum.face=-1;V.step=null;}}if(V.st==='walk'){const dx=V.tx-V.x,dy=V.ty-V.y,d=Math.hypot(dx,dy);if(d<4){V.st='idle';V.cb&&V.cb();V.cb=null;}else{V.x+=dx/d*42*dt;V.y+=dy/d*42*dt;V.face=dx<0?-1:1;}}}}
@@ -2803,43 +2803,41 @@ function updateWoodsC1(){if(DLG.active||WEVENT.on||FADE.dir||BATTLE.on)return;
   if(lum.x>2560&&!BAG.includes('lantern')){lum.x=2530;lum.vx=0;talk([['Lum',"The road ahead disappears into the dark of Stranglethorn Forest."],['Lum',"I can't see a thing past those first trees. I'll need a stronger light than this."]]);return;}
   if(lum.x>2560&&!C1.endSeen){C1.endSeen=1;talk([['Lum',"The road leads east… into Stranglethorn Forest."],['Lum',"Hold on, Cosmic. I'm coming."]],false,()=>{C1.endCard=.001;});}}
 function hutDoorC1(){if(C1.vane>=2){if(VANE)return;goScene(enterVHut);return;}
-  if(C1.reaper===0){C1.reaper=1;talk([['Lum',"Locked…"],['Lum',"Hello? Is anyone in there?"]],false,()=>{sfxRumble&&sfxRumble(1.6,.6);shake=6;REAPER={kind:'reaper',scene:'woods',x:HUTDOOR.x+230,y:HUTDOOR.y+70,s:1,pack:1,calm:0,dead:0,face:-1,t:0,st:'rise',rise:0};setTimeout(()=>talk([['Lum',"Something's coming out of the ground…!"]]),900);});return;}
+  if(C1.reaper===0){C1.reaper=1;talk([['Lum',"Locked…"],['Lum',"Hello? Anyone home?"]],false,()=>{sfxRumble&&sfxRumble(1.6,.6);shake=6;REAPER={kind:'reaper',scene:'woods',x:HUTDOOR.x+230,y:HUTDOOR.y+70,s:1,pack:1,calm:0,dead:0,face:-1,t:0,st:'rise',rise:0};setTimeout(()=>talk([['Lum',"What is that!?"]]),900);});return;}
   if(C1.reaper===1){say("Something is pounding on the door!");return;}
   // the Grave Reaper is gone: knock again and the gravekeeper finally answers
   C1.vane=1;WEVENT.on=true;
-  talk([['Lum',"Hello?"],['Lum',"Anyone home?"],['Voice',"Is it gone?"],['Lum',"I believe so. I'm Lum and I'm searching for my apprentice. Have you seen a blue haired boy?"]],false,()=>{
+  talk([['Voice',"Is it gone?"],['Lum',"I believe so. I'm Lum and I'm searching for my apprentice. Have you seen a blue haired boy?"]],false,()=>{
     sfxPage&&sfxPage(1);VANE={step:{x:HUTDOOR.x+140,y:HUTDOOR.y+84},x:HUTDOOR.x,y:HUTDOOR.y+4,tx:HUTDOOR.x+62,ty:HUTDOOR.y+66,face:1,st:'walk',t:0,cb:()=>{VANE.face=lum.x<VANE.x?-1:1;lum.face=VANE.x<lum.x?-1:1;vaneScene();}};});}
 function vaneScene(){talk([
-  ['Vane',"Lum…? Not the Lum from the little shop out past the woods? At the very edge of the world?"],
-  ['Vane',"Well, I'll be. All these years I've heard talk of someone living out there. Thought you were half a story."],
+  ['Vane',"Lum…? Lum from the little shop out past the woods? At the very edge of the world?"],
+  ['Vane',"Well, I'll be. All these years I've heard talk of someone living out beyond where the path ends."],
   ['Vane',"Name's Vane. I keep these graves. Not that they need much keeping. This place has been dead for ages. Heh."],
-  ['Vane',"Nothing ever happens out here. The residents are very quiet, and they never complain."],
   ['Vane',"Sorry I talk so much… I'm usually the only one around here."],
-  ['Vane',"You must have heard that storm last night? Thunder shaking the windows, wind howling like something was crying out there."],
-  ['Vane',"The ground started rumbling, graves cracking open… and that skeletal abomination you just put down came lurching after me."],
-  ['Vane',"Chased me right into my hut. I bolted the door and kept the lantern burning till dawn. Most excitement this graveyard's seen in a hundred years."],
-  ['Vane',"Sorry I talk so much… I normally talk to myself!"],
-  ['Vane',"And now an unlikely visitor from the edge of the world, knocking on my door. Something is stirring… I can feel it in my old bones."],
+  ['Vane',"You must have heard that storm last night? Thunder shaking my hut, wind howling..."],
+  ['Vane',"Even the ground started rumbling, graves cracking open…"],
+  ['Vane',"I bolted the door and kept my trusty lantern burning till dawn."],
+  ['Vane',"Sorry I talk so much… I haven't seen the living in many moons!"],
+  ['Vane',"And now a most unlikely visitor from the edge of the world, knocking on my door. Something is stirring… I can feel it in my bones."],
   ['Vane',"But a blue-haired boy… aye. I saw him. Through the window, between the lightning flashes."],
-  ['Vane',"Standing among the graves with a sword far too big for him. It was glowing red as a hot coal."],
-  ['Vane',"There was a great flash of light, so bright I had to look away. When I looked back… he was gone. Just gone."],
-  ['Vane',"I told myself it was a bad dream."],
-  ['Lum',"…Cosmic. What have you done?"],
+  ['Vane',"Standing among the graves… and he had a red sword."],
+  ['Vane',"There was a great flash of light, so bright I had to look away. When I looked back… he was gone."],
+  ['Vane',"I told myself it was all a bad dream."],
+  ['Lum',"…Cosmic!"],
   ['Vane',"You're going after him, aren't you?"],
-  ['Vane',"We're mostly cut off from the rest of the world. There are dark places ahead and you won't make it through without light."],
-  ['Vane',"I'd lend you my lantern, but… I've already lost one thing I treasure this week. Can't bear to part with another."]],false,()=>{
-    C1.vane=2;C1.charmQ=1;if(PARTY.lum.charm==='vanecharm'){vaneNotice(vaneWalkIn);return;}
-    talk([['Vane',"My lucky cross. Wooden beads and a little carved cross. I've worn it every day for forty years."],
-      ['Vane',"I think my fox friend ran off with it. Little rascal visits for scraps, and steals anything that shines."],
-      ['Vane',"If you happen across it, bring it back to me, and my lantern is yours."],['Lum',"I'll keep an eye out."],
+  ['Vane',"We're mostly cut off from the rest of the world. There are dark places ahead and you won't make it through without light."]],false,()=>{
+    C1.vane=2;C1.charmQ=1;if(PARTY.lum.charm==='vanecharm'||BAG.includes('vanecharm')){vaneNotice(vaneWalkIn);return;}
+    talk([['Vane',"Maybe we can help each other out.. I seem to have lost my necklace."],
+      ['Vane',"I think my fox friend ran off with it…"],
+      ['Vane',"It's an heirloom, and all I got for protection around here! Please bring it back to me, and my lantern is yours."],['Lum',"I'll keep an eye out."],
       ['Vane',"There's a little tin lantern in my hut. It won't light much, but take it. Door's open."]],false,()=>{GOAL.tag='NEW TASK';GOAL.text="Find Vane's lucky cross";HINT.goalT=0;vaneWalkIn();});});}
 function vaneWalkIn(){WEVENT.on=false;if(!VANE)return;VANE.st='walk';VANE.tx=HUTDOOR.x;VANE.ty=HUTDOOR.y+4;VANE.cb=()=>{VANE=null;sfxPage&&sfxPage(.6);};}
-function vaneNotice(after){talk([['Vane',"Wait… that cross around your neck. That's mine! My lucky cross!"],['Vane',"I lost it days ago. I wondered if my fox friend ran off with it."]],false,()=>
+function vaneNotice(after){talk([['Vane',"Wait… that's the cross! My lucky cross!"]],false,()=>
   askChoice("Return Vane's Lucky Cross?",[["Yes",()=>vaneTrade(after)],["No",()=>talk([['Vane',"…Ah. Well. If you change your mind, you know where to find me."]],false,()=>{GOAL.tag='TASK';GOAL.text="Return Vane's lucky cross";HINT.goalT=0;after&&after();})]]));}
 function vaneTrade(after){
   PARTY.lum.charm=null;{const i=BAG.indexOf('vanecharm');if(i>=0)BAG.splice(i,1);}syncMaxHp&&syncMaxHp();C1.charmQ=2;
   talk([['Vane',"Thank you, Lum. You don't know what this means to an old man."],['Vane',"A deal's a deal. Here, take my lantern. It's brighter than that little tin one."]],false,()=>{giveItem('lantern');
-    setTimeout(()=>talk([['Vane',"The paths ahead twist and tangle, and some places are darker than night. This old lantern has never once gone out on me."],['Lum',"Thank you, Vane."],['Vane',"Bring the boy home safe. And… mind the shadows."]],false,()=>{GOAL.tag='NEW TASK';GOAL.text='Head east toward Stranglethorn Forest';HINT.goalT=0;after&&after();}),900);});}
+    setTimeout(()=>talk([['Vane',"The paths ahead twist and tangle, and some places are darker than night."],['Lum',"Thank you, Vane."],['Vane',"Bring the boy home safe. And… mind the shadows."]],false,()=>{GOAL.tag='NEW TASK';GOAL.text='Head east toward Stranglethorn Forest';HINT.goalT=0;after&&after();}),900);});}
 function drawC1EndCard(){if(!C1.endCard)return;C1.endCard+=1/60;const t=C1.endCard,a=Math.min(1,t*1.5,(6-t)*1.2);if(t>6){C1.endCard=0;return;}ctx.save();ctx.setTransform(DPR,0,0,DPR,0,0);ctx.globalAlpha=Math.max(0,a);ctx.fillStyle='rgba(10,8,20,.6)';ctx.fillRect(0,H*.36-50,W,108);
   ctx.textAlign='center';ctx.fillStyle='#efe6ff';ctx.font='700 22px "Alegreya SC", Georgia, serif';ctx.fillText('Stranglethorn Forest',W/2,H*.36);ctx.font='italic 15px Alegreya, Georgia, serif';ctx.fillStyle='rgba(239,230,255,.8)';ctx.fillText('The playtest ends here — this path is still being written.',W/2,H*.36+30);ctx.restore();}
 function drawC1Title(){if(!C1.title)return;C1.title+=1/60;const t=C1.title;if(t>5){C1.title=0;return;}const a=Math.min(1,t*1.2,(5-t)*1.2);ctx.save();ctx.setTransform(DPR,0,0,DPR,0,0);ctx.globalAlpha=a;ctx.fillStyle='rgba(20,14,30,.55)';ctx.fillRect(0,H*.3-46,W,92);ctx.textAlign='center';
@@ -2915,7 +2913,7 @@ const VHINT=[];const VHEMB=[];
 function setupVHut(){VHINT.length=0;
   VHINT.push({x:400,y:768,reach:62,door:true,onInteract:()=>goScene(()=>{buildWoods();buildWoodsC1();SCENE='woods';lum.x=HUTDOOR.x+30;lum.y=HUTDOOR.y+46;lum.face=1;lum.state='idle';lum.vx=lum.vy=0;cam.x=lum.x+60;cam.y=lum.y-50;WTITLE.t=99;})});
   VHINT.push({x:468,y:505,reach:80,fire:true,onInteract:fireInteract});
-  VHINT.push({x:VHVANE.x,y:VHVANE.y,reach:72,onInteract:()=>{if(C1.charmQ===1&&PARTY.lum.charm==='vanecharm'){vaneNotice();return;}if(C1.charmQ===1){talk([['Vane',["Any sign of my lucky cross? That fox of mine loves the old oak north of the road.","Take the little tin lantern if you haven't. It's by the bed."][(C1.vtalk=(C1.vtalk||0)+1)%2]]]);return;}const L=[
+  VHINT.push({x:VHVANE.x,y:VHVANE.y,reach:72,onInteract:()=>{if(C1.charmQ===1&&(PARTY.lum.charm==='vanecharm'||BAG.includes('vanecharm'))){vaneNotice();return;}if(C1.charmQ===1){talk([['Vane',["Any sign of my lucky cross? That fox of mine loves the old oak north of the road.","Take the little tin lantern if you haven't. It's by the bed."][(C1.vtalk=(C1.vtalk||0)+1)%2]]]);return;}const L=[
     [['Vane',"The fire's yours whenever you need it. Grind away."]],
     [['Vane',"Slime, bone, bramble… you'd be amazed what this graveyard coughs up after a storm."]],
     [['Vane',"That bed's softer than it looks. Rest a spell if those woods got the better of you."]],
@@ -3505,7 +3503,7 @@ function start(data){
   if(resume){INTRO.on=false;INTRO.fade=0;INTRO.ui=1;becomeCosmic(lum.x,lum.y,1);HINT.on=false;HINT.goalT=99;}else{introStart();audioInit();INTRO.waiting=true;}
   requestAnimationFrame(frame);
 }
-window.__g={DFOES,graveRise,get WGRAVES(){return WGRAVES},enterDun,DUN,DUNINT,dunFree,WOBJ,get INTERACTABLES(){return INTERACTABLES},C1I,skipC1Intro,FORAGE,pickForage,PARTS,enterWoodsC1,set LUMK(v){LUMK=v},enterVHut,MIX,openMix,doMix,RECIPES,get NEAR(){return NEAR},startChapter1,C1,WFOES,get REAPER(){return REAPER},get VANE(){return VANE},hutDoorC1,POWDERS,get CH(){return CH},spawnKing,kingArrives,get kingState(){return kingState},makeResultCard,CHSEL,recordPrologue,STATS,RESULTS,STORM,BATS,WSKELS,spawnSkels,fokalurEvent,get skelDone(){return skelDone},set skelDone(v){skelDone=v},enterWoods,woodsFree,WEV,NIGHT,cutHedge,goToSleep,enterGarden,enterBedroom,BED,bedFree,enterShop,SHOPLUM,shopFree,get restTalk(){return restTalk},PSLIMES,pondVoiceEvent,enterPond,pondFree,CHOICE,pickChoice,giveItem,get shedChestOpen(){return shedChestOpen},enterShed,SHSLIMES,shedFree,SHFLOOR,planStage,stageSlots,SSLIMES,get mimicState(){return mimicState},FOE_TYPES,enterStudy,studyFree,SFLOOR,GSLIMES,gardenFree,BATTLE,HEROES,MATS,startEncounter,battleAction,chooseMenu,WSLIMES,hitSlimes,defeatSlime,WEVENT,DLG,MENU,PARTY,BAG,TUT,takeBucket,openMenu,closeMenu,menuTap,get bucketTaken(){return bucketTaken},get SCENE(){return SCENE},WCAM,goScene,enterWell,SLUGS,lum,CK,BRIDGE,creekNearest,cos,INTRO,get PC(){return PC}};window.claude?.hot?.snapshot?.(()=>({lum:{x:lum.x,y:lum.y}}));
+window.__g={get FADEX(){return FADE},get WIPEX(){return WIPE},get KEYS(){return keys},DFOES,graveRise,get WGRAVES(){return WGRAVES},enterDun,DUN,DUNINT,dunFree,WOBJ,get INTERACTABLES(){return INTERACTABLES},C1I,skipC1Intro,FORAGE,pickForage,PARTS,enterWoodsC1,set LUMK(v){LUMK=v},enterVHut,MIX,openMix,doMix,RECIPES,get NEAR(){return NEAR},startChapter1,C1,WFOES,get REAPER(){return REAPER},get VANE(){return VANE},hutDoorC1,POWDERS,get CH(){return CH},spawnKing,kingArrives,get kingState(){return kingState},makeResultCard,CHSEL,recordPrologue,STATS,RESULTS,STORM,BATS,WSKELS,spawnSkels,fokalurEvent,get skelDone(){return skelDone},set skelDone(v){skelDone=v},enterWoods,woodsFree,WEV,NIGHT,cutHedge,goToSleep,enterGarden,enterBedroom,BED,bedFree,enterShop,SHOPLUM,shopFree,get restTalk(){return restTalk},PSLIMES,pondVoiceEvent,enterPond,pondFree,CHOICE,pickChoice,giveItem,get shedChestOpen(){return shedChestOpen},enterShed,SHSLIMES,shedFree,SHFLOOR,planStage,stageSlots,SSLIMES,get mimicState(){return mimicState},FOE_TYPES,enterStudy,studyFree,SFLOOR,GSLIMES,gardenFree,BATTLE,HEROES,MATS,startEncounter,battleAction,chooseMenu,WSLIMES,hitSlimes,defeatSlime,WEVENT,DLG,MENU,PARTY,BAG,TUT,takeBucket,openMenu,closeMenu,menuTap,get bucketTaken(){return bucketTaken},get SCENE(){return SCENE},WCAM,goScene,enterWell,SLUGS,lum,CK,BRIDGE,creekNearest,cos,INTRO,get PC(){return PC}};window.claude?.hot?.snapshot?.(()=>({lum:{x:lum.x,y:lum.y}}));
 window.claude?.hot?.ready?window.claude.hot.ready(start):start(window.claude?.hot?.data??{});
 })();
 </script>
