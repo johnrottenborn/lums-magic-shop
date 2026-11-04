@@ -2819,39 +2819,33 @@ function updateWoodsC1(){if(DLG.active||WEVENT.on||FADE.dir||BATTLE.on)return;
   if(lum.x>2560&&!BAG.includes('lantern')){lum.x=2530;lum.vx=0;talk([['Lum',"The road ahead disappears into the dark of Stranglethorn Forest."],['Lum',"I can't see a thing past those first trees. I'll need a stronger light than this."]]);return;}
   if(lum.x>2560&&!C1.endSeen){C1.endSeen=1;talk([['Lum',"The road leads east… into Stranglethorn Forest."],['Lum',"Hold on, Cosmic. I'm coming."]],false,()=>{C1.endCard=.001;});}}
 function hutDoorC1(){if(C1.vane>=2){if(VANE)return;goScene(enterVHut);return;}
-  if(C1.reaper===0){C1.reaper=1;talk([['Lum',"Locked…"],['Lum',"Hello? Anyone home?"]],false,()=>{sfxRumble&&sfxRumble(1.6,.6);shake=6;REAPER={kind:'reaper',scene:'woods',x:HUTDOOR.x+230,y:HUTDOOR.y+70,s:1,pack:1,calm:0,dead:0,face:-1,t:0,st:'rise',rise:0};setTimeout(()=>talk([['Lum',"What is that!?"]]),900);});return;}
+  if(C1.reaper===0){C1.reaper=1;talk([['Lum',"Locked…"]],false,()=>{sfxRumble&&sfxRumble(1.6,.6);shake=6;REAPER={kind:'reaper',scene:'woods',x:HUTDOOR.x+230,y:HUTDOOR.y+70,s:1,pack:1,calm:0,dead:0,face:-1,t:0,st:'rise',rise:0};setTimeout(()=>talk([['Lum',"Aaah!"]]),900);});return;}
   if(C1.reaper===1){say("Something is pounding on the door!");return;}
   // the Grave Reaper is gone: knock again and the gravekeeper finally answers
   C1.vane=1;WEVENT.on=true;
   talk([['Voice',"Is it gone?"],['Lum',"I believe so. I'm Lum and I'm searching for my apprentice. Have you seen a blue haired boy?"]],false,()=>{
     sfxPage&&sfxPage(1);VANE={step:{x:HUTDOOR.x+140,y:HUTDOOR.y+84},x:HUTDOOR.x,y:HUTDOOR.y+4,tx:HUTDOOR.x+62,ty:HUTDOOR.y+66,face:1,st:'walk',t:0,cb:()=>{VANE.face=lum.x<VANE.x?-1:1;lum.face=VANE.x<lum.x?-1:1;vaneScene();}};});}
 function vaneScene(){talk([
-  ['Vane',"Lum…? Lum from the little shop out past the woods? At the very edge of the world?"],
-  ['Vane',"Well, I'll be. All these years I've heard talk of someone living out beyond where the path ends."],
-  ['Vane',"Name's Vane. I keep these graves. Not that they need much keeping. This place has been dead for ages. Heh."],
-  ['Vane',"Sorry I talk so much… I'm usually the only one around here."],
-  ['Vane',"You must have heard that storm last night? Thunder shaking my hut, wind howling..."],
-  ['Vane',"Even the ground started rumbling, graves cracking open…"],
-  ['Vane',"I bolted the door and kept my trusty lantern burning till dawn."],
-  ['Vane',"Sorry I talk so much… I haven't seen the living in many moons!"],
-  ['Vane',"And now a most unlikely visitor from the edge of the world, knocking on my door. Something is stirring… I can feel it in my bones."],
-  ['Vane',"But a blue-haired boy… aye. I saw him. Through the window, between the lightning flashes."],
-  ['Vane',"Standing among the graves… and he had a red sword."],
-  ['Vane',"There was a great flash of light, so bright I had to look away. When I looked back… he was gone."],
-  ['Vane',"I told myself it was all a bad dream."],
-  ['Lum',"…Cosmic!"],
-  ['Vane',"You're going after him, aren't you?"],
-  ['Vane',"We're mostly cut off from the rest of the world. There are dark places ahead and you won't make it through without light."]],false,()=>{
+  ["Vane","Lum\u2026? Lum from the Magic Shop?"],
+  ["Vane","I thought you were just part of some old story\u2026 never could find my way to your shop!"],
+  ["Vane","Anyways! Name's Vane and I'm the Gravekeeper. This place has been dead for ages. Heh."],
+  ["Vane","You must have heard that storm last night? Thunder shaking, wind howling..."],
+  ["Vane","I locked the door and kept my trusty lantern burning till dawn."],
+  ["Vane","And now a most unlikely visitor from the edge of the world, knocking on my door. Something is stirring\u2026 I can feel it in my bones."],
+  ["Vane","But a blue-haired boy\u2026 aye. I saw him. Through the window, standing among the graves\u2026 and he had a red sword."],
+  ["Vane","There was a terrifying flash of light, and I had to turn away. When I looked back\u2026 he was gone."],
+  ["Vane","I told myself it was all a bad dream."],
+  ["Lum","\u2026Cosmic!"],
+  ["Vane","Quite possible\u2026 you're going after him, aren't you?"],
+  ["Vane","We're mostly cut off from the rest of the world. There are dark places ahead and you won't make it through without light."]],false,()=>{
     C1.vane=2;C1.charmQ=1;if(PARTY.lum.charm==='vanecharm'||BAG.includes('vanecharm')){vaneNotice(vaneWalkIn);return;}
-    talk([['Vane',"Maybe we can help each other out.. I seem to have lost my necklace."],
-      ['Vane',"I think my fox friend ran off with it…"],
-      ['Vane',"It's an heirloom, and all I got for protection around here! Please bring it back to me, and my lantern is yours."],['Lum',"I'll keep an eye out."]],false,()=>{GOAL.tag='NEW TASK';GOAL.text="Find Vane's lucky cross";HINT.goalT=0;vaneWalkIn();});});}
+    talk([["Vane","Maybe we can help each other out. I seem to have lost my necklace."],["Vane","If I had to guess, I dropped to the ground and my furry little friend scurried away with it\u2026"],["Vane","It's an heirloom, and all I got for protection around here! Please bring it back to me, and my lantern is yours."],["Lum","I'll keep an eye out."],["Vane","You won't make it far inside Stranglethorn without my trusty lantern!"]],false,()=>{GOAL.tag='NEW TASK';GOAL.text="Find Vane's lost necklace";HINT.goalT=0;vaneWalkIn();});});}
 function vaneWalkIn(){WEVENT.on=false;if(!VANE)return;VANE.st='walk';VANE.tx=HUTDOOR.x;VANE.ty=HUTDOOR.y+4;VANE.cb=()=>{VANE=null;sfxPage&&sfxPage(.6);};}
 function vaneNotice(after){talk([['Vane',"Wait… that's the cross! My lucky cross!"]],false,()=>
   askChoice("Return Vane's Lucky Cross?",[["Yes",()=>vaneTrade(after)],["No",()=>talk([['Vane',"…Ah. Well. If you change your mind, you know where to find me."]],false,()=>{GOAL.tag='TASK';GOAL.text="Return Vane's lucky cross";HINT.goalT=0;after&&after();})]]));}
 function vaneTrade(after){
   PARTY.lum.charm=null;{const i=BAG.indexOf('vanecharm');if(i>=0)BAG.splice(i,1);}syncMaxHp&&syncMaxHp();C1.charmQ=2;
-  talk([['Vane',"Thank you, Lum. You don't know what this means to an old man."],['Vane',"A deal's a deal. Here, take my lantern."]],false,()=>{giveItem('lantern');
+  talk([['Vane',"Thank you, Lum. You don't know what this means to an old man."],['Vane',"In exchange… Here, take my lantern."]],false,()=>{giveItem('lantern');
     setTimeout(()=>talk([['Vane',"The paths ahead twist and tangle, and some places are darker than night."],['Lum',"Thank you, Vane."],['Vane',"Bring the boy home safe. And… mind the shadows."]],false,()=>{GOAL.tag='NEW TASK';GOAL.text='Head east toward Stranglethorn Forest';HINT.goalT=0;after&&after();}),900);});}
 function drawC1EndCard(){if(!C1.endCard)return;C1.endCard+=1/60;const t=C1.endCard,a=Math.min(1,t*1.5,(6-t)*1.2);if(t>6){C1.endCard=0;return;}ctx.save();ctx.setTransform(DPR,0,0,DPR,0,0);ctx.globalAlpha=Math.max(0,a);ctx.fillStyle='rgba(10,8,20,.6)';ctx.fillRect(0,H*.36-50,W,108);
   ctx.textAlign='center';ctx.fillStyle='#efe6ff';ctx.font='700 22px "Alegreya SC", Georgia, serif';ctx.fillText('Stranglethorn Forest',W/2,H*.36);ctx.font='italic 15px Alegreya, Georgia, serif';ctx.fillStyle='rgba(239,230,255,.8)';ctx.fillText('The playtest ends here — this path is still being written.',W/2,H*.36+30);ctx.restore();}
@@ -2928,18 +2922,16 @@ const VHINT=[];const VHEMB=[];
 function setupVHut(){VHINT.length=0;
   VHINT.push({x:400,y:768,reach:62,door:true,onInteract:()=>goScene(()=>{buildWoods();buildWoodsC1();SCENE='woods';lum.x=HUTDOOR.x+30;lum.y=HUTDOOR.y+46;lum.face=1;lum.state='idle';lum.vx=lum.vy=0;cam.x=lum.x+60;cam.y=lum.y-50;WTITLE.t=99;})});
   VHINT.push({x:468,y:505,reach:80,fire:true,onInteract:fireInteract});
-  VHINT.push({x:VHVANE.x,y:VHVANE.y,reach:72,onInteract:()=>{if(C1.charmQ===1&&(PARTY.lum.charm==='vanecharm'||BAG.includes('vanecharm'))){vaneNotice();return;}if(C1.charmQ===1){talk([['Vane',"Any sign of my lucky cross? That fox of mine loves the old oak north of the road."]]);return;}const L=[
+  VHINT.push({x:VHVANE.x,y:VHVANE.y,reach:72,onInteract:()=>{if(C1.charmQ===1&&(PARTY.lum.charm==='vanecharm'||BAG.includes('vanecharm'))){vaneNotice();return;}if(C1.charmQ===1){talk([['Vane',"Any sign of my lucky cross? That's what I get for feeding wildlife! Heh. They love the oak tree north of the road."]]);return;}const L=[
     [['Vane',"The fire's yours whenever you need it. Grind away."]],
     [['Vane',"Slime, bone, bramble… you'd be amazed what this graveyard coughs up after a storm."]],
-    [['Vane',"That bed's softer than it looks. Rest a spell if those woods got the better of you."]],
-    [['Vane',"I used to talk to the kettle. Now I've got you. Big improvement. The kettle never laughs at my jokes."]],
     [['Vane',"Bring the boy home safe, Lum. And mind the shadows."]]];talk(L[(C1.vtalk=(C1.vtalk||0)+1)%L.length]);}});
   VHINT.push({x:552,y:705,reach:62,onInteract:()=>askChoice("Rest a while?",[["Yes",()=>{WEVENT.on=true;goScene(()=>{HEROES[HERO].hp=HEROES[HERO].maxHp;lum.x=515;lum.y=650;lum.face=-1;setTimeout(()=>{WEVENT.on=false;talk([['Vane',"Feel better? Told you. Softest bed this side of the world's edge."],['Lum',"Much better. Thank you, Vane."]]);if(typeof SAVEC!=='undefined')SAVEC.t=99;},900);});}],["No",()=>{}]])});
   const L=(x,y,reach,lines)=>{let i=0;VHINT.push({x,y,reach,onInteract:()=>say(lines[(i++)%lines.length])});};
-  L(330,560,70,["A ledger of every grave, with little notes. \"Liked tulips.\" \"Hated tulips.\" \"Still owes me a coin.\"","Jars of dried herbs and grave-moss… a few of these would make lovely powders."]);
-  L(288,700,64,["A wreath of garlic on the wall. For cooking… or for something else. I won't ask."]);}
+  L(330,560,70,["A ledger of every grave, with little notes. \"Liked tulips.\" \"Still owes me a coin.\"","Jars of dried herbs and grave-moss… a few of these would make lovely powders."]);
+  L(288,700,64,["A wreath of garlic on the wall."]);}
 function enterVHut(){SCENE='vhut';lum.x=400;lum.y=735;lum.face=1;lum.vx=lum.vy=0;lum.state='idleUp';WCAM.x=400;WTITLE.t=0;setupVHut();
-  if(!C1.hutSeen){C1.hutSeen=1;setTimeout(()=>talk([['Vane',"Come in, come in. Mind the step, and the bones. Those are mine."],['Vane',"Make yourself at home. The hearth's always lit. If you've got powders to grind, use the fire."],['Lum',"A warm fire and a good mortar… I could mix a few powders and potions here."]],false,()=>{GOAL.tag='TIP';GOAL.text='Mix powders & potions at a fire';HINT.goalT=0;}),900);}}
+  if(!C1.hutSeen){C1.hutSeen=1;setTimeout(()=>talk([['Vane',"Come in, come in."],['Vane',"Make yourself at home. The hearth's always lit. If you've got powders to grind, use the fire."],['Lum',"A warm fire and a good mortar… I could mix a few powders and potions here."]],false,()=>{GOAL.tag='TIP';GOAL.text='Mix powders & potions at a fire';HINT.goalT=0;}),900);}}
 function drawVHut(){const im=IMG.vanehut;if(!ready(im))return;const [rz]=roomView();
   ctx.setTransform(DPR,0,0,DPR,0,0);ctx.fillStyle='#1c1612';ctx.fillRect(0,0,W,H);
   ctx.setTransform(DPR*rz,0,0,DPR*rz,DPR*(W/2-WCAM.x*rz),0);ctx.drawImage(im,0,0,VHW,VHH);
