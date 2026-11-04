@@ -2939,7 +2939,7 @@ function c1IntroStart(){C1I.on=true;C1I.titled=0;C1I.t=0;C1I.st=0;C1I.w=0;C1I.ev
   lum.x=0;lum.y=4;lum.face=1;lum.state='idle';lum.vx=lum.vy=0;lum.alpha=0;INTRO.ui=0;HINT.goalT=99;GOAL.tag='';GOAL.text='';
   const vh=H/zoom;cam.x=20;cam.y=1700-vh/2;resetForage();}
 function c1Walk(tx,ty,sp,dt){const dx=tx-lum.x,dy=ty-lum.y,d=Math.hypot(dx,dy);if(d<3){lum.x=tx;lum.y=ty;return true;}const m=Math.min(d,sp*dt);lum.x+=dx/d*m;lum.y+=dy/d*m;
-  lum.state=dy>Math.abs(dx)?'walkDown':'walk';if(Math.abs(dx)>4)lum.face=dx<0?-1:1;const a=ANIM[lum.state];lum.ft+=dt*a.fps*(sp/95);lum.fi=Math.floor(lum.ft)%a.frames.length;return false;}
+  lum.state=dy>Math.abs(dx)?'walkDown':'walk';if(Math.abs(dx)>4)lum.face=dx<0?-1:1;const a=ANIM[lum.state];C1I.ft=(C1I.ft||0)+dt*a.fps*(sp/95);lum.fi=Math.floor(C1I.ft)%a.frames.length;return false;}
 function c1Idle(){lum.state='idle';lum.fi=0;}
 function c1Leaves(n){for(let i=0;i<n;i++)PARTS.push({type:'bpetal',x:lum.x+rnd(-260,260),y:lum.y+rnd(-520,-80),z:rnd(30,110),vx:rnd(-25,25),vy:rnd(150,240),vz:-rnd(6,12),life:0,max:rnd(3,4.5),s:rnd(3.4,5.4),rot:rnd(0,TAU),vr:rnd(-7,7),col:['#9a7448','#b08a52','#7d5c38','#c2a066','#8e6a3c'][(Math.random()*5)|0],leaf:1});}
 function sfxGust(){if(!SND.ready)return;const t=SND.ctx.currentTime;noiseHit(t,2.8,'bandpass',380,.7,.32,SND.sfx,1300);noiseHit(t+.4,2.2,'bandpass',900,1.2,.16,SND.sfx,420);}
@@ -2955,7 +2955,7 @@ function updateC1Intro(dt){C1I.t+=dt;C1I.w+=dt;INTRO.ui=0;C1I.evil=Math.max(0,C1
     case 3:{if(c1Walk(10,520,95,dt)){c1Idle();c1Talk([['Lum',"Cosmic! Your breakfast is getting cold!"]],4);}break;}
     case 4:{c1Idle();if(C1I.w>1.3)c1Talk([['Lum',"Cosmic!"]],5);break;}
     case 5:{c1Idle();lum.face=C1I.w<.5?-1:1;if(C1I.w>1.1)c1Talk([['Lum',"Cosmic?"]],6);break;}
-    case 6:{if(c1Walk(12,880,70,dt)){c1Idle();c1Talk([['Lum',"He had such an exciting day yesterday… I wonder if he's on another adventure..."]],7);}break;}
+    case 6:{if(c1Walk(12,880,70,dt)){c1Idle();c1Talk([['Lum',"I wonder if he's on another adventure..."]],7);}break;}
     case 7:{c1Idle();if(C1I.w<dt*1.5){sfxGust();C1I.leafT=3.2;c1Leaves(10);}if(C1I.w>1.7){C1I.st=8;C1I.w=0;}break;}
     case 8:{if(c1Walk(14,1450,205,dt)){c1Idle();lum.face=1;C1I.st=9;C1I.w=0;C1I.evil=1;sfxEerie&&sfxEerie();shake=3;}break;}
     case 9:{c1Idle();if(C1I.w>1)c1Talk([['Lum',"The hedge… it's been cut clean through."],['Lum',"This was no ordinary blade. There's something old in it… something wicked."],['Lum',"Why do I know that? I've never felt anything like it… and yet, somehow, I remember."]],10);break;}
