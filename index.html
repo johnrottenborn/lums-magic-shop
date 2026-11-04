@@ -1104,7 +1104,7 @@ function setupWell(){WINT.length=0;
   L(1070,630,90,["Scrolls, a mortar and pestle... someone's been studying down here.","This scroll has a drawing of a giant slime with a crown. Oh no. Oh no no no."]);
   L(1175,672,90,["THE RUNIC CONSERVATORY. A secret room! Under our well! This whole time!"]);
   WINT.push({x:195,y:700,reach:80,onInteract:()=>goScene(()=>enterGarden())});
-  if(!bucketTaken)WINT.push({x:750,y:510,reach:62,bucket:1,onInteract:()=>talk([['Cosmic',"Hmm... this old bucket is surprisingly solid."],['Cosmic',"It might make a sturdy helmet!"]],false,takeBucket)});
+  if(!bucketTaken)WINT.push({x:750,y:510,reach:62,bucket:1,onInteract:()=>takeBucket()});
   WINT.push({x:676,y:510,reach:70,onInteract:()=>{if(studyVisited)goScene(()=>enterStudy());else talk([['Cosmic',"There's a shiny slime trail leading through that doorway..."],['Cosmic',"Okay. Brave apprentice. Very brave. Here I go."]],false,()=>goScene(()=>enterStudy()));}});
   L(140,720,90,["The runes glow brighter when I get close. They're warm, like sunlight."]);
   L(1270,720,90,["This rune looks like a little door. Or a little house. Or a very square bird."]);
@@ -1946,7 +1946,7 @@ const SHINT=[],SHSLIMES=[];let shedChestOpen=false;let shedSpawned=false,shedVis
 function setupShed(){SHINT.length=0;{const [x,y]=sp_(560,1010);SHINT.push({x,y,reach:60,onInteract:()=>goScene(()=>enterGardenFromShed())});}const L=(sx,sy,reach,lines)=>{const [x,y]=sp_(sx,sy);let i=0;SHINT.push({x,y,reach,onInteract:()=>say(lines[(i++)%lines.length])});};
   L(400,870,70,["Shelves and shelves of seedlings. Some of them are glowing! Master Lum, what are you growing in here?","This little one has blue sparkly leaves. I'm calling it Sprout. Hi, Sprout."]);
   {const [x,y]=sp_(290,930);SHINT.push({x,y,reach:70,grab:()=>!shedChestOpen&&BAG.includes('shedkey'),onInteract:()=>{if(shedChestOpen){say("Empty now. Just a little dust and the smell of mint.");return;}if(!BAG.includes('shedkey')){say("Locked");return;}
-    talk([['Cosmic',"Click! The key fits!"],['Cosmic',"Boots! Green garden boots! They're exactly my size!"]],false,()=>{shedChestOpen=true;BAG.splice(BAG.indexOf('shedkey'),1);delete MATS.shedkey;giveItem('gboots');});}});}
+    shedChestOpen=true;BAG.splice(BAG.indexOf('shedkey'),1);delete MATS.shedkey;giveItem('gboots');}});}
   L(600,880,80,["A potting bench with a little brass scale, a trowel, and a seed packet that says 'DO NOT PLANT INDOORS'.","There's a spellbook on the bench, open to a page about growing moonmint. Someone's been taking notes in the margins."]);
   L(560,880,70,["A big sack of potting soil. It smells like rain and earthworms. Good earthworms."]);
   L(840,870,70,["Rakes, shovels, a little pitchfork... Master Lum keeps everything so tidy. Except me. I'm the untidy part."]);
@@ -1993,7 +1993,7 @@ const PINT=[];let shroudTaken=false,pondVisited=false,pondReturn={x:POND.x,y:PON
 const PEXIT={x:905,y:742};
 function setupPond(){PINT.length=0;
   PINT.push({x:705,y:735,reach:120,onInteract:()=>talk([['Cosmic',"Wait... this statue..."],['Cosmic',"It looks exactly like Master Lum!"],['Cosmic',"But that's impossible. This temple must be hundreds of years old. Maybe thousands."]])});
-  if(!shroudTaken)PINT.push({x:455,y:700,reach:90,cloth:1,onInteract:()=>talk([['Cosmic',"A little blue cloth tied around the pillar, swaying in the water. It's the same blue as Master Lum's robes..."],['Cosmic',"It's old and frayed... but it feels strangely warm. Like it wants to be worn."]],false,()=>{shroudTaken=true;const i=PINT.findIndex(o=>o.cloth);if(i>=0)PINT.splice(i,1);giveItem('shroud');})});
+  if(!shroudTaken)PINT.push({x:455,y:700,reach:90,cloth:1,onInteract:()=>{shroudTaken=true;const i=PINT.findIndex(o=>o.cloth);if(i>=0)PINT.splice(i,1);giveItem('shroud');}});
   PINT.push({x:250,y:660,reach:80,onInteract:()=>say("Old clay pots, crusted with shells. One of them has the same rune that's carved over Master Lum's door.")});
   PINT.push({x:1150,y:655,reach:80,onInteract:()=>say("Through the arch... is that a shipwreck? In our POND? How big is this pond?!")});
   PINT.push({x:PEXIT.x,y:PEXIT.y,reach:70,onInteract:()=>askChoice("Leave the underwater temple?",[["Leave",()=>goScene(()=>enterGardenFromPond())],["Stay",()=>{}]])});}
@@ -3192,7 +3192,7 @@ const FORAGE_LINE={duskberry:"Plump duskberries.",dewberry:"Dewberries, still co
 function pickForage(f){if(f.picked){say(["I've picked this one clean. More will grow soon.","Nothing left to pick here for now."][(sayCount++)%2]);return;}
   f.picked=1;MATS[f.id]=(MATS[f.id]||0)+f.n;if(!BAG.includes(f.id))BAG.push(f.id);TOAST.t=0;TOAST.name=`${ITEMS[f.id].name} ×${f.n}`;TOAST.id=f.id;MENU.newItems++;sfxItem&&sfxItem();if(typeof SAVEC!=='undefined')SAVEC.t=99;
   for(let i=0;i<10;i++)PARTS.push({type:'fdust',x:f.x+rnd(-24,24),y:f.y,z:rnd(20,70),vx:rnd(-10,10),vy:rnd(-4,4),vz:rnd(10,30),life:0,max:rnd(.5,1),s:rnd(1,2),col:'255,240,190'});
-  if(!C1.forageTip){C1.forageTip=1;talk([['Lum',FORAGE_LINE[f.id]],['Lum',"Lum's Magic Mixing needs nothing but a little heat. Any fire will do."]]);}else say(FORAGE_LINE[f.id]);}
+  C1.forageTip=1;}
 function drawForage(list=FORAGE){if(CH<1||C1I.on)return;ctx.save();ctx.globalCompositeOperation='lighter';
   for(const f of list){if(f.picked)continue;if(Math.abs(f.x-cam.x)>W/zoom/2+60||Math.abs(f.y-cam.y)>H/zoom/2+120)continue;
     for(let i=0;i<3;i++){const ph=T*1.6+i*2.1+f.x*.01,a=Math.max(0,Math.sin(ph));const gx=f.x+Math.cos(i*2.3+f.y)*(f.herb?26:22),gy=f.y-(f.herb?10:30)-Math.sin(i*1.7+f.x)*14;drawGlow(ctx,gx,gy,16,'255,226,140',.8*a);ctx.save();ctx.globalCompositeOperation='source-over';ctx.globalAlpha=a;ctx.fillStyle='#fffbe6';const r=7*a+2;ctx.beginPath();ctx.moveTo(gx,gy-r);ctx.quadraticCurveTo(gx,gy,gx+r,gy);ctx.quadraticCurveTo(gx,gy,gx,gy+r);ctx.quadraticCurveTo(gx,gy,gx-r,gy);ctx.quadraticCurveTo(gx,gy,gx,gy-r);ctx.fill();ctx.restore();}}
@@ -3252,11 +3252,11 @@ function setupDun(){DUNINT.length=0;const r=DUN.room,D=(x,y,reach,fn)=>DUNINT.pu
   if(r===2){D(175,590,64,()=>dunGo(1,1240,600,-1));D(1270,590,64,()=>dunGo(3,290,540,1));L(700,655,80,["The roots here are so thick they look woven together.","Purple fungus on the ceiling. Glowmold. Lovely in a powder, if only I could reach it."]);}
   if(r===3){D(270,525,60,()=>dunGo(2,1240,600,-1));
     DUNINT.push({x:700,y:540,reach:66,dynDoor:1,get door(){return !!C1.webCut},onInteract:webInteract});
-    DUNINT.push({x:880,y:570,reach:66,grab:()=>!C1.dunChest,onInteract:()=>{if(C1.dunChest){say("Empty.");return;}C1.dunChest=1;sfxPage&&sfxPage(.8);talk([['Lum',"An old chest, wrapped in webs… and something inside!"]],false,()=>giveItem('crystalpouch'));}});
+    DUNINT.push({x:880,y:570,reach:66,grab:()=>!C1.dunChest,onInteract:()=>{if(C1.dunChest){say("Empty.");return;}C1.dunChest=1;sfxPage&&sfxPage(.8);giveItem('crystalpouch');}});
     DUNINT.push({x:1210,y:565,reach:70,onInteract:()=>askChoice("Drink from the pool?",[["Yes",()=>{const H_=HEROES[HERO];H_.hp=H_.maxHp;sfxItem&&sfxItem();for(let i=0;i<16;i++)PARTS.push({type:'fiz',col:'140,230,255',x:lum.x+rnd(-24,24),y:lum.y,z:rnd(10,90),vx:rnd(-10,10),vy:rnd(-4,4),vz:rnd(20,60),life:0,max:rnd(.6,1.1),s:rnd(1.4,2.6)});say("Cold and sweet. I feel completely restored.");}],["No",()=>{}]])});}
   if(r===4){D(700,760,70,()=>dunGo(3,700,560,-1));D(710,412,60,()=>dunGo(5,700,740,-1));
     DUNINT.push({x:880,y:575,reach:66,grab:()=>C1.vixen&&!C1.charmFound,onInteract:()=>{if(!C1.vixen){say("A nest of shiny things… and a fox curled right on top of it.");return;}if(C1.charmFound){say("A nest of twigs, buttons, and shiny bits.");return;}
-      C1.charmFound=1;talk([['Lum',"A little thief's treasure hoard."],['Lum',C1.charmQ===1?"And there it is. Wooden beads and a little carved cross. Vane's lucky cross!":"And a string of wooden beads with a little carved cross, worn smooth. Somebody must be missing this."]],false,()=>{giveItem('vanecharm');if(C1.charmQ===1){GOAL.tag='NEW TASK';GOAL.text="Return Vane's lucky cross (wear it so he sees)";HINT.goalT=0;}});}});
+      C1.charmFound=1;giveItem('vanecharm');if(C1.charmQ===1){GOAL.tag='NEW TASK';GOAL.text="Return Vane's lucky cross (wear it so he sees)";HINT.goalT=0;}}});
   }
   if(r===5){D(700,760,70,()=>dunGo(4,705,440,1));if(!C1.bigVixen)DUNINT.push({x:700,y:615,reach:95,onInteract:()=>{const g=DFOES.find(f=>f.kind==='bigvixen');if(!g)return;talk([['Lum',"…This one is much bigger than the little thief. It could be dangerous."]],false,()=>askChoice("Wake the fox?",[["Yes",()=>{g.asleep=0;startEncounter(g,'normal');}],["No",()=>say("Let sleeping foxes lie.")]]));}});L(560,600,60,["So many eyes…"]);}}
 function webInteract(){if(C1.webCut){dunGo(4,700,730,-1);return;}
