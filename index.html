@@ -2699,7 +2699,7 @@ function c1Reset(){CH=1;HERO='lum';PARTY_ORDER[0]='lum';PC='lum';ANIM=LUM_ANIM;
   for(const k in STATS)if(typeof STATS[k]==='number')STATS[k]=0;STATS.found={};
   INTRO.on=false;INTRO.waiting=false;INTRO.fade=0;INTRO.ui=1;INTRO.lumShown=true;cos.hidden=true;HINT.on=false;HINT.goalT=99;TUT.stage=0;}
 function c1Bedroom(){const door=BEDINT[0];BEDINT.length=0;BEDINT.push(door);const L=(x,y,reach,lines)=>{let i=0;BEDINT.push({x,y,reach,onInteract:()=>say(lines[(i++)%lines.length])});};
-  L(900,740,130,["Cosmic's bed. Still made. He never even lay down last night.","His pillow still has that little dent from his bucket helmet. Oh, Cosmic."]);
+  L(900,740,130,["Cosmic's bed. The blankets are thrown back… he must have slipped out sometime in the night.","His pillow's gone cold. Wherever he went, he left a long while ago."]);
   L(540,640,95,["No time to rest. Not until I know where he's gone."]);
   L(205,680,100,["His treasure chest. A frog-shaped rock, three marbles, and a feather he's saving for a hat."]);
   L(790,640,90,["My reading glasses, and 'Quiet Magic for Loud Apprentices.' I bought it as a joke. He didn't laugh."]);
