@@ -312,6 +312,7 @@ addEventListener('keyup',e=>{keys[e.code]=false;});
 const stick={id:null,bx:0,by:0,x:0,y:0,R:58};
 const BTN={a:{x:0,y:0,r:44,down:false,id:null,pulse:0,shake:0},b:{x:0,y:0,r:36,down:false,id:null,pulse:0,shake:0}};
 let W=0,H=0,DPR=1,zoom=1;
+{const _el=CanvasRenderingContext2D.prototype.ellipse;CanvasRenderingContext2D.prototype.ellipse=function(x,y,rx,ry,...r){return _el.call(this,x,y,Math.max(0,rx),Math.max(0,ry),...r);};}
 function layoutButtons(){const pad=Math.max(18,W*.05);
   BTN.a.r=clamp(W*.09,29,40);BTN.b.r=BTN.a.r*.86;
   BTN.a.x=W-pad-BTN.a.r;BTN.a.y=H-pad-BTN.a.r-BTN.a.r*1.1;
@@ -993,11 +994,11 @@ const GOAL={tag:'NEW TASK',text:'Prove to Lum you can handle the slimes'};
 const HINT={on:false,t:0,step:0,moved:0,looked:0,cast:0,goalT:0};let casts=0;
 const TOUCHUI=()=>typeof STICKUI!=='undefined'?STICKUI.touch:true,tw=(t,d)=>TOUCHUI()?t:d;
 const HINT_TEXT={get length(){return 3},get 0(){return tw('Drag on the left side of the screen to walk','Use WASD or the arrow keys to walk')},get 1(){return tw('When a bubble pops up over Cosmic, tap anywhere to take a look','When a bubble pops up over Cosmic, press E or click to take a look')},get 2(){return tw('Tap the Spell button to practice a spell','Press Space to practice a spell')}};
-function updateHints(dt){if(!HINT.on)return;HINT.t+=dt;HINT.goalT+=dt;if(Math.hypot(lum.vx,lum.vy)>40)HINT.moved+=dt;
+function updateHints(dt){HINT.goalT+=dt;if(!HINT.on)return;HINT.t+=dt;if(Math.hypot(lum.vx,lum.vy)>40)HINT.moved+=dt;
   if(HINT.step===0&&HINT.moved>1.2){HINT.step=1;HINT.t=0;}if(HINT.step===1&&HINT.looked){HINT.step=2;HINT.t=0;}if(HINT.step===2&&HINT.cast){HINT.step=3;HINT.t=0;}if(HINT.step>=3&&HINT.t>1)HINT.on=false;}
 function drawHints(){if(!HINT.on&&HINT.goalT>7)return;
   if(HINT.goalT<7){const a=Math.min(1,HINT.goalT*2,(7-HINT.goalT)*1.5);ctx.save();ctx.globalAlpha=a;ctx.textAlign='center';
-    ctx.fillStyle='rgba(30,38,30,.55)';rr(W/2-150,58,300,52,14);ctx.fill();ctx.fillStyle='#f2d58a';ctx.font='700 11px "Alegreya SC", Georgia, serif';ctx.fillText(GOAL.tag,W/2,77);
+    ctx.font='500 15px Alegreya, Georgia, serif';const bw=Math.min(W-24,Math.max(300,ctx.measureText(GOAL.text).width+40));ctx.fillStyle='rgba(30,38,30,.55)';rr(W/2-bw/2,58,bw,52,14);ctx.fill();ctx.fillStyle='#f2d58a';ctx.font='700 11px "Alegreya SC", Georgia, serif';ctx.fillText(GOAL.tag,W/2,77);
     ctx.fillStyle='#fdf8ec';ctx.font='500 15px Alegreya, Georgia, serif';ctx.fillText(GOAL.text,W/2,98);ctx.restore();}
   if(HINT.on&&HINT.step<3&&HINT.goalT>1.5&&!(TUT.stage===1)&&!WEVENT.on){const txt=HINT_TEXT[HINT.step],a=Math.min(1,HINT.t*2)*(.8+.2*Math.sin(T*3));ctx.save();ctx.globalAlpha=a;ctx.font='500 15px Alegreya, Georgia, serif';ctx.textAlign='center';
     const w=ctx.measureText(txt).width+32,y=H*.62;ctx.fillStyle='rgba(30,38,30,.5)';rr(W/2-w/2,y-18,w,34,17);ctx.fill();ctx.fillStyle='#fdf8ec';ctx.fillText(txt,W/2,y+5);ctx.restore();}}
@@ -2962,9 +2963,9 @@ function updateC1Intro(dt){C1I.t+=dt;C1I.w+=dt;INTRO.ui=0;C1I.evil=Math.max(0,C1
     case 6:{if(c1Walk(12,880,70,dt)){c1Idle();c1Talk([['Lum',"I wonder if he's on another adventure..."]],7);}break;}
     case 7:{c1Idle();if(C1I.w<dt*1.5){sfxGust();C1I.leafT=3.2;c1Leaves(10);}if(C1I.w>1.7){C1I.st=8;C1I.w=0;}break;}
     case 8:{if(c1Walk(14,1450,205,dt)){c1Idle();lum.face=1;C1I.st=9;C1I.w=0;C1I.evil=1;sfxEerie&&sfxEerie();shake=3;}break;}
-    case 9:{c1Idle();if(C1I.w>1)c1Talk([['Lum',"The hedge… it's been cut clean through."],['Lum',"This was no ordinary blade. There's something old in it… something wicked."],['Lum',"Why do I know that? I've never felt anything like it… and yet, somehow, I remember."]],10);break;}
-    case 10:{c1Idle();if(C1I.w>.6)c1Talk([['Lum',"Cosmic! COSMIC!"]],11);break;}
-    case 11:{c1Idle();if(C1I.w>1.8)c1Talk([['Lum',"…I have a bad feeling about this."]],12);break;}
+    case 9:{c1Idle();if(C1I.w>1)c1Talk([['Lum',"My hedges… what could have done this?"]],10);break;}
+    case 10:{c1Idle();if(C1I.w>.6)c1Talk([['Lum',"COSMIC!"]],11);break;}
+    case 11:{c1Idle();if(C1I.w>2.6){C1I.st=12;}break;}
     case 12:{c1IntroEnd();break;}}}
 function c1IntroEnd(){C1I.on=false;C1I.st=99;WEVENT.on=false;lum.alpha=1;C1.hedgeSeen=1;C1.introDone=1;GOAL.tag='NEW TASK';GOAL.text='Search for your missing apprentice, Cosmic';HINT.goalT=0;if(typeof SAVEC!=='undefined')SAVEC.t=99;}
 function skipC1Intro(){if(!C1I.on)return;DLG.active=false;DLG.onEnd=null;DLG.withCosmic=false;C1.title=0;lum.x=14;lum.y=1450;lum.face=1;c1Idle();const vh=H/zoom;cam.x=lum.x;cam.y=clamp(lum.y-50,BACK.y+vh/2,1700-vh/2);c1IntroEnd();}
