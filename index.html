@@ -2880,7 +2880,7 @@ function c1FoeFrame(f){const B=BATTLE,me=B.foes[B.foeI]===f,ph=B.phase,t=B.t;
     if(me&&f.heavyNow&&ph==='foeWind')return['cast',3+Math.min(1,Math.floor(f.wind*2))];if(me&&f.heavyNow&&ph==='foeLeap')return['cast',5];if(me&&ph==='foeCharge')return['cast',Math.min(2,Math.floor(t*3))];
     if(me&&ph==='foeWind')return['strike',0];if(me&&ph==='foeLeap')return['strike',1+Math.min(2,Math.floor(B.t/B.leapD*3))];if(me&&ph==='foeBack')return['strike',4];if(f.charged)return['cast',2];return['idle',Math.floor(T*5+f.ph)];}
   return['idle',0];}
-function drawBattleC1Foe(f){const S=bS(),B=BATTLE,x=f.x+f.ox,y=f.y+f.oy,sh=f.type,H_={wisp:120,rskel:205,reaper:200,bat:150,vixen:150,bigvixen:240,spider:120}[sh]*S*f.s;const __s=sh==='vixen'||sh==='bigvixen'?'fox':sh;
+function drawBattleC1Foe(f){const S=bS(),B=BATTLE,x=f.x+f.ox,y=f.y+f.oy,sh=f.type,H_={wisp:120,rskel:205,reaper:200,bat:150,vixen:150,bigvixen:185,spider:120}[sh]*S*f.s;const __s=sh==='vixen'||sh==='bigvixen'?'fox':sh;
   let al=1;if(f.dead){const lim=sh==='reaper'?1.4:1.1;if(f.dead>lim)al=Math.max(0,1-(f.dead-lim)/.6);if(al<=0)return;}
   ctx.fillStyle=`rgba(10,10,20,${(.32*al).toFixed(3)})`;ctx.beginPath();ctx.ellipse(x,y-2,H_*(sh==='wisp'?.32:.22),H_*.05,0,0,TAU);ctx.fill();
   const [an,fi]=c1FoeFrame(f);let yy=y;if(sh==='wisp')yy-=12*S+Math.sin(T*2.2+f.ph)*5*S;if(sh==='rskel')yy-=10*S+Math.sin(T*1.8+f.ph)*5*S;if(sh==='bat'){yy-=70*S+Math.sin(T*3+f.ph)*8*S;if(f.dead)yy+=Math.min(1,f.dead/.8)*70*S;}
