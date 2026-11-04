@@ -1993,7 +1993,7 @@ const PINT=[];let shroudTaken=false,pondVisited=false,pondReturn={x:POND.x,y:PON
 const PEXIT={x:905,y:742};
 function setupPond(){PINT.length=0;
   PINT.push({x:705,y:735,reach:120,onInteract:()=>talk([['Cosmic',"Wait... this statue..."],['Cosmic',"It looks exactly like Master Lum!"],['Cosmic',"But that's impossible. This temple must be hundreds of years old. Maybe thousands."]])});
-  if(!shroudTaken)PINT.push({x:455,y:700,reach:90,cloth:1,onInteract:()=>{shroudTaken=true;const i=PINT.findIndex(o=>o.cloth);if(i>=0)PINT.splice(i,1);giveItem('shroud');}});
+  if(!shroudTaken)PINT.push({x:455,y:700,reach:90,cloth:1,onInteract:()=>{shroudTaken=true;const i=PINT.findIndex(o=>o.cloth);if(i>=0)PINT.splice(i,1);giveItem('shroud');talk([['Cosmic',"It's the same blue as Master Lum's robes..."],['Cosmic',"Old and frayed... but strangely warm. Like it wants to be worn."]]);}});
   PINT.push({x:250,y:660,reach:80,onInteract:()=>say("Old clay pots, crusted with shells. One of them has the same rune that's carved over Master Lum's door.")});
   PINT.push({x:1150,y:655,reach:80,onInteract:()=>say("Through the arch... is that a shipwreck? In our POND? How big is this pond?!")});
   PINT.push({x:PEXIT.x,y:PEXIT.y,reach:70,onInteract:()=>askChoice("Leave the underwater temple?",[["Leave",()=>goScene(()=>enterGardenFromPond())],["Stay",()=>{}]])});}
@@ -3256,7 +3256,7 @@ function setupDun(){DUNINT.length=0;const r=DUN.room,D=(x,y,reach,fn)=>DUNINT.pu
     DUNINT.push({x:1210,y:565,reach:70,onInteract:()=>askChoice("Drink from the pool?",[["Yes",()=>{const H_=HEROES[HERO];H_.hp=H_.maxHp;sfxItem&&sfxItem();for(let i=0;i<16;i++)PARTS.push({type:'fiz',col:'140,230,255',x:lum.x+rnd(-24,24),y:lum.y,z:rnd(10,90),vx:rnd(-10,10),vy:rnd(-4,4),vz:rnd(20,60),life:0,max:rnd(.6,1.1),s:rnd(1.4,2.6)});say("Cold and sweet. I feel completely restored.");}],["No",()=>{}]])});}
   if(r===4){D(700,760,70,()=>dunGo(3,700,560,-1));D(710,412,60,()=>dunGo(5,700,740,-1));
     DUNINT.push({x:880,y:575,reach:66,grab:()=>C1.vixen&&!C1.charmFound,onInteract:()=>{if(!C1.vixen){say("A nest of shiny things… and a fox curled right on top of it.");return;}if(C1.charmFound){say("A nest of twigs, buttons, and shiny bits.");return;}
-      C1.charmFound=1;giveItem('vanecharm');if(C1.charmQ===1){GOAL.tag='NEW TASK';GOAL.text="Return Vane's lucky cross (wear it so he sees)";HINT.goalT=0;}}});
+      C1.charmFound=1;giveItem('vanecharm');talk([['Lum',C1.charmQ===1?"Wooden beads and a little carved cross. Vane's lucky cross!":"Wooden beads and a little carved cross, worn smooth. Somebody must be missing this."]],false,()=>{if(C1.charmQ===1){GOAL.tag='NEW TASK';GOAL.text="Return Vane's lucky cross (wear it so he sees)";HINT.goalT=0;}});}});
   }
   if(r===5){D(700,760,70,()=>dunGo(4,705,440,1));if(!C1.bigVixen)DUNINT.push({x:700,y:615,reach:95,onInteract:()=>{const g=DFOES.find(f=>f.kind==='bigvixen');if(!g)return;talk([['Lum',"…This one is much bigger than the little thief. It could be dangerous."]],false,()=>askChoice("Wake the fox?",[["Yes",()=>{g.asleep=0;startEncounter(g,'normal');}],["No",()=>say("Let sleeping foxes lie.")]]));}});L(560,600,60,["So many eyes…"]);}}
 function webInteract(){if(C1.webCut){dunGo(4,700,730,-1);return;}
