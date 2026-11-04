@@ -2978,7 +2978,7 @@ function buildForage(){if(forageBuilt)return;forageBuilt=true;
   for(const r of ROWS)if(r.kind==='mint')FORAGE.push({x:r.ax+r.d[0]*r.L*.5,y:r.ay+4,id:'moonleaf',n:2,picked:0,herb:1});
   // give Lum her own words for the garden (the prologue keeps Cosmic's)
   for(const o of INTERACTABLES){if(o.door||o.hedgeDoor||o.c1)continue;const sh=ESTATE.find(e=>e.t==='shrub'&&Math.abs(e.x-o.x)<1&&Math.abs(e.y-o.y)<1);
-    const row=!sh&&ROWS.find(r=>Math.abs(r.ax+r.d[0]*20-o.x)<1&&Math.abs(r.ay+4-o.y)<1);if(!sh&&!row)continue;const orig=o.onInteract,line=sh?(sh.drained?"The slimes drained this one dry. Cosmic watered it back to life, bless him. It'll bloom again in time.":LUMSHR[sh.k]):LUMHERB[row.kind];if(!line)continue;o.onInteract=()=>{if(CH>0)say(line);else orig();};}
+    const row=!sh&&ROWS.find(r=>Math.abs(r.ax+r.d[0]*20-o.x)<1&&Math.abs(r.ay+4-o.y)<1);if(!sh&&!row)continue;const orig=o.onInteract,line=sh?(sh.drained?"The slimes drained this one of its magic. With a little time and care, it'll bloom again.":LUMSHR[sh.k]):LUMHERB[row.kind];if(!line)continue;o.onInteract=()=>{if(CH>0)say(line);else orig();};}
   for(const f of FORAGE)INTERACTABLES.push({x:f.x,y:f.y,reach:f.herb?62:76,lum:true,c1:1,forage:f,onInteract:()=>{if(CH>0)pickForage(f);else{const o=INTERACTABLES.find(q=>q!==this&&!q.c1&&Math.hypot(q.x-f.x,q.y-f.y)<2);o&&o.onInteract();}}});}
 function resetForage(){buildForage();for(const f of FORAGE)f.picked=0;}
 const FORAGE_LINE={duskberry:"Plump duskberries.",dewberry:"Dewberries, still cold with morning dew.",emberberry:"Emberberries, warm as a little hearth.",moonleaf:"Fresh moonmint leaves."};
