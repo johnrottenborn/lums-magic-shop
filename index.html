@@ -1165,8 +1165,8 @@ const ITEMS={
   lumpouch:{name:"Lum's Powder Pouch",slot:'main',stats:{atk:1},desc:"A sealed leather pouch packed with Lum's handmade powders. Sparkdust for striking, and a few rarer blends for tricky foes."},
   lumrobe:{name:"Starry Shop Cape",slot:'chest',stats:{def:1},desc:"Lum's favorite cape, dusted with embroidered moons and stars. She claims it's just for keeping warm."},
   crystalpouch:{name:'Crystal Powder Pouch',slot:'main',stats:{atk:2,mag:1},desc:"A pouch stitched with tiny crystals, found in a cobwebbed chest beneath the old oak. Powders thrown from it sting a little more. +2 ATK, +1 MAG."},
-  smalllantern:{name:'Little Tin Lantern',slot:'off',stats:{},desc:"A small lantern from Vane's hut. Hold it in your off hand to light a little circle around you in dark places. It won't light much, but it's better than nothing."},
-  vanecharm:{name:"Vane's Rune Charm",slot:'charm',stats:{def:1,mag:1},desc:"A silver charm etched with old runes, warm to the touch. It belongs to Vane. +1 DEF, +1 MAG."},
+  smalllantern:{name:'Little Tin Lantern',slot:'off',stats:{def:1},desc:"A small tin lantern from Vane's hut. Held in the off hand, it lights a little circle around you in dark places. +1 DEF."},
+  vanecharm:{name:"Vane's Lucky Cross",slot:'charm',stats:{def:1,mag:1},desc:"A little silver cross on a worn chain, polished smooth by years of thumbs. Someone must be missing it. +1 DEF, +1 MAG."},
   lantern:{name:"Gravekeeper's Lantern",kind:'key',desc:"Vane's old lantern. It has never once gone out. It will light the dark paths ahead."},
   duskberry:{name:'Duskberries',kind:'mat',desc:"Dark, sweet berries from Lum's garden. With a little heat they become a Healing Potion."},
   dewberry:{name:'Dewberries',kind:'mat',desc:"Blue berries that stay cold with morning dew, even at noon. Their chill goes into Frostbloom Powder."},
@@ -1229,8 +1229,10 @@ function drawBucketHat(c,fr){const im=IMG.bucket_worn;if(!ready(im))return;const
   c.drawImage(im,-w/2,-h+3,w,h);
   c.restore();}
 /* little painted icons for the book */
-const IMGICON={crystalpouch:'icon_pouch_crystal',smalllantern:'tool_lantern_ornate',vanecharm:'tool_rune_compass',lantern:'tool_lantern',duskberry:'ing_duskberry',dewberry:'ing_dewberry',emberberry:'ing_emberberry',moonleaf:'ing_leavesB5',slimeparts:'ing_slime',boneparts:'ing_bones',thornsprig:'ing_twig',potion:'icon_potion',lumpouch:'icon_pouch_seal',lumrobe:'icon_cape_stars',mooncharm:'acc_moon_necklace',moonmint:'acc_moonstone_ring',duskflower:'acc_heart_ring'};
-function drawIcon(c,id,x,y,s,ghost){c.save();c.translate(x,y);const G=ghost?'rgba(110,84,52,.22)':null;c.lineJoin='round';c.lineCap='round';
+const IMGICON={crystalpouch:'icon_pouch_crystal',smalllantern:'tool_lantern_ornate',lantern:'tool_lantern',duskberry:'ing_duskberry',dewberry:'ing_dewberry',emberberry:'ing_emberberry',moonleaf:'ing_leavesB5',slimeparts:'ing_slime',boneparts:'ing_bones',thornsprig:'ing_twig',potion:'icon_potion',lumpouch:'icon_pouch_seal',lumrobe:'icon_cape_stars',mooncharm:'acc_moon_necklace',moonmint:'acc_moonstone_ring',duskflower:'acc_heart_ring'};
+function drawIcon(c,id,x,y,s,ghost){c.save();c.translate(x,y);if(id==='vanecharm'&&!ghost){c.lineCap='round';c.strokeStyle='#8a8f9a';c.lineWidth=s*.035;c.beginPath();c.moveTo(-s*.28,-s*.42);c.quadraticCurveTo(0,-s*.05,s*.28,-s*.42);c.stroke();
+    const g=c.createLinearGradient(-s*.2,-s*.2,s*.2,s*.4);g.addColorStop(0,'#f4f6fa');g.addColorStop(1,'#9aa2b0');c.fillStyle=g;c.strokeStyle='#4a505c';c.lineWidth=Math.max(1,s*.03);const w=s*.09;
+    c.beginPath();c.rect(-w,-s*.16,w*2,s*.58);c.rect(-s*.21,-s*.02,s*.42,w*2);c.fill();c.stroke();c.fillStyle='#fff';c.globalAlpha=.7;c.fillRect(-w*.5,-s*.12,w*.5,s*.4);c.restore();return;}const G=ghost?'rgba(110,84,52,.22)':null;c.lineJoin='round';c.lineCap='round';
   if(!G&&IMGICON[id]&&ready(IMG[IMGICON[id]])){const im=IMG[IMGICON[id]],h=s*1.15,w=h*im.naturalWidth/im.naturalHeight,sc=Math.min(1,s*1.15/w);c.drawImage(im,-w*sc/2,-h*sc/2,w*sc,h*sc);c.restore();return;}
   if(id==='lantern'){c.strokeStyle='#3a2a18';c.lineWidth=s*.05;c.fillStyle=G||'#5a4428';c.beginPath();c.arc(0,-s*.38,s*.09,Math.PI,0);c.stroke();c.fillRect(-s*.2,-s*.32,s*.4,s*.08);c.fillRect(-s*.18,s*.3,s*.36,s*.08);
     if(!G){drawGlow(c,0,0,s*.45,'255,200,120',.5+.15*Math.sin(T*6));c.fillStyle='rgba(255,215,140,.9)';}c.beginPath();c.moveTo(-s*.16,-s*.24);c.lineTo(s*.16,-s*.24);c.lineTo(s*.14,s*.3);c.lineTo(-s*.14,s*.3);c.closePath();c.fill();c.stroke();c.restore();return;}
@@ -2347,8 +2349,7 @@ function drawHollow(o){const im=IMG.hollow;if(!ready(im))return;const k=HOLLOW.s
   // cold air breathing out of the hollow
   ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,o.x,o.y-50,40,'150,180,220',.08+.05*Math.sin(T*1.3));ctx.restore();}
 function hollowInteract(){if(PC==='cosmic'){say("A hollow in the old oak. Cold air is breathing out of it… nope. Not tonight.");return;}
-  const lit=PARTY.lum.off==='smalllantern'||BAG.includes('lantern');
-  if(!lit){talk([['Lum',"A hollow in the old oak… and it goes down. Deep down."],['Lum',"Cold air is breathing up from below. I can't see a thing in there."],['Lum',BAG.includes('smalllantern')?"I should hold the little tin lantern in my off hand before I go down.":"I'd need a light before I go poking around in the dark."]]);return;}
+  if(!C1.hollowSeen){C1.hollowSeen=1;talk([['Lum',"A hollow in the old oak… and it goes down. Deep down."],['Lum',"Cosmic? Are you down there?"],['Lum',"…No answer. But he's just the sort to go exploring somewhere like this. I'd better look."]],false,()=>goScene(()=>enterDun(1,560,650,1)));return;}
   goScene(()=>enterDun(1,560,650,1));}
 function drawHut(o){const im=IMG.hut;if(!ready(im))return;const k=HUT.k,w=im.naturalWidth*k,h=im.naturalHeight*k,x=o.x-429*k,y=o.y-880*k;ctx.save();ctx.translate(o.x,0);ctx.scale(-1,1);ctx.translate(-o.x,0);ctx.drawImage(im,x,y,w,h);
   ctx.save();ctx.globalCompositeOperation='lighter';const f=.8+.12*Math.sin(T*6)+.08*Math.sin(T*11);drawGlow(ctx,x+134*k,y+560*k,40,'255,190,110',.5*f);drawGlow(ctx,x+134*k,y+560*k,10,'255,230,170',.8*f);drawGlow(ctx,x+690*k,y+560*k,26,'255,200,120',.18*f);
@@ -2816,17 +2817,19 @@ function vaneScene(){talk([
   ['Lum',"…Cosmic. What have you done?"],
   ['Vane',"You're going after him, aren't you?"],
   ['Vane',"We're mostly cut off from the rest of the world. There are dark places ahead and you won't make it through without light."],
-  ['Vane',"I'd hand you my lantern, but… heh. I've already lost one thing I treasure this week. Can't bear to part with another."],
-  ['Vane',"My charm. Silver, covered in old runes. Some little thief of a critter snatched it off my windowsill and ran off with it."],
-  ['Vane',"Last I saw, it vanished into the hollow of the old oak, just north of the road."],
-  ['Vane',"Bring it back to me, and my lantern is yours. Fair trade?"],
-  ['Lum',"Fair trade."],
-  ['Vane',"There's a little tin lantern in my hut. It won't light much, but it'll do for poking around under that oak. Door's open."]],false,()=>{
-    C1.vane=2;C1.charmQ=1;GOAL.tag='NEW TASK';GOAL.text="Find Vane's charm in the old oak's hollow";HINT.goalT=0;WEVENT.on=false;VANE.st='walk';VANE.tx=HUTDOOR.x;VANE.ty=HUTDOOR.y+4;VANE.cb=()=>{VANE=null;sfxPage&&sfxPage(.6);};});}
-function vaneTrade(){const eq=PARTY.lum.charm==='vanecharm';
-  talk([['Lum',"Vane, I found this in the hollow under the old oak."],['Vane',"My charm! You found it! Oh, bless you, Lum."],['Vane',"Belonged to my wife, this did. I haven't felt right since it went missing."],['Vane',"A deal's a deal."]],false,()=>{
-    if(eq)PARTY.lum.charm=null;else{const i=BAG.indexOf('vanecharm');if(i>=0)BAG.splice(i,1);}syncMaxHp&&syncMaxHp();
-    C1.charmQ=2;giveItem('lantern');setTimeout(()=>talk([['Vane',"The paths ahead twist and tangle, and some places are darker than night. This old lantern has never once gone out on me."],['Lum',"Thank you, Vane."],['Vane',"Bring the boy home safe. And… mind the shadows."]],false,()=>{GOAL.tag='NEW TASK';GOAL.text='Head east toward Stranglethorn Forest';HINT.goalT=0;}),900);});}
+  ['Vane',"I'd lend you my lantern, but… I've already lost one thing I treasure this week. Can't bear to part with another."]],false,()=>{
+    C1.vane=2;C1.charmQ=1;if(PARTY.lum.charm==='vanecharm'){vaneNotice(vaneWalkIn);return;}
+    talk([['Vane',"My lucky cross. Silver, on a little chain. I've worn it every day for forty years."],
+      ['Vane',"I think my fox friend ran off with it. Little rascal visits for scraps, and steals anything that shines."],
+      ['Vane',"If you happen across it, bring it back to me, and my lantern is yours."],['Lum',"I'll keep an eye out."],
+      ['Vane',"There's a little tin lantern in my hut. It won't light much, but take it. Door's open."]],false,()=>{GOAL.tag='NEW TASK';GOAL.text="Find Vane's lucky cross";HINT.goalT=0;vaneWalkIn();});});}
+function vaneWalkIn(){WEVENT.on=false;if(!VANE)return;VANE.st='walk';VANE.tx=HUTDOOR.x;VANE.ty=HUTDOOR.y+4;VANE.cb=()=>{VANE=null;sfxPage&&sfxPage(.6);};}
+function vaneNotice(after){talk([['Vane',"Wait… that cross around your neck. That's mine! My lucky cross!"],['Vane',"I lost it days ago. I wondered if my fox friend ran off with it."]],false,()=>
+  askChoice("Return Vane's Lucky Cross?",[["Yes",()=>vaneTrade(after)],["No",()=>talk([['Vane',"…Ah. Well. If you change your mind, you know where to find me."]],false,()=>{GOAL.tag='TASK';GOAL.text="Return Vane's lucky cross";HINT.goalT=0;after&&after();})]]));}
+function vaneTrade(after){
+  PARTY.lum.charm=null;{const i=BAG.indexOf('vanecharm');if(i>=0)BAG.splice(i,1);}syncMaxHp&&syncMaxHp();C1.charmQ=2;
+  talk([['Vane',"Thank you, Lum. You don't know what this means to an old man."],['Vane',"A deal's a deal. Here, take my lantern. It's brighter than that little tin one."]],false,()=>{giveItem('lantern');
+    setTimeout(()=>talk([['Vane',"The paths ahead twist and tangle, and some places are darker than night. This old lantern has never once gone out on me."],['Lum',"Thank you, Vane."],['Vane',"Bring the boy home safe. And… mind the shadows."]],false,()=>{GOAL.tag='NEW TASK';GOAL.text='Head east toward Stranglethorn Forest';HINT.goalT=0;after&&after();}),900);});}
 function drawC1EndCard(){if(!C1.endCard)return;C1.endCard+=1/60;const t=C1.endCard,a=Math.min(1,t*1.5,(6-t)*1.2);if(t>6){C1.endCard=0;return;}ctx.save();ctx.setTransform(DPR,0,0,DPR,0,0);ctx.globalAlpha=Math.max(0,a);ctx.fillStyle='rgba(10,8,20,.6)';ctx.fillRect(0,H*.36-50,W,108);
   ctx.textAlign='center';ctx.fillStyle='#efe6ff';ctx.font='700 22px "Alegreya SC", Georgia, serif';ctx.fillText('Stranglethorn Forest',W/2,H*.36);ctx.font='italic 15px Alegreya, Georgia, serif';ctx.fillStyle='rgba(239,230,255,.8)';ctx.fillText('The playtest ends here — this path is still being written.',W/2,H*.36+30);ctx.restore();}
 function drawC1Title(){if(!C1.title)return;C1.title+=1/60;const t=C1.title;if(t>5){C1.title=0;return;}const a=Math.min(1,t*1.2,(5-t)*1.2);ctx.save();ctx.setTransform(DPR,0,0,DPR,0,0);ctx.globalAlpha=a;ctx.fillStyle='rgba(20,14,30,.55)';ctx.fillRect(0,H*.3-46,W,92);ctx.textAlign='center';
@@ -2897,7 +2900,7 @@ const VHINT=[];const VHEMB=[];
 function setupVHut(){VHINT.length=0;
   VHINT.push({x:400,y:768,reach:62,door:true,onInteract:()=>goScene(()=>{buildWoods();buildWoodsC1();SCENE='woods';lum.x=HUTDOOR.x+30;lum.y=HUTDOOR.y+46;lum.face=1;lum.state='idle';lum.vx=lum.vy=0;cam.x=lum.x+60;cam.y=lum.y-50;WTITLE.t=99;})});
   VHINT.push({x:468,y:505,reach:80,fire:true,onInteract:fireInteract});
-  VHINT.push({x:VHVANE.x,y:VHVANE.y,reach:72,onInteract:()=>{if(C1.charmQ===1&&(BAG.includes('vanecharm')||PARTY.lum.charm==='vanecharm')){vaneTrade();return;}if(C1.charmQ===1){talk([['Vane',["Any luck with my charm? Try the hollow of the old oak, north of the road.","Take the little tin lantern if you haven't. It's by the bed."][(C1.vtalk=(C1.vtalk||0)+1)%2]]]);return;}const L=[
+  VHINT.push({x:VHVANE.x,y:VHVANE.y,reach:72,onInteract:()=>{if(C1.charmQ===1&&PARTY.lum.charm==='vanecharm'){vaneNotice();return;}if(C1.charmQ===1){talk([['Vane',["Any sign of my lucky cross? That fox of mine loves the old oak north of the road.","Take the little tin lantern if you haven't. It's by the bed."][(C1.vtalk=(C1.vtalk||0)+1)%2]]]);return;}const L=[
     [['Vane',"The fire's yours whenever you need it. Grind away."]],
     [['Vane',"Slime, bone, bramble… you'd be amazed what this graveyard coughs up after a storm."]],
     [['Vane',"That bed's softer than it looks. Rest a spell if those woods got the better of you."]],
@@ -3100,7 +3103,7 @@ function setupDun(){DUNINT.length=0;const r=DUN.room,D=(x,y,reach,fn)=>DUNINT.pu
     DUNINT.push({x:1210,y:565,reach:70,onInteract:()=>askChoice("Drink from the pool?",[["Yes",()=>{const H_=HEROES[HERO];H_.hp=H_.maxHp;sfxItem&&sfxItem();for(let i=0;i<16;i++)PARTS.push({type:'fiz',col:'140,230,255',x:lum.x+rnd(-24,24),y:lum.y,z:rnd(10,90),vx:rnd(-10,10),vy:rnd(-4,4),vz:rnd(20,60),life:0,max:rnd(.6,1.1),s:rnd(1.4,2.6)});say("Cold and sweet. I feel completely restored.");}],["No",()=>{}]])});}
   if(r===4){D(700,760,70,()=>dunGo(3,700,560,-1));D(710,412,60,()=>dunGo(5,700,740,-1));
     DUNINT.push({x:880,y:575,reach:66,grab:()=>!C1.charmFound,onInteract:()=>{if(C1.charmFound){say("A nest of twigs, buttons, and shiny bits. Some little thief has quite a collection.");return;}
-      C1.charmFound=1;talk([['Lum',"A nest, packed with buttons, bottle caps, and bits of shiny glass…"],['Lum',"And there it is. A silver charm covered in old runes. This must be Vane's!"]],false,()=>{giveItem('vanecharm');GOAL.tag='NEW TASK';GOAL.text='Return the charm to Vane';HINT.goalT=0;});}});
+      C1.charmFound=1;talk([['Lum',"A nest, packed with buttons, bottle caps, and bits of shiny glass… some little thief's treasure hoard."],['Lum',C1.charmQ===1?"And there it is. A silver cross on a little chain. Vane's lucky cross!":"And a little silver cross on a chain, worn smooth. Somebody must be missing this."]],false,()=>{giveItem('vanecharm');if(C1.charmQ===1){GOAL.tag='NEW TASK';GOAL.text="Return Vane's lucky cross (wear it so he sees)";HINT.goalT=0;}});}});
   }
   if(r===5){D(700,760,70,()=>dunGo(4,705,440,1));L(660,560,70,["…Nope. Whatever is watching me can keep this tunnel.","So many eyes. None of them are blinking. I'm leaving now."]);}}
 function webInteract(){if(C1.webCut){dunGo(4,700,730,-1);return;}
@@ -3108,7 +3111,7 @@ function webInteract(){if(C1.webCut){dunGo(4,700,730,-1);return;}
       setTimeout(()=>say("The web curls and withers away. Thornbane works on more than just monsters."),500);}],["No",()=>{}]]));return;}
   talk([['Lum',"A thick wall of web stretches across the passage. It's sticky as honey."],['Lum',"Thornbane Powder would wither it right away. I could mix some at a fire."]]);}
 function enterDun(room,x,y,face){SCENE='dun';DUN.room=room;lum.x=x??560;lum.y=y??640;lum.face=face||1;lum.vx=lum.vy=0;lum.state='idle';WCAM.x=lum.x;WTITLE.t=0;setupDun();
-  if(room===1&&!C1.dunSeen){C1.dunSeen=1;setTimeout(()=>talk([['Lum',"Roots for stairs, and cobwebs everywhere… the little lantern barely lights a step ahead."],['Lum',"Vane's charm has to be down here somewhere."]]),900);}
+  if(room===1&&!C1.dunSeen){C1.dunSeen=1;setTimeout(()=>talk([['Lum',"Roots for stairs, and cobwebs everywhere… I can barely see a step ahead."],['Lum',"Cosmic? …Cosmic!"],['Lum',"Only my own echo. Careful now, Lum."]]),900);}
   if(room===5)DUN.eyes=EYES5.map(()=>({b:rnd(0,6),t:0}));}
 function drawDun(){const R=DROOMS[DUN.room],im=IMG['dun'+DUN.room];if(!ready(im))return;const [rz]=roomView();
   ctx.setTransform(DPR,0,0,DPR,0,0);ctx.fillStyle='#07080c';ctx.fillRect(0,0,W,H);
