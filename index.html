@@ -948,13 +948,25 @@ const NOTE=n=>440*Math.pow(2,(n-69)/12);
 const PROG=[[50,[62,66,69,73]],[47,[59,62,66,69]],[43,[55,59,62,66]],[45,[57,61,64,69]],[50,[62,66,69,74]],[54,[57,61,66,69]],[43,[55,59,64,67]],[45,[57,61,64,67]]];
 const MEL=[[78,-1,81,-1,78,76,-1,74],[76,-1,-1,74,73,-1,71,-1],[74,-1,79,-1,78,-1,74,-1],[76,-1,73,-1,69,-1,-1,-1],[78,-1,81,83,81,-1,78,-1],[76,-1,78,-1,73,-1,-1,-1],[74,76,79,-1,78,76,74,-1],[73,-1,76,-1,74,-1,-1,-1]];
 const ARP=[0,1,2,3,2,1,2,1],EIGHTH=60/64/2;
-function scheduleMusic(){if(BMUS.on){scheduleBattleMusic();return;}if(NIGHT.on){SND.nextNote=SND.ctx.currentTime+.1;return;}const c=SND.ctx;while(SND.nextNote<c.currentTime+.25){const t=SND.nextNote,s=SND.step,bar=Math.floor(s/8)%PROG.length,e=s%8,[root,ch]=PROG[bar],section=Math.floor(s/64)%4;
+function scheduleMusic(){if(BMUS.on){scheduleBattleMusic();return;}if(NIGHT.on){SND.nextNote=SND.ctx.currentTime+.1;return;}if(CH>0&&(SCENE==='woods'||SCENE==='dun')){scheduleWoodsMusic();return;}SND.wStep=0;const c=SND.ctx;while(SND.nextNote<c.currentTime+.25){const t=SND.nextNote,s=SND.step,bar=Math.floor(s/8)%PROG.length,e=s%8,[root,ch]=PROG[bar],section=Math.floor(s/64)%4;
     if(e===0){pluck(t,NOTE(root-12),.22,2.6,SND.music,0,.5);pad(t,ch.slice(0,3).map(NOTE),EIGHTH*8+.4,.012);}
     if(e===4)pluck(t,NOTE(root),.12,1.8,SND.music,0,.5);
     pluck(t+(Math.random()-.5)*.012,NOTE(ch[ARP[e]]),.07+(e===0?.03:0),1.6,SND.music,(ARP[e]-1.5)*.25,.7);
     if(section!==2){const m=MEL[bar][e];if(m>0)bell(t+.004,NOTE(m+(section===3?12:0)),section===3?.05:.075,2.2,SND.music,.12);}
     else if(e%2===0&&Math.random()<.5)bell(t,NOTE(ch[(Math.random()*4)|0]+24),.035,2,SND.music,(Math.random()-.5)*.6);
     SND.nextNote+=EIGHTH*(e%2?.94:1.06);SND.step++;}}
+
+/* --- the Whispering Wood: slow, hushed and a little uneasy --- */
+const WPROG=[[38,[50,53,57,62]],[34,[46,50,53,57]],[36,[48,51,55,60]],[33,[45,50,52,57]]],WSCALE=[74,76,77,79,81,82,84,86,89];
+function scheduleWoodsMusic(){const c=SND.ctx,Q=60/46;if(!SND.wNext||SND.wNext<c.currentTime-1)SND.wNext=c.currentTime+.1;
+  while(SND.wNext<c.currentTime+.3){const t=SND.wNext,s=SND.wStep||0,bar=Math.floor(s/8)%WPROG.length,e=s%8,[root,ch]=WPROG[bar],dun=SCENE==='dun';
+    if(e===0){pluck(t,NOTE(root),dun?.2:.16,6,SND.music,0,.25);pad(t,ch.map(NOTE),Q*8+1,dun?.012:.009);}
+    if(e===4&&Math.random()<.6)pluck(t,NOTE(root+7),.07,4,SND.music,-.2,.3);
+    if((e===2||e===6)&&Math.random()<.55){const n=WSCALE[(Math.random()*WSCALE.length)|0];bell(t+Math.random()*.15,NOTE(n),.035,3.4,SND.music,(Math.random()-.5)*.9);
+      if(Math.random()<.3)bell(t+Q*.5,NOTE(n-1),.022,3,SND.music,(Math.random()-.5)*.9);}
+    if(e===7&&bar===3&&Math.random()<.5)bell(t,NOTE(73),.03,4,SND.music,.5);
+    SND.wNext+=Q;SND.wStep=s+1;}
+  SND.nextNote=c.currentTime+.1;}
 
 /* --- birds: little chirps and trills scattered around the clearing --- */
 function bird(){const c=SND.ctx,t=c.currentTime+.05,n=2+((Math.random()*5)|0),base=2400+Math.random()*2200,pan=Math.random()*1.6-.8,kind=Math.random();
@@ -964,9 +976,9 @@ function bird(){const c=SND.ctx,t=c.currentTime+.05,n=2+((Math.random()*5)|0),ba
 
 /* --- effects --- */
 function sfxStep(stone){if(!SND.ready)return;const t=SND.ctx.currentTime;
-  if(stone){noiseHit(t,.05,'bandpass',2600+Math.random()*900,3,.11,SND.sfx);const o=SND.ctx.createOscillator(),g=SND.ctx.createGain();o.frequency.value=160+Math.random()*30;g.gain.setValueAtTime(.06,t);g.gain.exponentialRampToValueAtTime(.0005,t+.06);o.connect(g);g.connect(SND.sfx);o.start(t);o.stop(t+.08);
-    if(SND.runeCool<=0&&Math.random()<.45){SND.runeCool=.6;const sc=[86,88,90,93,95,98];bell(t+.03,NOTE(sc[(Math.random()*sc.length)|0]),.035,1.6,SND.sfx,(Math.random()-.5)*.4);}}
-  else noiseHit(t,.11,'bandpass',1500+Math.random()*700,.9,.07,SND.sfx);}
+  if(stone){noiseHit(t,.05,'bandpass',2400+Math.random()*700,3,.055,SND.sfx);const o=SND.ctx.createOscillator(),g=SND.ctx.createGain();o.frequency.value=150+Math.random()*25;g.gain.setValueAtTime(.03,t);g.gain.exponentialRampToValueAtTime(.0005,t+.06);o.connect(g);g.connect(SND.sfx);o.start(t);o.stop(t+.08);
+    if(SND.runeCool<=0&&Math.random()<.45){SND.runeCool=.6;const sc=[86,88,90,93,95,98];bell(t+.03,NOTE(sc[(Math.random()*sc.length)|0]),.025,1.6,SND.sfx,(Math.random()-.5)*.4);}}
+  else noiseHit(t,.1,'bandpass',1200+Math.random()*500,.9,.035,SND.sfx);}
 function sfxWade(){if(!SND.ready)return;const t=SND.ctx.currentTime;noiseHit(t,.22,'bandpass',1800+Math.random()*600,1.1,.12,SND.sfx,600);noiseHit(t+.03,.12,'highpass',3500,.7,.04,SND.sfx);}
 function sfxSplash(){if(!SND.ready)return;const t=SND.ctx.currentTime;noiseHit(t,.5,'bandpass',3200,1.2,.22,SND.sfx,700);noiseHit(t+.02,.28,'highpass',4000,.7,.06,SND.sfx);
   for(let i=0;i<6;i++){const st=t+.35+Math.random()*.6,o=SND.ctx.createOscillator(),g=SND.ctx.createGain(),f=1100+Math.random()*1300;o.frequency.setValueAtTime(f,st);o.frequency.exponentialRampToValueAtTime(f*.55,st+.05);
