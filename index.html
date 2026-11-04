@@ -2369,7 +2369,7 @@ function drawWoods(){const vw=W/zoom,vh=H/zoom,x0=cam.x-vw/2-40,y0=cam.y-vh/2-40
   drawPath(SPURP,x0,x1);drawPath(ROADP,x0,x1);if(CH===1)drawBoots(x0,x1);
   // the clearing and the graveyard ground
   
-  const L=[];for(const s_ of WSKELS)L.push([s_.y,{t:'skel',ref:s_}]);if(CH===1){for(const g_ of WFOES)L.push([g_.y,{t:'wfoe',ref:g_}]);if(REAPER)L.push([REAPER.y,{t:'reaperow',ref:REAPER}]);if(VANE)L.push([VANE.y,{t:'vane',ref:VANE}]);}for(const o of WOBJ)if(o.x>x0-300&&o.x<x1+300&&o.y>y0-40&&o.y<y1+600)L.push([o.y,o]);L.push([lum.y,null]);L.sort((a,b)=>a[0]-b[0]);
+  const L=[];for(const s_ of WSKELS)L.push([s_.y,{t:'skel',ref:s_}]);if(CH===1){for(const g_ of WFOES)L.push([g_.y,{t:'wfoe',ref:g_}]);if(REAPER)L.push([REAPER.y,{t:'reaperow',ref:REAPER}]);if(VANE)L.push([VANE.y,{t:'vane',ref:VANE}]);}for(const o of WOBJ)if(o.t==="hollow"||(o.x>x0-300&&o.x<x1+300&&o.y>y0-40&&o.y<y1+600))L.push([o.y,o]);L.push([lum.y,null]);L.sort((a,b)=>a[0]-b[0]);
   drawSealFx();let past=false;for(const [,o] of L){if(!o){if(WEV.foka)drawFokalur();else drawLum();past=true;continue;}if(o.t==='skel'){drawWoodsSkel(o.ref);continue;}if(o.t==='wfoe'){drawWFoe(o.ref);continue;}if(o.t==='reaperow'){drawReaperOW(o.ref);continue;}if(o.t==='vane'){drawVaneOW(o.ref);continue;}const fade=past&&Math.abs(o.x-lum.x)<130&&o.y-lum.y<260;if(fade){ctx.save();ctx.globalAlpha=.45;}if(o.t==='stone')drawStandingStone(o);else if(o.t==='gate')drawGate(o);else if(o.t==='hut')drawHut(o);else if(o.t==='hollow')drawHollow(o);else if(o.t==='grave')drawGrave(o);else drawEstateObj(o);if(fade)ctx.restore();}
   drawSkDust();
   // drifting ground mist
