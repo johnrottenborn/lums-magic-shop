@@ -2906,7 +2906,7 @@ function thornFree(x,y){if(x<18||y<14||y>TH_-14)return false;if(x>TW_-12&&Math.f
 function solveThorn(px,py,nx,ny){if(thornFree(nx,ny))return [nx,ny];if(thornFree(nx,py))return [nx,py];if(thornFree(px,ny))return [px,ny];return [px,py];}
 function enterThorn(){buildThorn();SCENE='thorn';lum.x=40;lum.y=TMZ.start*TCH+TCH/2+10;lum.face=1;lum.vx=lum.vy=0;lum.state='idle';lum.alpha=1;cam.x=lum.x+120;cam.y=lum.y-50;THORN.t=0;GOAL.tag='TASK';GOAL.text='Follow the red flowers through Stranglethorn';HINT.goalT=0;}
 function startThornPreview(){audioInit();c1Reset();C1.introDone=1;C1.hedgeSeen=1;C1I.on=false;WEVENT.on=false;INTRO.lumShown=true;if(!BAG.includes('lantern'))BAG.push('lantern');FADE.a=1;FADE.dir=-1;enterThorn();}
-function updateThorn(dt){const k=Math.min(1,dt*4.5);cam.x+=(lum.x+40-cam.x)*k;cam.y+=(lum.y-50-cam.y)*k;const vw=W/zoom,vh=H/zoom;cam.x=clamp(cam.x,vw/2-80,TW_+80-vw/2);cam.y=clamp(cam.y,-200+vh/2,TH_+60-vh/2);THORN.t+=dt;
+function updateThorn(dt){updateThornAtmos(dt);const k=Math.min(1,dt*4.5);cam.x+=(lum.x+40-cam.x)*k;cam.y+=(lum.y-50-cam.y)*k;const vw=W/zoom,vh=H/zoom;cam.x=clamp(cam.x,vw/2-80,TW_+80-vw/2);cam.y=clamp(cam.y,-200+vh/2,TH_+60-vh/2);THORN.t+=dt;
   if(lum.x>TW_-30&&!C1.thornEnd&&!DLG.active){C1.thornEnd=1;C1.endCard=.001;}}
 function drawRedFlowers(x,y,s,seed){ctx.save();ctx.translate(x,y);ctx.scale(s,s);
   for(let i=0;i<4;i++){const a=hash(seed,i,61)*TAU,l=10+hash(seed,i,63)*8;ctx.fillStyle='#2f4a24';ctx.beginPath();ctx.ellipse(Math.cos(a)*l*.6,Math.sin(a)*l*.3+2,l*.55,3,a,0,TAU);ctx.fill();}
@@ -2919,6 +2919,47 @@ function drawThornProp(o,alpha){const name=o.t==='hedge'?'bramble_hedge':o.t==='
   const w=o.w,h=w*im.naturalHeight/im.naturalWidth;ctx.save();ctx.globalAlpha=alpha;ctx.translate(o.x,o.y);if(o.flip)ctx.scale(-1,1);
   const base=o.t==='oak'?.99:o.t==='web'?.97:o.t==='tree'?.985:.94;ctx.drawImage(im,-w/2,-h*base,w,h);ctx.restore();
   if(o.t==='oak'){ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,o.x-w*.32,o.y-h*.2,60,'120,230,220',.35+.12*Math.sin(T*2));ctx.restore();}}
+
+/* ---------- Stranglethorn atmosphere: drifting fog, motes, petals, cold grade, haunted sound ---------- */
+let THFOG=null;
+function makeFogTex(){const N=256,c=document.createElement('canvas');c.width=c.height=N;const g=c.getContext('2d'),im=g.createImageData(N,N),d=im.data;
+  const rnd_=(x,y,s)=>{const h=Math.sin(x*127.1+y*311.7+s*74.7)*43758.5453;return h-Math.floor(h);};
+  const vn=(x,y,per,s)=>{const xi=Math.floor(x),yi=Math.floor(y),xf=x-xi,yf=y-yi,u=xf*xf*(3-2*xf),v=yf*yf*(3-2*yf),w=(a)=>((a%per)+per)%per;
+    const a=rnd_(w(xi),w(yi),s),b=rnd_(w(xi+1),w(yi),s),c_=rnd_(w(xi),w(yi+1),s),e=rnd_(w(xi+1),w(yi+1),s);return a+(b-a)*u+(c_-a)*v+(a-b-c_+e)*u*v;};
+  for(let y=0;y<N;y++)for(let x=0;x<N;x++){let f=0,amp=.5,tot=0;for(let o=0;o<5;o++){const per=4<<o;f+=vn(x/N*per,y/N*per,per,o)*amp;tot+=amp;amp*=.5;}f/=tot;
+    const a=Math.max(0,Math.min(1,(f-.38)/.42));const i=(y*N+x)*4;d[i]=d[i+1]=d[i+2]=255;d[i+3]=Math.round(a*a*(3-2*a)*255);}
+  g.putImageData(im,0,0);return c;}
+function fogLayer(tex,scale,ox,oy,alpha,tint){const S=256*scale;const sx=((ox%S)+S)%S,sy=((oy%S)+S)%S;ctx.save();ctx.globalAlpha=alpha;
+  for(let y=-sy;y<H;y+=S)for(let x=-sx;x<W;x+=S)ctx.drawImage(tex,x,y,S+1,S+1);
+  ctx.restore();}
+function drawThornFog(pass){if(!THFOG){THFOG=makeFogTex();THFOG.tint=document.createElement('canvas');THFOG.tint.width=THFOG.tint.height=256;const g=THFOG.tint.getContext('2d');g.drawImage(THFOG,0,0);g.globalCompositeOperation='source-in';g.fillStyle='rgb(188,182,204)';g.fillRect(0,0,256,256);
+    THFOG.red=document.createElement('canvas');THFOG.red.width=THFOG.red.height=256;const g2=THFOG.red.getContext('2d');g2.drawImage(THFOG,0,0);g2.globalCompositeOperation='source-in';g2.fillStyle='rgb(150,96,112)';g2.fillRect(0,0,256,256);}
+  const z=zoom,cx=cam.x*z,cy=cam.y*z;
+  if(pass===0){fogLayer(THFOG.tint,3.6,cx*.9+T*14,cy*.9+T*3,.25,0);fogLayer(THFOG.red,2.4,cx*1.05-T*9,cy*1.05+T*2,.16,0);}
+  else{fogLayer(THFOG.tint,4.6,cx*.6+T*22,cy*.6-T*4,.12,0);
+    // low ground haze hugging the bottom of the view
+    const g=ctx.createLinearGradient(0,H*.55,0,H);g.addColorStop(0,'rgba(170,165,190,0)');g.addColorStop(1,'rgba(150,145,175,.16)');ctx.fillStyle=g;ctx.fillRect(0,H*.55,W,H*.45);}}
+function updateThornAtmos(dt){const A=THORN.motes||(THORN.motes=[]);const vw=W/zoom,vh=H/zoom;
+  while(A.length<46)A.push({x:cam.x+rnd(-vw/2,vw/2),y:cam.y+rnd(-vh/2,vh/2),z:rnd(20,160),vx:rnd(-6,6),vy:rnd(-4,4),ph:rnd(0,TAU),k:'mote',s:rnd(1.2,2.6)});
+  if(Math.random()<dt*1.4)A.push({x:cam.x+rnd(-vw/2,vw/2),y:cam.y-vh/2-40,z:0,vx:rnd(10,30),vy:rnd(28,46),ph:rnd(0,TAU),k:'petal',s:rnd(4,6.5),rot:rnd(0,TAU)});
+  for(let i=A.length-1;i>=0;i--){const m=A[i];m.x+=(m.vx+Math.sin(T*.7+m.ph)*8)*dt;m.y+=m.vy*dt;if(m.k==='petal')m.rot+=dt*2;
+    if(Math.abs(m.x-cam.x)>vw*.7||Math.abs(m.y-cam.y)>vh*.7)A.splice(i,1);}
+  // the forest whispers
+  if(SND.ready&&SND.on){const c=SND.ctx,now=c.currentTime;
+    if(!SND.thG){const mk=(v,o)=>{const g=c.createGain();g.gain.value=v;g.connect(o);return g;};SND.thG=mk(0,SND.amb);const lp=c.createBiquadFilter();lp.type='lowpass';lp.frequency.value=260;lp.connect(SND.thG);
+      for(const [f,ty,v] of [[55,'sine',.5],[55.6,'triangle',.3],[82.4,'sine',.22],[110.3,'sine',.08]]){const o=c.createOscillator(),g=c.createGain();o.type=ty;o.frequency.value=f;g.gain.value=v;o.connect(g);g.connect(lp);o.start();}
+      const lfo=c.createOscillator(),lg=c.createGain();lfo.frequency.value=.07;lg.gain.value=.35;lfo.connect(lg);lg.connect(SND.thG.gain);lfo.start();
+      const bp=c.createBiquadFilter();bp.type='bandpass';bp.Q.value=4;bp.frequency.value=600;SND.thWind=bp;const ns=c.createBufferSource();ns.buffer=SND.brown;ns.loop=true;ns.start();ns.connect(bp);SND.thWindG=mk(0,SND.amb);bp.connect(SND.thWindG);SND.thT=4;}
+    const on=SCENE==='thorn'&&!BATTLE.on;SND.thG.gain.setTargetAtTime(on?.06:0,now,1.2);SND.thWindG.gain.setTargetAtTime(on?.05+.03*Math.sin(T*.23):0,now,.8);SND.thWind.frequency.setTargetAtTime(420+260*Math.sin(T*.17)+120*Math.sin(T*.61),now,.5);
+    if(on){SND.thT-=dt;if(SND.thT<=0){SND.thT=6+Math.random()*9;const r=Math.random();
+      if(r<.45){// a breathy whisper drifting past
+        const t=now;for(let k=0;k<3;k++)noiseHit(t+k*.22+Math.random()*.1,.32+Math.random()*.2,'bandpass',900+Math.random()*1400,9,.05,SND.sfxVerb||SND.sfx,600+Math.random()*900);}
+      else if(r<.8){// an old branch creaking
+        const o=c.createOscillator(),g=c.createGain(),f=c.createBiquadFilter();o.type='sawtooth';o.frequency.setValueAtTime(70+Math.random()*30,now);o.frequency.linearRampToValueAtTime(48+Math.random()*20,now+1.1);f.type='bandpass';f.frequency.value=420;f.Q.value=6;g.gain.setValueAtTime(0,now);g.gain.linearRampToValueAtTime(.05,now+.25);g.gain.linearRampToValueAtTime(0,now+1.2);o.connect(f);f.connect(g);g.connect(SND.sfxVerb||SND.sfx);o.start(now);o.stop(now+1.3);}
+      else{// a far, cold chime
+        const o=c.createOscillator(),g=c.createGain();o.type='sine';o.frequency.value=[622,698,740,932][Math.floor(Math.random()*4)];g.gain.setValueAtTime(0,now);g.gain.linearRampToValueAtTime(.025,now+.05);g.gain.exponentialRampToValueAtTime(.0005,now+3.5);o.connect(g);g.connect(SND.sfxVerb||SND.sfx);o.start(now);o.stop(now+3.6);}}}}}
+function drawThornMotes(){const A=THORN.motes||[];ctx.save();for(const m of A){if(m.k==='mote'){ctx.globalCompositeOperation='lighter';const tw=.5+.5*Math.sin(T*2+m.ph);drawGlow(ctx,m.x,m.y-m.z,m.s*5,'200,190,230',.22*tw);}
+  else{ctx.globalCompositeOperation='source-over';ctx.save();ctx.translate(m.x,m.y);ctx.rotate(m.rot);ctx.scale(1,.55+.45*Math.sin(m.rot*1.7));ctx.fillStyle='rgba(120,22,34,.85)';ctx.beginPath();ctx.ellipse(0,0,m.s,m.s*.55,0,0,TAU);ctx.fill();ctx.restore();}}ctx.restore();}
 function drawThorn(){const vw=W/zoom,vh=H/zoom,x0=cam.x-vw/2-60,y0=cam.y-vh/2-60,x1=cam.x+vw/2+60,y1=cam.y+vh/2+400;
   ctx.setTransform(DPR*zoom,0,0,DPR*zoom,DPR*(W/2-cam.x*zoom),DPR*(H/2-cam.y*zoom));
   ctx.fillStyle='#1d2a1a';ctx.fillRect(x0,y0,x1-x0,y1-y0);
@@ -2928,12 +2969,18 @@ function drawThorn(){const vw=W/zoom,vh=H/zoom,x0=cam.x-vw/2-60,y0=cam.y-vh/2-60
   for(const f of THORN.flowers)if(f.x>x0-30&&f.x<x1+30&&f.y>y0-30&&f.y<y1)drawRedFlowers(f.x,f.y,f.s,f.seed);
   const L=[];for(const o of THORN.props)if(o.x>x0-o.w/2-40&&o.x<x1+o.w/2+40&&o.y>y0-20&&o.y<y1+o.w*1.4)L.push([o.y,o]);L.push([lum.y,null]);L.sort((a,b)=>a[0]-b[0]);
   let past=false;for(const [,o] of L){if(!o){drawLum();past=true;continue;}const near=past&&Math.abs(o.x-lum.x)<o.w*.42&&o.y-lum.y<o.w*.95;drawThornProp(o,near?(o.t==='arch'?.6:.42):1);}
+  drawThornMotes();
   ctx.save();ctx.globalCompositeOperation='lighter';for(const m of THORN.mist){if(m.x<x0-m.r||m.x>x1+m.r||m.y<y0-m.r||m.y>y1+m.r)continue;drawGlow(ctx,m.x+Math.sin(T*.08+m.ph)*50,m.y,m.r,'150,90,110',.05+.025*Math.sin(T*.4+m.ph));}ctx.restore();
   ctx.setTransform(DPR,0,0,DPR,0,0);
+  // cold, washed-out grade
+  ctx.save();ctx.globalCompositeOperation='saturation';ctx.fillStyle='rgba(128,128,128,.32)';ctx.fillRect(0,0,W,H);ctx.globalCompositeOperation='multiply';ctx.fillStyle='rgb(190,192,214)';ctx.fillRect(0,0,W,H);ctx.restore();
+  drawThornFog(0);
   // darkness, held back by Vane's lantern
-  const sx=(lum.x-cam.x)*zoom+W/2,sy=(lum.y-70-cam.y)*zoom+H/2,R=Math.min(W,H)*.62*(1+.02*Math.sin(T*7));const g=ctx.createRadialGradient(sx,sy,R*.12,sx,sy,R);
+  const sx=(lum.x-cam.x)*zoom+W/2,sy=(lum.y-70-cam.y)*zoom+H/2,R=Math.min(W,H)*.6*(1+.025*Math.sin(T*7)+.018*Math.sin(T*17.3)+.01*Math.sin(T*31));const g=ctx.createRadialGradient(sx,sy,R*.12,sx,sy,R);
   g.addColorStop(0,'rgba(8,4,14,0)');g.addColorStop(.45,'rgba(8,4,14,.18)');g.addColorStop(1,'rgba(6,3,12,.66)');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
   ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,sx+lum.face*14*zoom,sy+10*zoom,90*zoom,'255,190,110',.16+.03*Math.sin(T*9));ctx.restore();
+  drawThornFog(1);
+  {const vg=ctx.createRadialGradient(W/2,H*.48,Math.min(W,H)*.32,W/2,H*.48,Math.max(W,H)*.78);vg.addColorStop(0,'rgba(4,3,10,0)');vg.addColorStop(1,'rgba(4,3,10,.6)');ctx.fillStyle=vg;ctx.fillRect(0,0,W,H);}
   drawC1EndCard();
   if(THORN.t<4.5){const a=Math.min(1,THORN.t*1.5,(4.5-THORN.t)*1.2);ctx.save();ctx.globalAlpha=a;ctx.textAlign='center';ctx.fillStyle='rgba(20,5,10,.45)';ctx.fillRect(0,H*.3-40,W,80);
     ctx.fillStyle='#f0dede';ctx.font='700 26px "Alegreya SC", Georgia, serif';ctx.fillText('Stranglethorn Forest',W/2,H*.3+4);ctx.font='italic 14px Alegreya, Georgia, serif';ctx.fillStyle='rgba(240,222,222,.8)';ctx.fillText('where the red briars grow',W/2,H*.3+28);ctx.restore();}}
