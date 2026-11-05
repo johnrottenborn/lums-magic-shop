@@ -2838,7 +2838,7 @@ function removeHedge(){for(let i=ESTATE.length-1;i>=0;i--){const o=ESTATE[i];if(
 /* ---------- the woods, the morning after ---------- */
 let woodsC1Built=false;
 function buildWoodsC1(){if(woodsC1Built)return;woodsC1Built=true;WFOES.length=0;
-  if(!WINTS.some(o=>o.c1east))WINTS.push({x:2660,y:628,reach:58,door:true,c1east:1,onInteract:()=>{if(!BAG.includes('lantern')){goScene(enterThornGate);return;}if(!C1.endSeen){C1.endSeen=1;talk([['Lum',"The road leads east… into Stranglethorn Forest."],['Lum',"Hold on, Cosmic. I'm coming."]],false,()=>goScene(enterThorn));return;}goScene(enterThorn);}});
+  if(!WINTS.some(o=>o.c1east))WINTS.push({x:2660,y:628,reach:58,door:true,c1east:1,onInteract:()=>{if(!BAG.includes('lantern')){goScene(enterThornGate);return;}C1.endSeen=1;goScene(enterThorn);}});
   if(!WINTS.some(o=>o.c1west))WINTS.push({x:40,y:630,reach:70,door:true,c1west:1,onInteract:()=>goScene(()=>{enterGarden();lum.x=20;lum.y=1620;lum.face=-1;cam.x=lum.x;cam.y=lum.y-50;})});
   let nid=1;const add=(kind,x,y)=>WFOES.push({kind,scene:'woods',x,y,hx:x,hy:y,tx:x,ty:y,s:1,pack:1,calm:1.5,dead:0,t:rnd(0,4),ph:rnd(0,TAU),face:-1,id:nid++});
   add('wisp',760,670);add('fslime',980,590);add('wisp',1260,570);add('fslime',1520,630);add('wisp',1780,600);
