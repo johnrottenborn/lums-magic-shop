@@ -358,13 +358,13 @@ function pressA(){if(WEV.end>9.7){backToTitle();return;}if(DLG.active&&!CHOICE.o
 function nearInteract(){if(!PLAYER()||busy())return null;
   if(SCENE==='garden')for(const g of SLUGS)if(Math.hypot(g.x-lum.x,g.y-lum.y)<70)return {slug:g};
   if(SCENE!=='garden'&&SCENE!=='woods'&&SCENE!=='thorn')for(const g of roomSlimes())if(!g.dead&&Math.hypot(g.x-lum.x,g.y-lum.y)<90)return {slime:g};
-  let best=null,bd=1e9;for(const o of (SCENE==='well'?WINT:SCENE==='study'?SINT:SCENE==='shed'?SHINT:SCENE==='pond'?PINT:SCENE==='shop'?SHOPINT:SCENE==='bed'?BEDINT:SCENE==='vhut'?VHINT:SCENE==='dun'?DUNINT:SCENE==='woods'?WINTS:INTERACTABLES)){const d=Math.hypot(o.x-lum.x,o.y-lum.y);if(o.lum&&d<o.reach){best=o;break;}if(d<(o.reach||90)&&d<bd){bd=d;best=o;}}return best;}
+  let best=null,bd=1e9;for(const o of (SCENE==='well'?WINT:SCENE==='study'?SINT:SCENE==='shed'?SHINT:SCENE==='pond'?PINT:SCENE==='shop'?SHOPINT:SCENE==='bed'?BEDINT:SCENE==='vhut'?VHINT:SCENE==='thgate'?THGINT:SCENE==='dun'?DUNINT:SCENE==='woods'?WINTS:INTERACTABLES)){const d=Math.hypot(o.x-lum.x,o.y-lum.y);if(o.lum&&d<o.reach){best=o;break;}if(d<(o.reach||90)&&d<bd){bd=d;best=o;}}return best;}
 let NEAR=null,nearA=0;
 function tapScreen(){if(CHOICE.on||MIX.on||performance.now()<(CHOICE.until||0)||FADE.dir||MENU.open||BATTLE.pending||WIPE.dir||BATTLE.on)return;if(DLG.active){dlgNext();return;}if(NEAR&&!busy())pressB();}
 function pressB(){if(WEV.end>9.7){backToTitle();return;}if(FADE.dir||MENU.open||BATTLE.pending||WIPE.dir)return;if(INTRO.waiting){titleKey();return;}if(INTRO.on){introSkip();return;}BTN.b.pulse=1;if(DLG.active){dlgNext();return;}if(busy())return;
   if(SCENE==='garden')for(const g of SLUGS)if(Math.hypot(g.x-lum.x,g.y-lum.y)<70&&!DLG.active){lum.state='interact';lum.at=0;HINT.looked=1;g.shy=2.5;say(SLUG_LINES[(slugTalk++)%SLUG_LINES.length]);return;}
   if(SCENE!=='garden')for(const g of roomSlimes())if(!g.dead&&Math.hypot(g.x-lum.x,g.y-lum.y)<90){lum.state='interact';lum.at=0;say(['It\'s shimmering at me. Menacingly.','I can see little sparks of magic swirling inside it… like it swallowed a piece of the pool.','Its tentacles keep reaching for my staff. No! Mine!'][(slimeTalk++)%3]);return;}
-  let best=null,bd=1e9;for(const o of (SCENE==='well'?WINT:SCENE==='study'?SINT:SCENE==='shed'?SHINT:SCENE==='pond'?PINT:SCENE==='shop'?SHOPINT:SCENE==='bed'?BEDINT:SCENE==='vhut'?VHINT:SCENE==='dun'?DUNINT:SCENE==='woods'?WINTS:INTERACTABLES)){const d=Math.hypot(o.x-lum.x,o.y-lum.y);if(o.lum&&d<o.reach){best=o;break;}if(d<(o.reach||90)&&d<bd){bd=d;best=o;}}
+  let best=null,bd=1e9;for(const o of (SCENE==='well'?WINT:SCENE==='study'?SINT:SCENE==='shed'?SHINT:SCENE==='pond'?PINT:SCENE==='shop'?SHOPINT:SCENE==='bed'?BEDINT:SCENE==='vhut'?VHINT:SCENE==='thgate'?THGINT:SCENE==='dun'?DUNINT:SCENE==='woods'?WINTS:INTERACTABLES)){const d=Math.hypot(o.x-lum.x,o.y-lum.y);if(o.lum&&d<o.reach){best=o;break;}if(d<(o.reach||90)&&d<bd){bd=d;best=o;}}
   lum.state='interact';lum.at=0;
   if(best&&best.onInteract){best.onInteract();HINT.looked=1;}else{lum.bubble=1.1;}}
 function startBattle(foe){/* battle scene goes here once foes exist */battleFlash=1;}
@@ -2819,7 +2819,7 @@ function removeHedge(){for(let i=ESTATE.length-1;i>=0;i--){const o=ESTATE[i];if(
 /* ---------- the woods, the morning after ---------- */
 let woodsC1Built=false;
 function buildWoodsC1(){if(woodsC1Built)return;woodsC1Built=true;WFOES.length=0;
-  if(!WINTS.some(o=>o.c1east))WINTS.push({x:2590,y:628,reach:80,door:true,c1east:1,onInteract:()=>{if(!BAG.includes('lantern'))goScene(enterThornGate);else{C1.endSeen=1;goScene(enterThorn);}}});
+  if(!WINTS.some(o=>o.c1east))WINTS.push({x:2660,y:628,reach:58,door:true,c1east:1,onInteract:()=>{if(!BAG.includes('lantern')){goScene(enterThornGate);return;}if(!C1.endSeen){C1.endSeen=1;talk([['Lum',"The road leads east… into Stranglethorn Forest."],['Lum',"Hold on, Cosmic. I'm coming."]],false,()=>goScene(enterThorn));return;}goScene(enterThorn);}});
   if(!WINTS.some(o=>o.c1west))WINTS.push({x:40,y:630,reach:70,door:true,c1west:1,onInteract:()=>goScene(()=>{enterGarden();lum.x=20;lum.y=1620;lum.face=-1;cam.x=lum.x;cam.y=lum.y-50;})});
   const add=(kind,x,y)=>WFOES.push({kind,scene:'woods',x,y,hx:x,hy:y,tx:x,ty:y,s:1,pack:1,calm:1.5,dead:0,t:rnd(0,4),ph:rnd(0,TAU),face:-1,id:WFOES.length});
   add('fslime',430,640);add('wisp',760,670);add('fslime',980,590);add('wisp',1260,570);add('fslime',1520,630);add('wisp',1780,600);
@@ -2862,9 +2862,8 @@ function enterWoodsC1(){buildWoods();buildWoodsC1();SCENE='woods';lum.x=70;lum.y
 function updateWoodsC1(){if(DLG.active||WEVENT.on||FADE.dir||BATTLE.on)return;
   if(!C1.tracksSeen&&lum.x>230){C1.tracksSeen=1;talk([['Lum',"Muddy tracks…"],['Lum',"What were you doing all the way out here, Cosmic?"]]);GOAL.tag='TASK';GOAL.text="Follow Cosmic's tracks";HINT.goalT=0;}
   if(!C1.cemSeen&&lum.y>GATE.y+40){C1.cemSeen=1;talk([['Lum',"The tracks lead right here…"],['Lum',"What happened here last night?"]]);GOAL.tag='TASK';GOAL.text='Search the graveyard';HINT.goalT=0;}
-  if(lum.x>2560&&!BAG.includes('lantern')){lum.x=2500;lum.vx=lum.vy=0;goScene(enterThornGate);return;}
-  if(lum.x>2560&&!C1.endSeen){C1.endSeen=1;talk([['Lum',"The road leads east… into Stranglethorn Forest."],['Lum',"Hold on, Cosmic. I'm coming."]],false,()=>{goScene(enterThorn);});}
-  else if(lum.x>2560&&C1.endSeen&&!FADE.dir)goScene(enterThorn);}
+
+}
 /* ---------- Stranglethorn Forest: the bramble maze (art preview, no NPCs or enemies yet) ---------- */
 const TMZ={R:12,C:15,rt:["110011101001001","100001101101011","011000000010000","100110010000011","011101010111101","111010100010101","111010110011011","000100100101001","101101001010111","111000011000111","011010001101011","010000000000001"],dn:["001110001010011","010111011010110","010101110111110","101001101101101","000011010100000","000100101100101","010101001110010","001101011101100","001010110011000","100011110010010","010111110001010","111111111111111"],start:6,finish:2};
 const TCW=360,TCH=300,TW_=TMZ.C*TCW,TH_=TMZ.R*TCH;const THORN={built:false,props:[],flowers:[],path:[],pockets:[],t:0,lightK:1};
@@ -3011,16 +3010,18 @@ function drawThornWebs(x0,y0,x1,y1){for(const w of THORN.webs||[]){if(w.cx<x0-25
 
 /* ---------- the edge of Stranglethorn without a lantern: a still view of the forest, and no way in ---------- */
 const THGATE={t:0};
-function enterThornGate(){SCENE='thgate';THGATE.t=0;WEVENT.on=true;lum.vx=lum.vy=0;lum.state='idle';
-  setTimeout(()=>talk([['Lum',"The road ahead disappears into the dark of Stranglethorn Forest."],['Lum',"I can't see a thing past those first trees. I'll need a stronger light than this."]],false,()=>goScene(()=>{WEVENT.on=false;SCENE='woods';lum.x=2500;lum.face=-1;cam.x=lum.x+60;cam.y=lum.y-50;})),900);}
+const THGINT=[{x:40,y:600,reach:110,door:true,onInteract:()=>goScene(()=>{SCENE='woods';lum.x=2610;lum.y=628;lum.face=-1;lum.state='idle';lum.vx=lum.vy=0;cam.x=lum.x+60;cam.y=lum.y-50;})},
+  {x:520,y:600,reach:470,onInteract:()=>say(["It's far too dark to go any further. I need a better way to bring light in here.","I can't find the path without a proper light. Vane's lantern burns all night… maybe he'd lend it.","The thorns swallow every bit of light. I'll need something brighter than this."][(sayCount++)%3])}];
+function enterThornGate(){SCENE='thgate';THGATE.t=0;WEVENT.on=true;lum.x=500;lum.y=600;lum.vx=lum.vy=0;lum.state='idle';lum.face=1;
+  setTimeout(()=>talk([['Lum',"The road ahead disappears into the dark of Stranglethorn Forest."],['Lum',"I can't see a thing past those first trees. I'll need a stronger light than this."]],false,()=>{WEVENT.on=false;}),900);}
 function drawThornGate(){THGATE.t+=1/60;const im=IMG.thorngate;ctx.setTransform(DPR,0,0,DPR,0,0);ctx.fillStyle='#0c0608';ctx.fillRect(0,0,W,H);
   let px=W*.6,py=H*.62;if(ready(im)){const k=1.04+THGATE.t*.006,sc=Math.max(W/im.naturalWidth,H/im.naturalHeight)*k,iw=im.naturalWidth*sc,ih=im.naturalHeight*sc,ix=(W-iw)/2,iy=(H-ih)/2;ctx.drawImage(im,ix,iy,iw,ih);px=ix+iw*.585;py=iy+ih*.69;}
   // as dark as Gaia's Hollow: only the faint glimmer of the path beyond shows through
   {const R_=Math.hypot(W,H),r0=Math.min(W,H)*.06,r1=Math.min(W,H)*.42,fl=1+.04*Math.sin(THGATE.t*1.3);const g=ctx.createRadialGradient(px,py,0,px,py,R_);g.addColorStop(0,'rgba(4,3,8,.42)');g.addColorStop(r0*fl/R_,'rgba(4,3,8,.5)');g.addColorStop(r1*fl/R_,'rgba(4,3,8,.86)');g.addColorStop(1,'rgba(4,3,8,.9)');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);}
   if(typeof drawThornFog==='function'){drawThornFog(0);drawThornFog(1);}
   const vg=ctx.createRadialGradient(W/2,H*.5,Math.min(W,H)*.3,W/2,H*.5,Math.max(W,H)*.75);vg.addColorStop(0,'rgba(6,2,6,0)');vg.addColorStop(1,'rgba(6,2,6,.65)');ctx.fillStyle=vg;ctx.fillRect(0,0,W,H);
-  if(ready(atlas)){const fr=LUM_ANIM.idleUp.frames[0],dh=Math.min(H*.5,W*1.05),dw=dh*FW/FH,lx=W*.4,ly=H*1.02,b=Math.sin(THGATE.t*2.3);THGATE.lx=lx;THGATE.ly=ly-dh*.86;
-    ctx.save();ctx.translate(lx,ly);ctx.scale(1-.004*b,1+.009*b);ctx.filter='brightness(.5) saturate(.7)';ctx.drawImage(atlas,fr*FW,0,FW,FH,-dw/2,-dh*(274/280),dw,dh);ctx.filter='none';ctx.restore();
+  if(ready(atlas)){const moving=lum.state==='walk',an=moving?LUM_ANIM.walk:LUM_ANIM.idleUp,fr=moving?an.frames[(lum.fi|0)%an.frames.length]:an.frames[0],dh=Math.min(H*.5,W*1.05),dw=dh*FW/FH,lx=W*.2+(W*.62)*clamp(lum.x/1000,0,1),ly=H*1.02,b=moving?0:Math.sin(THGATE.t*2.3);THGATE.lx=lx;THGATE.ly=ly-dh*.86;
+    ctx.save();ctx.translate(lx,ly);if(moving&&lum.face!==an.native)ctx.scale(-1,1);ctx.scale(1-.004*b,1+.009*b);ctx.filter='brightness(.5) saturate(.7)';ctx.drawImage(atlas,fr*FW,0,FW,FH,-dw/2,-dh*(274/280),dw,dh);ctx.filter='none';ctx.restore();
     ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,lx+dw*.08,ly-dh*.62,dw*.5,'210,190,150',.07);ctx.restore();}
   if(THGATE.t<4.5){const a=Math.min(1,THGATE.t*1.2,(4.5-THGATE.t)*1.2);ctx.save();ctx.globalAlpha=a;ctx.textAlign='center';ctx.fillStyle='rgba(20,5,10,.45)';ctx.fillRect(0,H*.3-40,W,80);ctx.fillStyle='#f0dede';ctx.font='700 26px "Alegreya SC", Georgia, serif';ctx.fillText('Stranglethorn Forest',W/2,H*.3+10);ctx.restore();}}
 function drawThorn(){const vw=W/zoom,vh=H/zoom,x0=cam.x-vw/2-60,y0=cam.y-vh/2-60,x1=cam.x+vw/2+60,y1=cam.y+vh/2+400;
@@ -3502,14 +3503,14 @@ function update(dt){
   const [ix,iy,im]=inputVec();
   lum.cool=Math.max(0,lum.cool-dt);lum.bubble=Math.max(0,lum.bubble-dt);battleFlash=Math.max(0,battleFlash-dt*1.5);
   lum.wet=SCENE==='garden'&&inStream(lum.x,lum.y,4)&&!inPond(lum.x,lum.y,-4);
-  const maxS=RUN_SPEED*(lum.wet?.62:1)*(SCENE==='woods'||SCENE==='thorn'?.82:SCENE!=='garden'?roomH(lum.y)/175:1);
+  const maxS=RUN_SPEED*(lum.wet?.62:1)*(SCENE==='woods'||SCENE==='thorn'?.82:SCENE==='thgate'?.9:SCENE!=='garden'?roomH(lum.y)/175:1);
   const tvx=busy()?0:ix*maxS*im,tvy=busy()?0:iy*maxS*im,driving=im>0&&!busy();
   const kk=1-Math.exp(-dt*(driving?ACCEL:DECEL));lum.vx+=(tvx-lum.vx)*kk;lum.vy+=(tvy-lum.vy)*kk;
   let spd=Math.hypot(lum.vx,lum.vy);if(!driving&&spd<6){lum.vx=lum.vy=0;spd=0;}
   const wat=(x,y)=>inPond(x,y,-12);
   {const tx=lum.vx*dt,ty=lum.vy*dt,steps=Math.max(1,Math.ceil(Math.hypot(tx,ty)/3));
    for(let k=0;k<steps;k++){let nx=lum.x+tx/steps,ny=lum.y+ty/steps;
-    if(SCENE==='well'){[nx,ny]=solveWell(lum.x,lum.y,nx,ny);lum.x=nx;lum.y=ny;continue;}if(SCENE==='study'){[nx,ny]=solveStudy(lum.x,lum.y,nx,ny);lum.x=nx;lum.y=ny;continue;}if(SCENE==='woods'){[nx,ny]=solveWoods(lum.x,lum.y,nx,ny);lum.x=nx;lum.y=ny;continue;}if(SCENE==='shed'){[nx,ny]=solveShed(lum.x,lum.y,nx,ny);lum.x=nx;lum.y=ny;continue;}if(SCENE==='pond'){[nx,ny]=solvePond(lum.x,lum.y,nx,ny);lum.x=nx;lum.y=ny;continue;}if(SCENE==='shop'){[nx,ny]=solveShop(lum.x,lum.y,nx,ny);lum.x=nx;lum.y=ny;continue;}if(SCENE==='bed'){[nx,ny]=solveBed(lum.x,lum.y,nx,ny);lum.x=nx;lum.y=ny;continue;}if(SCENE==='vhut'){[nx,ny]=solveVHut(lum.x,lum.y,nx,ny);lum.x=nx;lum.y=ny;continue;}if(SCENE==='dun'){[nx,ny]=solveDun(lum.x,lum.y,nx,ny);lum.x=nx;lum.y=ny;continue;}if(SCENE==='thorn'){[nx,ny]=solveThorn(lum.x,lum.y,nx,ny);lum.x=nx;lum.y=ny;continue;}
+    if(SCENE==='well'){[nx,ny]=solveWell(lum.x,lum.y,nx,ny);lum.x=nx;lum.y=ny;continue;}if(SCENE==='study'){[nx,ny]=solveStudy(lum.x,lum.y,nx,ny);lum.x=nx;lum.y=ny;continue;}if(SCENE==='woods'){[nx,ny]=solveWoods(lum.x,lum.y,nx,ny);lum.x=nx;lum.y=ny;continue;}if(SCENE==='shed'){[nx,ny]=solveShed(lum.x,lum.y,nx,ny);lum.x=nx;lum.y=ny;continue;}if(SCENE==='pond'){[nx,ny]=solvePond(lum.x,lum.y,nx,ny);lum.x=nx;lum.y=ny;continue;}if(SCENE==='shop'){[nx,ny]=solveShop(lum.x,lum.y,nx,ny);lum.x=nx;lum.y=ny;continue;}if(SCENE==='bed'){[nx,ny]=solveBed(lum.x,lum.y,nx,ny);lum.x=nx;lum.y=ny;continue;}if(SCENE==='vhut'){[nx,ny]=solveVHut(lum.x,lum.y,nx,ny);lum.x=nx;lum.y=ny;continue;}if(SCENE==='dun'){[nx,ny]=solveDun(lum.x,lum.y,nx,ny);lum.x=nx;lum.y=ny;continue;}if(SCENE==='thorn'){[nx,ny]=solveThorn(lum.x,lum.y,nx,ny);lum.x=nx;lum.y=ny;continue;}if(SCENE==='thgate'){lum.x=clamp(nx,20,1000);lum.y=600;continue;}
     [nx,ny]=solveEstate(nx,ny);
     if(wat(nx,ny)){if(!wat(lum.x,ny))nx=lum.x;else if(!wat(nx,lum.y))ny=lum.y;else{nx=lum.x;ny=lum.y;}}
     if(!inMap(nx,ny)){if(inMap(lum.x,ny))nx=lum.x;else if(inMap(nx,lum.y))ny=lum.y;else{nx=lum.x;ny=lum.y;}}
@@ -3789,8 +3790,8 @@ function drawUI_(){drawHints();
 }
 /* the little ... bubble over Cosmic when there's something to look at; tap anywhere to look */
 function drawNearDots(){if(nearA<=0||DLG.active)return;let sx,sy;const hy=lum.y-(PC==='cosmic'?158:150*LUMK);
-  if(SCENE==='garden'||SCENE==='woods'||SCENE==='thorn'){sx=(lum.x-cam.x)*zoom+W/2;sy=(hy-cam.y)*zoom+H/2;}else{const k_=roomH(lum.y)/151;[sx,sy]=wellToScreen(lum.x,lum.y-(lum.y-hy)*k_);sy+=WOFF.y;}
-  const e=1-Math.pow(1-nearA,3),bx=sx+14,by=sy-6-(1-e)*8+Math.sin(T*3)*1.5;ctx.save();ctx.globalAlpha=e;
+  if(SCENE==='thgate'&&THGATE.lx){sx=THGATE.lx;sy=THGATE.ly;}else if(SCENE==='garden'||SCENE==='woods'||SCENE==='thorn'){sx=(lum.x-cam.x)*zoom+W/2;sy=(hy-cam.y)*zoom+H/2;}else{const k_=roomH(lum.y)/151;[sx,sy]=wellToScreen(lum.x,lum.y-(lum.y-hy)*k_);sy+=WOFF.y;}
+  const e=1-Math.pow(1-nearA,3),bx=sx>W-60?sx-46:sx+14,by=sy-6-(1-e)*8+Math.sin(T*3)*1.5;ctx.save();ctx.globalAlpha=e;
   ctx.fillStyle='rgba(60,50,30,.18)';ctx.beginPath();ctx.ellipse(bx+1,by+3,25,17,0,0,TAU);ctx.fill();
   ctx.fillStyle='#fffdf6';ctx.strokeStyle='rgba(60,50,40,.45)';ctx.lineWidth=1.6;ctx.beginPath();ctx.ellipse(bx,by,24,16,0,0,TAU);ctx.fill();ctx.stroke();
   ctx.beginPath();ctx.moveTo(bx-8,by+13);ctx.lineTo(bx-13,by+24);ctx.lineTo(bx-1,by+14);ctx.fill();
