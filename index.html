@@ -3013,10 +3013,12 @@ const THGATE={t:0};
 function enterThornGate(){SCENE='thgate';THGATE.t=0;WEVENT.on=true;lum.vx=lum.vy=0;lum.state='idle';
   setTimeout(()=>talk([['Lum',"The road ahead disappears into the dark of Stranglethorn Forest."],['Lum',"I can't see a thing past those first trees. I'll need a stronger light than this."]],false,()=>goScene(()=>{WEVENT.on=false;SCENE='woods';lum.x=2500;lum.face=-1;cam.x=lum.x+60;cam.y=lum.y-50;})),900);}
 function drawThornGate(){THGATE.t+=1/60;const im=IMG.thorngate;ctx.setTransform(DPR,0,0,DPR,0,0);ctx.fillStyle='#0c0608';ctx.fillRect(0,0,W,H);
-  if(ready(im)){const k=1.04+THGATE.t*.006,sc=Math.max(W/im.naturalWidth,H/im.naturalHeight)*k,iw=im.naturalWidth*sc,ih=im.naturalHeight*sc;ctx.drawImage(im,(W-iw)/2,(H-ih)/2,iw,ih);}
+  let px=W*.6,py=H*.62;if(ready(im)){const k=1.04+THGATE.t*.006,sc=Math.max(W/im.naturalWidth,H/im.naturalHeight)*k,iw=im.naturalWidth*sc,ih=im.naturalHeight*sc,ix=(W-iw)/2,iy=(H-ih)/2;ctx.drawImage(im,ix,iy,iw,ih);px=ix+iw*.585;py=iy+ih*.69;}
+  // as dark as Gaia's Hollow: only the faint glimmer of the path beyond shows through
+  {const R_=Math.hypot(W,H),r0=Math.min(W,H)*.06,r1=Math.min(W,H)*.42,fl=1+.04*Math.sin(THGATE.t*1.3);const g=ctx.createRadialGradient(px,py,0,px,py,R_);g.addColorStop(0,'rgba(4,3,8,.42)');g.addColorStop(r0*fl/R_,'rgba(4,3,8,.5)');g.addColorStop(r1*fl/R_,'rgba(4,3,8,.86)');g.addColorStop(1,'rgba(4,3,8,.9)');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);}
   if(typeof drawThornFog==='function'){drawThornFog(0);drawThornFog(1);}
   const vg=ctx.createRadialGradient(W/2,H*.5,Math.min(W,H)*.3,W/2,H*.5,Math.max(W,H)*.75);vg.addColorStop(0,'rgba(6,2,6,0)');vg.addColorStop(1,'rgba(6,2,6,.65)');ctx.fillStyle=vg;ctx.fillRect(0,0,W,H);
-  if(THGATE.t<4.5){const a=Math.min(1,THGATE.t*1.2,(4.5-THGATE.t)*1.2);ctx.save();ctx.globalAlpha=a;ctx.textAlign='center';ctx.fillStyle='rgba(20,5,10,.45)';ctx.fillRect(0,H*.3-40,W,80);ctx.fillStyle='#f0dede';ctx.font='700 26px "Alegreya SC", Georgia, serif';ctx.fillText('Stranglethorn Forest',W/2,H*.3+4);ctx.font='italic 14px Alegreya, Georgia, serif';ctx.fillStyle='rgba(240,222,222,.8)';ctx.fillText('too dark to enter',W/2,H*.3+28);ctx.restore();}}
+  if(THGATE.t<4.5){const a=Math.min(1,THGATE.t*1.2,(4.5-THGATE.t)*1.2);ctx.save();ctx.globalAlpha=a;ctx.textAlign='center';ctx.fillStyle='rgba(20,5,10,.45)';ctx.fillRect(0,H*.3-40,W,80);ctx.fillStyle='#f0dede';ctx.font='700 26px "Alegreya SC", Georgia, serif';ctx.fillText('Stranglethorn Forest',W/2,H*.3+10);ctx.restore();}}
 function drawThorn(){const vw=W/zoom,vh=H/zoom,x0=cam.x-vw/2-60,y0=cam.y-vh/2-60,x1=cam.x+vw/2+60,y1=cam.y+vh/2+400;
   ctx.setTransform(DPR*zoom,0,0,DPR*zoom,DPR*(W/2-cam.x*zoom),DPR*(H/2-cam.y*zoom));
   ctx.fillStyle='#1d2a1a';ctx.fillRect(x0,y0,x1-x0,y1-y0);
