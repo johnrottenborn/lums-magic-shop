@@ -3020,7 +3020,7 @@ function drawThornGate(){THGATE.t+=1/60;const im=IMG.thorngate;ctx.setTransform(
   {const R_=Math.hypot(W,H),r0=Math.min(W,H)*.06,r1=Math.min(W,H)*.42,fl=1+.04*Math.sin(THGATE.t*1.3);const g=ctx.createRadialGradient(px,py,0,px,py,R_);g.addColorStop(0,'rgba(4,3,8,.42)');g.addColorStop(r0*fl/R_,'rgba(4,3,8,.5)');g.addColorStop(r1*fl/R_,'rgba(4,3,8,.86)');g.addColorStop(1,'rgba(4,3,8,.9)');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);}
   if(typeof drawThornFog==='function'){drawThornFog(0);drawThornFog(1);}
   const vg=ctx.createRadialGradient(W/2,H*.5,Math.min(W,H)*.3,W/2,H*.5,Math.max(W,H)*.75);vg.addColorStop(0,'rgba(6,2,6,0)');vg.addColorStop(1,'rgba(6,2,6,.65)');ctx.fillStyle=vg;ctx.fillRect(0,0,W,H);
-  if(ready(atlas)){const moving=lum.state==='walk',an=moving?LUM_ANIM.walk:LUM_ANIM.idleUp,fr=moving?an.frames[(lum.fi|0)%an.frames.length]:an.frames[0],dh=Math.min(H*.5,W*1.05),dw=dh*FW/FH,lx=W*.2+(W*.62)*clamp(lum.x/1000,0,1),ly=H*1.02,b=moving?0:Math.sin(THGATE.t*2.3);THGATE.lx=lx;THGATE.ly=ly-dh*.86;
+  if(ready(atlas)){const moving=lum.state==='walk',an=moving?LUM_ANIM.walk:LUM_ANIM.idleUp,fr=moving?an.frames[Math.floor(THGATE.t*an.fps)%an.frames.length]:an.frames[0],dh=Math.min(H*.25,W*.525),dw=dh*FW/FH,lx=W*.2+(W*.62)*clamp(lum.x/1000,0,1),ly=H*.95,b=moving?0:Math.sin(THGATE.t*2.3);THGATE.lx=lx;THGATE.ly=ly-dh*.86;
     ctx.save();ctx.translate(lx,ly);if(moving&&lum.face!==an.native)ctx.scale(-1,1);ctx.scale(1-.004*b,1+.009*b);ctx.filter='brightness(.5) saturate(.7)';ctx.drawImage(atlas,fr*FW,0,FW,FH,-dw/2,-dh*(274/280),dw,dh);ctx.filter='none';ctx.restore();
     ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,lx+dw*.08,ly-dh*.62,dw*.5,'210,190,150',.07);ctx.restore();}
   if(THGATE.t<4.5){const a=Math.min(1,THGATE.t*1.2,(4.5-THGATE.t)*1.2);ctx.save();ctx.globalAlpha=a;ctx.textAlign='center';ctx.fillStyle='rgba(20,5,10,.45)';ctx.fillRect(0,H*.3-40,W,80);ctx.fillStyle='#f0dede';ctx.font='700 26px "Alegreya SC", Georgia, serif';ctx.fillText('Stranglethorn Forest',W/2,H*.3+10);ctx.restore();}}
@@ -3503,7 +3503,7 @@ function update(dt){
   const [ix,iy,im]=inputVec();
   lum.cool=Math.max(0,lum.cool-dt);lum.bubble=Math.max(0,lum.bubble-dt);battleFlash=Math.max(0,battleFlash-dt*1.5);
   lum.wet=SCENE==='garden'&&inStream(lum.x,lum.y,4)&&!inPond(lum.x,lum.y,-4);
-  const maxS=RUN_SPEED*(lum.wet?.62:1)*(SCENE==='woods'||SCENE==='thorn'?.82:SCENE==='thgate'?.82*Math.min(H*.5,W*1.05)*1000/(143*.62*W):SCENE!=='garden'?roomH(lum.y)/175:1);
+  const maxS=RUN_SPEED*(lum.wet?.62:1)*(SCENE==='woods'||SCENE==='thorn'?.82:SCENE==='thgate'?.32*Math.min(H*.25,W*.525)*1000/(143*.62*W):SCENE!=='garden'?roomH(lum.y)/175:1);
   const tvx=busy()?0:ix*maxS*im,tvy=busy()?0:iy*maxS*im,driving=im>0&&!busy();
   const kk=1-Math.exp(-dt*(driving?ACCEL:DECEL));lum.vx+=(tvx-lum.vx)*kk;lum.vy+=(tvy-lum.vy)*kk;
   let spd=Math.hypot(lum.vx,lum.vy);if(!driving&&spd<6){lum.vx=lum.vy=0;spd=0;}
