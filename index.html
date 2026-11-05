@@ -2819,6 +2819,7 @@ function removeHedge(){for(let i=ESTATE.length-1;i>=0;i--){const o=ESTATE[i];if(
 /* ---------- the woods, the morning after ---------- */
 let woodsC1Built=false;
 function buildWoodsC1(){if(woodsC1Built)return;woodsC1Built=true;WFOES.length=0;
+  if(!WINTS.some(o=>o.c1east))WINTS.push({x:2590,y:628,reach:80,door:true,c1east:1,onInteract:()=>{if(!BAG.includes('lantern'))goScene(enterThornGate);else{C1.endSeen=1;goScene(enterThorn);}}});
   if(!WINTS.some(o=>o.c1west))WINTS.push({x:40,y:630,reach:70,door:true,c1west:1,onInteract:()=>goScene(()=>{enterGarden();lum.x=20;lum.y=1620;lum.face=-1;cam.x=lum.x;cam.y=lum.y-50;})});
   const add=(kind,x,y)=>WFOES.push({kind,scene:'woods',x,y,hx:x,hy:y,tx:x,ty:y,s:1,pack:1,calm:1.5,dead:0,t:rnd(0,4),ph:rnd(0,TAU),face:-1,id:WFOES.length});
   add('fslime',430,640);add('wisp',760,670);add('fslime',980,590);add('wisp',1260,570);add('fslime',1520,630);add('wisp',1780,600);
@@ -3018,6 +3019,9 @@ function drawThornGate(){THGATE.t+=1/60;const im=IMG.thorngate;ctx.setTransform(
   {const R_=Math.hypot(W,H),r0=Math.min(W,H)*.06,r1=Math.min(W,H)*.42,fl=1+.04*Math.sin(THGATE.t*1.3);const g=ctx.createRadialGradient(px,py,0,px,py,R_);g.addColorStop(0,'rgba(4,3,8,.42)');g.addColorStop(r0*fl/R_,'rgba(4,3,8,.5)');g.addColorStop(r1*fl/R_,'rgba(4,3,8,.86)');g.addColorStop(1,'rgba(4,3,8,.9)');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);}
   if(typeof drawThornFog==='function'){drawThornFog(0);drawThornFog(1);}
   const vg=ctx.createRadialGradient(W/2,H*.5,Math.min(W,H)*.3,W/2,H*.5,Math.max(W,H)*.75);vg.addColorStop(0,'rgba(6,2,6,0)');vg.addColorStop(1,'rgba(6,2,6,.65)');ctx.fillStyle=vg;ctx.fillRect(0,0,W,H);
+  if(ready(atlas)){const fr=LUM_ANIM.idleUp.frames[0],dh=Math.min(H*.5,W*1.05),dw=dh*FW/FH,lx=W*.4,ly=H*1.02,b=Math.sin(THGATE.t*2.3);THGATE.lx=lx;THGATE.ly=ly-dh*.86;
+    ctx.save();ctx.translate(lx,ly);ctx.scale(1-.004*b,1+.009*b);ctx.filter='brightness(.5) saturate(.7)';ctx.drawImage(atlas,fr*FW,0,FW,FH,-dw/2,-dh*(274/280),dw,dh);ctx.filter='none';ctx.restore();
+    ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,lx+dw*.08,ly-dh*.62,dw*.5,'210,190,150',.07);ctx.restore();}
   if(THGATE.t<4.5){const a=Math.min(1,THGATE.t*1.2,(4.5-THGATE.t)*1.2);ctx.save();ctx.globalAlpha=a;ctx.textAlign='center';ctx.fillStyle='rgba(20,5,10,.45)';ctx.fillRect(0,H*.3-40,W,80);ctx.fillStyle='#f0dede';ctx.font='700 26px "Alegreya SC", Georgia, serif';ctx.fillText('Stranglethorn Forest',W/2,H*.3+10);ctx.restore();}}
 function drawThorn(){const vw=W/zoom,vh=H/zoom,x0=cam.x-vw/2-60,y0=cam.y-vh/2-60,x1=cam.x+vw/2+60,y1=cam.y+vh/2+400;
   ctx.setTransform(DPR*zoom,0,0,DPR*zoom,DPR*(W/2-cam.x*zoom),DPR*(H/2-cam.y*zoom));
@@ -3745,7 +3749,7 @@ function render(){if(SCENE==='thgate'){drawThornGate();drawUI();return;}if(SCENE
 }
 
 let BUBBLE_BASE=null;
-function bubbleAt(wx,wy,text,name,alpha,small){if(typeof text!=='string')return;let sx=(wx-cam.x)*zoom+W/2,sy=(wy-cam.y)*zoom+H/2;if(SCENE!=='garden'&&SCENE!=='woods'&&SCENE!=='thorn'){const by_=BUBBLE_BASE??lum.y,k_=roomH(by_)/151;[sx,sy]=wellToScreen(wx,by_-(by_-wy)*k_);}ctx.save();ctx.globalAlpha=alpha;
+function bubbleAt(wx,wy,text,name,alpha,small){if(typeof text!=='string')return;let sx=(wx-cam.x)*zoom+W/2,sy=(wy-cam.y)*zoom+H/2;if(SCENE!=='garden'&&SCENE!=='woods'&&SCENE!=='thorn'&&SCENE!=='thgate'){const by_=BUBBLE_BASE??lum.y,k_=roomH(by_)/151;[sx,sy]=wellToScreen(wx,by_-(by_-wy)*k_);}ctx.save();ctx.globalAlpha=alpha;
   ctx.font=(small?'500 13px':'500 15px')+' Alegreya, "Palatino Linotype", Georgia, serif';const maxW=small?160:Math.min(240,W-80);
   const words=text.split(' '),lines=[];let cur='';for(const w_ of words){const t=cur?cur+' '+w_:w_;if(ctx.measureText(t).width>maxW&&cur){lines.push(cur);cur=w_;}else cur=t;}lines.push(cur);
   const lh=small?17:20,top=name?16:0,bw=Math.max(...lines.map(l=>ctx.measureText(l).width),name?ctx.measureText(name).width:0)+28,bh=lines.length*lh+18+top;
@@ -3758,7 +3762,7 @@ function bubbleAt(wx,wy,text,name,alpha,small){if(typeof text!=='string')return;
 function drawSay(){
   if(lum.quipT>0&&!DLG.active){bubbleAt(lum.x,lum.y-150,lum.quip,null,Math.min(1,lum.quipT*3,(2.4-lum.quipT)*6),true);}
   if(DLG.active&&DLG.lines[DLG.i][0]==='???'){drawEerie(DLG.lines[DLG.i][1],DLG.t);return;}
-  if(DLG.active){const [who,text]=DLG.lines[DLG.i];const pcName=PC==='cosmic'?'Cosmic':'Lum';let sp=who===pcName||who==='Fokalur'?lum:who==='Vane'&&SCENE==='vhut'?VHVANE:who==='Vane'&&VANE?VANE:who==='Voice'?{x:HUTDOOR.x,y:HUTDOOR.y}:(who==='Cosmic'?cos:{x:0,y:-30});if(who==='Lum'&&PC==='cosmic')sp=SCENE==='shop'?SHOPLUM:{x:0,y:-30};BUBBLE_BASE=sp.y;const h=who==='Fokalur'?300:who==='Cosmic'?160:who==='Vane'?165:who==='Voice'?120:(PC!=='cosmic'&&who==='Lum'?160:182);const a=Math.min(1,DLG.t*6);bubbleAt(sp.x,sp.y-h,text,who,a,false);BUBBLE_BASE=null;}
+  if(DLG.active){const [who,text]=DLG.lines[DLG.i];const pcName=PC==='cosmic'?'Cosmic':'Lum';let sp=who===pcName||who==='Fokalur'?lum:who==='Vane'&&SCENE==='vhut'?VHVANE:who==='Vane'&&VANE?VANE:who==='Voice'?{x:HUTDOOR.x,y:HUTDOOR.y}:(who==='Cosmic'?cos:{x:0,y:-30});if(who==='Lum'&&PC==='cosmic')sp=SCENE==='shop'?SHOPLUM:{x:0,y:-30};BUBBLE_BASE=sp.y;const h=who==='Fokalur'?300:who==='Cosmic'?160:who==='Vane'?165:who==='Voice'?120:(PC!=='cosmic'&&who==='Lum'?160:182);const a=Math.min(1,DLG.t*6);if(SCENE==='thgate'&&THGATE.lx){bubbleAt(cam.x+(THGATE.lx-W/2)/zoom,cam.y+(THGATE.ly-H/2)/zoom,text,who,a,false);}else bubbleAt(sp.x,sp.y-h,text,who,a,false);BUBBLE_BASE=null;}
   else if(cos.bubble>0&&!cos.hidden){bubbleAt(cos.x,cos.y-150,cos.bubbleText,null,Math.min(1,cos.bubble*3,(2.4-cos.bubble)*6),true);}}
 function rr(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();}
 function drawUI(){drawUIinner();drawC1IntroUI();drawC1Title();drawMix();drawChoice();drawSceneFade();drawWipe();}
