@@ -1154,7 +1154,7 @@ function drawWellRoom(){const im=IMG.wellroom;if(!ready(im))return;const rz=H/76
   ctx.setTransform(DPR,0,0,DPR,0,0);
   const vg=ctx.createRadialGradient(W/2,H*.5,Math.min(W,H)*.3,W/2,H*.5,Math.max(W,H)*.75);vg.addColorStop(0,'rgba(10,14,24,0)');vg.addColorStop(1,'rgba(10,14,24,.45)');ctx.fillStyle=vg;ctx.fillRect(0,0,W,H);
   if(WTITLE.t<4.5&&!CAPTURE.on){const a=Math.min(1,WTITLE.t*1.5,(4.5-WTITLE.t)*1.2);ctx.save();ctx.globalAlpha=a;ctx.textAlign='center';ctx.fillStyle='rgba(10,14,24,.4)';ctx.fillRect(0,H*.3-40,W,80);
-    ctx.fillStyle='#e9f4ff';ctx.font='700 26px "Alegreya SC", Georgia, serif';ctx.fillText('The Runic Conservatory',W/2,H*.3+4);ctx.font='italic 14px Alegreya, Georgia, serif';ctx.fillStyle='rgba(233,244,255,.8)';ctx.fillText('beneath the old well',W/2,H*.3+28);ctx.restore();}}
+    ctx.fillStyle='#e9f4ff';ctx.font='700 26px "Alegreya SC", Georgia, serif';ctx.fillText('The Runic Conservatory',W/2,H*.3+10);ctx.restore();}}
 function drawSparkPart(o,q){const a=1-q,y=o.y-o.z,tw=.6+.4*Math.sin(T*30+o.x);if(o.star){const r=o.s*(q<.15?q/.15:1);ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,o.x,y,o.s*4.5,o.col,a*.7);ctx.restore();ctx.save();ctx.translate(o.x,y);ctx.rotate(o.rot+q*6);ctx.globalAlpha=Math.min(1,a*1.4)*tw;ctx.fillStyle='#ffe58a';ctx.strokeStyle='rgba(170,110,20,.85)';ctx.lineWidth=.8;starPath(ctx,r);ctx.fill();ctx.stroke();ctx.fillStyle='#fffbe6';starPath(ctx,r*.42);ctx.fill();ctx.restore();return;}ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,o.x,y,o.s*4,o.col,a*.75);ctx.restore();ctx.fillStyle=`rgba(255,250,225,${(a*tw).toFixed(3)})`;ctx.beginPath();ctx.arc(o.x,y,o.s*.55,0,TAU);ctx.fill();}
 function drawPartWell(o){const q=o.life/o.max;if(o.type==='fiz'&&o.col){drawSparkPart(o,q);return;}if(o.type==='fiz'){const a=1-q;drawGlow(ctx,o.x,o.y-o.z,o.s*3,'170,220,255',a*.6);}else if(o.type==='puff'){drawGlow(ctx,o.x,o.y-o.z,o.s,'200,200,210',.35*(1-q));}}
 const SHOPZ=.82;function roomView(){const rz=H/768*(SCENE==='shop'?SHOPZ:1);return [rz,SCENE==='shop'?H-768*rz:0];}
@@ -1932,7 +1932,7 @@ function drawStudy(){const im=IMG.studyroom;if(!ready(im))return;const rz=H/768*
   ctx.setTransform(DPR,0,0,DPR,0,0);
   const vg=ctx.createRadialGradient(W/2,H*.5,Math.min(W,H)*.3,W/2,H*.5,Math.max(W,H)*.75);vg.addColorStop(0,'rgba(14,10,8,0)');vg.addColorStop(1,'rgba(14,10,8,.45)');ctx.fillStyle=vg;ctx.fillRect(0,0,W,H);
   if(WTITLE.t<4.5&&!CAPTURE.on){const a=Math.min(1,WTITLE.t*1.5,(4.5-WTITLE.t)*1.2);ctx.save();ctx.globalAlpha=a;ctx.textAlign='center';ctx.fillStyle='rgba(14,10,8,.4)';ctx.fillRect(0,H*.3-40,W,80);
-    ctx.fillStyle='#fff3dc';ctx.font='700 26px "Alegreya SC", Georgia, serif';ctx.fillText('The Hidden Study',W/2,H*.3+4);ctx.font='italic 14px Alegreya, Georgia, serif';ctx.fillStyle='rgba(255,243,220,.8)';ctx.fillText('beyond the conservatory',W/2,H*.3+28);ctx.restore();}}
+    ctx.fillStyle='#fff3dc';ctx.font='700 26px "Alegreya SC", Georgia, serif';ctx.fillText('The Hidden Study',W/2,H*.3+10);ctx.restore();}}
 
 /* =====================================================================
    INSIDE THE GARDEN SHED (painting placed in the 1375x768 room frame)
@@ -1978,7 +1978,7 @@ function drawShed(){const im=IMG.shedroom;if(!ready(im))return;const rz=H/768*RO
   const vg=ctx.createRadialGradient(W/2,H*.5,Math.min(W,H)*.35,W/2,H*.5,Math.max(W,H)*.75);vg.addColorStop(0,'rgba(60,40,20,0)');vg.addColorStop(1,'rgba(60,40,20,.25)');ctx.fillStyle=vg;ctx.fillRect(0,0,W,H);
   if(NIGHT.on){drawNightShade(lum.x,lum.y,.74);ctx.save();ctx.setTransform(DPR,0,0,DPR,0,0);ctx.globalCompositeOperation='lighter';drawGlow(ctx,W*.5,H*.18,W*.5,'120,140,210',.06);ctx.restore();}
   if(WTITLE.t<4.5&&!CAPTURE.on){const a=Math.min(1,WTITLE.t*1.5,(4.5-WTITLE.t)*1.2);ctx.save();ctx.globalAlpha=a;ctx.textAlign='center';ctx.fillStyle='rgba(40,28,14,.42)';ctx.fillRect(0,H*.3-40,W,80);
-    ctx.fillStyle='#fff3dc';ctx.font='700 26px "Alegreya SC", Georgia, serif';ctx.fillText("Lum's Garden Shed",W/2,H*.3+4);ctx.font='italic 14px Alegreya, Georgia, serif';ctx.fillStyle='rgba(255,243,220,.8)';ctx.fillText('where the seedlings glow',W/2,H*.3+28);ctx.restore();}}
+    ctx.fillStyle='#fff3dc';ctx.font='700 26px "Alegreya SC", Georgia, serif';ctx.fillText("Lum's Garden Shed",W/2,H*.3+10);ctx.restore();}}
 
 /* =====================================================================
    THE SUNKEN SHRINE: a forgotten temple at the bottom of the koi pond
@@ -2115,7 +2115,7 @@ function drawPondRoom(){const im=IMG.pondroom;if(!ready(im))return;const rz=H/76
   // gentle water wobble vignette
   const vg=ctx.createRadialGradient(W/2,H*.5,Math.min(W,H)*.3,W/2,H*.5,Math.max(W,H)*.75);vg.addColorStop(0,'rgba(5,30,35,0)');vg.addColorStop(1,'rgba(5,30,35,.5)');ctx.fillStyle=vg;ctx.fillRect(0,0,W,H);
   if(WTITLE.t<4.5&&!CAPTURE.on){const a=Math.min(1,WTITLE.t*1.5,(4.5-WTITLE.t)*1.2);ctx.save();ctx.globalAlpha=a;ctx.textAlign='center';ctx.fillStyle='rgba(5,25,30,.45)';ctx.fillRect(0,H*.3-40,W,80);
-    ctx.fillStyle='#e6fbf6';ctx.font='700 26px "Alegreya SC", Georgia, serif';ctx.fillText('The Sunken Shrine',W/2,H*.3+4);ctx.font='italic 14px Alegreya, Georgia, serif';ctx.fillStyle='rgba(230,251,246,.8)';ctx.fillText('beneath the koi pond',W/2,H*.3+28);ctx.restore();}}
+    ctx.fillStyle='#e6fbf6';ctx.font='700 26px "Alegreya SC", Georgia, serif';ctx.fillText('The Sunken Shrine',W/2,H*.3+10);ctx.restore();}}
 
 /* =====================================================================
    INSIDE LUM'S MAGIC SHOP
@@ -2201,7 +2201,7 @@ function drawShop(){const im=IMG.shoproom;if(!ready(im))return;const [rz,oy]=roo
   if(NIGHT.on)drawNightShade(lum.x,lum.y,.62);
   const vg=ctx.createRadialGradient(W/2,H*.5,Math.min(W,H)*.35,W/2,H*.5,Math.max(W,H)*.75);vg.addColorStop(0,'rgba(50,30,15,0)');vg.addColorStop(1,'rgba(50,30,15,.3)');ctx.fillStyle=vg;ctx.fillRect(0,0,W,H);
   if(WTITLE.t<4.5&&!CAPTURE.on){const a=Math.min(1,WTITLE.t*1.5,(4.5-WTITLE.t)*1.2);ctx.save();ctx.globalAlpha=a;ctx.textAlign='center';ctx.fillStyle='rgba(40,26,12,.42)';ctx.fillRect(0,H*.3-40,W,80);
-    ctx.fillStyle='#fff3dc';ctx.font='700 26px "Alegreya SC", Georgia, serif';ctx.fillText("Lum's Magic Shop",W/2,H*.3+4);ctx.font='italic 14px Alegreya, Georgia, serif';ctx.fillStyle='rgba(255,243,220,.8)';ctx.fillText('potions, powders & peculiar things',W/2,H*.3+28);ctx.restore();}}
+    ctx.fillStyle='#fff3dc';ctx.font='700 26px "Alegreya SC", Georgia, serif';ctx.fillText("Lum's Magic Shop",W/2,H*.3+10);ctx.restore();}}
 
 /* =====================================================================
    THE BEDROOM: two quilted beds under the eaves
@@ -2290,7 +2290,7 @@ function drawBedroom(){const im=IMG.bedroom;if(!ready(im))return;const rz=H/768*
   ctx.setTransform(DPR,0,0,DPR,0,0);
   const vg=ctx.createRadialGradient(W/2,H*.5,Math.min(W,H)*.35,W/2,H*.5,Math.max(W,H)*.75);vg.addColorStop(0,'rgba(40,25,15,0)');vg.addColorStop(1,n?'rgba(8,10,30,.55)':'rgba(40,25,15,.28)');ctx.fillStyle=vg;ctx.fillRect(0,0,W,H);
   if(WTITLE.t<4.5&&!CAPTURE.on&&!n){const a=Math.min(1,WTITLE.t*1.5,(4.5-WTITLE.t)*1.2);ctx.save();ctx.globalAlpha=a;ctx.textAlign='center';ctx.fillStyle='rgba(40,26,12,.42)';ctx.fillRect(0,H*.3-40,W,80);
-    ctx.fillStyle='#fff3dc';ctx.font='700 26px "Alegreya SC", Georgia, serif';ctx.fillText('The Bedroom',W/2,H*.3+4);ctx.font='italic 14px Alegreya, Georgia, serif';ctx.fillStyle='rgba(255,243,220,.8)';ctx.fillText('two beds beneath the eaves',W/2,H*.3+28);ctx.restore();}}
+    ctx.fillStyle='#fff3dc';ctx.font='700 26px "Alegreya SC", Georgia, serif';ctx.fillText('The Bedroom',W/2,H*.3+10);ctx.restore();}}
 
 /* =====================================================================
    THE WOODS BEYOND THE GARDEN: a winding dirt road to a stone circle and a cemetery
@@ -2441,7 +2441,7 @@ function drawWoods(){const vw=W/zoom,vh=H/zoom,x0=cam.x-vw/2-40,y0=cam.y-vh/2-40
   if(WEV.flash>0){ctx.fillStyle=`rgba(255,235,240,${Math.min(1,WEV.flash).toFixed(3)})`;ctx.fillRect(0,0,W,H);}
   if(WEV.quake){ctx.fillStyle=`rgba(120,10,30,${(.12+.08*Math.sin(T*6)).toFixed(3)})`;ctx.fillRect(0,0,W,H);}
   if(WTITLE.t<4.5&&!CAPTURE.on){const a=Math.min(1,WTITLE.t*1.5,(4.5-WTITLE.t)*1.2);ctx.save();ctx.globalAlpha=a;ctx.textAlign='center';ctx.fillStyle='rgba(5,8,20,.45)';ctx.fillRect(0,H*.3-40,W,80);
-    ctx.fillStyle='#e4e2f0';ctx.font='700 26px "Alegreya SC", Georgia, serif';ctx.fillText('The Whispering Wood',W/2,H*.3+4);ctx.font='italic 14px Alegreya, Georgia, serif';ctx.fillStyle='rgba(228,226,240,.8)';ctx.fillText('beyond the garden hedge',W/2,H*.3+28);ctx.restore();}
+    ctx.fillStyle='#e4e2f0';ctx.font='700 26px "Alegreya SC", Georgia, serif';ctx.fillText('The Whispering Wood',W/2,H*.3+10);ctx.restore();}
   if(WEV.end){WEV.end+=1/60;const a=Math.min(1,WEV.end/2);ctx.save();ctx.fillStyle=`rgba(0,0,0,${a})`;ctx.fillRect(0,0,W,H);if(WEV.end>6.5){ctx.restore();drawResults(WEV.end-6.5);}else{ctx.globalAlpha=Math.max(0,Math.min(1,(WEV.end-2)/1.5,(6.5-WEV.end)/.8));ctx.textAlign='center';ctx.fillStyle='#e8e2f2';ctx.font='italic 20px Alegreya, Georgia, serif';ctx.fillText('And the world began to tremble…',W/2,H*.45);ctx.font='700 22px "Alegreya SC", Georgia, serif';ctx.fillStyle='rgba(232,226,242,.85)';ctx.fillText('End of Prologue',W/2,H*.45+40);ctx.restore();}}}
 
 /* ---------- the restless dead of the old graveyard ---------- */
@@ -3046,7 +3046,7 @@ function drawThorn(){const vw=W/zoom,vh=H/zoom,x0=cam.x-vw/2-60,y0=cam.y-vh/2-60
   {const vg=ctx.createRadialGradient(W/2,H*.48,Math.min(W,H)*.32,W/2,H*.48,Math.max(W,H)*.78);vg.addColorStop(0,'rgba(4,3,10,0)');vg.addColorStop(1,'rgba(4,3,10,.6)');ctx.fillStyle=vg;ctx.fillRect(0,0,W,H);}
   drawC1EndCard();
   if(THORN.t<4.5){const a=Math.min(1,THORN.t*1.5,(4.5-THORN.t)*1.2);ctx.save();ctx.globalAlpha=a;ctx.textAlign='center';ctx.fillStyle='rgba(20,5,10,.45)';ctx.fillRect(0,H*.3-40,W,80);
-    ctx.fillStyle='#f0dede';ctx.font='700 26px "Alegreya SC", Georgia, serif';ctx.fillText('Stranglethorn Forest',W/2,H*.3+4);ctx.font='italic 14px Alegreya, Georgia, serif';ctx.fillStyle='rgba(240,222,222,.8)';ctx.fillText('where the red briars grow',W/2,H*.3+28);ctx.restore();}}
+    ctx.fillStyle='#f0dede';ctx.font='700 26px "Alegreya SC", Georgia, serif';ctx.fillText('Stranglethorn Forest',W/2,H*.3+10);ctx.restore();}}
 function hutDoorC1(){if(C1.vane>=2){if(VANE)return;goScene(enterVHut);return;}
   if(C1.reaper===0){C1.reaper=1;talk([['Lum',"Locked…"]],false,()=>{sfxRumble&&sfxRumble(1.6,.6);shake=6;REAPER={kind:'reaper',scene:'woods',x:HUTDOOR.x+230,y:HUTDOOR.y+70,s:1,pack:1,calm:0,dead:0,face:-1,t:0,st:'rise',rise:0};setTimeout(()=>talk([['Lum',"Aaah!"]]),900);});return;}
   if(C1.reaper===1){say("Something is pounding on the door!");return;}
@@ -3079,7 +3079,7 @@ function vaneTrade(after){
 function drawC1EndCard(){if(!C1.endCard)return;C1.endCard+=1/60;const t=C1.endCard,a=Math.min(1,t*1.5,(6-t)*1.2);if(t>6){C1.endCard=0;return;}ctx.save();ctx.setTransform(DPR,0,0,DPR,0,0);ctx.globalAlpha=Math.max(0,a);ctx.fillStyle='rgba(10,8,20,.6)';ctx.fillRect(0,H*.36-50,W,108);
   ctx.textAlign='center';ctx.fillStyle='#efe6ff';ctx.font='700 22px "Alegreya SC", Georgia, serif';ctx.fillText('Stranglethorn Forest',W/2,H*.36);ctx.font='italic 15px Alegreya, Georgia, serif';ctx.fillStyle='rgba(239,230,255,.8)';ctx.fillText('The playtest ends here — this path is still being written.',W/2,H*.36+30);ctx.restore();}
 function drawC1Title(){if(!C1.title)return;C1.title+=1/60;const t=C1.title;if(t>5){C1.title=0;return;}const a=Math.min(1,t*1.2,(5-t)*1.2);ctx.save();ctx.setTransform(DPR,0,0,DPR,0,0);ctx.globalAlpha=a;ctx.fillStyle='rgba(20,14,30,.55)';ctx.fillRect(0,H*.3-46,W,92);ctx.textAlign='center';
-  ctx.fillStyle='#fdf6e4';ctx.font='700 24px "Alegreya SC", Georgia, serif';ctx.fillText('Chapter 1',W/2,H*.3);ctx.font='italic 15px Alegreya, Georgia, serif';ctx.fillStyle='rgba(253,246,228,.8)';ctx.fillText('The Morning After',W/2,H*.3+26);ctx.restore();}
+  ctx.fillStyle='#fdf6e4';ctx.font='700 24px "Alegreya SC", Georgia, serif';ctx.fillText('Chapter 1',W/2,H*.3);ctx.restore();}
 /* ---------- Lum's battle kit: powders ---------- */
 const POWDERS={frost:3,thorn:3,moon:3};
 const POWDER_LIST=[['spark','Sparkdust','Damage · unlimited',null],['frost','Frostbloom Powder','Freezes · enemy may lose a turn','frost'],['thorn','Thornbane Powder','Weakens enemy attacks','thorn'],['moon','Moonmint Powder','Calms · strong vs undead','moon']];
@@ -3270,7 +3270,7 @@ function drawVHut(){const im=IMG.vanehut;if(!ready(im))return;const [rz]=roomVie
   ctx.setTransform(DPR,0,0,DPR,0,0);
   const vg=ctx.createRadialGradient(W/2,H*.5,Math.min(W,H)*.35,W/2,H*.5,Math.max(W,H)*.75);vg.addColorStop(0,'rgba(30,18,10,0)');vg.addColorStop(1,'rgba(20,12,24,.45)');ctx.fillStyle=vg;ctx.fillRect(0,0,W,H);
   if(WTITLE.t<4.5&&!CAPTURE.on){const a=Math.min(1,WTITLE.t*1.5,(4.5-WTITLE.t)*1.2);ctx.save();ctx.globalAlpha=a;ctx.textAlign='center';ctx.fillStyle='rgba(40,26,12,.42)';ctx.fillRect(0,H*.3-40,W,80);
-    ctx.fillStyle='#fff3dc';ctx.font='700 26px "Alegreya SC", Georgia, serif';ctx.fillText("The Gravekeeper's Hut",W/2,H*.3+4);ctx.font='italic 14px Alegreya, Georgia, serif';ctx.fillStyle='rgba(255,243,220,.8)';ctx.fillText('a warm hearth among the graves',W/2,H*.3+28);ctx.restore();}}
+    ctx.fillStyle='#fff3dc';ctx.font='700 26px "Alegreya SC", Georgia, serif';ctx.fillText("The Gravekeeper's Hut",W/2,H*.3+10);ctx.restore();}}
 
 /* ---------- mixing ---------- */
 const RECIPES=[
@@ -3485,7 +3485,7 @@ function drawDun(){const R=DROOMS[DUN.room],im=IMG['dun'+DUN.room];if(!ready(im)
   if(R.light){const [lx,ly,lr]=R.light,[px,py]=wellToScreen(lx,ly);drawGlow(ctx,px,py,lr*rz,'180,210,255',.22);}
   ctx.restore();
   if(WTITLE.t<4.5&&!CAPTURE.on){const a=Math.min(1,WTITLE.t*1.5,(4.5-WTITLE.t)*1.2);ctx.save();ctx.globalAlpha=a;ctx.textAlign='center';ctx.fillStyle='rgba(10,8,14,.5)';ctx.fillRect(0,H*.3-40,W,80);
-    ctx.fillStyle='#e8eef6';ctx.font='700 26px "Alegreya SC", Georgia, serif';ctx.fillText(R.name,W/2,H*.3+4);ctx.restore();}}
+    ctx.fillStyle='#e8eef6';ctx.font='700 26px "Alegreya SC", Georgia, serif';ctx.fillText(R.name,W/2,H*.3+10);ctx.restore();}}
 
 /* ---------- update ---------- */
 let T=0;const cam={x:0,y:0};
