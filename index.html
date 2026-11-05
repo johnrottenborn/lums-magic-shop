@@ -3337,7 +3337,7 @@ function drawBattleC1Foe(f){const S=bS(),B=BATTLE,x=f.x+f.ox,y=f.y+f.oy,sh=f.typ
    VANE'S HUT (inside) + MIXING AT THE FIRE (Lum only)
    ===================================================================== */
 const VHW=657,VHH=768;   // world size: the painting scaled to the room height
-const VHFLOOR=[[385,492],[545,492],[548,515],[495,525],[495,585],[532,605],[530,768],[255,768],[268,700],[300,622],[350,555]];
+const VHFLOOR=[[440,492],[545,492],[548,515],[495,525],[495,585],[532,605],[530,768],[262,768],[285,700],[330,630],[395,565]];
 const VHVANE={x:330,y:665};
 function vhutFree(x,y){return inPoly(x,y,VHFLOOR)&&Math.hypot((x-VHVANE.x)/1.6,y-VHVANE.y)>22;}
 function solveVHut(px,py,nx,ny){if(vhutFree(nx,ny))return [nx,ny];if(vhutFree(nx,py))return [nx,py];if(vhutFree(px,ny))return [px,ny];return [px,py];}
