@@ -1213,7 +1213,8 @@ function statLine(who){return heroStats(who);}
 function giveItem(id){BAG.push(id);if(typeof SAVEC!=='undefined')SAVEC.t=99;if(HIDDEN.some(([k])=>k===id))STATS.found[id]=1;TOAST.t=0;TOAST.name=ITEMS[id].name;TOAST.id=id;MENU.newItems++;sfxItem();}
 function equip(who,id){if((SCENE==='shop'||SCENE==='bed')&&id==='blade'){MENU.note="Cosmic: Not in here! I don't want Master Lum to find out about the sword…";MENU.noteT=3;return;}const it=ITEMS[id],cur=PARTY[who][it.slot];const i=BAG.indexOf(id);if(i<0)return;BAG.splice(i,1);if(cur)BAG.splice(i,0,cur);PARTY[who][it.slot]=id;syncMaxHp(who);sfxEquip();
   MENU.sel={kind:'slot',slot:it.slot};if(TUT.stage===3&&id==='bucket'){TUT.stage=4;TUT.t=0;}}
-function unequip(who,slot){const id=PARTY[who][slot];if(!id)return;if(BAG.length>=8){MENU.note='Your satchel is full!';MENU.noteT=2;return;}PARTY[who][slot]=null;syncMaxHp(who);BAG.push(id);MENU.sel={kind:'bag',i:BAG.length-1};sfxPage(.5);}
+function satchelSlots(){return new Set(BAG.filter(b=>ITEMS[b]&&ITEMS[b].kind!=='mat')).size;}
+function unequip(who,slot){const id=PARTY[who][slot];if(!id)return;if(satchelSlots()>=8&&!BAG.includes(id)){MENU.note='Your satchel is full!';MENU.noteT=2;return;}PARTY[who][slot]=null;syncMaxHp(who);BAG.push(id);MENU.sel={kind:'bag',i:BAG.length-1};sfxPage(.5);}
 function openMenu(){if(MENU.open||DLG.active||FADE.dir||INTRO.on||INTRO.waiting||busy())return;MENU.open=true;MENU.sel=null;MENU.newItems=0;MENU.who=HERO;MENU.tab="bag";sfxBook(true);lum.vx=lum.vy=0;stick.id=null;
   if(TUT.stage===1){TUT.stage=2;TUT.t=0;}}
 function closeMenu(){if(!MENU.open)return;MENU.open=false;SAVEC.t=99;sfxBook(false);
@@ -1383,11 +1384,11 @@ function drawMenu(dt){const MH=(MENU.who&&PARTY_ORDER.includes(MENU.who))?MENU.w
   c.fillStyle='#6a4a28';c.font='700 13px "Alegreya SC", Georgia, serif';c.textAlign='center';if(MH==='lum'){const tb=MENU.tab||'bag';for(const [k,l,tx] of [['bag','Satchel',BKW/2-62],['ing','Ingredients',BKW/2+62]]){const on=tb===k;c.fillStyle=on?'#7a4f9a':'rgba(120,86,40,.18)';rr(tx-54,y-12,108,24,12);c.fill();c.fillStyle=on?'#fff':'#6a4a28';c.fillText(l,tx,y+5);hit(tx-56,y-16,112,32,()=>{MENU.tab=k;MENU.sel=null;sfxPage(.35);});}}else c.fillText('Satchel',BKW/2,y+4);
   const cs=62,gap=10,gx=BKW/2-(cs*4+gap*3)/2,gy=y+16;
   if(MH==='lum'&&MENU.tab==='ing'){drawIngTab(c,px,pw,gy+2,py+ph-8);}else{
-  const VIS=MH!=='cosmic'?BAG.map((b,i)=>i).filter(i=>ITEMS[BAG[i]]&&ITEMS[BAG[i]].kind!=='mat'):BAG.map((b,i)=>i);
+  const VIS=[],seenB={};BAG.forEach((b,i)=>{if(MH!=='cosmic'&&!(ITEMS[b]&&ITEMS[b].kind!=='mat'))return;if(seenB[b]!==undefined)return;seenB[b]=i;VIS.push(i);});const bagN=id=>BAG.filter(b=>b===id).length;
   for(let i=0;i<8;i++){const cx=gx+(i%4)*(cs+gap),cy=gy+Math.floor(i/4)*(cs+gap),bi=VIS[i],id=bi===undefined?undefined:BAG[bi],sel=bi!==undefined&&MENU.sel&&MENU.sel.kind==='bag'&&MENU.sel.i===bi;
     c.fillStyle='rgba(120,86,40,.14)';rr(cx,cy,cs,cs,10);c.fill();c.strokeStyle='rgba(140,100,50,.4)';c.lineWidth=1.2;c.stroke();
     if(sel){drawGlow(c,cx+cs/2,cy+cs/2,cs*.8,'255,215,120',.45);c.strokeStyle='#e0a83a';c.lineWidth=2.6;rr(cx-1,cy-1,cs+2,cs+2,11);c.stroke();}
-    if(id){drawIcon(c,id,cx+cs/2,cy+cs/2+2,cs*.62);if(ITEMS[id].kind==='mat'){c.fillStyle='#6a4a28';c.font='700 13px "Alegreya SC", Georgia, serif';c.textAlign='right';c.fillText('\u00D7'+(MATS[id]||0),cx+cs-6,cy+cs-6);c.textAlign='center';}hit(cx,cy,cs,cs,()=>{MENU.sel={kind:'bag',i:bi};sfxPage(.35);if(TUT.stage===2&&id==='bucket'){TUT.stage=3;TUT.t=0;}});
+    if(id){drawIcon(c,id,cx+cs/2,cy+cs/2+2,cs*.62);{const nn=ITEMS[id].kind==='mat'?(MATS[id]||0):bagN(id);if(nn>1||ITEMS[id].kind==='mat'){c.fillStyle='#6a4a28';c.font='700 13px "Alegreya SC", Georgia, serif';c.textAlign='right';c.fillText('\u00D7'+nn,cx+cs-6,cy+cs-6);c.textAlign='center';}}hit(cx,cy,cs,cs,()=>{MENU.sel={kind:'bag',i:bi};sfxPage(.35);if(TUT.stage===2&&id==='bucket'){TUT.stage=3;TUT.t=0;}});
       if(TUT.stage===2&&id==='bucket'){tutRing(c,cx+cs/2,cy+cs/2,cs*.55);tutArrow(c,cx+cs/2,cy-6,1);}}}
   // details of whatever is selected
   y=gy+cs*2+gap+14;const dx=px+22,dw_=pw-44;c.strokeStyle='rgba(140,100,50,.35)';c.beginPath();c.moveTo(dx,y);c.lineTo(dx+dw_,y);c.stroke();
@@ -1400,7 +1401,7 @@ function drawMenu(dt){const MH=(MENU.who&&PARTY_ORDER.includes(MENU.who))?MENU.w
     const lab=fromSlot?'Unequip':it.slot?'Equip':it.heal?'Use':null;if(lab){
     c.fillStyle='rgba(60,30,10,.25)';rr(bx+1,by+3,bw,bh,12);c.fill();const g=c.createLinearGradient(0,by,0,by+bh);g.addColorStop(0,fromSlot?'#a4886a':'#e8b85a');g.addColorStop(1,fromSlot?'#7a6248':'#b07a2a');c.fillStyle=g;rr(bx,by,bw,bh,12);c.fill();c.strokeStyle='#5a3a14';c.lineWidth=1.5;c.stroke();
     c.fillStyle='#fffaf0';c.font='700 16px "Alegreya SC", Georgia, serif';c.textAlign='center';c.fillText(lab,bx+bw/2,by+24);c.textAlign='left';
-    hit(bx,by,bw,bh,()=>{if(fromSlot)unequip(MH,fromSlot);else if(it.slot)equip(MH,id);else if(it.heal){const H_=HEROES[MH];if(H_.hp>=H_.maxHp){MENU.note=HEROES[MH].name+' is already feeling great!';MENU.noteT=2;return;}const amt=healRoll(it);H_.hp=Math.min(H_.maxHp,H_.hp+amt);BAG.splice(MENU.sel.i,1);STATS.items++;MENU.sel=null;sfxItem();MENU.note=`Healed ${amt} HP!`;MENU.noteT=1.8;}});}
+    hit(bx,by,bw,bh,()=>{if(fromSlot)unequip(MH,fromSlot);else if(it.slot)equip(MH,id);else if(it.heal){const H_=HEROES[MH];if(H_.hp>=H_.maxHp){MENU.note=HEROES[MH].name+' is already feeling great!';MENU.noteT=2;return;}const amt=healRoll(it);H_.hp=Math.min(H_.maxHp,H_.hp+amt);BAG.splice(MENU.sel.i,1);STATS.items++;{const ni=BAG.indexOf(id);MENU.sel=ni>=0?{kind:'bag',i:ni}:null;}sfxItem();MENU.note=`Healed ${amt} HP!`;MENU.noteT=1.8;}});}
     if(TUT.stage===3&&id==='bucket'&&!fromSlot){c.save();const p=.5+.5*Math.sin(T*6);c.strokeStyle=`rgba(232,170,60,${(.6+.4*p).toFixed(3)})`;c.lineWidth=3;rr(bx-5-p*2,by-5-p*2,bw+10+p*4,bh+10+p*4,15);c.stroke();c.restore();tutArrow(c,bx+bw/2,by-8,1);}}
   else{c.font='italic 14px Alegreya, Georgia, serif';c.fillStyle='#8a7050';c.textAlign='center';c.fillText(BAG.length?tw('Tap an item to read about it.','Click an item to read about it.'):'Your satchel is empty… for now.',BKW/2,y+40);}
   }
@@ -1847,11 +1848,11 @@ function drawBattleMenu(){const B=BATTLE,S=bS();B.menuHits=[];B.itemHits=[];
       drawMenuIcon(k,x,y+bounce,r);ctx.fillStyle='#fdf6e4';ctx.strokeStyle='rgba(30,20,10,.7)';ctx.lineWidth=3;ctx.font=`700 ${Math.round(12*S)}px "Alegreya SC", Georgia, serif`;ctx.strokeText(label,x,y+r+16*S);ctx.fillText(label,x,y+r+16*S);
       B.menuHits.push({x,y,r,i});});ctx.restore();}
   if(B.phase==='target')tutText(tw('Tap an enemy to bonk it','Click an enemy (or press Space) to attack it'));
-  if(B.phase==='items'){const use=BAG.filter(id=>ITEMS[id].kind==='use');const w=Math.min(W-40,320),x=(W-w)/2,y=H*.55,h_=Math.max(120,use.length*46+70);
+  if(B.phase==='items'){const use=[...new Set(BAG.filter(id=>ITEMS[id].kind==='use'))];const w=Math.min(W-40,320),x=(W-w)/2,y=H*.55,h_=Math.max(120,use.length*46+70);
     ctx.save();ctx.fillStyle='rgba(20,10,10,.3)';rr(x+2,y+4,w,h_,14);ctx.fill();ctx.fillStyle='#f6ecd2';rr(x,y,w,h_,14);ctx.fill();ctx.strokeStyle='#c49a4e';ctx.lineWidth=1.5;ctx.stroke();
     ctx.fillStyle='#6a4a28';ctx.font='700 14px "Alegreya SC", Georgia, serif';ctx.textAlign='center';ctx.fillText('Potions & Powders',W/2,y+26);
     if(!use.length){ctx.font='italic 14px Alegreya, Georgia, serif';ctx.fillStyle='#8a7050';ctx.fillText("Nothing in your satchel yet…",W/2,y+60);ctx.fillText("Maybe the magic shop has something?",W/2,y+80);}
-    use.forEach((id,i)=>{const yy=y+40+i*46;ctx.fillStyle='rgba(120,86,40,.12)';rr(x+12,yy,w-24,40,10);ctx.fill();if(!TOUCHUI()&&i===(B.itemSel||0)){ctx.strokeStyle='#e0a83a';ctx.lineWidth=2;ctx.stroke();}drawIcon(ctx,id,x+34,yy+20,26);ctx.fillStyle='#4a3420';ctx.textAlign='left';ctx.font='700 14px "Alegreya SC", Georgia, serif';ctx.fillText(ITEMS[id].name,x+58,yy+18);ctx.font='italic 12px Alegreya, Georgia, serif';ctx.fillStyle='#7a6040';ctx.fillText(ITEMS[id].short||'',x+58,yy+33);
+    use.forEach((id,i)=>{const yy=y+40+i*46;ctx.fillStyle='rgba(120,86,40,.12)';rr(x+12,yy,w-24,40,10);ctx.fill();if(!TOUCHUI()&&i===(B.itemSel||0)){ctx.strokeStyle='#e0a83a';ctx.lineWidth=2;ctx.stroke();}drawIcon(ctx,id,x+34,yy+20,26);ctx.fillStyle='#4a3420';ctx.textAlign='left';ctx.font='700 14px "Alegreya SC", Georgia, serif';ctx.fillText(ITEMS[id].name,x+58,yy+18);{const nn=BAG.filter(b=>b===id).length;ctx.textAlign='right';ctx.fillText('\u00D7'+nn,x+w-24,yy+26);ctx.textAlign='left';}ctx.font='italic 12px Alegreya, Georgia, serif';ctx.fillStyle='#7a6040';ctx.fillText(ITEMS[id].short||'',x+58,yy+33);
       B.itemHits.push({x:x+12,y:yy,w:w-24,h:40,act:()=>useItem(id)});});
     ctx.font='italic 12px Alegreya, Georgia, serif';ctx.fillStyle='#8a7050';ctx.textAlign='center';ctx.fillText(tw('tap outside to go back','click outside or press Esc to go back'),W/2,y+h_-12);ctx.restore();}}
 function drawMenuIcon(k,x,y,r){ctx.save();ctx.translate(x,y);
