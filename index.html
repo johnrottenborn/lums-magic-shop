@@ -3011,7 +3011,7 @@ function drawThornWebs(x0,y0,x1,y1){for(const w of THORN.webs||[]){if(w.cx<x0-25
 /* ---------- the edge of Stranglethorn without a lantern: a still view of the forest, and no way in ---------- */
 const THGATE={t:0};
 const THGINT=[{x:40,y:600,reach:110,door:true,onInteract:()=>goScene(()=>{SCENE='woods';lum.x=2610;lum.y=628;lum.face=-1;lum.state='idle';lum.vx=lum.vy=0;cam.x=lum.x+60;cam.y=lum.y-50;})},
-  {x:520,y:600,reach:470,onInteract:()=>say(["It's far too dark to go any further. I need a better way to bring light in here.","I can't find the path without a proper light. Vane's lantern burns all night… maybe he'd lend it.","The thorns swallow every bit of light. I'll need something brighter than this."][(sayCount++)%3])}];
+  {x:520,y:600,reach:470,onInteract:()=>say(["It's far too dark to go any further. I need a better way to bring light in here.","I can't find the path without a proper light.","The thorns swallow every bit of light. I'll need something brighter than this."][(sayCount++)%3])}];
 function enterThornGate(){SCENE='thgate';THGATE.t=0;WEVENT.on=true;lum.x=500;lum.y=600;lum.vx=lum.vy=0;lum.state='idle';lum.face=1;
   setTimeout(()=>talk([['Lum',"The road ahead disappears into the dark of Stranglethorn Forest."],['Lum',"I can't see a thing past those first trees. I'll need a stronger light than this."]],false,()=>{WEVENT.on=false;}),900);}
 function drawThornGate(){THGATE.t+=1/60;const im=IMG.thorngate;ctx.setTransform(DPR,0,0,DPR,0,0);ctx.fillStyle='#0c0608';ctx.fillRect(0,0,W,H);
