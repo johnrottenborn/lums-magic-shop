@@ -2902,9 +2902,9 @@ function buildThorn(){if(THORN.built)return;THORN.built=true;const P=THORN.props
   // vertical hedges: a receding line of bushes
   for(let r=0;r<TMZ.R;r++)for(let line=0;line<=TMZ.C;line++)if(vW(r,line)){const x=line*TCW;for(let k=0;k<4;k++){const y=r*TCH+38+k*75;P.push({t:'hedge',x:x+(H_(r*7+k,line,11)-.5)*16,y,w:150+H_(r*7+k,line,13)*24,flip:H_(r*7+k,line,15)<.5});}}
   // posts at every junction so corners look solid
-  for(let vr=0;vr<=TMZ.R;vr++)for(let vc=0;vc<=TMZ.C;vc++){const any=hW(vr,vc-1)||hW(vr,vc)||vW(vr-1,vc)||vW(vr,vc);if(any&&H_(vr,vc,17)<.18&&vr>0&&vr<TMZ.R)P.push({t:'tree',img:['bwood_small_a','bwood_small_b','bwood2_small_a','bwood2_small_b'][Math.floor(H_(vr,vc,19)*4)],x:vc*TCW,y:vr*TCH+8,w:250+H_(vr,vc,21)*50,flip:H_(vr,vc,23)<.5});}
+  for(let vr=0;vr<=TMZ.R;vr++)for(let vc=0;vc<=TMZ.C;vc++){const any=hW(vr,vc-1)||hW(vr,vc)||vW(vr-1,vc)||vW(vr,vc);if(any&&H_(vr,vc,17)<.18&&vr>0&&vr<TMZ.R)P.push({t:'tree',img:['bwood_small_a','bwood_small_b','bwood2_small_a','bwood2_small_b'][Math.floor(H_(vr,vc,19)*4)],x:vc*TCW,y:vr*TCH+8,w:430+H_(vr,vc,21)*90,flip:H_(vr,vc,23)<.5});}
   // sealed pockets become thickets of red trees
-  for(const [r,c] of THORN.pockets){const big=H_(r,c,29)<.5;P.push({t:'tree',img:big?(H_(r,c,37)<.5?'bwood_big':'bwood2_big'):['bwood_small_a','bwood_small_b','bwood2_small_a','bwood2_small_b'][Math.floor(H_(r,c,31)*4)],x:c*TCW+TCW/2+(H_(r,c,33)-.5)*60,y:r*TCH+TCH*.82,w:big?470:300,flip:H_(r,c,35)<.5});}
+  for(const [r,c] of THORN.pockets){const big=H_(r,c,29)<.5;P.push({t:'tree',img:big?(H_(r,c,37)<.5?'bwood_big':'bwood2_big'):['bwood_small_a','bwood_small_b','bwood2_small_a','bwood2_small_b'][Math.floor(H_(r,c,31)*4)],x:c*TCW+TCW/2+(H_(r,c,33)-.5)*60,y:r*TCH+TCH*.82,w:big?760:500,flip:H_(r,c,35)<.5});}
   // gateways: a bramble arch wherever the path passes through a gap flanked by hedges
   const pth=THORN.path;for(let i=1;i<pth.length;i++){const [r0,c0]=pth[i-1],[r1,c1]=pth[i];if(c0!==c1)continue;const line=Math.max(r0,r1);if(hW(line,c0-1)&&hW(line,c0+1)&&H_(line,c0,41)<.75)P.push({t:'arch',x:c0*TCW+TCW/2,y:line*TCH+14,w:430});}
   // Jak's resting place: the old oak frames the dead end (characters come later)
