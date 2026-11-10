@@ -23,7 +23,7 @@ const DUNINT=[];
 /* the Fox Hood waits on the Briar Den floor once both foxes there are gone */
 const HOOD={x:780,y:610};
 function hoodOut(){if(C1.hoodOut)return true;if(dfoesBuilt&&!DFOES.some(g=>g.room===8))C1.hoodOut=1;return !!C1.hoodOut;}
-const SPRING_DOOR={x:5*360+180,y:72},CELLAR_DOOR={x:11*360+180,y:10*300+70};
+const SPRING_DOOR={x:5*360+180,y:72},CELLAR_DOOR={x:11*360+180,y:10*300+66};
 function drinkSpring(){const all=Object.keys(HEROES).filter(id=>id!=='cosmic'&&(id!=='jak'||C1.jak));let hurt=false;for(const id of all){const h=HEROES[id];if(h.hp<h.maxHp)hurt=true;h.hp=h.maxHp;}
   sfxItem&&sfxItem();for(let i=0;i<16;i++)PARTS.push({type:'fdust',x:lum.x+rnd(-30,30),y:lum.y,z:rnd(10,80),vx:rnd(-10,10),vy:rnd(-4,4),vz:rnd(20,40),life:0,max:rnd(.6,1.1),s:rnd(1,2.2),col:'170,230,255'});
   say(hurt?(C1.jak?"Cool, clear water from deep under the forest… Every ache is gone. We're both good as new.":"Cool, clear water from deep under the forest… Every ache is gone. I'm good as new."):"The water is cool and clear. I already feel fine, but it's lovely all the same.");}
