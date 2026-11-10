@@ -10,6 +10,7 @@ const DROOMS={
      block:[{x:880,y:548,rx:46,ry:16}]},
   4:{name:"Gaia's Vault",sub:'a thief’s hiding place',dark:.82,floor:[[480,768],[520,640],[560,560],[620,470],[660,400],[760,400],[800,470],[850,560],[960,600],[1000,640],[920,768]],
      block:[{x:890,y:556,rx:48,ry:14}],light:[700,30,200]},
+  10:{name:'Spider Lair',dark:.5,floor:[[190,610],[300,560],[410,590],[470,640],[600,672],[800,662],[940,645],[1010,690],[1120,700],[1210,768],[170,768]]},
   9:{name:'Ember Hollow',dark:.45,floor:[[230,700],[320,640],[430,600],[560,560],[640,520],[700,470],[760,432],[900,428],[970,455],[1010,500],[1070,560],[1130,625],[1180,700],[1200,768],[260,768]],block:[{x:792,y:510,rx:104,ry:30}]},
   8:{name:'Briar Den',dark:.55,floor:[[470,768],[500,690],[560,620],[640,570],[720,548],[880,548],[960,575],[1030,630],[1090,700],[1110,768]]},
   7:{name:'Thornroot Cellar',dark:.55,floor:[[330,640],[470,610],[600,575],[720,545],[1150,530],[1240,560],[1320,640],[1330,768],[420,768],[340,700]],block:[{x:945,y:614,rx:168,ry:38}]},
@@ -50,8 +51,9 @@ function setupDun(){DUNINT.length=0;const r=DUN.room,D=(x,y,reach,fn)=>DUNINT.pu
   if(r===7){D(470,612,64,()=>goScene(()=>{enterThorn();lum.x=CELLAR_DOOR.x;lum.y=CELLAR_DOOR.y+CMOUTH.ry+30;lum.face=1;cam.x=lum.x;cam.y=lum.y-50;resetJakFollow();}));
     D(950,545,80,()=>dunGo(8,780,705,1));}
   if(r===9){D(300,660,72,()=>goScene(()=>{enterThorn();lum.x=WEBWELL_DOOR.x-75;lum.y=WEBWELL_DOOR.y+58;lum.face=1;cam.x=lum.x;cam.y=lum.y-50;resetJakFollow();}));
-    D(860,445,70,()=>say("The tunnel at the back winds on into the dark… I'll come back when I'm ready."));
+    D(860,445,70,()=>dunGo(10,260,660,1));
     DUNINT.push({x:792,y:540,reach:110,fire:true,onInteract:fireInteract});}
+  if(r===10){D(210,640,70,()=>dunGo(9,860,470,1));}
   if(r===8){D(780,752,64,()=>dunGo(7,1040,560,-1));
     DUNINT.push({x:HOOD.x,y:HOOD.y,reach:80,grab:()=>hoodOut()&&!C1.foxHood,onInteract:()=>{if(!hoodOut()||C1.foxHood){say(DEN_LINES[(sayCount++)%2]);return;}C1.foxHood=1;giveItem('foxhood');}});
     L(780,552,90,DEN_LINES);}
@@ -66,14 +68,15 @@ function buildDFoes(){if(dfoesBuilt)return;dfoesBuilt=true;DFOES.length=0;let id
   if(!C1.bigVixen)DFOES.push({id:91,kind:'bigvixen',scene:'dun',room:5,x:720,y:585,hx:720,hy:585,tx:720,ty:585,s:1.4,pack:1,calm:0,ph:0,t:0,face:1,still:1,asleep:1});
   for(const [room,x,y] of [[3,520,660],[3,1050,650],[5,560,690]])DFOES.push({id:id++,kind:'spider',scene:'dun',room,x,y,hx:x,hy:y,tx:x,ty:y,s:1,pack:1,calm:0,ph:rnd(0,TAU),t:0,face:-1});
   for(const [room,x,y] of [[7,720,690],[7,1080,700],[7,1210,625],...(C1.hoodOut?[]:[[8,640,650],[8,960,660]])])DFOES.push({id:id++,kind:'rvixen',scene:'dun',room,x,y,hx:x,hy:y,tx:x,ty:y,s:1,pack:1,calm:2,ph:rnd(0,TAU),t:0,face:-1});
+  if(!C1.lairBoss)DFOES.push({id:95,kind:'bigspider',scene:'dun',room:10,x:720,y:575,hx:720,hy:575,tx:720,ty:575,s:1,pack:1,calm:0,ph:0,t:0,face:-1,still:1,lair:1,over:{name:'Webmother',hp:46,atk:5,def:2,loot:'foxsuit',flag:'lairBoss'}});
   for(const [room,x,y] of [[2,520,700],[2,950,690],[5,900,690]])DFOES.push({id:id++,kind:'bat',scene:'dun',room,x,y,hx:x,hy:y,tx:x,ty:y,s:1,pack:1,calm:0,ph:rnd(0,TAU),t:0,face:-1});}
 function updateDFoes(dt){const ok=!DLG.active&&!WEVENT.on&&!MENU.open&&!FADE.dir&&!BATTLE.on&&!BATTLE.pending&&!CHOICE.on&&!MIX.on;
   for(const g of DFOES){if(g.room!==DUN.room)continue;g.ph+=dt;g.t+=dt;g.calm=Math.max(0,g.calm-dt);const d=Math.hypot(lum.x-g.x,lum.y-g.y);
-    if(g.still){g.face=g.asleep?1:lum.x<g.x?-1:1;if(g.kind==='vixen'&&ok&&!g.calm&&d<130&&lum.bumpT<=0)startEncounter(g,'normal');continue;}
+    if(g.still){if(g.lair){g.face=-1;if(ok&&d<190&&lum.bumpT<=0)startEncounter(g,'normal');continue;}g.face=g.asleep?1:lum.x<g.x?-1:1;if(g.kind==='vixen'&&ok&&!g.calm&&d<130&&lum.bumpT<=0)startEncounter(g,'normal');continue;}
     if(ok&&!g.calm&&d<230){g.tx=lum.x;g.ty=lum.y;if(d<60&&lum.bumpT<=0){startEncounter(g,'ambush');continue;}}
     else if(g.t>2.5||Math.hypot(g.tx-g.x,g.ty-g.y)<10){g.t=0;const a=rnd(0,TAU);g.tx=g.hx+Math.cos(a)*rnd(40,160);g.ty=g.hy+Math.sin(a)*rnd(10,50);}
     if(!ok)continue;const dx=g.tx-g.x,dy=g.ty-g.y,dd=Math.hypot(dx,dy)||1,sp=d<230&&!g.calm?95:55;const nx=g.x+dx/dd*sp*dt,ny=g.y+dy/dd*sp*dt;if(dunFree(nx,ny)){g.x=nx;g.y=ny;}else{g.tx=g.hx;g.ty=g.hy;}if(Math.abs(dx)>4)g.face=dx<0?-1:1;}}
-function drawDFoe(g){const k=dunH(g.y)/151,bob=Math.sin(g.ph*3)*8;if(g.kind==='rvixen'){const mv=Math.hypot(g.tx-g.x,g.ty-g.y)>8,h=118*k;ctx.fillStyle='rgba(0,0,0,.3)';ctx.beginPath();ctx.ellipse(g.x,g.y,h*.42,h*.07,0,0,TAU);ctx.fill();c1Frame(ctx,'fox_red','run',mv?Math.floor(g.ph*14)%12:0,g.x,g.y,h,g.face>0,1,0);return;}if(g.kind==='spider'){const mv=Math.hypot(g.tx-g.x,g.ty-g.y)>8;ctx.fillStyle='rgba(0,0,0,.3)';ctx.beginPath();ctx.ellipse(g.x,g.y,34*k,7*k,0,0,TAU);ctx.fill();c1Frame(ctx,'spider',mv?'crawl':'idle',Math.floor(g.ph*(mv?12:4))%(mv?5:4),g.x,g.y,70*k,mv?g.face>0:g.face<0,1,0);return;}if(g.kind==='vixen'||g.kind==='bigvixen'){const h=(g.kind==='bigvixen'?230:120)*k,br=1+Math.sin(g.ph*(g.asleep?1.4:3))*.012;ctx.fillStyle='rgba(0,0,0,.3)';ctx.beginPath();ctx.ellipse(g.x,g.y,h*.42,h*.07,0,0,TAU);ctx.fill();ctx.save();ctx.translate(g.x,g.y);ctx.scale(1,br);ctx.translate(-g.x,-g.y);c1Frame(ctx,'fox',g.asleep?'hurt':'run',0,g.x,g.y,h,g.face>0,1,0);ctx.restore();
+function drawDFoe(g){const k=dunH(g.y)/151,bob=Math.sin(g.ph*3)*8;if(g.kind==='bigspider'){const h=330*k;ctx.fillStyle='rgba(0,0,0,.35)';ctx.beginPath();ctx.ellipse(g.x,g.y,h*.5,h*.09,0,0,TAU);ctx.fill();ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,g.x,g.y-h*.35,h*.6,'150,120,200',.16+.05*Math.sin(T*1.5));ctx.restore();ctx.save();ctx.filter='brightness(1.45) contrast(1.1)';c1Frame(ctx,'spider_dark','idle',Math.floor(g.ph*4)%4,g.x,g.y,h,true,1,0);ctx.restore();return;}if(g.kind==='rvixen'){const mv=Math.hypot(g.tx-g.x,g.ty-g.y)>8,h=118*k;ctx.fillStyle='rgba(0,0,0,.3)';ctx.beginPath();ctx.ellipse(g.x,g.y,h*.42,h*.07,0,0,TAU);ctx.fill();c1Frame(ctx,'fox_red','run',mv?Math.floor(g.ph*14)%12:0,g.x,g.y,h,g.face>0,1,0);return;}if(g.kind==='spider'){const mv=Math.hypot(g.tx-g.x,g.ty-g.y)>8;ctx.fillStyle='rgba(0,0,0,.3)';ctx.beginPath();ctx.ellipse(g.x,g.y,34*k,7*k,0,0,TAU);ctx.fill();c1Frame(ctx,'spider',mv?'crawl':'idle',Math.floor(g.ph*(mv?12:4))%(mv?5:4),g.x,g.y,70*k,mv?g.face>0:g.face<0,1,0);return;}if(g.kind==='vixen'||g.kind==='bigvixen'){const h=(g.kind==='bigvixen'?230:120)*k,br=1+Math.sin(g.ph*(g.asleep?1.4:3))*.012;ctx.fillStyle='rgba(0,0,0,.3)';ctx.beginPath();ctx.ellipse(g.x,g.y,h*.42,h*.07,0,0,TAU);ctx.fill();ctx.save();ctx.translate(g.x,g.y);ctx.scale(1,br);ctx.translate(-g.x,-g.y);c1Frame(ctx,'fox',g.asleep?'hurt':'run',0,g.x,g.y,h,g.face>0,1,0);ctx.restore();
     ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,g.x,g.y-h*.4,h*.5,'255,170,90',.08+.03*Math.sin(g.ph*2));ctx.restore();return;}ctx.fillStyle='rgba(0,0,0,.25)';ctx.beginPath();ctx.ellipse(g.x,g.y,26*k,6*k,0,0,TAU);ctx.fill();
   c1Frame(ctx,'bat','fly',Math.floor(g.ph*9)%3,g.x,g.y-110*k-bob,90*k,g.face>0,1,0);}
 function enterDun(room,x,y,face){buildDFoes();SCENE='dun';DUN.room=room;lum.x=x??560;lum.y=y??640;lum.face=face||1;lum.vx=lum.vy=0;lum.state='idle';WCAM.x=lum.x;WTITLE.t=0;setupDun();

@@ -244,6 +244,22 @@ const CASES = {
     await p.evaluate(() => window.__g.pressA()); await wait(2200);
     check(await p.evaluate(() => window.__g.SCENE === 'thorn'), 'the Ember Hollow stairs did not lead back up');
   },
+  async 'spider-lair'(p) {
+    await startCh1(p);
+    await p.evaluate(() => { const g = window.__g; g.enterDun(9, 860, 470, 1); g.DLG.active = false; }); await wait(900);
+    await p.evaluate(() => { const g = window.__g; g.DLG.active = false; g.lumS.x = 860; g.lumS.y = 450; }); await wait(400);
+    await p.evaluate(() => window.__g.pressA()); await wait(2200);
+    check(await p.evaluate(() => window.__g.SCENE === 'dun' && window.__g.DUN.room === 10), 'the Ember Hollow tunnel did not lead to the Spider Lair');
+    check(await p.evaluate(() => window.__g.DFOES.some(f => f.room === 10 && f.lair)), 'no boss in the Spider Lair');
+    await p.evaluate(() => { const g = window.__g; g.DLG.active = false; g.lumS.bumpT = 0; }); await wait(1500);
+    await p.screenshot({ path: path.join(SHOTS, 'spider-lair-room-' + (p.viewportSize().width < 600 ? 'phone' : 'desktop') + '.png') });
+    await p.evaluate(() => { const g = window.__g; g.lumS.x = 700; g.lumS.y = 670; }); await wait(1800);
+    const f = await p.evaluate(() => { const B = window.__g.BATTLE; return B.foes && B.foes[0] && { name: B.foes[0].name, hp: B.foes[0].max, loot: B.foes[0].loot, label: window.__g.WIPEX.label }; });
+    check(f && f.name === 'Webmother' && f.hp === 46 && f.loot === 'foxsuit', 'walking up to the boss did not start its battle: ' + JSON.stringify(f));
+    await wait(2500);
+    await p.evaluate(() => { const B = window.__g.BATTLE; B.phase = 'win'; B.t = 1; B.rewarded = 0; }); await wait(600);
+    check(await p.evaluate(() => window.__g.BAG.includes('foxsuit') && window.__g.C1X.lairBoss === 1), 'beating the boss did not give the Fox Suit');
+  },
   async 'deeproot-sleeping-fox'(p) {
     await startCh1(p);
     await p.evaluate(() => { const g = window.__g; g.C1X.bigVixen = 0; g.enterDun(5, 900, 600, -1);
