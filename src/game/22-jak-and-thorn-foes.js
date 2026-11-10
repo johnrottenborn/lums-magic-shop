@@ -51,7 +51,11 @@ const THINT=[{x:JAKREST.x,y:JAKREST.y,reach:95,onInteract:()=>jakInteract()},{x:
   // the small pocket near the bottom right: stairs down to the Thornroot Cellar
   {x:11*TCW+TCW/2,y:10*TCH+66,reach:100,door:true,onInteract:()=>dunGo(7,560,620,1)},
   // under the spider web in the middle of the maze: a third well, down to the Ember Hollow
-  {x:5*TCW+TCW/2,y:4*TCH+58,reach:100,door:true,onInteract:()=>dunGo(9,370,650,1)}];
+  {x:5*TCW+TCW/2,y:4*TCH+58,reach:100,door:true,onInteract:()=>dunGo(9,370,650,1)},
+  // the maze's exit, once the Broodmother is gone: on to the clearing
+  {x:TW_-40,y:TMZ.finish*TCH+TCH/2+10,reach:90,door:true,onInteract:()=>goScene(enterClearing)},
+  // and back again, before Lum reaches Cosmic
+  {x:TW_+260+95,y:TMZ.finish*TCH+TCH/2+10,reach:80,door:true,onInteract:()=>{if(FKS.st)return;goScene(()=>{lum.x=TW_-120;lum.y=TMZ.finish*TCH+TCH/2+10;lum.face=-1;cam.x=lum.x;cam.y=lum.y-50;resetJakFollow();});}}];
 
 // roaming creatures: spiders, Flora, red slimes and red foxes
 const THFOES=[];let thFoesBuilt=false;const THBOSS={kind:'bigspider',scene:'thorn',x:12*TCW+TCW/2,y:2*TCH+190,s:1,pack:1,calm:0,dead:0,ph:0,face:-1,boss:1};
@@ -91,8 +95,8 @@ function drawThorn(){const vw=W/zoom,vh=H/zoom,x0=cam.x-vw/2-60,y0=cam.y-vh/2-60
   drawCellarMouth();
   for(const f of THORN.flowers)if(f.x>x0-30&&f.x<x1+30&&f.y>y0-30&&f.y<y1)drawRedFlowers(f.x,f.y,f.s,f.seed);
   const L=[];for(const o of THORN.props)if(o.x>x0-o.w/2-40&&o.x<x1+o.w/2+40&&o.y>y0-20&&o.y<y1+o.w*1.4)L.push([o.y,o]);L.push([lum.y,null]);L.sort((a,b)=>a[0]-b[0]);
-  for(const g of THFOES)if(g.x>x0-150&&g.x<x1+150&&g.y>y0-60&&g.y<y1+260)L.push([g.y,{t:'thfoe',ref:g}]);if(!C1.thornBoss)L.push([THBOSS.y,{t:'boss'}]);for(const s_ of COSSEE)if(s_.st===1||s_.st===2)L.push([s_.y,{t:'cosghost',ref:s_}]);if(!C1.jak)L.push([JAKREST.y,{t:'jakrest'}]);else if(JAKF&&jakInParty())L.push([JAKF.y,{t:'jak'}]);L.sort((a,b)=>a[0]-b[0]);
-  THORN.blooms=[];let past=false;for(const [,o] of L){if(!o){drawLum();past=true;continue;}if(o.t==='thfoe'){drawThornFoe(o.ref);continue;}if(o.t==='boss'){drawThornBoss();continue;}if(o.t==='cosghost'){drawCosGhost(o.ref);continue;}if(o.t==='jakrest'){drawJakResting();continue;}if(o.t==='jak'){drawJakOW();continue;}let fa=1;if(past){const kx=clamp(1-(Math.abs(o.x-lum.x)-o.w*.2)/(o.w*.3),0,1),ky=clamp(1-(o.y-lum.y-o.w*.7)/(o.w*.35),0,1);fa=1-kx*ky*(o.t==='arch'?.4:.58);}drawThornProp(o,fa);}
+  for(const g of THFOES)if(g.x>x0-150&&g.x<x1+150&&g.y>y0-60&&g.y<y1+260)L.push([g.y,{t:'thfoe',ref:g}]);if(!C1.thornBoss)L.push([THBOSS.y,{t:'boss'}]);for(const s_ of COSSEE)if(s_.st===1||s_.st===2)L.push([s_.y,{t:'cosghost',ref:s_}]);if(!C1.fkDone&&lum.x>TW_)L.push([FKS.cy,{t:'fks'}]);if(!C1.jak)L.push([JAKREST.y,{t:'jakrest'}]);else if(JAKF&&jakInParty())L.push([JAKF.y,{t:'jak'}]);L.sort((a,b)=>a[0]-b[0]);
+  THORN.blooms=[];let past=false;for(const [,o] of L){if(!o){drawLum();past=true;continue;}if(o.t==='thfoe'){drawThornFoe(o.ref);continue;}if(o.t==='boss'){drawThornBoss();continue;}if(o.t==='cosghost'){drawCosGhost(o.ref);continue;}if(o.t==='fks'){drawFKS();continue;}if(o.t==='jakrest'){drawJakResting();continue;}if(o.t==='jak'){drawJakOW();continue;}let fa=1;if(past){const kx=clamp(1-(Math.abs(o.x-lum.x)-o.w*.2)/(o.w*.3),0,1),ky=clamp(1-(o.y-lum.y-o.w*.7)/(o.w*.35),0,1);fa=1-kx*ky*(o.t==='arch'?.4:.58);}drawThornProp(o,fa);}
   drawForage(THORN.forage||[]);drawThornCritters(x0,y0,x1,y1);drawThornWebs(x0,y0,x1,y1);
   drawThornMotes();
   ctx.save();ctx.globalCompositeOperation='lighter';for(const m of THORN.mist){if(m.x<x0-m.r||m.x>x1+m.r||m.y<y0-m.r||m.y>y1+m.r)continue;drawGlow(ctx,m.x+Math.sin(T*.08+m.ph)*50,m.y,m.r,'150,90,110',.05+.025*Math.sin(T*.4+m.ph));}ctx.restore();
@@ -104,7 +108,9 @@ function drawThorn(){const vw=W/zoom,vh=H/zoom,x0=cam.x-vw/2-60,y0=cam.y-vh/2-60
   const sx=(lum.x-cam.x)*zoom+W/2,sy=(lum.y-70-cam.y)*zoom+H/2,R=Math.min(W,H)*.5*(1+.025*Math.sin(T*7)+.018*Math.sin(T*17.3)+.01*Math.sin(T*31));const g=ctx.createRadialGradient(sx,sy,R*.12,sx,sy,R);
   g.addColorStop(0,'rgba(8,4,14,0)');g.addColorStop(.4,'rgba(8,4,14,.26)');g.addColorStop(.8,'rgba(6,3,12,.66)');g.addColorStop(1,'rgba(5,2,10,.8)');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
   ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,sx+lum.face*14*zoom,sy+10*zoom,90*zoom,'255,190,110',.16+.03*Math.sin(T*9));ctx.restore();
+  if(FKS.fa>0&&!C1.fkDone){ctx.save();ctx.setTransform(DPR*zoom,0,0,DPR*zoom,DPR*(W/2-cam.x*zoom),DPR*(H/2-cam.y*zoom));ctx.globalCompositeOperation='lighter';drawGlow(ctx,FKS.cx,FKS.cy-280,320,'170,40,90',.28*FKS.fa);ctx.globalCompositeOperation='source-over';drawFokFrame(ctx,FKS.st===2?(FKS.t<1.4?4:5):Math.floor(T*4)%4,FKS.cx,FKS.cy+4,560,false,.6*FKS.fa);ctx.restore();}
   drawThornFog(1);
+  if(FKS.flash>0){ctx.fillStyle=`rgba(255,240,250,${Math.min(1,FKS.flash).toFixed(3)})`;ctx.fillRect(0,0,W,H);}
   // the guiding roses keep a faint warm glow so they read through the fog
   ctx.save();ctx.globalCompositeOperation='lighter';for(const [bx,by] of THORN.blooms||[]){const px=(bx-cam.x)*zoom+W/2,py=(by-cam.y)*zoom+H/2;drawGlow(ctx,px,py,26*zoom,'235,40,60',.32+.06*Math.sin(T*2+bx));}ctx.restore();
   {const vg=ctx.createRadialGradient(W/2,H*.48,Math.min(W,H)*.32,W/2,H*.48,Math.max(W,H)*.78);vg.addColorStop(0,'rgba(4,3,10,0)');vg.addColorStop(1,'rgba(4,3,10,.6)');ctx.fillStyle=vg;ctx.fillRect(0,0,W,H);}
@@ -140,7 +146,37 @@ function vaneTrade(after){
   PARTY.lum.charm=null;{const i=BAG.indexOf('vanecharm');if(i>=0)BAG.splice(i,1);}syncMaxHp&&syncMaxHp();C1.charmQ=2;
   talk([['Vane',"Thank you, Lum. You don't know what this means to an old man."],['Vane',"In exchange… Here, take my lantern."]],false,()=>{giveItem('lantern');if(!C1.vanePotions){C1.vanePotions=1;setTimeout(()=>talk([['Vane',"And these. Two healing potions I've been saving for a rainy day. Seems the rain has come."]],false,()=>{BAG.push('potion','potion');TOAST.t=0;TOAST.name=ITEMS.potion.name+' ×2';TOAST.id='potion';MENU.newItems++;sfxItem&&sfxItem();setTimeout(vaneTradeRest,900);}),900);return;}vaneTradeRest();function vaneTradeRest(){
     setTimeout(()=>talk([['Vane',"The paths ahead twist and tangle, and some places are darker than night."],['Lum',"Thank you, Vane."],['Vane',"Bring the boy home safe. And… mind the shadows."]],false,()=>{GOAL.tag='NEW TASK';GOAL.text='Head east toward Stranglethorn Forest';HINT.goalT=0;after&&after();}),900);}});}
-function drawC1EndCard(){if(!C1.endCard)return;C1.endCard+=1/60;const t=C1.endCard,a=Math.min(1,t*1.5,(6-t)*1.2);if(t>6){C1.endCard=0;return;}ctx.save();ctx.setTransform(DPR,0,0,DPR,0,0);ctx.globalAlpha=Math.max(0,a);ctx.fillStyle='rgba(10,8,20,.6)';ctx.fillRect(0,H*.36-50,W,108);
-  ctx.textAlign='center';ctx.fillStyle='#efe6ff';ctx.font='700 22px "Alegreya SC", Georgia, serif';ctx.fillText('Stranglethorn Forest',W/2,H*.36);ctx.font='italic 15px Alegreya, Georgia, serif';ctx.fillStyle='rgba(239,230,255,.8)';ctx.fillText('The playtest ends here — this path is still being written.',W/2,H*.36+30);ctx.restore();}
+function drawC1EndCard(){if(!C1.endCard)return;C1.endCard+=1/60;const t=C1.endCard,a=Math.min(1,t*1.5,(6-t)*1.2);if(t>6){C1.endCard=0;if(C1.chEnd)backToTitle();return;}ctx.save();ctx.setTransform(DPR,0,0,DPR,0,0);ctx.globalAlpha=Math.max(0,a);ctx.fillStyle='rgba(10,8,20,.6)';ctx.fillRect(0,H*.36-50,W,108);
+  ctx.textAlign='center';ctx.fillStyle='#efe6ff';ctx.font='700 22px "Alegreya SC", Georgia, serif';ctx.fillText(C1.chEnd?'End of Chapter 1':'Stranglethorn Forest',W/2,H*.36);ctx.font='italic 15px Alegreya, Georgia, serif';ctx.fillStyle='rgba(239,230,255,.8)';ctx.fillText(C1.chEnd?'To be continued…':'The playtest ends here — this path is still being written.',W/2,H*.36+30);ctx.restore();}
 function drawC1Title(){if(!C1.title)return;C1.title+=1/60;const t=C1.title;if(t>5){C1.title=0;return;}const a=Math.min(1,t*1.2,(5-t)*1.2);ctx.save();ctx.setTransform(DPR,0,0,DPR,0,0);ctx.globalAlpha=a;ctx.fillStyle='rgba(20,14,30,.55)';ctx.fillRect(0,H*.3-46,W,92);ctx.textAlign='center';
   ctx.fillStyle='#fdf6e4';ctx.font='700 24px "Alegreya SC", Georgia, serif';ctx.fillText('Chapter 1',W/2,H*.3);ctx.restore();}
+
+/* ---------- the clearing past Stranglethorn: Cosmic waits, and Fokalur wakes ----------
+   st: 0 waiting · 1 talking · 2 transforming · 3 Fokalur speaks · 4 battle · 5 after the battle · 6 Fokalur fades · 7 farewell */
+const FKS={st:0,t:0,cx:CLR.x0+640,cy:CLR.cy,fa:0,ca:1,flash:0};
+function enterClearing(){SCENE='thorn';lum.x=CLR.x0+190;lum.y=CLR.cy;lum.face=1;lum.vx=lum.vy=0;lum.state='idle';cam.x=lum.x+120;cam.y=lum.y-50;resetJakFollow();
+  if(!FKS.st){GOAL.tag='TASK';GOAL.text='Reach Cosmic';HINT.goalT=0;}}
+function updateClearing(dt){if(C1.fkDone)return;FKS.t+=dt;FKS.flash=Math.max(0,FKS.flash-dt*.8);
+  if(FKS.st===0&&!DLG.active&&!FADE.dir&&!BATTLE.on&&lum.x>CLR.x0&&Math.hypot(lum.x-FKS.cx,(lum.y-FKS.cy)*1.2)<215){FKS.st=1;fkMeet();}
+  if(FKS.st===2){if(FKS.t>.6&&!FKS.flashed){FKS.flashed=1;FKS.flash=1;sfxRumble(2,1);}FKS.ca=Math.max(0,1-FKS.t/.8);FKS.fa=clamp((FKS.t-.6)/.8,0,1);if(FKS.t>2.4){FKS.st=3;fkReveal();}}
+  if(FKS.st===6){FKS.fa=Math.max(0,FKS.fa-dt*.7);if(FKS.fa<=0){FKS.st=7;fkFarewell();}}}
+const fkJak=()=>jakInParty();
+function fkMeet(){WEVENT.on=true;lum.vx=lum.vy=0;lum.state='idle';lum.face=1;
+  const L=[['Lum',"Cosmic! Oh, thank the stars… I've been searching all night!"]];
+  if(fkJak())L.push(['Jak',"So that's your apprentice? …Lum, wait. Something's wrong with him."]);
+  L.push(['Cosmic',"Master Lum… you shouldn't have followed me."],['Lum',"Don't be silly. Come here, let's get you home. The shop's far too quiet without you."],['Cosmic',"Home…"],['Cosmic',"The boy can't hear you anymore, little witch."],['Lum',"…That isn't your voice. Cosmic, what's happened to you?"]);
+  talk(L,false,()=>{FKS.st=2;FKS.t=0;sfxEerie();});}
+function fkReveal(){const L=[['Fokalur',"Your apprentice broke my seal with his own hands. His body is mine now."],['Fokalur',"I am Fokalur. And you will not be taking him home."]];
+  if(fkJak())L.push(['Jak',"Lum, get behind me!"]);
+  talk(L,false,()=>{FKS.st=4;WEVENT.on=false;lum.bumpT=0;startEncounter({kind:'fokalur',scene:'thorn',x:FKS.cx,y:FKS.cy,s:1,pack:1,calm:0,dead:0,scripted:true,boss:1,onLose:fkAfterLoss},'normal');});}
+function fkAfterLoss(){for(const id of PARTY_ORDER)HEROES[id].hp=Math.max(1,Math.round(HEROES[id].maxHp*.25));
+  SCENE='thorn';lum.x=FKS.cx-240;lum.y=FKS.cy;lum.face=1;lum.vx=lum.vy=0;lum.state='idle';cam.x=lum.x+120;cam.y=lum.y-50;resetJakFollow();FKS.st=5;FKS.fa=1;FKS.ca=0;WEVENT.on=true;
+  setTimeout(()=>talk([['Fokalur',fkJak()?"Is that all? A powder-maker and a lost traveller, against a god.":"Is that all? A powder-maker, against a god."],['Fokalur',"I'll let you live, witch. I want you to watch this world fall… knowing whose hands brought it down."]],false,()=>{FKS.st=6;FKS.flash=.8;sfxRumble(3,.9);}),900);}
+function fkFarewell(){const L=[['Lum',"Cosmic… I'm not giving up on you. I'll find a way to bring you back. I promise."]];if(fkJak())L.push(['Jak',"Then we'll find it together."]);
+  talk(L,false,()=>{C1.fkDone=1;C1.chEnd=1;finishChapter('ch1');C1.endCard=.001;});}
+function drawFKS(){const x=FKS.cx,y=FKS.cy;
+  if(FKS.ca>0&&ready(catlas)){const A=COS_ANIM.idle,dw=CFW*CSPR,dh=CFH*CSPR;ctx.save();ctx.globalAlpha=FKS.ca;ctx.fillStyle='rgba(0,0,0,.3)';ctx.beginPath();ctx.ellipse(x,y+2,26,7,0,0,TAU);ctx.fill();
+    ctx.translate(x,y+3);if(-1!==A.native)ctx.scale(-1,1);ctx.drawImage(catlas,A.frames[0]*CFW,0,CFW,CFH,-dw/2,-dh*(264/270),dw,dh);ctx.restore();
+    if(FKS.st>=1){ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,x,y-70,70,'170,40,90',.18*FKS.ca+.1*Math.sin(T*4)*FKS.ca);ctx.restore();}}
+  if(FKS.fa>0){const h=560,n=FKS.st===2?(FKS.t<1.4?4:5):Math.floor(T*4)%4;ctx.save();ctx.globalAlpha=FKS.fa;ctx.fillStyle='rgba(10,0,10,.45)';ctx.beginPath();ctx.ellipse(x,y,140,28,0,0,TAU);ctx.fill();ctx.restore();
+    ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,x,y-280,300,'160,30,80',(.22+.08*Math.sin(T*3))*FKS.fa);ctx.restore();drawFokFrame(ctx,n,x,y+4,h,false,FKS.fa);}}

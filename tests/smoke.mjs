@@ -264,7 +264,7 @@ const CASES = {
   async 'cosmic-sightings'(p) {
     await p.evaluate(() => window.__g.startThornPreview()); await wait(4500);
     const n = await p.evaluate(() => { const g = window.__g; g.DLG.active = false; g.THFOES.length = 0; return g.COSSEE.length; });
-    check(n === 4, 'expected 4 Cosmic sightings, got ' + n);
+    check(n === 5, 'expected 5 Cosmic sightings, got ' + n);
     const st = await p.evaluate(() => { const g = window.__g, s = g.COSSEE[0], Rw = Math.min(innerWidth, innerHeight) * .5; g.lum.x = s.x - Rw * .85; g.lum.y = s.y; g.lum.bumpT = 99; return 1; });
     await wait(700);
     check(await p.evaluate(() => window.__g.COSSEE[0].st === 1), 'Cosmic did not appear at the edge of the light');
@@ -272,6 +272,28 @@ const CASES = {
     await p.evaluate(() => { const g = window.__g, s = g.COSSEE[0]; g.lum.x = s.x - 60; }); await wait(400);
     const r = await p.evaluate(() => { const g = window.__g; return { st: g.COSSEE[0].st, seen: g.C1X.cosSeen0, line: g.DLG.active && g.DLG.lines[0][1] }; });
     check(r.st >= 2 && r.seen === 1 && /Cosmic/.test(r.line || ''), 'Cosmic did not vanish with a line from Lum: ' + JSON.stringify(r));
+  },
+  async 'fokalur-clearing'(p) {
+    const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop';
+    const until = async (fn, ms = 20000) => { for (let t = 0; t < ms; t += 250) { if (await p.evaluate(fn)) return true; await p.evaluate(() => { const g = window.__g; if (g.DLG.active) g.pressA(); }); await wait(250); } return false; };
+    await p.evaluate(() => window.__g.startThornPreview()); await wait(1500);
+    await p.evaluate(() => { const g = window.__g; g.jakJoin(); g.DLG.active = false; g.C1X.thornBoss = 1; for (let i = 0; i < 4; i++) g.C1X['cosSeen' + i] = 1; g.THFOES.length = 0; }); await wait(400);
+    await p.evaluate(() => { const g = window.__g, TW = g.CLR.x0 - 260; g.DLG.active = false; g.lum.x = TW - 70; g.lum.y = g.CLR.cy; }); await wait(900);
+    check(await p.evaluate(() => window.__g.C1X.cosSeen4 === 1), 'Cosmic did not appear one last time at the exit');
+    await p.evaluate(() => { window.__g.DLG.active = false; }); await wait(1800);
+    check(await p.evaluate(() => !!(window.__g.NEAR && window.__g.NEAR.door)), 'no door emote at the maze exit');
+    await p.evaluate(() => window.__g.pressA()); await wait(2200);
+    check(await p.evaluate(() => window.__g.lum.x > window.__g.CLR.x0), 'the exit door did not lead to the clearing');
+    await wait(1200); await p.screenshot({ path: path.join(SHOTS, `fokalur-clearing-arrive-${vp}.png`) });
+    await p.evaluate(() => { const g = window.__g; g.lum.x = g.FKS.cx - 200; g.lum.y = g.FKS.cy; }); await wait(500);
+    check(await p.evaluate(() => window.__g.FKS.st >= 1 && window.__g.DLG.active), 'walking up to Cosmic did not start the scene');
+    check(await until(() => window.__g.FKS.st === 3), 'Cosmic did not transform');
+    await wait(400); await p.screenshot({ path: path.join(SHOTS, `fokalur-clearing-reveal-${vp}.png`) });
+    check(await until(() => window.__g.BATTLE.on && window.__g.BATTLE.foes && window.__g.BATTLE.foes[0] && window.__g.BATTLE.foes[0].name === 'Fokalur'), 'the Fokalur battle did not start');
+    await wait(3500); await p.screenshot({ path: path.join(SHOTS, `fokalur-battle-${vp}.png`) });
+    await p.evaluate(() => { const B = window.__g.BATTLE; B.phase = 'lose'; B.t = 3; B.ending = 0; });
+    check(await until(() => window.__g.C1X.fkDone === 1, 40000), 'the scene after the battle did not finish the chapter');
+    check(await p.evaluate(() => window.__g.readSave() === null && window.__g.C1X.chEnd === 1), 'Chapter 1 end did not clear the save');
   },
   async 'deeproot-sleeping-fox'(p) {
     await startCh1(p);

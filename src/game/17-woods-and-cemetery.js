@@ -195,8 +195,8 @@ function drawSealFx(){if(!WEV.seal)return;const t=WEV.seal,x=lum.x,y=lum.y;ctx.s
     ctx.strokeStyle=`rgba(255,70,60,${(.7*a).toFixed(3)})`;ctx.lineWidth=2.5;for(let i=0;i<9;i++){const an=i/9*TAU+.3,len=t*90*(0.7+hash(i,3,9)*.6);ctx.beginPath();ctx.moveTo(x,y);let px=x,py=y;for(let k=1;k<=5;k++){px=x+Math.cos(an+(hash(i,k,7)-.5)*.5)*len*k/5;py=y+Math.sin(an+(hash(i,k,8)-.5)*.5)*len*k/5*.5;ctx.lineTo(px,py);}ctx.stroke();}}
   else{const a=Math.max(0,1-(t-2.6)/4);drawGlow(ctx,x,y-120,220,'170,40,90',.35*a+.12);}
   ctx.restore();}
-function drawFokalur(){const t=WEV.foka,h=280;let n=Math.floor(T*4)%4;if(t<.5)n=4;else if(t<2.2)n=5;else if(WEV.quake)n=6+(Math.floor(T*3)%2?0:0);else if(t<3)n=7;
-  ctx.fillStyle='rgba(10,0,10,.45)';ctx.beginPath();ctx.ellipse(lum.x,lum.y,70,14,0,0,TAU);ctx.fill();
-  ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,lum.x,lum.y-140,150,'160,30,80',.22+.08*Math.sin(T*3));ctx.restore();
+function drawFokalur(){const t=WEV.foka,h=560;let n=Math.floor(T*4)%4;if(t<.5)n=4;else if(t<2.2)n=5;else if(WEV.quake)n=6+(Math.floor(T*3)%2?0:0);else if(t<3)n=7;
+  ctx.fillStyle='rgba(10,0,10,.45)';ctx.beginPath();ctx.ellipse(lum.x,lum.y,140,28,0,0,TAU);ctx.fill();
+  ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,lum.x,lum.y-280,300,'160,30,80',.22+.08*Math.sin(T*3));ctx.restore();
   drawFokFrame(ctx,n,lum.x,lum.y+4,h,lum.face<0,Math.min(1,t*3));}
 
