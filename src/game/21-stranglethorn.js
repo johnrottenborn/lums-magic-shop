@@ -46,7 +46,7 @@ function thornFree(x,y){if(x<18||y<14||y>TH_-14)return false;if(x>TW_-12&&Math.f
   return true;}
 function solveThorn(px,py,nx,ny){if(thornFree(nx,ny))return [nx,ny];if(thornFree(nx,py))return [nx,py];if(thornFree(px,ny))return [px,ny];return [px,py];}
 function enterThorn(){buildThorn();if(!THORN.spiders)buildThornCritters();buildThornFoes();SCENE='thorn';lum.x=40;lum.y=TMZ.start*TCH+TCH/2+10;lum.face=1;lum.vx=lum.vy=0;lum.state='idle';lum.alpha=1;cam.x=lum.x+120;cam.y=lum.y-50;THORN.t=0;resetJakFollow();if(!C1.jak&&!C1.jakSeenT)C1.jakSeenT=0;GOAL.tag='TASK';GOAL.text='Follow the red flowers through Stranglethorn';HINT.goalT=0;}
-function startThornPreview(){audioInit();c1Reset();C1.introDone=1;C1.hedgeSeen=1;C1I.on=false;WEVENT.on=false;INTRO.lumShown=true;if(!BAG.includes('lantern'))BAG.push('lantern');FADE.a=1;FADE.dir=-1;enterThorn();}
+function startThornPreview(){SAVEC.finished=0;audioInit();c1Reset();C1.introDone=1;C1.hedgeSeen=1;C1I.on=false;WEVENT.on=false;INTRO.lumShown=true;if(!BAG.includes('lantern'))BAG.push('lantern');FADE.a=1;FADE.dir=-1;enterThorn();}
 function updateThorn(dt){updateThornAtmos(dt);updateThornCritters(dt);updateThornFoes(dt);updateJakFollow(dt);
   if(!C1.jak&&!C1.jakSpotted&&!DLG.active&&!FADE.dir&&Math.hypot(lum.x-JAKREST.x,lum.y-JAKREST.y)<300){C1.jakSpotted=1;talk([['Lum',"Someone's there… slumped against the roots of that old oak."]]);}
   if(!C1.thornBoss&&lum.x>12*TCW+TCW*.8&&Math.floor(lum.y/TCH)===2){lum.x=12*TCW+TCW*.8;}const k=Math.min(1,dt*4.5);cam.x+=(lum.x+40-cam.x)*k;cam.y+=(lum.y-50-cam.y)*k;const vw=W/zoom,vh=H/zoom;cam.x=clamp(cam.x,vw/2-80,TW_+80-vw/2);cam.y=clamp(cam.y,-200+vh/2,TH_+60-vh/2);THORN.t+=dt;

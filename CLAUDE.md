@@ -61,6 +61,7 @@ To find something, grep `src/game` for the function or constant name. Don't read
 - **Never put subtitles on area titles.**
 - **Screen changes always use the small black door emote** that the player must interact with. No automatic transitions.
 - **Every combo move needs 5 stars** (`COMBO_MAX = 5`). Lum's combo is Starfall; Jak's is Staff Bolt.
+- **Finishing a chapter removes Continue from the title menu.** Call `finishChapter('<id>')` (in 18-save) at the end of every chapter; the prologue already does. Chapter 1's ending must call it too when it is built.
 - The spellbook party row shows only members who have joined (1–4). No empty placeholders.
 - Chapter 1 has no final name yet. The title card "The Morning After" and the chapter-select labels are placeholders.
 - Talk the story through with the designer before building new story content. Ask before big changes.

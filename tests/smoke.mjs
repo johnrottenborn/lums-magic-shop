@@ -106,6 +106,14 @@ const CASES = {
     await p.evaluate(() => window.__g.pressA());
     check(await p.evaluate(() => window.__g.WIPEX.label) === 'First Strike!', 'tapping by the sword did not start First Strike');
   },
+  async 'prologue-end-clears-continue'(p) {
+    check(await p.evaluate(() => { localStorage.setItem('lums-magic-shop-save-v1', JSON.stringify({ v: 1, sv: 1, t: Date.now(), scene: 'garden' })); return !!window.__g.readSave(); }), 'test save was not written');
+    await p.evaluate(() => { const g = window.__g; g.INTRO.on = false; g.INTRO.waiting = false; g.enterWoods(); g.WEV.end = 7; });
+    await wait(1200);
+    check(await p.evaluate(() => window.__g.readSave()) === null, 'finishing the prologue left a save behind');
+    await p.reload(); await p.waitForFunction(() => window.__g, null, { timeout: 15000 }); await wait(1500);
+    check(await p.evaluate(() => window.__g.readSave()) === null, 'a save came back after reloading');
+  },
   async 'deeproot-sleeping-fox'(p) {
     await startCh1(p);
     await p.evaluate(() => { const g = window.__g; g.C1X.bigVixen = 0; g.enterDun(5, 900, 600, -1);

@@ -53,7 +53,7 @@ function fmtTime(t){t=Math.floor(t);const h=Math.floor(t/3600),m=Math.floor(t/60
 function drawStar(x,y,r,fill){ctx.save();ctx.translate(x,y);ctx.beginPath();for(let k=0;k<10;k++){const a=k/10*TAU-Math.PI/2,rr_=k%2?r*.45:r;ctx.lineTo(Math.cos(a)*rr_,Math.sin(a)*rr_);}ctx.closePath();
   ctx.fillStyle='rgba(255,255,255,.08)';ctx.fill();if(fill>0){ctx.save();ctx.clip();ctx.fillStyle='#f5c542';ctx.fillRect(-r,-r,2*r*fill,2*r);ctx.restore();ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,0,0,r*1.6,'255,200,90',.25*fill);ctx.restore();}
   ctx.strokeStyle=fill>0?'#ffe7a0':'rgba(232,226,242,.45)';ctx.lineWidth=1.6;ctx.stroke();ctx.restore();}
-function drawResults(t){if(!RESULTS.r){RESULTS.r=prologueScore();RESULTS.badges=earnedBadges(RESULTS.r);RESULTS.keep=keepsakeFor(RESULTS.r.stars);recordPrologue(RESULTS.r.stars,RESULTS.badges,RESULTS.keep);RESULTS.fired=[];RESULTS.sp=[];}
+function drawResults(t){if(!RESULTS.r){RESULTS.r=prologueScore();RESULTS.badges=earnedBadges(RESULTS.r);RESULTS.keep=keepsakeFor(RESULTS.r.stars);recordPrologue(RESULTS.r.stars,RESULTS.badges,RESULTS.keep);finishChapter('prologue');RESULTS.fired=[];RESULTS.sp=[];}
   const R=RESULTS.r,S_=STATS,a=Math.min(1,t/1.2),dt=1/60;RESULTS.hits=[];ctx.save();ctx.globalAlpha=a;ctx.textAlign='center';ctx.textBaseline='alphabetic';
   const pw=Math.min(W-32,390),px=W/2-pw/2;let y=Math.max(46,H*.06);
   ctx.fillStyle='rgba(232,226,242,.6)';ctx.font='italic 14px Alegreya, Georgia, serif';ctx.fillText('End of Prologue',W/2,y);y+=30;

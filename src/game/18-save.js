@@ -7,7 +7,10 @@ function snapshot(){if(C1.jak)C1.jakHp=HEROES.jak.hp;return {v:1,sv:SAVE_VER,t:D
   left:{well:WSLIMES.length,study:SSLIMES.length,shed:SHSLIMES.length,pond:PSLIMES.length,slugs:SLUGS.filter(g=>g.kind!=='slugking').length,skels:WSKELS.length},
   ch:CH,c1:{...C1,endCard:0,title:0},powders:{...POWDERS},wf:WFOES.map(g=>g.id),c1built:woodsC1Built,
   night:{on:NIGHT.on,cut:NIGHT.cut,rain:NIGHT.rain,nudged:NIGHT.nudged||0},stats:STATS,wev:{mid:WEV.mid,circle:WEV.circle,cem:WEV.cem,entered:WEV.entered||0},shopDoor,pondReturn};}
-function saveGame(){try{localStorage.setItem(SAVE_KEY,JSON.stringify(snapshot()));}catch(e){}}
+/* a finished chapter leaves no save behind, so the title menu drops Continue. Call finishChapter() at the end of every chapter. */
+function clearSave(){try{localStorage.removeItem(SAVE_KEY);}catch(e){}}
+function finishChapter(id){try{const p=readProg();p[id]=Object.assign(p[id]||{},{done:1});localStorage.setItem(PROG_KEY,JSON.stringify(p));}catch(e){}clearSave();SAVEC.finished=1;}
+function saveGame(){if(SAVEC.finished)return;try{localStorage.setItem(SAVE_KEY,JSON.stringify(snapshot()));}catch(e){}}
 function autosave(dt){SAVEC.t+=dt;if(SAVEC.t>1&&canSave()){SAVEC.t=0;saveGame();}
   // rooms fill with foes when first entered; on a continued game, trim them back to what was left
   const L_={well:[WSLIMES,()=>slimesSpawned],study:[SSLIMES,()=>sslimesSpawned],shed:[SHSLIMES,()=>shedSpawned],pond:[PSLIMES,()=>pondSlimesSpawned]};
@@ -33,7 +36,7 @@ function applySave(d){if(d.ch===1){applySaveC1(d);return;}const f=d.f||{};if(d.s
   cam.x=lum.x;cam.y=lum.y-50;if(sc==='woods'){cam.x=lum.x+60;}WCAM.x=lum.x;
   TUT.stage=d.tut||0;GOAL.tag='TASK';GOAL.text=(d.goal&&d.goal.text)||GOAL.text;HINT.goalT=0;
   if(sc==='woods'&&skelDone>=3)setTimeout(fokalurEvent,1500);}
-function newGame(){try{localStorage.removeItem(SAVE_KEY);}catch(e){}beginIntro();}
+function newGame(){clearSave();SAVEC.finished=0;beginIntro();}
 /* save versioning: bump SAVE_VER whenever a change could break older saves, and add a step to MIGRATIONS */
 const SAVE_VER=2;
 const MIGRATIONS={
