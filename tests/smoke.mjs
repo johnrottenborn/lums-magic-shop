@@ -261,6 +261,18 @@ const CASES = {
     await p.evaluate(() => { const B = window.__g.BATTLE; B.phase = 'win'; B.t = 1; B.rewarded = 0; }); await wait(600);
     check(await p.evaluate(() => window.__g.BAG.includes('foxsuit') && window.__g.C1X.lairBoss === 1), 'beating the boss did not give the Fox Suit');
   },
+  async 'cosmic-sightings'(p) {
+    await p.evaluate(() => window.__g.startThornPreview()); await wait(4500);
+    const n = await p.evaluate(() => { const g = window.__g; g.DLG.active = false; g.THFOES.length = 0; return g.COSSEE.length; });
+    check(n === 4, 'expected 4 Cosmic sightings, got ' + n);
+    const st = await p.evaluate(() => { const g = window.__g, s = g.COSSEE[0], Rw = Math.min(innerWidth, innerHeight) * .5; g.lum.x = s.x - Rw * .85; g.lum.y = s.y; g.lum.bumpT = 99; return 1; });
+    await wait(700);
+    check(await p.evaluate(() => window.__g.COSSEE[0].st === 1), 'Cosmic did not appear at the edge of the light');
+    await p.screenshot({ path: path.join(SHOTS, 'cosmic-sighting-' + (p.viewportSize().width < 600 ? 'phone' : 'desktop') + '.png') });
+    await p.evaluate(() => { const g = window.__g, s = g.COSSEE[0]; g.lum.x = s.x - 60; }); await wait(400);
+    const r = await p.evaluate(() => { const g = window.__g; return { st: g.COSSEE[0].st, seen: g.C1X.cosSeen0, line: g.DLG.active && g.DLG.lines[0][1] }; });
+    check(r.st >= 2 && r.seen === 1 && /Cosmic/.test(r.line || ''), 'Cosmic did not vanish with a line from Lum: ' + JSON.stringify(r));
+  },
   async 'deeproot-sleeping-fox'(p) {
     await startCh1(p);
     await p.evaluate(() => { const g = window.__g; g.C1X.bigVixen = 0; g.enterDun(5, 900, 600, -1);

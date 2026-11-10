@@ -91,8 +91,8 @@ function drawThorn(){const vw=W/zoom,vh=H/zoom,x0=cam.x-vw/2-60,y0=cam.y-vh/2-60
   drawCellarMouth();
   for(const f of THORN.flowers)if(f.x>x0-30&&f.x<x1+30&&f.y>y0-30&&f.y<y1)drawRedFlowers(f.x,f.y,f.s,f.seed);
   const L=[];for(const o of THORN.props)if(o.x>x0-o.w/2-40&&o.x<x1+o.w/2+40&&o.y>y0-20&&o.y<y1+o.w*1.4)L.push([o.y,o]);L.push([lum.y,null]);L.sort((a,b)=>a[0]-b[0]);
-  for(const g of THFOES)if(g.x>x0-150&&g.x<x1+150&&g.y>y0-60&&g.y<y1+260)L.push([g.y,{t:'thfoe',ref:g}]);if(!C1.thornBoss)L.push([THBOSS.y,{t:'boss'}]);if(!C1.jak)L.push([JAKREST.y,{t:'jakrest'}]);else if(JAKF&&jakInParty())L.push([JAKF.y,{t:'jak'}]);L.sort((a,b)=>a[0]-b[0]);
-  THORN.blooms=[];let past=false;for(const [,o] of L){if(!o){drawLum();past=true;continue;}if(o.t==='thfoe'){drawThornFoe(o.ref);continue;}if(o.t==='boss'){drawThornBoss();continue;}if(o.t==='jakrest'){drawJakResting();continue;}if(o.t==='jak'){drawJakOW();continue;}let fa=1;if(past){const kx=clamp(1-(Math.abs(o.x-lum.x)-o.w*.2)/(o.w*.3),0,1),ky=clamp(1-(o.y-lum.y-o.w*.7)/(o.w*.35),0,1);fa=1-kx*ky*(o.t==='arch'?.4:.58);}drawThornProp(o,fa);}
+  for(const g of THFOES)if(g.x>x0-150&&g.x<x1+150&&g.y>y0-60&&g.y<y1+260)L.push([g.y,{t:'thfoe',ref:g}]);if(!C1.thornBoss)L.push([THBOSS.y,{t:'boss'}]);for(const s_ of COSSEE)if(s_.st===1||s_.st===2)L.push([s_.y,{t:'cosghost',ref:s_}]);if(!C1.jak)L.push([JAKREST.y,{t:'jakrest'}]);else if(JAKF&&jakInParty())L.push([JAKF.y,{t:'jak'}]);L.sort((a,b)=>a[0]-b[0]);
+  THORN.blooms=[];let past=false;for(const [,o] of L){if(!o){drawLum();past=true;continue;}if(o.t==='thfoe'){drawThornFoe(o.ref);continue;}if(o.t==='boss'){drawThornBoss();continue;}if(o.t==='cosghost'){drawCosGhost(o.ref);continue;}if(o.t==='jakrest'){drawJakResting();continue;}if(o.t==='jak'){drawJakOW();continue;}let fa=1;if(past){const kx=clamp(1-(Math.abs(o.x-lum.x)-o.w*.2)/(o.w*.3),0,1),ky=clamp(1-(o.y-lum.y-o.w*.7)/(o.w*.35),0,1);fa=1-kx*ky*(o.t==='arch'?.4:.58);}drawThornProp(o,fa);}
   drawForage(THORN.forage||[]);drawThornCritters(x0,y0,x1,y1);drawThornWebs(x0,y0,x1,y1);
   drawThornMotes();
   ctx.save();ctx.globalCompositeOperation='lighter';for(const m of THORN.mist){if(m.x<x0-m.r||m.x>x1+m.r||m.y<y0-m.r||m.y>y1+m.r)continue;drawGlow(ctx,m.x+Math.sin(T*.08+m.ph)*50,m.y,m.r,'150,90,110',.05+.025*Math.sin(T*.4+m.ph));}ctx.restore();
@@ -101,8 +101,8 @@ function drawThorn(){const vw=W/zoom,vh=H/zoom,x0=cam.x-vw/2-60,y0=cam.y-vh/2-60
   ctx.save();ctx.globalCompositeOperation='saturation';ctx.fillStyle='rgba(128,128,128,.32)';ctx.fillRect(0,0,W,H);ctx.globalCompositeOperation='multiply';ctx.fillStyle='rgb(190,192,214)';ctx.fillRect(0,0,W,H);ctx.restore();
   drawThornFog(0);
   // darkness, held back by Vane's lantern
-  const sx=(lum.x-cam.x)*zoom+W/2,sy=(lum.y-70-cam.y)*zoom+H/2,R=Math.min(W,H)*.6*(1+.025*Math.sin(T*7)+.018*Math.sin(T*17.3)+.01*Math.sin(T*31));const g=ctx.createRadialGradient(sx,sy,R*.12,sx,sy,R);
-  g.addColorStop(0,'rgba(8,4,14,0)');g.addColorStop(.45,'rgba(8,4,14,.18)');g.addColorStop(1,'rgba(6,3,12,.6)');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  const sx=(lum.x-cam.x)*zoom+W/2,sy=(lum.y-70-cam.y)*zoom+H/2,R=Math.min(W,H)*.5*(1+.025*Math.sin(T*7)+.018*Math.sin(T*17.3)+.01*Math.sin(T*31));const g=ctx.createRadialGradient(sx,sy,R*.12,sx,sy,R);
+  g.addColorStop(0,'rgba(8,4,14,0)');g.addColorStop(.4,'rgba(8,4,14,.26)');g.addColorStop(.8,'rgba(6,3,12,.66)');g.addColorStop(1,'rgba(5,2,10,.8)');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
   ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,sx+lum.face*14*zoom,sy+10*zoom,90*zoom,'255,190,110',.16+.03*Math.sin(T*9));ctx.restore();
   drawThornFog(1);
   // the guiding roses keep a faint warm glow so they read through the fog

@@ -41,6 +41,18 @@ function buildThorn(){if(THORN.built)return;THORN.built=true;const P=THORN.props
       const k=KS[got.length%3],side=H_(r,c,99)<.5?-1:1,x=c*TCW+TCW/2+side*(45+H_(r,c,101)*25),y=r*TCH+TCH*.42+(H_(r,c,103)-.5)*40;
       P.push({t:'shrub',k,x,y,s:SHR[k].s*1.05,flip:side>0,ph:x*.01,w:180});THORN.forage.push({x,y,id:FORAGE_MAP[k],n:2,picked:0});}}
   THORN.mist=[];for(let i=0;i<40;i++)THORN.mist.push({x:hash(i,1,77)*TW_,y:hash(i,2,77)*TH_,r:160+hash(i,3,77)*220,ph:hash(i,4,77)*TAU});}
+/* glimpses of Cosmic at the edge of the lantern light along the red-rose path; each happens once */
+const COSSEE=[],COS_LINES=["Cosmic? I am coming for you!","Cosmic! Wait for me!","Was that… Cosmic? Don't run off!","I saw you, Cosmic! Hold on, I'm coming!"];
+function buildCosSightings(){if(COSSEE.length)return;const p=THORN.path,n=p.length;[.22,.42,.62,.8].forEach((f,i)=>{const [r,c]=p[Math.round(f*(n-1))];COSSEE.push({i,x:c*TCW+TCW/2,y:r*TCH+TCH/2+20,st:0,t:0,a:0,face:-1});});}
+function updateCosSightings(dt){buildCosSightings();const Rw=Math.min(W,H)*.5/zoom,free=!DLG.active&&!BATTLE.on&&!BATTLE.pending&&!MENU.open&&!WEVENT.on&&!FADE.dir;
+  for(const s of COSSEE){if(C1['cosSeen'+s.i]){s.st=3;continue;}const d=Math.hypot(lum.x-s.x,(lum.y-s.y)*1.2);s.t+=dt;
+    if(s.st===0&&free&&d<Rw*.95){s.st=1;s.t=0;s.face=lum.x<s.x?-1:1;}
+    else if(s.st===1){s.a=Math.min(.95,s.a+dt*2);s.face=lum.x<s.x?-1:1;if(d<Rw*.5||s.t>2.4){s.st=2;s.t=0;s.face=-s.face;C1['cosSeen'+s.i]=1;if(!DLG.active)say(COS_LINES[s.i%COS_LINES.length]);}}
+    else if(s.st===2){s.x+=s.face*70*dt;s.a=Math.max(0,s.a-dt*.9);if(s.a<=0)s.st=3;}}}
+function drawCosGhost(s){if(!ready(catlas)||s.a<=0)return;const A=s.st===2?COS_ANIM.walk:COS_ANIM.idle,fr=s.st===2?A.frames[Math.floor(s.t*10)%A.frames.length]:A.frames[0];
+  ctx.save();ctx.globalAlpha=s.a;ctx.fillStyle='rgba(0,0,0,.25)';ctx.beginPath();ctx.ellipse(s.x,s.y+2,26,7,0,0,TAU);ctx.fill();
+  ctx.translate(s.x,s.y+3);if(s.face!==A.native)ctx.scale(-1,1);const dw=CFW*CSPR,dh=CFH*CSPR;ctx.filter='brightness(1.15) saturate(.85)';ctx.drawImage(catlas,fr*CFW,0,CFW,CFH,-dw/2,-dh*(264/270),dw,dh);ctx.restore();
+  ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,s.x,s.y-70,60,'140,170,255',.22*s.a);ctx.restore();}
 function thornFree(x,y){if(x<18||y<14||y>TH_-14)return false;if(x>TW_-12&&Math.floor(y/TCH)!==TMZ.finish)return false;if(x>TW_+30)return false;
   const c=clamp(Math.floor(x/TCW),0,TMZ.C-1),r=clamp(Math.floor(y/TCH),0,TMZ.R-1),lx=x-c*TCW,ly=y-r*TCH,T_=34,B_=24,SX=42;
   if(ly<B_&&hW(r,c))return false;if(ly>TCH-T_&&hW(r+1,c))return false;if(lx<SX&&vW(r,c))return false;if(lx>TCW-SX&&vW(r,c+1))return false;
@@ -55,7 +67,7 @@ function thornFree(x,y){if(x<18||y<14||y>TH_-14)return false;if(x>TW_-12&&Math.f
 function solveThorn(px,py,nx,ny){if(thornFree(nx,ny))return [nx,ny];if(thornFree(nx,py))return [nx,py];if(thornFree(px,ny))return [px,ny];return [px,py];}
 function enterThorn(){buildThorn();if(!THORN.fint){THORN.fint=1;for(const f of THORN.forage)THINT.push({x:f.x,y:f.y,reach:76,lum:true,forage:f,onInteract:()=>pickForage(f)});}for(const f of THORN.forage)f.picked=0;if(!THORN.spiders)buildThornCritters();buildThornFoes();SCENE='thorn';lum.x=40;lum.y=TMZ.start*TCH+TCH/2+10;lum.face=1;lum.vx=lum.vy=0;lum.state='idle';lum.alpha=1;cam.x=lum.x+120;cam.y=lum.y-50;THORN.t=0;resetJakFollow();if(!C1.jak&&!C1.jakSeenT)C1.jakSeenT=0;GOAL.tag='TASK';GOAL.text='Follow the red flowers through Stranglethorn';HINT.goalT=0;}
 function startThornPreview(){SAVEC.finished=0;audioInit();c1Reset();C1.introDone=1;C1.hedgeSeen=1;C1I.on=false;WEVENT.on=false;INTRO.lumShown=true;if(!BAG.includes('lantern'))BAG.push('lantern');FADE.a=1;FADE.dir=-1;enterThorn();}
-function updateThorn(dt){updateThornAtmos(dt);updateThornCritters(dt);updateThornFoes(dt);updateJakFollow(dt);
+function updateThorn(dt){updateThornAtmos(dt);updateCosSightings(dt);updateThornCritters(dt);updateThornFoes(dt);updateJakFollow(dt);
   if(!C1.jak&&!C1.jakSpotted&&!DLG.active&&!FADE.dir&&Math.hypot(lum.x-JAKREST.x,lum.y-JAKREST.y)<300){C1.jakSpotted=1;talk([['Lum',"Someone's there… slumped against the roots of that old oak."]]);}
   if(!C1.thornBoss&&lum.x>12*TCW+TCW*.8&&Math.floor(lum.y/TCH)===2){lum.x=12*TCW+TCW*.8;}const k=Math.min(1,dt*4.5);cam.x+=(lum.x+40-cam.x)*k;cam.y+=(lum.y-50-cam.y)*k;const vw=W/zoom,vh=H/zoom;cam.x=clamp(cam.x,vw/2-80,TW_+80-vw/2);cam.y=clamp(cam.y,-200+vh/2,TH_+60-vh/2);THORN.t+=dt;
   if(lum.x>TW_-30&&!C1.thornEnd&&!DLG.active){C1.thornEnd=1;C1.endCard=.001;}}
