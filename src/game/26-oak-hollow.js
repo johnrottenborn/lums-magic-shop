@@ -37,12 +37,12 @@ function webInteract(){if(C1.webCut){dunGo(4,700,730,-1);return;}
 const DFOES=[];let dfoesBuilt=false;
 function buildDFoes(){if(dfoesBuilt)return;dfoesBuilt=true;DFOES.length=0;let id=0;
   if(!C1.vixen)DFOES.push({id:90,kind:'vixen',scene:'dun',room:4,x:790,y:610,hx:790,hy:610,tx:790,ty:610,s:1,pack:1,calm:0,ph:0,t:0,face:1,still:1});
-  if(!C1.bigVixen)DFOES.push({id:91,kind:'bigvixen',scene:'dun',room:5,x:720,y:585,hx:720,hy:585,tx:720,ty:585,s:1.4,pack:1,calm:0,ph:0,t:0,face:-1,still:1,asleep:1});
+  if(!C1.bigVixen)DFOES.push({id:91,kind:'bigvixen',scene:'dun',room:5,x:720,y:585,hx:720,hy:585,tx:720,ty:585,s:1.4,pack:1,calm:0,ph:0,t:0,face:1,still:1,asleep:1});
   for(const [room,x,y] of [[3,520,660],[3,1050,650],[5,560,690]])DFOES.push({id:id++,kind:'spider',scene:'dun',room,x,y,hx:x,hy:y,tx:x,ty:y,s:1,pack:1,calm:0,ph:rnd(0,TAU),t:0,face:-1});
   for(const [room,x,y] of [[2,520,700],[2,950,690],[5,900,690]])DFOES.push({id:id++,kind:'bat',scene:'dun',room,x,y,hx:x,hy:y,tx:x,ty:y,s:1,pack:1,calm:0,ph:rnd(0,TAU),t:0,face:-1});}
 function updateDFoes(dt){const ok=!DLG.active&&!WEVENT.on&&!MENU.open&&!FADE.dir&&!BATTLE.on&&!BATTLE.pending&&!CHOICE.on&&!MIX.on;
   for(const g of DFOES){if(g.room!==DUN.room)continue;g.ph+=dt;g.t+=dt;g.calm=Math.max(0,g.calm-dt);const d=Math.hypot(lum.x-g.x,lum.y-g.y);
-    if(g.still){g.face=lum.x<g.x?-1:1;if(g.kind==='vixen'&&ok&&!g.calm&&d<130&&lum.bumpT<=0)startEncounter(g,'normal');continue;}
+    if(g.still){g.face=g.asleep?1:lum.x<g.x?-1:1;if(g.kind==='vixen'&&ok&&!g.calm&&d<130&&lum.bumpT<=0)startEncounter(g,'normal');continue;}
     if(ok&&!g.calm&&d<230){g.tx=lum.x;g.ty=lum.y;if(d<60&&lum.bumpT<=0){startEncounter(g,'ambush');continue;}}
     else if(g.t>2.5||Math.hypot(g.tx-g.x,g.ty-g.y)<10){g.t=0;const a=rnd(0,TAU);g.tx=g.hx+Math.cos(a)*rnd(40,160);g.ty=g.hy+Math.sin(a)*rnd(10,50);}
     if(!ok)continue;const dx=g.tx-g.x,dy=g.ty-g.y,dd=Math.hypot(dx,dy)||1,sp=d<230&&!g.calm?95:55;const nx=g.x+dx/dd*sp*dt,ny=g.y+dy/dd*sp*dt;if(dunFree(nx,ny)){g.x=nx;g.y=ny;}else{g.tx=g.hx;g.ty=g.hy;}if(Math.abs(dx)>4)g.face=dx<0?-1:1;}}

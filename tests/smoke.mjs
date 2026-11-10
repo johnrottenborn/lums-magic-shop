@@ -85,6 +85,14 @@ const CASES = {
     await p.evaluate(() => window.__g.enterThorn()); await wait(1800);
     check(await p.evaluate(() => window.__g.SCENE) === 'thorn', 'Stranglethorn maze did not open');
   },
+  async 'deeproot-sleeping-fox'(p) {
+    await startCh1(p);
+    await p.evaluate(() => { const g = window.__g; g.C1X.bigVixen = 0; g.enterDun(5, 900, 600, -1);
+      for (let i = g.DFOES.length - 1; i >= 0; i--) if (g.DFOES[i].kind !== 'bigvixen') g.DFOES.splice(i, 1); }); await wait(1500);
+    const fox = await p.evaluate(() => { const f = window.__g.DFOES.find(f => f.kind === 'bigvixen'); return f && { face: f.face, asleep: f.asleep }; });
+    check(fox && fox.asleep, 'sleeping fox missing from Deeproot');
+    check(fox.face > 0, 'sleeping fox turned to face Lum instead of facing right');
+  },
 };
 
 const browser = await chromium.launch();
