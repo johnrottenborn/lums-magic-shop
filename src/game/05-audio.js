@@ -49,7 +49,7 @@ const NOTE=n=>440*Math.pow(2,(n-69)/12);
 const PROG=[[50,[62,66,69,73]],[47,[59,62,66,69]],[43,[55,59,62,66]],[45,[57,61,64,69]],[50,[62,66,69,74]],[54,[57,61,66,69]],[43,[55,59,64,67]],[45,[57,61,64,67]]];
 const MEL=[[78,-1,81,-1,78,76,-1,74],[76,-1,-1,74,73,-1,71,-1],[74,-1,79,-1,78,-1,74,-1],[76,-1,73,-1,69,-1,-1,-1],[78,-1,81,83,81,-1,78,-1],[76,-1,78,-1,73,-1,-1,-1],[74,76,79,-1,78,76,74,-1],[73,-1,76,-1,74,-1,-1,-1]];
 const ARP=[0,1,2,3,2,1,2,1],EIGHTH=60/64/2;
-function scheduleMusic(){if(BMUS.on){scheduleBattleMusic();return;}if(NIGHT.on){SND.nextNote=SND.ctx.currentTime+.1;return;}if(CH>0&&(SCENE==='woods'||SCENE==='dun'||SCENE==='thorn')){scheduleWoodsMusic();return;}SND.wStep=0;const c=SND.ctx;while(SND.nextNote<c.currentTime+.25){const t=SND.nextNote,s=SND.step,bar=Math.floor(s/8)%PROG.length,e=s%8,[root,ch]=PROG[bar],section=Math.floor(s/64)%4;
+function scheduleMusic(){if(BMUS.on){scheduleBattleMusic();return;}if(NIGHT.on){SND.nextNote=SND.ctx.currentTime+.1;return;}if(CH>0&&(SCENE==='woods'||SCENE==='dun'||SCENE==='thorn'||SCENE==='thgate')){scheduleWoodsMusic();return;}SND.wStep=0;const c=SND.ctx;while(SND.nextNote<c.currentTime+.25){const t=SND.nextNote,s=SND.step,bar=Math.floor(s/8)%PROG.length,e=s%8,[root,ch]=PROG[bar],section=Math.floor(s/64)%4;
     if(e===0){pluck(t,NOTE(root-12),.22,2.6,SND.music,0,.5);pad(t,ch.slice(0,3).map(NOTE),EIGHTH*8+.4,.012);}
     if(e===4)pluck(t,NOTE(root),.12,1.8,SND.music,0,.5);
     pluck(t+(Math.random()-.5)*.012,NOTE(ch[ARP[e]]),.07+(e===0?.03:0),1.6,SND.music,(ARP[e]-1.5)*.25,.7);
