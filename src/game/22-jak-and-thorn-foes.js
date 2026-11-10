@@ -53,7 +53,7 @@ const THINT=[{x:JAKREST.x,y:JAKREST.y,reach:95,onInteract:()=>jakInteract()},{x:
   // under the spider web in the middle of the maze: a third well, down to the Ember Hollow
   {x:5*TCW+TCW/2,y:4*TCH+58,reach:100,door:true,onInteract:()=>dunGo(9,370,650,1)},
   // the maze's exit, once the Broodmother is gone: on to the clearing
-  {x:TW_-40,y:TMZ.finish*TCH+TCH/2+10,reach:90,door:true,onInteract:()=>goScene(enterClearing)},
+  {x:TW_,y:TMZ.finish*TCH+TCH/2+10,reach:165,door:true,onInteract:()=>goScene(enterClearing)},
   // and back again, before Lum reaches Cosmic
   {x:TW_+260+95,y:TMZ.finish*TCH+TCH/2+10,reach:80,door:true,onInteract:()=>{if(FKS.st)return;goScene(()=>{lum.x=TW_-120;lum.y=TMZ.finish*TCH+TCH/2+10;lum.face=-1;cam.x=lum.x;cam.y=lum.y-50;resetJakFollow();});}}];
 

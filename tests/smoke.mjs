@@ -282,6 +282,11 @@ const CASES = {
     check(await p.evaluate(() => window.__g.C1X.cosSeen4 === 1), 'Cosmic did not appear one last time at the exit');
     await p.evaluate(() => { window.__g.DLG.active = false; }); await wait(1800);
     check(await p.evaluate(() => !!(window.__g.NEAR && window.__g.NEAR.door)), 'no door emote at the maze exit');
+    // anywhere in the exit gap, not just its middle
+    for (const [dx, dy] of [[25, -125], [25, 105], [-60, -120], [10, 0]]) {
+      await p.evaluate(([dx, dy]) => { const g = window.__g, TW = g.CLR.x0 - 260; g.lum.x = TW + dx; g.lum.y = g.CLR.cy + dy; }, [dx, dy]); await wait(500);
+      check(await p.evaluate(() => !!(window.__g.NEAR && window.__g.NEAR.door)), `no door emote at the edge of the exit gap (${dx}, ${dy})`);
+    }
     await p.evaluate(() => window.__g.pressA()); await wait(2200);
     check(await p.evaluate(() => window.__g.lum.x > window.__g.CLR.x0), 'the exit door did not lead to the clearing');
     await wait(1200); await p.screenshot({ path: path.join(SHOTS, `fokalur-clearing-arrive-${vp}.png`) });
