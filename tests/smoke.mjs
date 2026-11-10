@@ -163,6 +163,22 @@ const CASES = {
     check(await p.evaluate(() => window.__g.HEROES_X.lum.hp === window.__g.HEROES_X.lum.maxHp), 'drinking did not restore HP');
     await wait(800);
   },
+  async 'thornroot-cellar'(p) {
+    await p.evaluate(() => window.__g.startThornPreview()); await wait(1200);
+    const d = await p.evaluate(() => window.__g.CELLAR_DOOR);
+    check(await p.evaluate(d => window.__g.thornFree(d.x, d.y + 40), d), 'the cellar entrance is inside a hedge');
+    await p.evaluate(d => { const g = window.__g; g.DLG.active = false; g.THFOES.length = 0; g.lum.x = d.x; g.lum.y = d.y + 40; }, d); await wait(800);
+    check(await p.evaluate(() => !!(window.__g.NEAR && window.__g.NEAR.door)), 'no door emote at the cellar entrance');
+    await p.evaluate(() => window.__g.pressA()); await wait(2200);
+    check(await p.evaluate(() => window.__g.SCENE === 'dun' && window.__g.DUN.room === 7), 'did not reach the cellar');
+    check(await p.evaluate(() => window.__g.DFOES.filter(f => f.room === 7 && f.kind === 'rvixen' && !f.dead).length) === 3, 'the cellar should have 3 foxes');
+    await p.evaluate(() => { const g = window.__g; g.DLG.active = false; g.lumS.bumpT = 99; }); await wait(300);
+    await p.screenshot({ path: path.join(SHOTS, 'thornroot-cellar-room-' + (p.viewportSize().width < 600 ? 'phone' : 'desktop') + '.png') });
+    await p.evaluate(() => { const g = window.__g; g.DFOES.length = 0; g.lumS.x = 470; g.lumS.y = 620; }); await wait(800);
+    await p.evaluate(() => window.__g.pressA()); await wait(2200);
+    const back = await p.evaluate(d => { const g = window.__g; return g.SCENE === 'thorn' && Math.abs(g.lumX.x - d.x) < 5; }, d);
+    check(back, 'climbing the cellar stairs did not return to the entrance');
+  },
   async 'deeproot-sleeping-fox'(p) {
     await startCh1(p);
     await p.evaluate(() => { const g = window.__g; g.C1X.bigVixen = 0; g.enterDun(5, 900, 600, -1);
