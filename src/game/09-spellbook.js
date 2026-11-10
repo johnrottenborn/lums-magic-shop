@@ -91,11 +91,13 @@ function drawBagPage(c,x,y,w,h,MH){const col=HCOL[MH]||'#7a4f9a',showIng=MH!=='c
 function drawItemCard(c,cx,cy,cw,MH,members){let id=null,fromSlot=null;if(MENU.sel.kind==='bag')id=BAG[MENU.sel.i];else{fromSlot=MENU.sel.slot;id=PARTY[MH][fromSlot];}
   const it=id?ITEMS[id]:null,pick=!!MENU.pick;
   hit(-5000,-5000,10000,10000,()=>{MENU.sel=null;MENU.pick=null;});
-  c.font='italic 14.5px Alegreya, Georgia, serif';const lines=wrapText(c,it?it.desc:'Nothing is worn here yet. Choose something from the satchel to equip it.',cw-44);
+  c.font='italic 14.5px Alegreya, Georgia, serif';const lines=wrapText(c,it?it.desc:'Nothing is worn here yet.',cw-44);
+  // gear in the satchel that fits this slot, so it can be equipped right here
+  const opts=fromSlot&&!pick?[...new Set(BAG.filter(b=>ITEMS[b]&&ITEMS[b].slot===fromSlot))]:[],ots=54,ogap=10,operRow=Math.max(1,Math.floor((cw-36+ogap)/(ots+ogap))),orows=Math.ceil(opts.length/operRow),optH=fromSlot&&!pick?34+(opts.length?orows*(ots+30):24):0;
   const cmp=previewDelta(MH),nm=it?it.name:'Empty '+SLOTS.find(s=>s[0]===fromSlot)[1];
   const cnt=it&&!fromSlot?(it.kind==='mat'?(MATS[id]||0):BAG.filter(b=>b===id).length):0;
   const lab=pick?null:fromSlot&&id?'Unequip':it&&it.slot&&!fromSlot?'Equip':it&&it.heal?'Use':null;
-  const chH=22+80+40+20+lines.length*19+(cmp?44:0)+(pick?58:0)+74;const x0=cx-cw/2,y0=Math.max(-BK.top+90,cy-chH/2);
+  const chH=22+80+40+20+lines.length*19+(cmp?44:0)+(pick?58:0)+optH+74;const x0=cx-cw/2,y0=Math.max(-BK.top+90,cy-chH/2);
   c.fillStyle='rgba(20,10,10,.35)';rr(x0+3,y0+8,cw,chH,18);c.fill();c.fillStyle='#fbf3dd';rr(x0,y0,cw,chH,18);c.fill();c.strokeStyle='#c49a4e';c.lineWidth=3;c.stroke();
   hit(x0,y0,cw,chH,()=>{});
   let yy=y0+22;c.fillStyle='#f3e6c4';c.beginPath();c.arc(cx,yy+40,40,0,TAU);c.fill();if(id){drawGlow(c,cx,yy+40,46,'255,225,150',.3);drawIcon(c,id,cx,yy+41,52);}else{c.save();c.globalAlpha=.7;drawIcon(c,SLOT_GHOST[fromSlot],cx,yy+40,50,true);c.restore();}
@@ -103,6 +105,14 @@ function drawItemCard(c,cx,cy,cw,MH,members){let id=null,fromSlot=null;if(MENU.s
   yy+=22;if(it){const sl=it.slot?SLOTS.find(s=>s[0]===it.slot)[1]:it.kind==='mat'?'Ingredient':it.kind==='key'?'Key Item':'Potion & Powder';const parts=[sl.toUpperCase()];for(const s in (it.stats||{}))parts.push(`+${it.stats[s]} ${STAT_NAME[s].toUpperCase()}`);if(it.hp)parts.push(`+${it.hp} MAX HP`);c.font='700 11.5px "Alegreya SC", Georgia, serif';c.fillStyle='#8a6a42';c.fillText(parts.join('  ·  '),cx,yy);}
   yy+=24;c.font='italic 14.5px Alegreya, Georgia, serif';c.fillStyle='#5a4630';lines.forEach((l,i)=>c.fillText(l,cx,yy+i*19));yy+=lines.length*19;
   if(cmp){yy+=8;const ks=Object.keys(cmp),uw=74,sx=cx-ks.length*uw/2;ks.forEach((k,i)=>{const ux=sx+i*uw,im=IMG[STATIMG[k]];if(ready(im))c.drawImage(im,ux+6,yy,28,28);c.textAlign='left';c.font='700 17px "Alegreya SC", Georgia, serif';c.fillStyle=cmp[k]>0?'#3f7a2e':'#a8402e';c.fillText((cmp[k]>0?'+':'')+cmp[k],ux+38,yy+21);});c.textAlign='center';yy+=36;}
+  if(optH){yy+=18;c.strokeStyle='rgba(196,154,78,.5)';c.lineWidth=1;c.beginPath();c.moveTo(x0+24,yy-8);c.lineTo(x0+cw-24,yy-8);c.stroke();
+    c.fillStyle='#8a6a42';c.font='700 12px "Alegreya SC", Georgia, serif';c.textAlign='center';c.fillText('FROM YOUR SATCHEL',cx,yy+8);yy+=20;
+    if(!opts.length){c.font='italic 14px Alegreya, Georgia, serif';c.fillStyle='#8a7050';c.fillText('Nothing in your satchel fits here.',cx,yy+12);yy+=24;}
+    else{opts.forEach((oid,i)=>{const r=Math.floor(i/operRow),q=i%operRow,inRow=Math.min(operRow,opts.length-r*operRow),rowW=inRow*ots+(inRow-1)*ogap,ox=cx-rowW/2+q*(ots+ogap),oy=yy+r*(ots+30);
+        c.fillStyle='#f3e6c4';rr(ox,oy,ots,ots,10);c.fill();c.strokeStyle='#c49a4e';c.lineWidth=2;rr(ox,oy,ots,ots,10);c.stroke();drawIcon(c,oid,ox+ots/2,oy+ots/2,ots*.66);
+        const st=ITEMS[oid].stats||{},sk=Object.keys(st)[0];c.font='700 10.5px "Alegreya SC", Georgia, serif';c.fillStyle='#6a5034';c.textAlign='center';c.fillText(sk?`+${st[sk]} ${{atk:'ATK',def:'DEF',mag:'MAG',spd:'SPD'}[sk]}`:'—',ox+ots/2,oy+ots+14);
+        hit(ox,oy,ots,ots+18,()=>{equip(MH,oid);MENU.sel={kind:'slot',slot:fromSlot};MENU.pick=null;sfxPage(.45);});});
+      yy+=orows*(ots+30);}}
   if(pick){yy+=14;c.fillStyle='#3b2a1c';c.font='700 18px "Alegreya SC", Georgia, serif';c.fillText('Who is this for?',cx,yy);c.font='italic 14px Alegreya, Georgia, serif';c.fillStyle='#8a6a42';c.fillText(tw('Tap a glowing portrait above','Click a glowing portrait above'),cx,yy+20);yy+=44;}
   const by=y0+chH-62,bh=46,gap=10;const btns=[];if(lab)btns.push([lab,true]);btns.push([pick?'Cancel':'Close',false]);const bw=(cw-36-gap*(btns.length-1))/btns.length;
   btns.forEach(([l,pri],i)=>{const bx=x0+18+i*(bw+gap);if(pri){c.fillStyle='rgba(60,30,10,.22)';rr(bx+1,by+3,bw,bh,12);c.fill();c.fillStyle=fromSlot?'#8a7258':(HCOL[MH]||'#7a4f9a');rr(bx,by,bw,bh,12);c.fill();c.fillStyle='#fbf3dd';}else{c.strokeStyle='#c49a4e';c.lineWidth=2;rr(bx+1,by+1,bw-2,bh-2,12);c.stroke();c.fillStyle='#5a3d22';}

@@ -218,6 +218,16 @@ const CASES = {
     const line = await p.evaluate(() => { const g = window.__g; g.pressA(); return g.DLG.active && g.DLG.lines[0][1]; });
     check(/no way through|as far as the den goes/.test(line || ''), 'the back of the den says nothing: ' + line);
   },
+  async 'equip-from-slot'(p) {
+    await startCh1(p);
+    await p.evaluate(() => { const g = window.__g; g.DLG.active = false; g.PARTY.lum.head = null; g.BAG.push('foxhood', 'bucket'); g.openMenu(); }); await wait(700);
+    await p.evaluate(() => { const g = window.__g; g.MENU.sel = { kind: 'slot', slot: 'head' }; g.MENU.pick = null; }); await wait(400);
+    await p.screenshot({ path: path.join(SHOTS, 'equip-from-slot-' + (p.viewportSize().width < 600 ? 'phone' : 'desktop') + '.png') });
+    await tapMenu(p, hits => hits.filter(h => h.w === 54 && h.h === 72)[0]);
+    check(await p.evaluate(() => window.__g.PARTY.lum.head === 'foxhood' && !window.__g.BAG.includes('foxhood')), 'tapping the Fox Hood under the Head slot did not equip it');
+    await tapMenu(p, hits => hits.filter(h => h.w === 54 && h.h === 72)[0]);
+    check(await p.evaluate(() => window.__g.PARTY.lum.head === 'bucket' && window.__g.BAG.includes('foxhood')), 'swapping from the slot card did not return the old item to the satchel');
+  },
   async 'deeproot-sleeping-fox'(p) {
     await startCh1(p);
     await p.evaluate(() => { const g = window.__g; g.C1X.bigVixen = 0; g.enterDun(5, 900, 600, -1);
