@@ -106,7 +106,7 @@ function nextFoe(){const B=BATTLE;B.foeI++;while(B.foeI<B.foes.length&&B.foes[B.
   if(f.type==='flora'){f.turn=(f.turn||0)+1;if(f.turn%3===0&&f.hp<f.max){B.phase='foeRegrow';B.t=0;B.regrew=0;pop(f.x,foeCenter(f).top-40*bS(),'Closes into a bud…','info');return;}B.phase='foeWind';B.t=0;B.windD=.7+Math.random()*.35;B.cmd={guard:false,lock:0,tried:false};return;}
   if(f.type==='reaper'){f.turn=(f.turn||0)+1;if(f.charged){f.heavyNow=1;B.phase='foeWind';B.t=0;B.windD=1.0;B.cmd={guard:false,lock:0,tried:false};pop(f.x,f.y-190*bS(),'Dark Bolt!','info');return;}
     if(f.turn%3===0){f.charged=1;B.phase='foeCharge';B.t=0;pop(f.x,f.y-190*bS(),'Gathering dark power…','info');return;}}
-  if(Math.random()<.22&&f.type!=='reaper'&&f.type!=='bigspider'){B.phase='foeJiggle';B.t=0;}else{B.phase='foeWind';B.t=0;B.windD=.6+Math.random()*.45;B.cmd={guard:false,lock:0,tried:false};}}
+  B.phase='foeWind';B.t=0;B.windD=.6+Math.random()*.45;B.cmd={guard:false,lock:0,tried:false};}
 function chooseMenu(i){const B=BATTLE,o=menuOpts()[i][0];sfxPage(.6);
   if(o==='powder'){B.phase='powders';B.itemSel=0;return;}
   if(o==='burst'&&B.heroes[B.cur].id==='jak'){C1.comboJ=0;B.phase='jbolt';B.t=0;B.burstDone=0;sfxNice&&sfxNice();return;}
@@ -140,7 +140,6 @@ function updateBattle(dt){const B=BATTLE;if(B.hitstop>0){B.hitstop-=dt;return;}B
     case 'bonkWind':{h.fr=B.t<B.windD*.5?17:18;const c=B.cmd;if(B.t>=B.windD+.08||(c.done&&B.t>=B.windD)){h.fr=19;STATS.atk++;if(c.nice)STATS.nice++;if(h.id==='lum')lumPowderHit(h,f,c);else{const st=heroStats(h.id),dmg=Math.max(1,st.atk+(c.nice?1:0)-f.def);hurtFoe(f,dmg,c.nice);if(h.id==='jak'){if(c.nice){C1.comboJ=Math.min(COMBO_MAX,(C1.comboJ||0)+1);if(C1.comboJ===COMBO_MAX)setTimeout(()=>{if(BATTLE.on)pop(h.x,h.y-230*S,'Staff Bolt ready!','nice');},500);}else C1.comboJ=0;}};shake=c.nice?12:3;B.tut.bonk=1;B.phase='bonkHit';B.t=0;}break;}
     case 'bonkHit':h.fr=19;if(B.t>.45){B.phase='bonkBack';B.t=0;}break;
     case 'bonkBack':{const u=Math.min(1,B.t/.4);h.ox*=1-u;h.oy*=1-u;h.face=-1;h.fr=[0,1,2,3,4,5,6,7][Math.floor(B.t*16)%8];if(u>=1){h.ox=h.oy=0;h.face=1;h.fr=16;nextHero();}break;}
-    case 'foeJiggle':{const f_=B.foes[B.foeI];f_.ox=Math.sin(B.t*30)*4*(1-B.t/1.2);if(B.t<.05)pop(f_.x,f_.y-110*S,f_.type==='slug'?'*sulks menacingly*':f_.type==='jelly'?'*shimmers ominously*':f_.type==='mimic'?'*clack clack clack*':f_.type==='fslime'?'*wobbles mossily*':f_.type==='wisp'?'*puffs out spores*':f_.type==='rskel'?'*sways and moans*':f_.type==='slugking'?'*adjusts his crown*':f_.type==='skel'?'*rattles its bones*':'*jiggle jiggle*','info');if(B.t>1.2){f_.ox=0;nextFoe();}break;}
     case 'foeSkip':if(B.t>.9)nextFoe();break;
     case 'poisonTick':if(B.t>.25&&!B.ptDone){B.ptDone=1;for(const h_ of B.heroes)if(h_.poison>0&&!h_.ko){h_.poison--;const H_=HEROES[h_.id];H_.hp=Math.max(0,H_.hp-1);h_.hurt=.35;STATS.dmg++;pop(h_.x,h_.y-120*S,'1','poison');pop(h_.x,h_.y-175*S,h_.poison?'Poison':'Poison wears off','info');sfxSlimeHit&&sfxSlimeHit(.6);if(H_.hp<=0)h_.ko=1;}}if(B.t>1.1){if(!aliveHeroes().length){B.phase='lose';B.t=0;}else startRound();}break;
     case 'foeCharge':if(B.t>1.4)nextFoe();break;
