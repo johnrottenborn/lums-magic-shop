@@ -180,6 +180,21 @@ const CASES = {
     const back = await p.evaluate(d => { const g = window.__g; return g.SCENE === 'thorn' && Math.abs(g.lumX.x - d.x) < 5; }, d);
     check(back, 'climbing the cellar stairs did not return to the entrance');
   },
+  async 'briar-den-fox-hood'(p) {
+    await startCh1(p);
+    await p.evaluate(() => { const g = window.__g; g.enterDun(7, 950, 560, 1); g.lumS.bumpT = 99; g.DLG.active = false; }); await wait(900);
+    await p.evaluate(() => { const g = window.__g; g.DLG.active = false; g.lumS.x = 950; g.lumS.y = 548; }); await wait(400);
+    check(await p.evaluate(() => !!(window.__g.NEAR && window.__g.NEAR.door)), 'no door emote at the cellar back wall');
+    await p.evaluate(() => window.__g.pressA()); await wait(2200);
+    check(await p.evaluate(() => window.__g.SCENE === 'dun' && window.__g.DUN.room === 8), 'back wall did not lead to the Briar Den');
+    check(await p.evaluate(() => window.__g.DFOES.filter(f => f.room === 8 && f.kind === 'rvixen').length) === 2, 'the den should have 2 foxes');
+    check(await p.evaluate(() => !window.__g.hoodOut()), 'the hood showed before the foxes were beaten');
+    await p.evaluate(() => { const g = window.__g; for (let i = g.DFOES.length - 1; i >= 0; i--) if (g.DFOES[i].room === 8) g.DFOES.splice(i, 1); g.DLG.active = false; g.lumS.x = g.HOOD.x - 62; g.lumS.y = g.HOOD.y + 22; g.lumS.face = 1; }); await wait(900);
+    check(await p.evaluate(() => window.__g.hoodOut() && !!(window.__g.NEAR && window.__g.NEAR.grab)), 'no pick-up emote by the hood');
+    await p.screenshot({ path: path.join(SHOTS, 'briar-den-hood-' + (p.viewportSize().width < 600 ? 'phone' : 'desktop') + '.png') });
+    await p.evaluate(() => window.__g.pressA()); await wait(500);
+    check(await p.evaluate(() => window.__g.BAG.includes('foxhood') && !window.__g.DLG.active), 'Fox Hood was not picked up with just the toast');
+  },
   async 'deeproot-sleeping-fox'(p) {
     await startCh1(p);
     await p.evaluate(() => { const g = window.__g; g.C1X.bigVixen = 0; g.enterDun(5, 900, 600, -1);

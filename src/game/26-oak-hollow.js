@@ -10,6 +10,7 @@ const DROOMS={
      block:[{x:880,y:548,rx:46,ry:16}]},
   4:{name:"Gaia's Vault",sub:'a thief’s hiding place',dark:.82,floor:[[480,768],[520,640],[560,560],[620,470],[660,400],[760,400],[800,470],[850,560],[960,600],[1000,640],[920,768]],
      block:[{x:890,y:556,rx:48,ry:14}],light:[700,30,200]},
+  8:{name:'Briar Den',dark:.55,floor:[[470,768],[500,690],[560,620],[640,570],[720,548],[880,548],[960,575],[1030,630],[1090,700],[1110,768]]},
   7:{name:'Thornroot Cellar',dark:.55,floor:[[330,640],[470,610],[600,575],[720,545],[1150,530],[1240,560],[1320,640],[1330,768],[420,768],[340,700]],block:[{x:935,y:600,rx:175,ry:45}]},
   6:{name:'Hidden Spring',dark:.5,floor:[[640,588],[760,576],[860,560],[1010,560],[1065,592],[1125,640],[1160,700],[1105,722],[1060,648],[980,614],[860,606],[740,608],[650,614]]},
   5:{name:'Deeproot',sub:'turn back',dark:.86,floor:[[420,768],[480,640],[560,580],[620,540],[700,540],[800,580],[950,620],[1050,700],[1080,768]]}};
@@ -19,6 +20,9 @@ function solveDun(px,py,nx,ny){if(dunFree(nx,ny))return [nx,ny];if(dunFree(nx,py
 const dunH=y=>150+(clamp(y,380,768)-620)*.28;
 const DUNINT=[];
 /* the Hidden Spring under Stranglethorn: a drink restores everyone's HP */
+/* the Fox Hood waits on the Briar Den floor once both foxes there are gone */
+const HOOD={x:780,y:610};
+function hoodOut(){if(C1.hoodOut)return true;if(dfoesBuilt&&!DFOES.some(g=>g.room===8))C1.hoodOut=1;return !!C1.hoodOut;}
 const SPRING_DOOR={x:5*360+180,y:72},CELLAR_DOOR={x:11*360+180,y:10*300+70};
 function drinkSpring(){const all=Object.keys(HEROES).filter(id=>id!=='cosmic'&&(id!=='jak'||C1.jak));let hurt=false;for(const id of all){const h=HEROES[id];if(h.hp<h.maxHp)hurt=true;h.hp=h.maxHp;}
   sfxItem&&sfxItem();for(let i=0;i<16;i++)PARTS.push({type:'fdust',x:lum.x+rnd(-30,30),y:lum.y,z:rnd(10,80),vx:rnd(-10,10),vy:rnd(-4,4),vz:rnd(20,40),life:0,max:rnd(.6,1.1),s:rnd(1,2.2),col:'170,230,255'});
@@ -43,7 +47,9 @@ function setupDun(){DUNINT.length=0;const r=DUN.room,D=(x,y,reach,fn)=>DUNINT.pu
   if(r===6){D(935,568,62,()=>goScene(()=>{enterThorn();lum.x=SPRING_DOOR.x;lum.y=SPRING_DOOR.y+50;lum.face=1;cam.x=lum.x;cam.y=lum.y-50;resetJakFollow();}));
     DUNINT.push({x:800,y:608,reach:95,onInteract:drinkSpring});}
   if(r===7){D(470,612,64,()=>goScene(()=>{enterThorn();lum.x=CELLAR_DOOR.x;lum.y=CELLAR_DOOR.y+CMOUTH.ry+30;lum.face=1;cam.x=lum.x;cam.y=lum.y-50;resetJakFollow();}));
-    D(950,545,80,()=>say("The passage behind the table twists deeper into the dark… I'll come back when I'm ready."));}
+    D(950,545,80,()=>dunGo(8,780,705,1));}
+  if(r===8){D(780,752,64,()=>dunGo(7,1040,560,-1));
+    DUNINT.push({x:HOOD.x,y:HOOD.y,reach:80,grab:()=>hoodOut()&&!C1.foxHood,onInteract:()=>{if(!hoodOut()||C1.foxHood)return;C1.foxHood=1;giveItem('foxhood');}});}
   if(r===5){D(700,760,70,()=>dunGo(4,705,440,1));if(!C1.bigVixen)DUNINT.push({x:700,y:615,reach:95,onInteract:()=>{const g=DFOES.find(f=>f.kind==='bigvixen');if(!g)return;talk([['Lum',"…This one is much bigger than the little thief. It could be dangerous."]],false,()=>askChoice("Wake the fox?",[["Yes",()=>{g.asleep=0;startEncounter(g,'normal');}],["No",()=>say("Let sleeping foxes lie.")]]));}});L(560,600,60,["So many eyes…"]);}}
 function webInteract(){if(C1.webCut){dunGo(4,700,730,-1);return;}
   if(POWDERS.thorn>0){talk([['Lum',"A thick wall of web stretches across the passage. It's sticky as honey."]],false,()=>askChoice("Throw Thornbane Powder?",[["Yes",()=>{POWDERS.thorn--;C1.webCut=1;sfxFizzle&&sfxFizzle(true);shake=3;for(let i=0;i<30;i++)PARTS.push({type:'fiz',col:'170,220,120',x:700+rnd(-70,70),y:520,z:rnd(20,180),vx:rnd(-30,30),vy:rnd(-6,6),vz:rnd(-10,60),life:0,max:rnd(.6,1.2),s:rnd(1.5,3)});
@@ -54,7 +60,7 @@ function buildDFoes(){if(dfoesBuilt)return;dfoesBuilt=true;DFOES.length=0;let id
   if(!C1.vixen)DFOES.push({id:90,kind:'vixen',scene:'dun',room:4,x:790,y:610,hx:790,hy:610,tx:790,ty:610,s:1,pack:1,calm:0,ph:0,t:0,face:1,still:1});
   if(!C1.bigVixen)DFOES.push({id:91,kind:'bigvixen',scene:'dun',room:5,x:720,y:585,hx:720,hy:585,tx:720,ty:585,s:1.4,pack:1,calm:0,ph:0,t:0,face:1,still:1,asleep:1});
   for(const [room,x,y] of [[3,520,660],[3,1050,650],[5,560,690]])DFOES.push({id:id++,kind:'spider',scene:'dun',room,x,y,hx:x,hy:y,tx:x,ty:y,s:1,pack:1,calm:0,ph:rnd(0,TAU),t:0,face:-1});
-  for(const [room,x,y] of [[7,720,690],[7,1080,700],[7,1210,625]])DFOES.push({id:id++,kind:'rvixen',scene:'dun',room,x,y,hx:x,hy:y,tx:x,ty:y,s:1,pack:1,calm:2,ph:rnd(0,TAU),t:0,face:-1});
+  for(const [room,x,y] of [[7,720,690],[7,1080,700],[7,1210,625],...(C1.hoodOut?[]:[[8,640,650],[8,960,660]])])DFOES.push({id:id++,kind:'rvixen',scene:'dun',room,x,y,hx:x,hy:y,tx:x,ty:y,s:1,pack:1,calm:2,ph:rnd(0,TAU),t:0,face:-1});
   for(const [room,x,y] of [[2,520,700],[2,950,690],[5,900,690]])DFOES.push({id:id++,kind:'bat',scene:'dun',room,x,y,hx:x,hy:y,tx:x,ty:y,s:1,pack:1,calm:0,ph:rnd(0,TAU),t:0,face:-1});}
 function updateDFoes(dt){const ok=!DLG.active&&!WEVENT.on&&!MENU.open&&!FADE.dir&&!BATTLE.on&&!BATTLE.pending&&!CHOICE.on&&!MIX.on;
   for(const g of DFOES){if(g.room!==DUN.room)continue;g.ph+=dt;g.t+=dt;g.calm=Math.max(0,g.calm-dt);const d=Math.hypot(lum.x-g.x,lum.y-g.y);
@@ -76,6 +82,8 @@ function drawDun(){const R=DROOMS[DUN.room],im=IMG['dun'+DUN.room];if(!ready(im)
     ctx.save();ctx.globalCompositeOperation='lighter';for(let i=0;i<6;i++){const x=1150+i*28+Math.sin(T*1.3+i)*8,y=515+Math.sin(T*2+i*2)*4;drawGlow(ctx,x,y,14,'130,230,255',.25+.15*Math.sin(T*3+i));}ctx.restore();}
   if(DUN.room===5){ctx.save();ctx.fillStyle='#1c1f28';EYES5.forEach(([x,y],i)=>{const e=DUN.eyes[i];if(!e)return;e.b-=1/60;if(e.b<0){e.t=.22;e.b=rnd(2,7);}if(e.t>0){e.t-=1/60;ctx.beginPath();ctx.ellipse(x,y,16,7,0,0,TAU);ctx.fill();}});ctx.restore();}
   if(DUN.room===4&&C1.vixen&&!C1.charmFound){ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,895,528,10+3*Math.sin(T*4),'235,240,255',.6);ctx.restore();}
+  if(DUN.room===8&&hoodOut()&&!C1.foxHood){const im=IMG.icon5_hood_fox,b=Math.sin(T*2.2)*2;ctx.save();ctx.fillStyle='rgba(0,0,0,.3)';ctx.beginPath();ctx.ellipse(HOOD.x,HOOD.y,22,6,0,0,TAU);ctx.fill();
+    if(ready(im))ctx.drawImage(im,HOOD.x-22,HOOD.y-44+b,44,44);ctx.globalCompositeOperation='lighter';drawGlow(ctx,HOOD.x,HOOD.y-22,30,'255,226,150',.25+.12*Math.sin(T*3));ctx.restore();}
   const k=dunH(lum.y)/151,here=DFOES.filter(g=>g.room===DUN.room);for(const g of here)if(g.y<=lum.y)drawDFoe(g);ctx.save();ctx.translate(lum.x,lum.y);ctx.scale(k,k);ctx.translate(-lum.x,-lum.y);drawLum();ctx.restore();for(const g of here)if(g.y>lum.y)drawDFoe(g);
   for(const p of PARTS)if(p.type==='fiz'||p.type==='puff'||p.type==='dust'){const k2=dunH(p.y)/151;ctx.save();ctx.translate(p.x,p.y);ctx.scale(k2,k2);ctx.translate(-p.x,-p.y);drawPartWell(p);ctx.restore();}
   // darkness: only the little lantern's circle (and any daylight from above) cuts through
