@@ -152,7 +152,9 @@ const CASES = {
   },
   async 'hidden-spring'(p) {
     await p.evaluate(() => window.__g.startThornPreview()); await wait(1200);
-    await p.evaluate(() => { const g = window.__g; g.DLG.active = false; g.THFOES.length = 0; g.lum.x = g.SPRING_DOOR.x; g.lum.y = g.SPRING_DOOR.y + 40; }); await wait(800);
+    await p.evaluate(() => { const g = window.__g; g.DLG.active = false; g.THFOES.length = 0; g.lum.x = g.SPRING_DOOR.x; g.lum.y = g.SPRING_DOOR.y + 86; }); await wait(3600);
+    check(await p.evaluate(() => { const g = window.__g, d = g.SPRING_DOOR; return g.thornFree(d.x, d.y + 86) && !g.thornFree(d.x, d.y); }), 'Lum can stand on the spring well, or not in front of it');
+    await p.screenshot({ path: path.join(SHOTS, 'hidden-spring-well-' + (p.viewportSize().width < 600 ? 'phone' : 'desktop') + '.png') });
     check(await p.evaluate(() => !!(window.__g.NEAR && window.__g.NEAR.door)), 'no door emote at the passage');
     await p.evaluate(() => window.__g.pressA()); await wait(300);
     check(await p.evaluate(() => /underground passage/.test(window.__g.DLG.lines[0][1])), 'Lum did not notice the passage');

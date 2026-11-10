@@ -39,13 +39,14 @@ function jakInteract(){if(C1.jak)return;
   talk([['Lum',"A man, slumped against the roots. He's barely breathing."]],false,()=>askChoice("Use on the stranger?",opts));}
 /* the Thornroot Cellar's entrance: the designer's old overgrown well, feathered into the forest floor, with a few cobwebs */
 const CMOUTH={rx:92,ry:58};
-function drawCellarMouth(){const x=CELLAR_DOOR.x,y=CELLAR_DOOR.y,im=IMG.thorn_well;if(!ready(im))return;const w=205,h=w*im.naturalHeight/im.naturalWidth;
+function drawCellarMouth(){drawThornWell(CELLAR_DOOR.x,CELLAR_DOOR.y);drawThornWell(SPRING_DOOR.x,SPRING_DOOR.y);}
+function drawThornWell(x,y){const im=IMG.thorn_well;if(!ready(im))return;const w=205,h=w*im.naturalHeight/im.naturalWidth;
   ctx.drawImage(im,x-w*.4946,y-h*.462,w,h);
   ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,x,y+5,54,'200,60,50',.1+.05*Math.sin(T*1.6));ctx.restore();
   for(const [n,dx,dy,ww,f] of [['thdec_smallweb',-92,34,85,false],['thdec_smallweb',94,-20,76,true]]){const wi=IMG[n];if(!ready(wi))continue;const wh=ww*wi.naturalHeight/wi.naturalWidth;ctx.save();ctx.globalAlpha=.85;ctx.translate(x+dx,y+dy);if(f)ctx.scale(-1,1);ctx.drawImage(wi,-ww/2,-wh/2,ww,wh);ctx.restore();}}
 const THINT=[{x:JAKREST.x,y:JAKREST.y,reach:95,onInteract:()=>jakInteract()},{x:30,y:TMZ.start*TCH+TCH/2+10,reach:60,door:true,onInteract:()=>goScene(()=>{buildWoods();buildWoodsC1();SCENE='woods';lum.x=2610;lum.y=628;lum.face=-1;lum.state='idle';lum.vx=lum.vy=0;cam.x=lum.x+60;cam.y=lum.y-50;resetJakFollow();})},
   // the top dead end: an underground passage down to the Hidden Spring
-  {x:5*TCW+TCW/2,y:72,reach:72,door:true,onInteract:()=>{const go=()=>dunGo(6,935,590,-1);if(C1.springSeen){go();return;}
+  {x:5*TCW+TCW/2,y:150,reach:100,door:true,onInteract:()=>{const go=()=>dunGo(6,935,590,-1);if(C1.springSeen){go();return;}
     talk([['Lum',"Wait… the roots here dip down into the ground. There's an underground passage!"]],false,()=>{C1.springSeen=1;go();});}},
   // the small pocket near the bottom right: stairs down to the Thornroot Cellar
   {x:11*TCW+TCW/2,y:10*TCH+66,reach:100,door:true,onInteract:()=>dunGo(7,560,620,1)}];
