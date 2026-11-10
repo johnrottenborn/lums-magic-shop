@@ -19,7 +19,11 @@ const DUNINT=[];
 function dunGo(room,x,y,face){goScene(()=>enterDun(room,x,y,face));}
 function setupDun(){DUNINT.length=0;const r=DUN.room,D=(x,y,reach,fn)=>DUNINT.push({x,y,reach,door:true,onInteract:fn}),L=(x,y,reach,lines)=>{let i=0;DUNINT.push({x,y,reach,onInteract:()=>say(lines[(i++)%lines.length])});};
   if(r===1){D(560,600,70,()=>goScene(()=>{buildWoods();buildWoodsC1();SCENE='woods';lum.x=HOLLOW.x;lum.y=HOLLOW.y+40;lum.face=1;lum.state='idle';lum.vx=lum.vy=0;cam.x=lum.x;cam.y=lum.y-50;WTITLE.t=99;}));
-    D(1270,590,64,()=>dunGo(2,200,600,1));L(185,630,64,["The tunnel twists away into the dark… and ends in a wall of roots. A dead end.","Just roots and cobwebs this way."]);}
+    D(1270,590,64,()=>dunGo(2,200,600,1));
+    // behind the stairs: too dark without the lantern; with it, the Fox Ring
+    DUNINT.push({x:700,y:598,reach:58,onInteract:()=>{if(C1.foxRing){say("Just roots and shadows back here now.");return;}if(!BAG.includes('lantern')){say("It's too dark to see without a lantern!");return;}
+      talk([['Lum',"The lantern catches something behind the stairs… something small and circular, glinting back at me."]],false,()=>{C1.foxRing=1;giveItem('foxring');});}});
+    L(185,630,64,["The tunnel twists away into the dark… and ends in a wall of roots. A dead end.","Just roots and cobwebs this way."]);}
   if(r===2){D(175,590,64,()=>dunGo(1,1240,600,-1));D(1270,590,64,()=>dunGo(3,290,540,1));L(700,655,80,["The roots here are so thick they look woven together.","Purple fungus on the ceiling. Glowmold. Lovely in a powder, if only I could reach it."]);}
   if(r===3){D(270,525,60,()=>dunGo(2,1240,600,-1));
     DUNINT.push({x:700,y:540,reach:66,dynDoor:1,get door(){return !!C1.webCut},onInteract:webInteract});

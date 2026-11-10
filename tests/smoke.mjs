@@ -136,6 +136,20 @@ const CASES = {
     await p.evaluate(() => window.__g.pressA()); await wait(400);
     check(await p.evaluate(id => (window.__g.MATS[id] || 0) >= 2 && window.__g.THORN.forage[0].picked, id), 'picking the bush gave nothing');
   },
+  async 'fox-ring'(p) {
+    await startCh1(p);
+    await p.evaluate(() => { const g = window.__g; g.enterDun(1, 700, 612, 1); g.DFOES.length = 0; g.BAG.splice(0, g.BAG.length, ...g.BAG.filter(i => i !== 'lantern')); }); await wait(1200);
+    const dark = await p.evaluate(() => { const g = window.__g; g.DLG.active = false; g.lum.x = 700; g.lum.y = 612; g.pressA(); return g.DLG.active && g.DLG.lines[0][1]; });
+    check(dark === "It's too dark to see without a lantern!", 'no-lantern line was: ' + dark);
+    await p.evaluate(() => { const g = window.__g; g.DLG.active = false; g.BAG.push('lantern'); }); await wait(1200);
+    const seen = await p.evaluate(() => { const g = window.__g; g.pressA(); return g.DLG.lines[0][1]; });
+    check(/small and circular/.test(seen), 'lantern line was: ' + seen);
+    await p.evaluate(() => window.__g.pressA()); await wait(500);
+    check(await p.evaluate(() => window.__g.BAG.includes('foxring')), 'Fox Ring was not given');
+    const got = await p.evaluate(() => { const g = window.__g, r = Math.random; g.PARTY.lum.charm = 'foxring'; const before = g.MATS.slimeparts || 0; Math.random = () => 0.1;
+      g.foxRingSteal({ type: 'slime', x: 0, y: 0 }); Math.random = r; return (g.MATS.slimeparts || 0) - before; });
+    check(got === 1, 'Fox Ring did not steal on a successful roll');
+  },
   async 'deeproot-sleeping-fox'(p) {
     await startCh1(p);
     await p.evaluate(() => { const g = window.__g; g.C1X.bigVixen = 0; g.enterDun(5, 900, 600, -1);

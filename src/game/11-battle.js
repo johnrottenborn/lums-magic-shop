@@ -23,6 +23,9 @@ function drawWipe(){if(WIPE.p<=0)return;const e=WIPE.p<1?(1-Math.cos(Math.PI*WIP
   ctx.restore();}
 
 /* ---------- starting and ending ---------- */
+/* Fox Ring (charm): a 50% chance on First Strike to steal the foe's ingredient */
+function foxRingSteal(f){const d=FOE_TYPES[f.type]&&FOE_TYPES[f.type].drop;if(!d||!Object.values(PARTY).some(p=>p&&p.charm==='foxring')||Math.random()>=.5)return;
+  MATS[d]=(MATS[d]||0)+1;if(!BAG.includes(d))BAG.push(d);BATTLE.loot&&BATTLE.loot.push(d);setTimeout(()=>pop(f.x,f.y-175*bS(),'Stole '+ITEMS[d].name+'!','info'),450);sfxItem&&sfxItem();}
 function startEncounter(g,mode){if(BATTLE.on||WIPE.dir||WEVENT.on||g.dead||g.calm>0)return;BATTLE.capG=g;CAPTURE.want=true;BATTLE.pending=true;lum.vx=lum.vy=0;sfxEncounter();WIPE.label=mode==='first'?'First Strike!':g.kind==='bigvixen'?'The Elder Vixen awakens!':g.kind==='vixen'?'The Vixen bares her teeth!':g.kind==='slugking'?'The Slug King appears!':g.kind==='reaper'?'The Grave Reaper attacks!':g.kind==='bigspider'?'The Broodmother descends!':(n=>`${/^[AEIOU]/.test(n)?'An':'A'} ${n} appears!`)(FOE_TYPES[g.kind||'slime'].name.split(' ').pop());
   pageTurn(()=>setupBattle(g,mode));}
 function setupBattle(g,mode){const B=BATTLE;B.on=true;B.pending=false;B.field=g;B.pops=[];B.spark=[];B.fx=[];B.hitstop=0;B.msg='';B.items=null;B.cur=0;B.menu=0;B.target=0;B.defending={};B.t=0;BMUS.on=true;
@@ -133,7 +136,7 @@ function updateBattle(dt){const B=BATTLE;if(B.hitstop>0){B.hitstop-=dt;return;}B
   for(let i=B.spark.length-1;i>=0;i--){const p=B.spark[i];p.t+=dt;p.vy+=500*dt;p.x+=p.vx*dt;p.y+=p.vy*dt;if(p.t>1)B.spark.splice(i,1);}
   const h=B.heroes[B.cur]||B.heroes[0],f=B.foes[B.target];
   switch(B.phase){
-    case 'firstStrike':if(B.t>.5&&!B.fsDone){B.fsDone=1;const t_=aliveFoes()[0];hurtFoe(t_,1,false);pop(t_.x,t_.y-130*S,'First Strike!','nice');}if(B.t>1.6){B.fsDone=0;B.phase='heroMenu';B.cur=0;}break;
+    case 'firstStrike':if(B.t>.5&&!B.fsDone){B.fsDone=1;const t_=aliveFoes()[0];hurtFoe(t_,1,false);pop(t_.x,t_.y-130*S,'First Strike!','nice');foxRingSteal(t_);}if(B.t>1.6){B.fsDone=0;B.phase='heroMenu';B.cur=0;}break;
     case 'banner':if(B.t>1.3){if(B.after==='foeTurn'){B.foeI=-1;nextFoe();}else B.phase=B.after;}break;
     case 'pause':if(B.t>.9){if(B.after==='nextHero')nextHero();}break;
     case 'bonkRun':{const u=Math.min(1,B.t/.45),rg=h.id==='lum'?.12:1,tx=f.x-70*S-h.x;h.ox=tx*u*rg;h.oy=(f.y-h.y)*u*rg;h.fr=[0,1,2,3,4,5,6,7][Math.floor(B.t*16)%8];if(u>=1){B.phase='bonkWind';B.t=0;B.windD=.85;h.fr=17;}break;}
