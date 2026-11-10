@@ -138,8 +138,8 @@ const CASES = {
   },
   async 'fox-ring'(p) {
     await startCh1(p);
-    await p.evaluate(() => { const g = window.__g; g.enterDun(1, 700, 612, 1); g.DFOES.length = 0; g.BAG.splice(0, g.BAG.length, ...g.BAG.filter(i => i !== 'lantern')); }); await wait(1200);
-    const dark = await p.evaluate(() => { const g = window.__g; g.DLG.active = false; g.lum.x = 700; g.lum.y = 612; g.pressA(); return g.DLG.active && g.DLG.lines[0][1]; });
+    await p.evaluate(() => { const g = window.__g; g.enterDun(1, 185, 640, 1); g.DFOES.length = 0; g.BAG.splice(0, g.BAG.length, ...g.BAG.filter(i => i !== 'lantern')); }); await wait(1200);
+    const dark = await p.evaluate(() => { const g = window.__g; g.DLG.active = false; g.lum.x = 185; g.lum.y = 640; g.pressA(); return g.DLG.active && g.DLG.lines[0][1]; });
     check(dark === "It's too dark to see without a lantern!", 'no-lantern line was: ' + dark);
     await p.evaluate(() => { const g = window.__g; g.DLG.active = false; g.BAG.push('lantern'); }); await wait(1200);
     const seen = await p.evaluate(() => { const g = window.__g; g.pressA(); return g.DLG.lines[0][1]; });
