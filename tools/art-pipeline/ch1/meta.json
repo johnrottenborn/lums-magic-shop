@@ -1,0 +1,1 @@
+{"rskel": {"idle": 4, "move": 4, "hover": 3, "cast": 4, "hurt": 4, "die": 4}, "wisp": {"idle": 4, "roll": 8, "spin": 4, "thorn": 4, "hurt": 3, "taunt": 4, "die": 4}, "vane": {"idle": 4, "walk": 8, "lantern": 3, "hurt": 4}, "reaper": {"idle": 6, "walk": 8, "cast": 7, "strike": 5, "hurt": 3}}
