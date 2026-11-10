@@ -119,6 +119,12 @@ const CASES = {
     await p.evaluate(() => { const g = window.__g; g.takeBucket(); }); await wait(1500);
     check(await p.evaluate(() => window.__g.bucketTaken), 'bucket was not taken');
   },
+  async 'lum-search-hint'(p) {
+    await p.evaluate(() => { const g = window.__g; g.INTRO.on = false; g.INTRO.waiting = false; g.DLG.active = false; g.enterShop(); }); await wait(1000);
+    const lines = await p.evaluate(() => { const g = window.__g; g.DLG.active = false; g.BAG.length = 0; g.BAG.push('hpowder'); g.PARTY.cosmic.main = null; g.lumTalk(); return g.DLG.lines.map(l => l[1]); });
+    check(lines.length === 4 && /imagination/.test(lines[1]) && /hardest places/.test(lines[2]), 'Lum\'s search hint is missing: ' + JSON.stringify(lines));
+    await wait(600);
+  },
   async 'deeproot-sleeping-fox'(p) {
     await startCh1(p);
     await p.evaluate(() => { const g = window.__g; g.C1X.bigVixen = 0; g.enterDun(5, 900, 600, -1);
