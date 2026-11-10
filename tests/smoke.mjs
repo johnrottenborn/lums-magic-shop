@@ -121,7 +121,7 @@ const CASES = {
   },
   async 'lum-search-hint'(p) {
     await p.evaluate(() => { const g = window.__g; g.INTRO.on = false; g.INTRO.waiting = false; g.DLG.active = false; g.enterShop(); }); await wait(1000);
-    const lines = await p.evaluate(() => { const g = window.__g; g.DLG.active = false; g.BAG.length = 0; g.BAG.push('hpowder'); g.PARTY.cosmic.main = null; g.lumTalk(); return g.DLG.lines.map(l => l[1]); });
+    const lines = await p.evaluate(() => { const g = window.__g; g.DLG.active = false; g.BAG.length = 0; g.BAG.push('potion'); g.PARTY.cosmic.main = null; g.lumTalk(); return g.DLG.lines.map(l => l[1]); });
     check(lines.length === 4 && /imagination/.test(lines[1]) && /hardest places/.test(lines[2]), 'Lum\'s search hint is missing: ' + JSON.stringify(lines));
     await wait(600);
   },
@@ -205,6 +205,11 @@ const CASES = {
     await p.evaluate(() => { const g = window.__g; g.DLG.active = false; g.lumS.x = 945; g.lumS.y = 556; }); await wait(400);
     await p.screenshot({ path: path.join(SHOTS, 'cellar-table-behind-' + (p.viewportSize().width < 600 ? 'phone' : 'desktop') + '.png') });
     await p.evaluate(() => { const g = window.__g; g.lumS.x = 945; g.lumS.y = 690; }); await wait(400);
+  },
+  async 'healing-powder-migrates'(p) {
+    const bag = await p.evaluate(() => { const g = window.__g, d = { v: 1, sv: 2, bag: ['hpowder', 'potion', 'bucket'] }; g.migrateSave(d); return d.bag; });
+    check(JSON.stringify(bag) === JSON.stringify(['potion', 'potion', 'bucket']), 'old Healing Powder was not turned into potions: ' + JSON.stringify(bag));
+    check(await p.evaluate(() => !window.__g.ITEMS.hpowder), 'Healing Powder still exists as an item');
   },
   async 'deeproot-sleeping-fox'(p) {
     await startCh1(p);

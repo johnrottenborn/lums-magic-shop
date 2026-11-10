@@ -13,7 +13,7 @@ const UNDEAD=t=>t==='rskel'||t==='reaper'||t==='skel';
 function c1Reset(){dfoesBuilt=false;DFOES.length=0;CH=1;HERO='lum';PARTY_ORDER.length=1;PARTY_ORDER[0]='lum';HEROES.jak.hp=5;thFoesBuilt=false;THFOES.length=0;JAKF=null;PC='lum';ANIM=LUM_ANIM;
   Object.assign(PARTY.lum,{main:'lumpouch',off:null,head:null,chest:'lumrobe',boots:null,charm:null});Object.assign(PARTY.jak,{main:'jakaxe',off:'jakstick',head:null,chest:'jakcoat',boots:null,charm:null});equipStartingKeepsake();
   HEROES.lum.hp=HEROES.lum.maxHp;syncMaxHp();HEROES.lum.hp=HEROES.lum.maxHp;
-  BAG.length=0;BAG.push('potion','potion','hpowder');for(const k in MATS)delete MATS[k];Object.assign(POWDERS,{frost:3,thorn:3,moon:3});
+  BAG.length=0;BAG.push('potion','potion','potion');for(const k in MATS)delete MATS[k];Object.assign(POWDERS,{frost:3,thorn:3,moon:3});
   for(const k in C1)C1[k]=0;
   // the garden is quiet now: no slugs, no slimes anywhere, the hedge already cut
   SLUGS.length=0;kingState=2;gardenDone=5;WSLIMES.length=0;SSLIMES.length=0;SHSLIMES.length=0;PSLIMES.length=0;slimesSpawned=sslimesSpawned=shedSpawned=pondSlimesSpawned=true;

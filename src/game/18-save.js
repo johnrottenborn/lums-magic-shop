@@ -38,9 +38,10 @@ function applySave(d){if(d.ch===1){applySaveC1(d);return;}const f=d.f||{};if(d.s
   if(sc==='woods'&&skelDone>=3)setTimeout(fokalurEvent,1500);}
 function newGame(){clearSave();SAVEC.finished=0;beginIntro();}
 /* save versioning: bump SAVE_VER whenever a change could break older saves, and add a step to MIGRATIONS */
-const SAVE_VER=2;
+const SAVE_VER=3;
 const MIGRATIONS={
   1:d=>{/* v1 -> v2: the Little Tin Lantern was removed */},
+  2:d=>{/* v2 -> v3: Healing Powder was removed; any in the satchel becomes a Healing Potion */if(Array.isArray(d.bag))d.bag=d.bag.map(i=>i==='hpowder'?'potion':i);},
 };
 function migrateSave(d){d.sv=d.sv||1;while(d.sv<SAVE_VER){try{MIGRATIONS[d.sv]&&MIGRATIONS[d.sv](d);}catch(e){console.error('migrate',d.sv,e);}d.sv++;}
   // always: drop anything that no longer exists in the game

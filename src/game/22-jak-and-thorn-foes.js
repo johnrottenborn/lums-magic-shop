@@ -33,9 +33,9 @@ function jakWake(item){const i=BAG.indexOf(item);if(i>=0)BAG.splice(i,1);sfxItem
     ['Jak',"Follow the red flowers. If you don't see any, you've gone the wrong way. I learned that the hard way."],
     ['Jak',"You have a light. Let me walk with you. My axe is yours until we're out of these woods."]],false,jakJoin),700);}
 function jakInteract(){if(C1.jak)return;
-  const hasP=BAG.includes('potion'),hasH=BAG.includes('hpowder');
-  if(!hasP&&!hasH){talk([['Lum',"He's breathing, but only just. I need something to heal him… a potion, or healing powder."]]);return;}
-  const opts=[];if(hasP)opts.push(["Healing Potion",()=>jakWake('potion')]);if(hasH)opts.push(["Healing Powder",()=>jakWake('hpowder')]);if(opts.length<2)opts.push(["Not yet",()=>{}]);
+  const hasP=BAG.includes('potion');
+  if(!hasP){talk([['Lum',"He's breathing, but only just. I need something to heal him… a healing potion."]]);return;}
+  const opts=[];if(hasP)opts.push(["Healing Potion",()=>jakWake('potion')]);if(opts.length<2)opts.push(["Not yet",()=>{}]);
   talk([['Lum',"A man, slumped against the roots. He's barely breathing."]],false,()=>askChoice("Use on the stranger?",opts));}
 /* the Thornroot Cellar's entrance: the designer's old overgrown well, feathered into the forest floor, with a few cobwebs */
 const CMOUTH={rx:92,ry:58};
