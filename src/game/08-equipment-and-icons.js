@@ -23,7 +23,7 @@ const ITEMS={
   lumpouch:{name:"Lum's Powder Pouch",slot:'main',stats:{atk:1},desc:"A sealed leather pouch packed with Lum's handmade powders. Sparkdust for striking, and a few rarer blends for tricky foes."},
   lumrobe:{name:"Starry Shop Cape",slot:'chest',stats:{def:1},desc:"Lum's favorite cape, dusted with embroidered moons and stars. She claims it's just for keeping warm."},
   foxboots:{name:'Vixenstep Boots',slot:'boots',stats:{def:1,spd:2},desc:"Light as a fox's step, dropped by the Elder Vixen in the watching dark. +1 DEF, +2 SPD."},
-  crystalpouch:{name:'Crystal Powder Pouch',slot:'main',stats:{atk:2,mag:1},desc:"A pouch stitched with tiny crystals, found in a cobwebbed chest beneath the old oak. Powders thrown from it sting a little more. +2 ATK, +1 MAG."},
+  crystalpouch:{name:'Foxfire Pouch',slot:'main',stats:{atk:2,mag:1},desc:"A soft fox-fur pouch, found in a cobwebbed chest beneath the old oak. Powders thrown from it sting a little more. +2 ATK, +1 MAG."},
   vanecharm:{name:"Cross Necklace",slot:'charm',stats:{def:1,mag:1},desc:"Worn wooden beads and a little carved cross, polished smooth by years of thumbs. Someone must be missing it. +1 DEF, +1 MAG."},
   lantern:{name:"Gravekeeper's Lantern",kind:'key',desc:"Vane's old lantern. It has never once gone out. It will light the dark paths ahead."},
   duskberry:{name:'Duskberries',kind:'mat',desc:"Dark, sweet berries from Lum's garden. With a little heat they become a Healing Potion."},
@@ -88,7 +88,7 @@ function drawBucketHat(c,fr){const im=IMG.bucket_worn;if(!ready(im))return;const
   c.drawImage(im,-w/2,-h+3,w,h);
   c.restore();}
 /* little painted icons for the book */
-const IMGICON={jakcoat:'icon_cloak_grey',jakaxe:'icon_axe_bearded',jakstick:'icon_stick',foxboots:'icon4_boots_fur',vanecharm:'icon2_cross_wood',shedkey:'icon2_key_gold',crystalpouch:'icon_pouch_crystal',lantern:'tool_lantern',duskberry:'ing_duskberry',dewberry:'ing_dewberry',emberberry:'ing_emberberry',moonleaf:'ing_leavesB5',slimeparts:'ing_slime',boneparts:'ing_bones',thornsprig:'ing_twig',potion:'icon_potion',lumpouch:'icon_pouch_seal',lumrobe:'icon_cape_stars',mooncharm:'acc_moon_necklace',moonmint:'acc_moonstone_ring',duskflower:'acc_heart_ring'};
+const IMGICON={jakcoat:'icon_cloak_grey',jakaxe:'icon_axe_bearded',jakstick:'icon_stick',foxboots:'icon4_boots_fur',vanecharm:'icon2_cross_wood',shedkey:'icon2_key_gold',crystalpouch:'icon5_pouch_foxfur',lantern:'tool_lantern',duskberry:'ing_duskberry',dewberry:'ing_dewberry',emberberry:'ing_emberberry',moonleaf:'ing_leavesB5',slimeparts:'ing_slime',boneparts:'ing_bones',thornsprig:'ing_twig',potion:'icon_potion',lumpouch:'icon_pouch_seal',lumrobe:'icon_cape_stars',mooncharm:'acc_moon_necklace',moonmint:'acc_moonstone_ring',duskflower:'acc_heart_ring'};
 function drawIcon(c,id,x,y,s,ghost){c.save();c.translate(x,y);const G=ghost?'rgba(110,84,52,.22)':null;c.lineJoin='round';c.lineCap='round';
   if(!G&&IMGICON[id]&&ready(IMG[IMGICON[id]])){const im=IMG[IMGICON[id]],h=s*1.15,w=h*im.naturalWidth/im.naturalHeight,sc=Math.min(1,s*1.15/w);c.drawImage(im,-w*sc/2,-h*sc/2,w*sc,h*sc);c.restore();return;}
   if(id==='lantern'){c.strokeStyle='#3a2a18';c.lineWidth=s*.05;c.fillStyle=G||'#5a4428';c.beginPath();c.arc(0,-s*.38,s*.09,Math.PI,0);c.stroke();c.fillRect(-s*.2,-s*.32,s*.4,s*.08);c.fillRect(-s*.18,s*.3,s*.36,s*.08);

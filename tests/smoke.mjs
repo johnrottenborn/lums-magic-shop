@@ -85,6 +85,12 @@ const CASES = {
     await p.evaluate(() => window.__g.enterThorn()); await wait(1800);
     check(await p.evaluate(() => window.__g.SCENE) === 'thorn', 'Stranglethorn maze did not open');
   },
+  async 'foxfire-pouch-card'(p) {
+    await startCh1(p);
+    await p.evaluate(() => { const g = window.__g; g.DLG.active = false; g.BAG.push('crystalpouch'); g.openMenu(); }); await wait(700);
+    await p.evaluate(() => { const g = window.__g; g.MENU.page = 'bag'; g.MENU.sel = { kind: 'bag', i: g.BAG.indexOf('crystalpouch') }; }); await wait(500);
+    check(await p.evaluate(() => window.__g.MENU.sel && window.__g.BAG.includes('crystalpouch')), 'Foxfire Pouch card did not open');
+  },
   async 'deeproot-sleeping-fox'(p) {
     await startCh1(p);
     await p.evaluate(() => { const g = window.__g; g.C1X.bigVixen = 0; g.enterDun(5, 900, 600, -1);
