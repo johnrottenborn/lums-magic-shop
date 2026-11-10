@@ -19,7 +19,7 @@ function solveDun(px,py,nx,ny){if(dunFree(nx,ny))return [nx,ny];if(dunFree(nx,py
 const dunH=y=>150+(clamp(y,380,768)-620)*.28;
 const DUNINT=[];
 /* the Hidden Spring under Stranglethorn: a drink restores everyone's HP */
-const SPRING_DOOR={x:5*360+180,y:72},CELLAR_DOOR={x:11*360+180,y:10*300+130};
+const SPRING_DOOR={x:5*360+180,y:72},CELLAR_DOOR={x:11*360+180,y:10*300+70};
 function drinkSpring(){const all=Object.keys(HEROES).filter(id=>id!=='cosmic'&&(id!=='jak'||C1.jak));let hurt=false;for(const id of all){const h=HEROES[id];if(h.hp<h.maxHp)hurt=true;h.hp=h.maxHp;}
   sfxItem&&sfxItem();for(let i=0;i<16;i++)PARTS.push({type:'fdust',x:lum.x+rnd(-30,30),y:lum.y,z:rnd(10,80),vx:rnd(-10,10),vy:rnd(-4,4),vz:rnd(20,40),life:0,max:rnd(.6,1.1),s:rnd(1,2.2),col:'170,230,255'});
   say(hurt?(C1.jak?"Cool, clear water from deep under the forest… Every ache is gone. We're both good as new.":"Cool, clear water from deep under the forest… Every ache is gone. I'm good as new."):"The water is cool and clear. I already feel fine, but it's lovely all the same.");}
@@ -42,7 +42,7 @@ function setupDun(){DUNINT.length=0;const r=DUN.room,D=(x,y,reach,fn)=>DUNINT.pu
   }
   if(r===6){D(935,568,62,()=>goScene(()=>{enterThorn();lum.x=SPRING_DOOR.x;lum.y=SPRING_DOOR.y+50;lum.face=1;cam.x=lum.x;cam.y=lum.y-50;resetJakFollow();}));
     DUNINT.push({x:800,y:608,reach:95,onInteract:drinkSpring});}
-  if(r===7){D(470,612,64,()=>goScene(()=>{enterThorn();lum.x=CELLAR_DOOR.x;lum.y=CELLAR_DOOR.y+50;lum.face=1;cam.x=lum.x;cam.y=lum.y-50;resetJakFollow();}));
+  if(r===7){D(470,612,64,()=>goScene(()=>{enterThorn();lum.x=CELLAR_DOOR.x;lum.y=CELLAR_DOOR.y+CMOUTH.ry+30;lum.face=1;cam.x=lum.x;cam.y=lum.y-50;resetJakFollow();}));
     D(950,545,80,()=>say("The passage behind the table twists deeper into the dark… I'll come back when I'm ready."));}
   if(r===5){D(700,760,70,()=>dunGo(4,705,440,1));if(!C1.bigVixen)DUNINT.push({x:700,y:615,reach:95,onInteract:()=>{const g=DFOES.find(f=>f.kind==='bigvixen');if(!g)return;talk([['Lum',"…This one is much bigger than the little thief. It could be dangerous."]],false,()=>askChoice("Wake the fox?",[["Yes",()=>{g.asleep=0;startEncounter(g,'normal');}],["No",()=>say("Let sleeping foxes lie.")]]));}});L(560,600,60,["So many eyes…"]);}}
 function webInteract(){if(C1.webCut){dunGo(4,700,730,-1);return;}

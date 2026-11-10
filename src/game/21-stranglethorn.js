@@ -48,6 +48,7 @@ function thornFree(x,y){if(x<18||y<14||y>TH_-14)return false;if(x>TW_-12&&Math.f
   if((nearL||nearR)&&(nearT||nearB)){const vr=r+(nearB?1:0),vc=c+(nearR?1:0);if(hW(vr,vc-1)||hW(vr,vc)||vW(vr-1,vc)||vW(vr,vc))return false;}
   // tree trunks that stand inside a corridor
   if(Math.hypot((x-(12*TCW+TCW/2))/110,(y-(2*TCH+62))/34)<1)return false;
+  if(Math.hypot((x-CELLAR_DOOR.x)/(CMOUTH.rx+6),(y-CELLAR_DOOR.y)/(CMOUTH.ry+8))<1)return false;
   for(const f of THORN.forage||[])if(Math.hypot((x-f.x)/34,(y-f.y+4)/12)<1)return false;
   if(!C1.thornBoss&&r===TMZ.finish&&c>=13)return false;
   return true;}

@@ -37,12 +37,30 @@ function jakInteract(){if(C1.jak)return;
   if(!hasP&&!hasH){talk([['Lum',"He's breathing, but only just. I need something to heal him… a potion, or healing powder."]]);return;}
   const opts=[];if(hasP)opts.push(["Healing Potion",()=>jakWake('potion')]);if(hasH)opts.push(["Healing Powder",()=>jakWake('hpowder')]);if(opts.length<2)opts.push(["Not yet",()=>{}]);
   talk([['Lum',"A man, slumped against the roots. He's barely breathing."]],false,()=>askChoice("Use on the stranger?",opts));}
+/* the Thornroot Cellar's entrance: a round, stone-ringed opening with root steps going down and a red glow below */
+const CMOUTH={rx:92,ry:34};
+function drawCellarMouth(){const x=CELLAR_DOOR.x,y=CELLAR_DOOR.y,rx=CMOUTH.rx,ry=CMOUTH.ry;ctx.save();
+  // trodden clearing around it
+  {const g=ctx.createRadialGradient(x,y,rx*.6,x,y,rx*2.1);g.addColorStop(0,'rgba(70,58,48,.55)');g.addColorStop(1,'rgba(70,58,48,0)');ctx.fillStyle=g;ctx.beginPath();ctx.ellipse(x,y,rx*2.1,ry*2.4,0,0,TAU);ctx.fill();}
+  // the pit
+  {const g=ctx.createRadialGradient(x,y+ry*.3,2,x,y,rx);g.addColorStop(0,'#090304');g.addColorStop(.75,'#1a0d0c');g.addColorStop(1,'#2e1e18');ctx.fillStyle=g;ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,TAU);ctx.fill();}
+  // root steps going down into the dark
+  ctx.save();ctx.beginPath();ctx.ellipse(x,y,rx-4,ry-3,0,0,TAU);ctx.clip();
+  for(let i=0;i<4;i++){const sy=y-ry*.55+i*ry*.32,w=rx*(1.05-i*.17),a=.55-i*.12;ctx.strokeStyle=`rgba(120,86,60,${a})`;ctx.lineWidth=5-i;ctx.beginPath();ctx.ellipse(x+rx*.08,sy,w*.6,ry*.22,0,.15*Math.PI,.85*Math.PI);ctx.stroke();}
+  ctx.restore();
+  // red light from the cellar below
+  ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,x,y+ry*.2,rx*.9,'200,60,50',.22+.08*Math.sin(T*1.6));ctx.restore();
+  // stone ring
+  for(let i=0;i<22;i++){const a=i/22*TAU,h=hash(i,7,331),sx=x+Math.cos(a)*(rx+4),sy=y+Math.sin(a)*(ry+3),s=7+h*5;
+    ctx.fillStyle=`rgb(${92+h*30|0},${84+h*26|0},${80+h*22|0})`;ctx.strokeStyle='rgba(30,22,20,.7)';ctx.lineWidth=1.2;ctx.beginPath();ctx.ellipse(sx,sy,s,s*.62,a,0,TAU);ctx.fill();ctx.stroke();
+    ctx.fillStyle='rgba(255,255,255,.12)';ctx.beginPath();ctx.ellipse(sx-s*.25,sy-s*.2,s*.4,s*.22,a,0,TAU);ctx.fill();}
+  ctx.restore();}
 const THINT=[{x:JAKREST.x,y:JAKREST.y,reach:95,onInteract:()=>jakInteract()},{x:30,y:TMZ.start*TCH+TCH/2+10,reach:60,door:true,onInteract:()=>goScene(()=>{buildWoods();buildWoodsC1();SCENE='woods';lum.x=2610;lum.y=628;lum.face=-1;lum.state='idle';lum.vx=lum.vy=0;cam.x=lum.x+60;cam.y=lum.y-50;resetJakFollow();})},
   // the top dead end: an underground passage down to the Hidden Spring
   {x:5*TCW+TCW/2,y:72,reach:72,door:true,onInteract:()=>{const go=()=>dunGo(6,935,590,-1);if(C1.springSeen){go();return;}
     talk([['Lum',"Wait… the roots here dip down into the ground. There's an underground passage!"]],false,()=>{C1.springSeen=1;go();});}},
   // the small pocket near the bottom right: stairs down to the Thornroot Cellar
-  {x:11*TCW+TCW/2,y:10*TCH+130,reach:72,door:true,onInteract:()=>dunGo(7,560,620,1)}];
+  {x:11*TCW+TCW/2,y:10*TCH+70,reach:96,door:true,onInteract:()=>dunGo(7,560,620,1)}];
 
 // roaming creatures: spiders, Flora, red slimes and red foxes
 const THFOES=[];let thFoesBuilt=false;const THBOSS={kind:'bigspider',scene:'thorn',x:12*TCW+TCW/2,y:2*TCH+190,s:1,pack:1,calm:0,dead:0,ph:0,face:-1,boss:1};
@@ -79,6 +97,7 @@ function drawThorn(){const vw=W/zoom,vh=H/zoom,x0=cam.x-vw/2-60,y0=cam.y-vh/2-60
   // fallen petals and a darker rim outside the maze
   ctx.fillStyle='rgba(10,8,12,.55)';if(x0<0)ctx.fillRect(x0,y0,-x0,y1-y0);if(x1>TW_)ctx.fillRect(TW_,y0,x1-TW_,y1-y0);if(y0<0)ctx.fillRect(x0,y0,x1-x0,-y0);
   for(const d of THORN.decals||[]){const im=IMG[d.n];if(!ready(im))continue;const h=d.w*im.naturalHeight/im.naturalWidth;if(d.x+d.w/2<x0||d.x-d.w/2>x1||d.y+h/2<y0||d.y-h/2>y1)continue;ctx.save();ctx.translate(d.x,d.y);if(d.flip)ctx.scale(-1,1);ctx.drawImage(im,-d.w/2,-h/2,d.w,h);ctx.restore();}
+  drawCellarMouth();
   for(const f of THORN.flowers)if(f.x>x0-30&&f.x<x1+30&&f.y>y0-30&&f.y<y1)drawRedFlowers(f.x,f.y,f.s,f.seed);
   const L=[];for(const o of THORN.props)if(o.x>x0-o.w/2-40&&o.x<x1+o.w/2+40&&o.y>y0-20&&o.y<y1+o.w*1.4)L.push([o.y,o]);L.push([lum.y,null]);L.sort((a,b)=>a[0]-b[0]);
   for(const g of THFOES)if(g.x>x0-150&&g.x<x1+150&&g.y>y0-60&&g.y<y1+260)L.push([g.y,{t:'thfoe',ref:g}]);if(!C1.thornBoss)L.push([THBOSS.y,{t:'boss'}]);if(!C1.jak)L.push([JAKREST.y,{t:'jakrest'}]);else if(JAKF&&jakInParty())L.push([JAKF.y,{t:'jak'}]);L.sort((a,b)=>a[0]-b[0]);
