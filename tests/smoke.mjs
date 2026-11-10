@@ -125,6 +125,17 @@ const CASES = {
     check(lines.length === 4 && /imagination/.test(lines[1]) && /hardest places/.test(lines[2]), 'Lum\'s search hint is missing: ' + JSON.stringify(lines));
     await wait(600);
   },
+  async 'stranglethorn-forage'(p) {
+    await p.evaluate(() => window.__g.startThornPreview()); await wait(1500);
+    const n = await p.evaluate(() => { const g = window.__g; g.DLG.active = false; g.THFOES.length = 0; const f = g.THORN.forage[0]; g.lum.x = f.x + (f.x > g.lum.x ? -60 : 60); g.lum.x = f.x - 60; g.lum.y = f.y + 30; return g.THORN.forage.length; });
+    check(n >= 3, 'only ' + n + ' forage bushes in Stranglethorn');
+    await wait(900);
+    check(await p.evaluate(() => !!(window.__g.NEAR && window.__g.NEAR.forage)), 'no pick emote next to a Stranglethorn bush');
+    await p.screenshot({ path: path.join(SHOTS, 'stranglethorn-forage-bush-' + (p.viewportSize().width < 600 ? 'phone' : 'desktop') + '.png') });
+    const id = await p.evaluate(() => window.__g.THORN.forage[0].id);
+    await p.evaluate(() => window.__g.pressA()); await wait(400);
+    check(await p.evaluate(id => (window.__g.MATS[id] || 0) >= 2 && window.__g.THORN.forage[0].picked, id), 'picking the bush gave nothing');
+  },
   async 'deeproot-sleeping-fox'(p) {
     await startCh1(p);
     await p.evaluate(() => { const g = window.__g; g.C1X.bigVixen = 0; g.enterDun(5, 900, 600, -1);

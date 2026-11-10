@@ -34,6 +34,12 @@ function buildThorn(){if(THORN.built)return;THORN.built=true;const P=THORN.props
     THORN.decals.push({n:d[0],w:d[1]*(.9+H_(r,c,85)*.2),x:c*TCW+TCW/2+(H_(r,c,87)-.5)*110,y:r*TCH+TCH/2+12+(H_(r,c,89)-.5)*70,flip:H_(r,c,91)<.5});}
   // extra webs gather near the spider's tree and around Jak's hollow
   for(const [n,w,x,y,f] of [['thdec_stickweb',300,13*TCW+TCW/2,2*TCH+175,false],['thdec_fernweb',220,11*TCW+TCW/2,2*TCH+190,true],['thdec_smallweb',130,12*TCW+60,2*TCH+230,false],['thdec_litterweb',175,7*TCW+TCW*.62,9*TCH+200,true]])THORN.decals.push({n,w,x,y,flip:f});
+  // berry bushes Lum can pick: a few scattered through open cells, some down the wrong turns
+  THORN.forage=[];{const busy_=(r,c)=>(r===TMZ.start&&c<=1)||(r===7&&c===1)||(r===TMZ.finish&&c>=11)||(r===2&&c>=11),cells=[];
+    for(let r=0;r<TMZ.R;r++)for(let c=0;c<TMZ.C;c++)if(prev.has(key(r,c))&&!busy_(r,c))cells.push([r,c]);cells.sort((a,b)=>H_(a[0],a[1],97)-H_(b[0],b[1],97));
+    const KS=[6,0,4],got=[];for(const [r,c] of cells){if(got.length>=5)break;if(got.some(([a,b])=>Math.abs(a-r)+Math.abs(b-c)<4))continue;got.push([r,c]);
+      const k=KS[got.length%3],side=H_(r,c,99)<.5?-1:1,x=c*TCW+TCW/2+side*(45+H_(r,c,101)*25),y=r*TCH+TCH*.42+(H_(r,c,103)-.5)*40;
+      P.push({t:'shrub',k,x,y,s:SHR[k].s*1.05,flip:side>0,ph:x*.01,w:180});THORN.forage.push({x,y,id:FORAGE_MAP[k],n:2,picked:0});}}
   THORN.mist=[];for(let i=0;i<40;i++)THORN.mist.push({x:hash(i,1,77)*TW_,y:hash(i,2,77)*TH_,r:160+hash(i,3,77)*220,ph:hash(i,4,77)*TAU});}
 function thornFree(x,y){if(x<18||y<14||y>TH_-14)return false;if(x>TW_-12&&Math.floor(y/TCH)!==TMZ.finish)return false;if(x>TW_+30)return false;
   const c=clamp(Math.floor(x/TCW),0,TMZ.C-1),r=clamp(Math.floor(y/TCH),0,TMZ.R-1),lx=x-c*TCW,ly=y-r*TCH,T_=34,B_=24,SX=42;
@@ -42,10 +48,11 @@ function thornFree(x,y){if(x<18||y<14||y>TH_-14)return false;if(x>TW_-12&&Math.f
   if((nearL||nearR)&&(nearT||nearB)){const vr=r+(nearB?1:0),vc=c+(nearR?1:0);if(hW(vr,vc-1)||hW(vr,vc)||vW(vr-1,vc)||vW(vr,vc))return false;}
   // tree trunks that stand inside a corridor
   if(Math.hypot((x-(12*TCW+TCW/2))/110,(y-(2*TCH+62))/34)<1)return false;
+  for(const f of THORN.forage||[])if(Math.hypot((x-f.x)/34,(y-f.y+4)/12)<1)return false;
   if(!C1.thornBoss&&r===TMZ.finish&&c>=13)return false;
   return true;}
 function solveThorn(px,py,nx,ny){if(thornFree(nx,ny))return [nx,ny];if(thornFree(nx,py))return [nx,py];if(thornFree(px,ny))return [px,ny];return [px,py];}
-function enterThorn(){buildThorn();if(!THORN.spiders)buildThornCritters();buildThornFoes();SCENE='thorn';lum.x=40;lum.y=TMZ.start*TCH+TCH/2+10;lum.face=1;lum.vx=lum.vy=0;lum.state='idle';lum.alpha=1;cam.x=lum.x+120;cam.y=lum.y-50;THORN.t=0;resetJakFollow();if(!C1.jak&&!C1.jakSeenT)C1.jakSeenT=0;GOAL.tag='TASK';GOAL.text='Follow the red flowers through Stranglethorn';HINT.goalT=0;}
+function enterThorn(){buildThorn();if(!THORN.fint){THORN.fint=1;for(const f of THORN.forage)THINT.push({x:f.x,y:f.y,reach:76,lum:true,forage:f,onInteract:()=>pickForage(f)});}for(const f of THORN.forage)f.picked=0;if(!THORN.spiders)buildThornCritters();buildThornFoes();SCENE='thorn';lum.x=40;lum.y=TMZ.start*TCH+TCH/2+10;lum.face=1;lum.vx=lum.vy=0;lum.state='idle';lum.alpha=1;cam.x=lum.x+120;cam.y=lum.y-50;THORN.t=0;resetJakFollow();if(!C1.jak&&!C1.jakSeenT)C1.jakSeenT=0;GOAL.tag='TASK';GOAL.text='Follow the red flowers through Stranglethorn';HINT.goalT=0;}
 function startThornPreview(){SAVEC.finished=0;audioInit();c1Reset();C1.introDone=1;C1.hedgeSeen=1;C1I.on=false;WEVENT.on=false;INTRO.lumShown=true;if(!BAG.includes('lantern'))BAG.push('lantern');FADE.a=1;FADE.dir=-1;enterThorn();}
 function updateThorn(dt){updateThornAtmos(dt);updateThornCritters(dt);updateThornFoes(dt);updateJakFollow(dt);
   if(!C1.jak&&!C1.jakSpotted&&!DLG.active&&!FADE.dir&&Math.hypot(lum.x-JAKREST.x,lum.y-JAKREST.y)<300){C1.jakSpotted=1;talk([['Lum',"Someone's there… slumped against the roots of that old oak."]]);}
@@ -58,7 +65,7 @@ function drawRedFlowers(x,y,s,seed){ctx.save();ctx.translate(x,y);ctx.scale(s,s)
     ctx.fillStyle='#e0363f';for(let p=0;p<5;p++){const a=p/5*TAU+.6;ctx.beginPath();ctx.ellipse(Math.cos(a)*r*.45,Math.sin(a)*r*.45,r*.42,r*.3,a,0,TAU);ctx.fill();}
     ctx.fillStyle='#2a0a0e';ctx.beginPath();ctx.arc(0,0,r*.28,0,TAU);ctx.fill();ctx.restore();}
   ctx.restore();}
-function drawThornProp(o,alpha){const name=o.t==='hedge'?'bramble_hedge':o.t==='arch'?'bramble_arch':o.t==='oak'?'oak_big':o.t==='web'?'webtree':o.img;const im=IMG[name];if(!ready(im))return;
+function drawThornProp(o,alpha){if(o.t==='shrub'){drawShrub(o);return;}const name=o.t==='hedge'?'bramble_hedge':o.t==='arch'?'bramble_arch':o.t==='oak'?'oak_big':o.t==='web'?'webtree':o.img;const im=IMG[name];if(!ready(im))return;
   const w=o.w,h=w*im.naturalHeight/im.naturalWidth;ctx.save();ctx.globalAlpha=alpha;ctx.translate(o.x,o.y);if(o.flip)ctx.scale(-1,1);
   if(o.t==='rose'&&THORN.blooms){const tw=o.img==='rose_twin';THORN.blooms.push([o.x+(tw?w*.3*(o.flip?-1:1):0),o.y-h*(o.img==='rose_bud'?.9:tw?.86:.88)]);}
   const base=o.t==='oak'?.99:o.t==='web'?.97:o.t==='tree'?.985:.94;ctx.drawImage(im,-w/2,-h*base,w,h);ctx.restore();
