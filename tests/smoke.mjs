@@ -73,6 +73,8 @@ const CASES = {
   async battle(p) {
     await startCh1(p);
     await p.evaluate(() => window.__g.startEncounter({ kind: 'spider', scene: 'dun', x: 0, y: 0, s: 1, pack: 1, calm: 0 }, 'normal'));
+    const intro = await p.evaluate(() => window.__g.WIPEX.label);
+    check(intro === 'A Spider appears!', `battle intro read "${intro}"`);
     let ph = '';
     for (let i = 0; i < 50 && ph !== 'heroMenu'; i++) { await wait(150); ph = await p.evaluate(() => window.__g.BATTLE.phase); }
     check(ph === 'heroMenu', 'battle never reached the hero menu (phase ' + ph + ')');

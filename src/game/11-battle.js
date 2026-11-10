@@ -23,7 +23,7 @@ function drawWipe(){if(WIPE.p<=0)return;const e=WIPE.p<1?(1-Math.cos(Math.PI*WIP
   ctx.restore();}
 
 /* ---------- starting and ending ---------- */
-function startEncounter(g,mode){if(BATTLE.on||WIPE.dir||WEVENT.on||g.dead||g.calm>0)return;BATTLE.capG=g;CAPTURE.want=true;BATTLE.pending=true;lum.vx=lum.vy=0;sfxEncounter();WIPE.label=mode==='first'?'First Strike!':g.kind==='bigvixen'?'The Elder Vixen awakens!':g.kind==='vixen'?'The Vixen bares her teeth!':g.kind==='slugking'?'The Slug King appears!':g.kind==='reaper'?'The Grave Reaper attacks!':g.kind==='bigspider'?'The Broodmother descends!':`A wild ${FOE_TYPES[g.kind||'slime'].name} appears!`;
+function startEncounter(g,mode){if(BATTLE.on||WIPE.dir||WEVENT.on||g.dead||g.calm>0)return;BATTLE.capG=g;CAPTURE.want=true;BATTLE.pending=true;lum.vx=lum.vy=0;sfxEncounter();WIPE.label=mode==='first'?'First Strike!':g.kind==='bigvixen'?'The Elder Vixen awakens!':g.kind==='vixen'?'The Vixen bares her teeth!':g.kind==='slugking'?'The Slug King appears!':g.kind==='reaper'?'The Grave Reaper attacks!':g.kind==='bigspider'?'The Broodmother descends!':(n=>`${/^[AEIOU]/.test(n)?'An':'A'} ${n} appears!`)(FOE_TYPES[g.kind||'slime'].name.split(' ').pop());
   pageTurn(()=>setupBattle(g,mode));}
 function setupBattle(g,mode){const B=BATTLE;B.on=true;B.pending=false;B.field=g;B.pops=[];B.spark=[];B.fx=[];B.hitstop=0;B.msg='';B.items=null;B.cur=0;B.menu=0;B.target=0;B.defending={};B.t=0;BMUS.on=true;
   B.heroes=PARTY_ORDER.map((id,i)=>({id,home:i,x:0,y:0,ox:0,oy:0,fr:16,face:1,hurt:0,ko:0}));
