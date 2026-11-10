@@ -195,6 +195,15 @@ const CASES = {
     await p.evaluate(() => window.__g.pressA()); await wait(500);
     check(await p.evaluate(() => window.__g.BAG.includes('foxhood') && !window.__g.DLG.active), 'Fox Hood was not picked up with just the toast');
   },
+  async 'cellar-table-depth'(p) {
+    await startCh1(p);
+    await p.evaluate(() => { const g = window.__g; g.enterDun(7, 945, 555, 1); g.DFOES.length = 0; g.DLG.active = false; }); await wait(1500);
+    check(await p.evaluate(() => !window.__g.dunFree(945, 600) && !window.__g.dunFree(1050, 620)), 'Lum can walk onto the cellar table');
+    check(await p.evaluate(() => window.__g.dunFree(945, 555) && window.__g.dunFree(945, 690)), 'Lum cannot get behind or in front of the cellar table');
+    await p.evaluate(() => { const g = window.__g; g.DLG.active = false; g.lumS.x = 945; g.lumS.y = 556; }); await wait(400);
+    await p.screenshot({ path: path.join(SHOTS, 'cellar-table-behind-' + (p.viewportSize().width < 600 ? 'phone' : 'desktop') + '.png') });
+    await p.evaluate(() => { const g = window.__g; g.lumS.x = 945; g.lumS.y = 690; }); await wait(400);
+  },
   async 'deeproot-sleeping-fox'(p) {
     await startCh1(p);
     await p.evaluate(() => { const g = window.__g; g.C1X.bigVixen = 0; g.enterDun(5, 900, 600, -1);
