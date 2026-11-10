@@ -150,6 +150,19 @@ const CASES = {
       g.foxRingSteal({ type: 'slime', x: 0, y: 0 }); Math.random = r; return (g.MATS.slimeparts || 0) - before; });
     check(got === 1, 'Fox Ring did not steal on a successful roll');
   },
+  async 'hidden-spring'(p) {
+    await p.evaluate(() => window.__g.startThornPreview()); await wait(1200);
+    await p.evaluate(() => { const g = window.__g; g.DLG.active = false; g.THFOES.length = 0; g.lum.x = g.SPRING_DOOR.x; g.lum.y = g.SPRING_DOOR.y + 40; }); await wait(800);
+    check(await p.evaluate(() => !!(window.__g.NEAR && window.__g.NEAR.door)), 'no door emote at the passage');
+    await p.evaluate(() => window.__g.pressA()); await wait(300);
+    check(await p.evaluate(() => /underground passage/.test(window.__g.DLG.lines[0][1])), 'Lum did not notice the passage');
+    await p.evaluate(() => window.__g.pressA()); await wait(2200);
+    check(await p.evaluate(() => window.__g.SCENE === 'dun' && window.__g.DUN.room === 6), 'did not reach the Hidden Spring');
+    await p.evaluate(() => { const g = window.__g; g.DLG.active = false; g.HEROES_X.lum.hp = 3; g.lum.x = 800; g.lum.y = 610; }); await wait(900);
+    await p.evaluate(() => window.__g.pressA()); await wait(400);
+    check(await p.evaluate(() => window.__g.HEROES_X.lum.hp === window.__g.HEROES_X.lum.maxHp), 'drinking did not restore HP');
+    await wait(800);
+  },
   async 'deeproot-sleeping-fox'(p) {
     await startCh1(p);
     await p.evaluate(() => { const g = window.__g; g.C1X.bigVixen = 0; g.enterDun(5, 900, 600, -1);

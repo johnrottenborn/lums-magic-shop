@@ -37,7 +37,10 @@ function jakInteract(){if(C1.jak)return;
   if(!hasP&&!hasH){talk([['Lum',"He's breathing, but only just. I need something to heal him… a potion, or healing powder."]]);return;}
   const opts=[];if(hasP)opts.push(["Healing Potion",()=>jakWake('potion')]);if(hasH)opts.push(["Healing Powder",()=>jakWake('hpowder')]);if(opts.length<2)opts.push(["Not yet",()=>{}]);
   talk([['Lum',"A man, slumped against the roots. He's barely breathing."]],false,()=>askChoice("Use on the stranger?",opts));}
-const THINT=[{x:JAKREST.x,y:JAKREST.y,reach:95,onInteract:()=>jakInteract()},{x:30,y:TMZ.start*TCH+TCH/2+10,reach:60,door:true,onInteract:()=>goScene(()=>{buildWoods();buildWoodsC1();SCENE='woods';lum.x=2610;lum.y=628;lum.face=-1;lum.state='idle';lum.vx=lum.vy=0;cam.x=lum.x+60;cam.y=lum.y-50;resetJakFollow();})}];
+const THINT=[{x:JAKREST.x,y:JAKREST.y,reach:95,onInteract:()=>jakInteract()},{x:30,y:TMZ.start*TCH+TCH/2+10,reach:60,door:true,onInteract:()=>goScene(()=>{buildWoods();buildWoodsC1();SCENE='woods';lum.x=2610;lum.y=628;lum.face=-1;lum.state='idle';lum.vx=lum.vy=0;cam.x=lum.x+60;cam.y=lum.y-50;resetJakFollow();})},
+  // the top dead end: an underground passage down to the Hidden Spring
+  {x:5*TCW+TCW/2,y:72,reach:72,door:true,onInteract:()=>{const go=()=>dunGo(6,935,590,-1);if(C1.springSeen){go();return;}
+    talk([['Lum',"Wait… the roots here dip down into the ground. There's an underground passage!"]],false,()=>{C1.springSeen=1;go();});}}];
 
 // roaming creatures: spiders, Flora, red slimes and red foxes
 const THFOES=[];let thFoesBuilt=false;const THBOSS={kind:'bigspider',scene:'thorn',x:12*TCW+TCW/2,y:2*TCH+190,s:1,pack:1,calm:0,dead:0,ph:0,face:-1,boss:1};

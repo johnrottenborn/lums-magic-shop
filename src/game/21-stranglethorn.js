@@ -35,7 +35,7 @@ function buildThorn(){if(THORN.built)return;THORN.built=true;const P=THORN.props
   // extra webs gather near the spider's tree and around Jak's hollow
   for(const [n,w,x,y,f] of [['thdec_stickweb',300,13*TCW+TCW/2,2*TCH+175,false],['thdec_fernweb',220,11*TCW+TCW/2,2*TCH+190,true],['thdec_smallweb',130,12*TCW+60,2*TCH+230,false],['thdec_litterweb',175,7*TCW+TCW*.62,9*TCH+200,true]])THORN.decals.push({n,w,x,y,flip:f});
   // berry bushes Lum can pick: a few scattered through open cells, some down the wrong turns
-  THORN.forage=[];{const busy_=(r,c)=>(r===TMZ.start&&c<=1)||(r===7&&c===1)||(r===TMZ.finish&&c>=11)||(r===2&&c>=11),cells=[];
+  THORN.forage=[];{const busy_=(r,c)=>(r===0&&c===5)||(r===TMZ.start&&c<=1)||(r===7&&c===1)||(r===TMZ.finish&&c>=11)||(r===2&&c>=11),cells=[];
     for(let r=0;r<TMZ.R;r++)for(let c=0;c<TMZ.C;c++)if(prev.has(key(r,c))&&!busy_(r,c))cells.push([r,c]);cells.sort((a,b)=>H_(a[0],a[1],97)-H_(b[0],b[1],97));
     const KS=[6,0,4],got=[];for(const [r,c] of cells){if(got.length>=5)break;if(got.some(([a,b])=>Math.abs(a-r)+Math.abs(b-c)<4))continue;got.push([r,c]);
       const k=KS[got.length%3],side=H_(r,c,99)<.5?-1:1,x=c*TCW+TCW/2+side*(45+H_(r,c,101)*25),y=r*TCH+TCH*.42+(H_(r,c,103)-.5)*40;
