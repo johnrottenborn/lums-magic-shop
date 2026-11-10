@@ -60,7 +60,7 @@ let battleFlash=0;
 
 /* ---------- effects ---------- */
 const PARTS=[];let shake=0;
-function puff(x,y,n,type,o={}){for(let i=0;i<n;i++)PARTS.push({type,x,y,z:o.z??0,vx:rnd(-1,1)*(o.sp??40),vy:rnd(-1,1)*(o.sp??40)*.6,vz:o.vz?rnd(o.vz*.5,o.vz):0,life:0,max:rnd(.5,1)*(o.life??1),s:rnd(.6,1.2)*(o.size??4),rot:rnd(0,TAU),vr:rnd(-8,8),col:o.col||'#fff'});}
+function puff(x,y,n,type,o={}){for(let i=0;i<n;i++)PARTS.push({type,x,y,z:o.z??0,vx:rnd(-1,1)*(o.sp??40),vy:rnd(-1,1)*(o.sp??40)*.6,vz:o.vz?rnd(o.vz*.5,o.vz):0,life:0,max:rnd(.5,1)*(o.life??1),s:rnd(.6,1.2)*(o.size??4),rot:rnd(0,TAU),vr:rnd(-8,8),col:o.col||(type==='fiz'?undefined:'#fff')});}
 const PUDDLES=[];
 /* spray: a loose cone of droplets and mist thrown from the spear tip */
 function emitSpray(n){

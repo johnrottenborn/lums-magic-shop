@@ -114,6 +114,11 @@ const CASES = {
     await p.reload(); await p.waitForFunction(() => window.__g, null, { timeout: 15000 }); await wait(1500);
     check(await p.evaluate(() => window.__g.readSave()) === null, 'a save came back after reloading');
   },
+  async 'bucket-pickup'(p) {
+    await p.evaluate(() => { const g = window.__g; g.INTRO.on = false; g.INTRO.waiting = false; g.DLG.active = false; g.enterWell(); }); await wait(1200);
+    await p.evaluate(() => { const g = window.__g; g.takeBucket(); }); await wait(1500);
+    check(await p.evaluate(() => window.__g.bucketTaken), 'bucket was not taken');
+  },
   async 'deeproot-sleeping-fox'(p) {
     await startCh1(p);
     await p.evaluate(() => { const g = window.__g; g.C1X.bigVixen = 0; g.enterDun(5, 900, 600, -1);
