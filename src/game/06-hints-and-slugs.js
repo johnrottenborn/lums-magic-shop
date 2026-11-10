@@ -2,7 +2,7 @@
 const GOAL={tag:'NEW TASK',text:'Prove to Lum you can handle the slimes'};
 const HINT={on:false,t:0,step:0,moved:0,looked:0,cast:0,goalT:0};let casts=0;
 const TOUCHUI=()=>typeof STICKUI!=='undefined'?STICKUI.touch:true,tw=(t,d)=>TOUCHUI()?t:d;
-const HINT_TEXT={get length(){return 3},get 0(){return tw('Drag on the left side of the screen to walk','Use WASD or the arrow keys to walk')},get 1(){return tw('When a bubble pops up over Cosmic, tap anywhere to take a look','When a bubble pops up over Cosmic, press E or click to take a look')},get 2(){return tw('Tap the Spell button to practice a spell','Press Space to practice a spell')}};
+const HINT_TEXT={get length(){return 3},get 0(){return tw('Drag on the left side of the screen to walk','Use WASD or the arrow keys to walk')},get 1(){return tw('When a bubble pops up over Cosmic, tap anywhere to take a look','When a bubble pops up over Cosmic, press E or click to take a look')},get 2(){return tw('When a sword pops up over Cosmic, tap anywhere to strike first','When a sword pops up over Cosmic, press E or click to strike first')}};
 function updateHints(dt){HINT.goalT+=dt;if(!HINT.on)return;HINT.t+=dt;if(Math.hypot(lum.vx,lum.vy)>40)HINT.moved+=dt;
   if(HINT.step===0&&HINT.moved>1.2){HINT.step=1;HINT.t=0;}if(HINT.step===1&&HINT.looked){HINT.step=2;HINT.t=0;}if(HINT.step===2&&HINT.cast){HINT.step=3;HINT.t=0;}if(HINT.step>=3&&HINT.t>1)HINT.on=false;}
 function drawHints(){if(!HINT.on&&HINT.goalT>7)return;if(MENU.a>.01)return;

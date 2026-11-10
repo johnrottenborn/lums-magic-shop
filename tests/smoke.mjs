@@ -93,6 +93,19 @@ const CASES = {
     await p.evaluate(() => { const g = window.__g; g.MENU.page = 'bag'; g.MENU.sel = { kind: 'bag', i: g.BAG.indexOf('crystalpouch') }; }); await wait(500);
     check(await p.evaluate(() => window.__g.MENU.sel && window.__g.BAG.includes('crystalpouch')), 'Foxfire Pouch card did not open');
   },
+  async 'sword-emote-first-strike'(p) {
+    await startCh1(p);
+    await p.evaluate(() => { const g = window.__g; g.enterDun(1, 560, 640, 1);
+      for (let i = g.DFOES.length - 1; i >= 0; i--) g.DFOES.splice(i, 1);
+      g.lum.bumpT = 99; const x = 660, y = 640;
+      g.DFOES.push({ id: 999, kind: 'spider', scene: 'dun', room: 1, x, y, hx: x, hy: y, tx: x, ty: y, s: 1, pack: 1, calm: 0, dead: 0, ph: 0, t: 0, face: -1 }); });
+    await wait(1500);
+    await p.evaluate(() => { const g = window.__g; g.DLG.active = false; const f = g.DFOES[0]; f.x = f.tx = g.lum.x + 100; f.y = f.ty = g.lum.y; }); await wait(250);
+    check(await p.evaluate(() => !!(window.__g.NEAR && window.__g.NEAR.foe)), 'no sword emote next to a spider');
+    await p.screenshot({ path: path.join(SHOTS, 'sword-emote-bubble-' + (p.viewportSize().width < 600 ? 'phone' : 'desktop') + '.png') });
+    await p.evaluate(() => window.__g.pressA());
+    check(await p.evaluate(() => window.__g.WIPEX.label) === 'First Strike!', 'tapping by the sword did not start First Strike');
+  },
   async 'deeproot-sleeping-fox'(p) {
     await startCh1(p);
     await p.evaluate(() => { const g = window.__g; g.C1X.bigVixen = 0; g.enterDun(5, 900, 600, -1);

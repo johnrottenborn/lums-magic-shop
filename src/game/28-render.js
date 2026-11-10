@@ -178,11 +178,7 @@ function drawUI_(){drawHints();
     const kg=ctx.createRadialGradient(kx-6,ky-6,2,kx,ky,24);kg.addColorStop(0,'rgba(255,255,255,.98)');kg.addColorStop(1,'rgba(225,240,215,.85)');ctx.fillStyle=kg;ctx.beginPath();ctx.arc(kx,ky,22,0,TAU);ctx.fill();}
   else{const gx=Math.max(18,W*.05)+stick.R,gy=BTN.a.y;ctx.strokeStyle='rgba(255,255,255,.45)';ctx.setLineDash([4,6]);ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(gx,gy,stick.R,0,TAU);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle='rgba(255,255,255,.3)';ctx.beginPath();ctx.arc(gx,gy,20,0,TAU);ctx.fill();}
   ctx.restore();}
-  const A=BTN.a,B=BTN.b,ax=A.x+(A.shake?Math.sin(A.shake*60)*3:0);
-  drawBtn(A,ax,['#d4f3ff','#3aa3e8','#1d4f9a'],'');drawNearDots();
-  if(lum.cool>0){ctx.fillStyle='rgba(10,30,60,.22)';ctx.beginPath();ctx.moveTo(ax,A.y);ctx.arc(ax,A.y,A.r,-Math.PI/2,-Math.PI/2+TAU*lum.cool/COOL);ctx.closePath();ctx.fill();}
-  ctx.globalAlpha=.8*UI_FADE;ctx.font='700 9px "Alegreya SC", Georgia, serif';ctx.textAlign='center';ctx.lineWidth=3;ctx.strokeStyle='rgba(40,70,35,.5)';ctx.fillStyle='#fff';
-  for(const [t,x,y] of [[PC==='cosmic'?'SPELL':CH>0?'POWDER':'WATER',A.x,A.y+A.r+13]]){ctx.strokeText(t,x,y);ctx.fillText(t,x,y);}ctx.globalAlpha=1;
+  drawNearDots();
   drawSay();
   if(battleFlash>0){ctx.fillStyle=`rgba(255,255,255,${(battleFlash*.6).toFixed(3)})`;ctx.fillRect(0,0,W,H);}
 }
@@ -193,7 +189,8 @@ function drawNearDots(){if(nearA<=0||DLG.active)return;let sx,sy;const hy=lum.y-
   ctx.fillStyle='rgba(60,50,30,.18)';ctx.beginPath();ctx.ellipse(bx+1,by+3,25,17,0,0,TAU);ctx.fill();
   ctx.fillStyle='#fffdf6';ctx.strokeStyle='rgba(60,50,40,.45)';ctx.lineWidth=1.6;ctx.beginPath();ctx.ellipse(bx,by,24,16,0,0,TAU);ctx.fill();ctx.stroke();
   ctx.beginPath();ctx.moveTo(bx-8,by+13);ctx.lineTo(bx-13,by+24);ctx.lineTo(bx-1,by+14);ctx.fill();
-  if(isGrab(NEAR))drawGrabHand(ctx,bx,by);
+  if(NEAR&&NEAR.foe)drawSwordEmote(ctx,bx,by);
+  else if(isGrab(NEAR))drawGrabHand(ctx,bx,by);
   else if(NEAR&&NEAR.fire&&canLumMix())drawMortar(ctx,bx,by+1,.95);
   else if(isDoor(NEAR)){const dw=11,dh=19,dx=bx-dw/2,dyb=by+dh/2-1,ope=.5+.5*Math.sin(T*3);
     ctx.fillStyle='#2a2622';ctx.beginPath();ctx.moveTo(dx,dyb);ctx.lineTo(dx,dyb-dh+dw/2);ctx.arc(bx,dyb-dh+dw/2,dw/2,Math.PI,0);ctx.lineTo(dx+dw,dyb);ctx.closePath();ctx.fill();
@@ -202,6 +199,7 @@ function drawNearDots(){if(nearA<=0||DLG.active)return;let sx,sy;const hy=lum.y-
     ctx.fillStyle='#2a2622';ctx.fillRect(dx-2,dyb-.4,dw+4,1.6);}
   else{ctx.fillStyle='#2a2622';for(let i=-1;i<=1;i++){const j=Math.max(0,Math.sin(T*5-i*.9))*2.2;ctx.beginPath();ctx.arc(bx+i*8,by-j,2.8,0,TAU);ctx.fill();}}
   ctx.restore();}
+function drawSwordEmote(c,x,y){const im=IMG.emote_sword;if(!ready(im))return;const h=23,b=Math.sin(T*6)*.9;c.drawImage(im,x-h/2,y-h/2-b,h,h);}
 function isGrab(o){if(!o)return false;if(o.grab)return o.grab();if(o.forage)return CH>0&&!o.forage.picked;return !!o.bucket||(!!o.cloth&&!shroudTaken);}
 function drawGrabHand(c,x,y){const im=IMG.emote_grab;if(ready(im)){const h=21,w=h*im.naturalWidth/im.naturalHeight,b=Math.sin(T*4)*.8;c.drawImage(im,x-w/2,y-h/2-b,w,h);return;}c.save();c.translate(x,y+1);c.fillStyle='#2a2622';c.lineJoin='round';
   // palm

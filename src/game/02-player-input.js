@@ -21,7 +21,6 @@ function layoutButtons(){const pad=Math.max(18,W*.05);
 function localPt(e){const r=cv.getBoundingClientRect();return [e.clientX-r.left,e.clientY-r.top];}
 const TAPS={};
 cv.addEventListener('pointerdown',e=>{e.preventDefault();if(WEV.end>6.5){const [rx,ry]=localPt(e);resultsTap(rx,ry);return;}{const [tx,ty]=localPt(e);TAPS[e.pointerId]={x:tx,y:ty,t:performance.now(),ok:!(BATTLE.on||MENU.open||INTRO.on||INTRO.waiting||Math.hypot(tx-(W-28),ty-28)<26||(PLAYER()&&Math.hypot(tx-BOOKBTN.x,ty-BOOKBTN.y)<BOOKBTN.r+10))};}{const [px,py]=localPt(e);if(Math.hypot(px-(W-28),py-28)<26){audioInit();setSound(!SND.on);return;}}if(INTRO.waiting){const [qx,qy]=localPt(e);titleTap(qx,qy);return;}if(INTRO.on){introSkip();return;}const [x,y]=localPt(e);if(C1I.on&&C1I.skipHit){const h=C1I.skipHit;if(x>h.x-6&&x<h.x+h.w+6&&y>h.y-8&&y<h.y+h.h+8){TAPS[e.pointerId].ok=false;skipC1Intro();return;}}if(MIX.on&&!CHOICE.on){TAPS[e.pointerId].ok=false;mixTap(x,y);return;}if(CHOICE.on){TAPS[e.pointerId].ok=false;for(const h of CHOICE.hits)if(x>h.x&&x<h.x+h.w&&y>h.y&&y<h.y+h.h){pickChoice(h.i);return;}return;}if(BATTLE.on){battlePointer(x,y);return;}if(BATTLE.pending||WIPE.dir)return;if(MENU.open){menuTap(x,y);return;}if(PLAYER()&&Math.hypot(x-BOOKBTN.x,y-BOOKBTN.y)<BOOKBTN.r+10){if(DLG.active)dlgNext();else openMenu();return;}
-  {const b=BTN.a;if(Math.hypot(x-b.x,y-b.y)<b.r*1.25){b.down=true;b.id=e.pointerId;cv.setPointerCapture(e.pointerId);TAPS[e.pointerId].ok=false;pressA();return;}}
   if(stick.id===null&&x<W*.62&&e.pointerType!=='mouse'){stick.id=e.pointerId;stick.bx=x;stick.by=y;stick.x=x;stick.y=y;cv.setPointerCapture(e.pointerId);}
 },{passive:false});
 cv.addEventListener('pointermove',e=>{{const tp=TAPS[e.pointerId];if(tp){const [x,y]=localPt(e);if(Math.hypot(x-tp.x,y-tp.y)>=14)tp.ok=false;}}if(e.pointerId===stick.id){const [x,y]=localPt(e);stick.x=x;stick.y=y;const dx=x-stick.bx,dy=y-stick.by,d=Math.hypot(dx,dy);
@@ -36,16 +35,21 @@ function inputVec(){if(INTRO.on||FADE.dir||MENU.open||WEVENT.on||CHOICE.on||MIX.
 const busy=()=>lum.state==='cast'||lum.state==='interact';
 /* A: water magic. Any droplet that lands on a foe starts a battle. */
 function backToTitle(){if(backToTitle.go)return;backToTitle.go=1;FADE.dir=1;FADE.cb=()=>location.reload();}
-function pressA(){if(WEV.end>9.7){backToTitle();return;}if(DLG.active&&!CHOICE.on&&!MIX.on&&!FADE.dir&&!MENU.open&&!BATTLE.pending&&!WIPE.dir&&!INTRO.on&&!INTRO.waiting&&performance.now()>=(CHOICE.until||0)){dlgNext();return;}if(CHOICE.on||MIX.on||FADE.dir||MENU.open||WEVENT.on||BATTLE.pending||WIPE.dir)return;if(INTRO.waiting){titleKey();return;}if(INTRO.on){introSkip();return;}if(DLG.active){dlgNext();return;}BTN.a.pulse=1;if(busy())return;if(lum.cool>0){BTN.a.shake=.3;return;}
-  lum.cool=PC==='cosmic'?1.5:COOL;lum.state='cast';lum.at=0;lum.sprayAcc=0;lum.fizzed=0;lum.quipped=0;HINT.cast=1;if(Math.abs(lum.aimx)>.2)lum.face=Math.sign(lum.aimx);}
+function pressA(){if(WEV.end>9.7){backToTitle();return;}if(DLG.active&&!CHOICE.on&&!MIX.on&&!FADE.dir&&!MENU.open&&!BATTLE.pending&&!WIPE.dir&&!INTRO.on&&!INTRO.waiting&&performance.now()>=(CHOICE.until||0)){dlgNext();return;}if(CHOICE.on||MIX.on||FADE.dir||MENU.open||WEVENT.on||BATTLE.pending||WIPE.dir)return;if(INTRO.waiting){titleKey();return;}if(INTRO.on){introSkip();return;}if(DLG.active){dlgNext();return;}if(busy())return;pressB();}
 /* B: interact with the nearest NPC or object in reach. */
-function nearInteract(){if(!PLAYER()||busy())return null;
+/* the sword emote: an enemy close enough to strike first. Bosses, sleeping/still foes and scripted fights keep their own openings. */
+const STRIKE_R=120,STRIKE_NO={slugking:1,reaper:1,bigspider:1,bigvixen:1};
+function nearFoe(){if(!PLAYER())return null;const L=SCENE==='garden'?SLUGS:SCENE==='thorn'?THFOES:SCENE==='dun'?DFOES.filter(g=>g.room===DUN.room):roomSlimes();let best=null,bd=STRIKE_R;
+  for(const g of L){if(!g||g.dead||g.calm>0||g.still||g.boss||g.scripted||STRIKE_NO[g.kind]||(g.rise!==undefined&&g.rise<1)||(g.scene&&g.scene!==SCENE))continue;const d=Math.hypot(g.x-lum.x,(g.y-lum.y)*1.4);if(d<bd){bd=d;best=g;}}return best;}
+function strikeFirst(g){HINT.cast=1;lum.vx=lum.vy=0;startEncounter(g,'first');}
+function nearInteract(){if(!PLAYER()||busy())return null;{const f=nearFoe();if(f)return {foe:f};}
   if(SCENE==='garden')for(const g of SLUGS)if(Math.hypot(g.x-lum.x,g.y-lum.y)<70)return {slug:g};
   if(SCENE!=='garden'&&SCENE!=='woods'&&SCENE!=='thorn')for(const g of roomSlimes())if(!g.dead&&Math.hypot(g.x-lum.x,g.y-lum.y)<90)return {slime:g};
   let best=null,bd=1e9;for(const o of (SCENE==='well'?WINT:SCENE==='study'?SINT:SCENE==='shed'?SHINT:SCENE==='pond'?PINT:SCENE==='shop'?SHOPINT:SCENE==='bed'?BEDINT:SCENE==='vhut'?VHINT:SCENE==='thgate'?THGINT:SCENE==='thorn'?THINT:SCENE==='dun'?DUNINT:SCENE==='woods'?WINTS:INTERACTABLES)){const d=Math.hypot(o.x-lum.x,o.y-lum.y);if(o.lum&&d<o.reach){best=o;break;}if(d<(o.reach||90)&&d<bd){bd=d;best=o;}}return best;}
 let NEAR=null,nearA=0;
 function tapScreen(){if(CHOICE.on||MIX.on||performance.now()<(CHOICE.until||0)||FADE.dir||MENU.open||BATTLE.pending||WIPE.dir||BATTLE.on)return;if(DLG.active){dlgNext();return;}if(NEAR&&!busy())pressB();}
 function pressB(){if(WEV.end>9.7){backToTitle();return;}if(FADE.dir||MENU.open||BATTLE.pending||WIPE.dir)return;if(INTRO.waiting){titleKey();return;}if(INTRO.on){introSkip();return;}BTN.b.pulse=1;if(DLG.active){dlgNext();return;}if(busy())return;
+  {const f=nearFoe();if(f){strikeFirst(f);return;}}
   if(SCENE==='garden')for(const g of SLUGS)if(Math.hypot(g.x-lum.x,g.y-lum.y)<70&&!DLG.active){lum.state='interact';lum.at=0;HINT.looked=1;g.shy=2.5;say(SLUG_LINES[(slugTalk++)%SLUG_LINES.length]);return;}
   if(SCENE!=='garden')for(const g of roomSlimes())if(!g.dead&&Math.hypot(g.x-lum.x,g.y-lum.y)<90){lum.state='interact';lum.at=0;say(['It\'s shimmering at me. Menacingly.','I can see little sparks of magic swirling inside it… like it swallowed a piece of the pool.','Its tentacles keep reaching for my staff. No! Mine!'][(slimeTalk++)%3]);return;}
   let best=null,bd=1e9;for(const o of (SCENE==='well'?WINT:SCENE==='study'?SINT:SCENE==='shed'?SHINT:SCENE==='pond'?PINT:SCENE==='shop'?SHOPINT:SCENE==='bed'?BEDINT:SCENE==='vhut'?VHINT:SCENE==='thgate'?THGINT:SCENE==='thorn'?THINT:SCENE==='dun'?DUNINT:SCENE==='woods'?WINTS:INTERACTABLES)){const d=Math.hypot(o.x-lum.x,o.y-lum.y);if(o.lum&&d<o.reach){best=o;break;}if(d<(o.reach||90)&&d<bd){bd=d;best=o;}}
