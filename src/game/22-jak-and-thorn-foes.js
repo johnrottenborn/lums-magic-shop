@@ -108,7 +108,7 @@ function drawThorn(){const vw=W/zoom,vh=H/zoom,x0=cam.x-vw/2-60,y0=cam.y-vh/2-60
   const sx=(lum.x-cam.x)*zoom+W/2,sy=(lum.y-70-cam.y)*zoom+H/2,R=Math.min(W,H)*.5*(1+.025*Math.sin(T*7)+.018*Math.sin(T*17.3)+.01*Math.sin(T*31));const g=ctx.createRadialGradient(sx,sy,R*.12,sx,sy,R);
   g.addColorStop(0,'rgba(8,4,14,0)');g.addColorStop(.4,'rgba(8,4,14,.26)');g.addColorStop(.8,'rgba(6,3,12,.66)');g.addColorStop(1,'rgba(5,2,10,.8)');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
   ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,sx+lum.face*14*zoom,sy+10*zoom,90*zoom,'255,190,110',.16+.03*Math.sin(T*9));ctx.restore();
-  if(FKS.fa>0&&!C1.fkDone){ctx.save();ctx.setTransform(DPR*zoom,0,0,DPR*zoom,DPR*(W/2-cam.x*zoom),DPR*(H/2-cam.y*zoom));ctx.globalCompositeOperation='lighter';drawGlow(ctx,FKS.cx,FKS.cy-280,320,'170,40,90',.28*FKS.fa);ctx.globalCompositeOperation='source-over';drawFokFrame(ctx,FKS.st===2?(FKS.t<1.4?4:5):Math.floor(T*4)%4,FKS.cx,FKS.cy+4,560,false,.6*FKS.fa);ctx.restore();}
+  if(FKS.fa>0&&!C1.fkDone){ctx.save();ctx.setTransform(DPR*zoom,0,0,DPR*zoom,DPR*(W/2-cam.x*zoom),DPR*(H/2-cam.y*zoom));ctx.globalCompositeOperation='lighter';drawGlow(ctx,FKS.cx,FKS.cy-280,320,'170,40,90',.28*FKS.fa);ctx.globalCompositeOperation='source-over';drawFokFrame(ctx,FKS.st===2?(FKS.t<1.4?4:5):Math.floor(T*4)%4,FKS.cx,FKS.cy+4,520,false,.88*FKS.fa);ctx.globalAlpha=1;drawLum();if(jakInParty()&&JAKF)drawJakOW();ctx.restore();}
   drawThornFog(1);
   if(FKS.flash>0){ctx.fillStyle=`rgba(255,240,250,${Math.min(1,FKS.flash).toFixed(3)})`;ctx.fillRect(0,0,W,H);}
   // the guiding roses keep a faint warm glow so they read through the fog
@@ -178,5 +178,5 @@ function drawFKS(){const x=FKS.cx,y=FKS.cy;
   if(FKS.ca>0&&ready(catlas)){const A=COS_ANIM.idle,dw=CFW*CSPR,dh=CFH*CSPR;ctx.save();ctx.globalAlpha=FKS.ca;ctx.fillStyle='rgba(0,0,0,.3)';ctx.beginPath();ctx.ellipse(x,y+2,26,7,0,0,TAU);ctx.fill();
     ctx.translate(x,y+3);if(-1!==A.native)ctx.scale(-1,1);ctx.drawImage(catlas,A.frames[0]*CFW,0,CFW,CFH,-dw/2,-dh*(264/270),dw,dh);ctx.restore();
     if(FKS.st>=1){ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,x,y-70,70,'170,40,90',.18*FKS.ca+.1*Math.sin(T*4)*FKS.ca);ctx.restore();}}
-  if(FKS.fa>0){const h=560,n=FKS.st===2?(FKS.t<1.4?4:5):Math.floor(T*4)%4;ctx.save();ctx.globalAlpha=FKS.fa;ctx.fillStyle='rgba(10,0,10,.45)';ctx.beginPath();ctx.ellipse(x,y,140,28,0,0,TAU);ctx.fill();ctx.restore();
+  if(FKS.fa>0){const h=520,n=FKS.st===2?(FKS.t<1.4?4:5):Math.floor(T*4)%4;ctx.save();ctx.globalAlpha=FKS.fa;ctx.fillStyle='rgba(10,0,10,.45)';ctx.beginPath();ctx.ellipse(x,y,140,28,0,0,TAU);ctx.fill();ctx.restore();
     ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,x,y-280,300,'160,30,80',(.22+.08*Math.sin(T*3))*FKS.fa);ctx.restore();drawFokFrame(ctx,n,x,y+4,h,false,FKS.fa);}}

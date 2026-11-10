@@ -153,7 +153,23 @@ function drawWoods(){const vw=W/zoom,vh=H/zoom,x0=cam.x-vw/2-40,y0=cam.y-vh/2-40
 /* ---------- the restless dead of the old graveyard ---------- */
 const WSKELS=[],SKDUST=[];let skelDone=0;const SKCW=640,SKCH=384,FKCW=260,FKCH=250;
 function drawSkelFrame(c,n,x,y,h,flip,alpha,flash){const im=IMG.skel;if(!ready(im))return;const k=h/SKCH,sx=(n%5)*SKCW,sy=((n/5)|0)*SKCH;c.save();c.translate(x,y);if(flip)c.scale(-1,1);c.globalAlpha=alpha;if(flash>0)c.filter='brightness(1.8)';c.drawImage(im,sx,sy,SKCW,SKCH,-320*k,-376*k,SKCW*k,SKCH*k);c.filter='none';c.restore();}
-function drawFokFrame(c,n,x,y,h,flip,alpha){const im=IMG.fokalur;if(!ready(im))return;const k=h/FKCH,sx=(n%4)*FKCW,sy=((n/4)|0)*FKCH;c.save();c.translate(x,y);if(flip)c.scale(-1,1);c.globalAlpha=alpha;c.drawImage(im,sx,sy,FKCW,FKCH,-130*k,-246*k,FKCW*k,FKCH*k);c.restore();}
+/* Fokalur, painted: one large cut-out, brought to life in code. h is the full image height; feet sit at y.
+   Frames 4–7 (the old sheet's casting/transforming rows) mean "casting": the staff orb flares. */
+const FOKA_W=975/576,FOKA_ORB=[300/975,112/576],FOKA_BODY=.512;
+function drawFokFrame(c,n,x,y,h,flip,alpha){const hd=IMG.fokalur_hd;if(ready(hd)){drawFokHD(c,n,x,y,h,flip,alpha);return;}drawFokSheet(c,n,x,y,h,flip,alpha);}
+function drawFokHD(c,n,x,y,h,flip,alpha){const im=IMG.fokalur_hd,w=h*FOKA_W,cast=n>=4,bob=Math.sin(T*1.5)*h*.012,br=Math.sin(T*1.5+1);
+  c.save();c.translate(x,y+bob);if(flip)c.scale(-1,1);c.globalAlpha=alpha;
+  // dark mist pooling at his feet and around him
+  c.save();c.globalCompositeOperation='source-over';for(let i=0;i<4;i++){const mx=(Math.sin(T*.6+i*1.7)*.18)*w,my=-h*(.08+.06*i);drawGlow(c,mx,my,h*.28,'40,10,40',.22*alpha);}c.restore();
+  c.save();c.translate(0,-h);c.scale(1+.018*br,1-.006*br);c.drawImage(im,-w*FOKA_BODY,0,w,h);c.restore();
+  // the staff orb: a slow pulse, flaring when he casts
+  const ox=(FOKA_ORB[0]-FOKA_BODY)*w,oy=-h+FOKA_ORB[1]*h;c.save();c.globalCompositeOperation='lighter';
+  drawGlow(c,ox,oy,h*(cast?.16:.07),'255,40,60',(cast?.85:.45+.15*Math.sin(T*3))*alpha);
+  if(cast){drawGlow(c,ox,oy,h*.4,'200,30,90',.25*alpha);for(let i=0;i<6;i++){const a=T*2+i*1.05,r=h*(.05+.03*Math.sin(T*5+i));drawGlow(c,ox+Math.cos(a)*r,oy+Math.sin(a)*r,h*.02,'255,120,160',.7*alpha);}}
+  // the eyes
+  drawGlow(c,0,-h+.245*h,h*.022,'255,220,120',(.5+.2*Math.sin(T*2.3))*alpha);
+  c.restore();c.restore();}
+function drawFokSheet(c,n,x,y,h,flip,alpha){const im=IMG.fokalur;if(!ready(im))return;const k=h/FKCH,sx=(n%4)*FKCW,sy=((n/4)|0)*FKCH;c.save();c.translate(x,y);if(flip)c.scale(-1,1);c.globalAlpha=alpha;c.drawImage(im,sx,sy,FKCW,FKCH,-130*k,-246*k,FKCW*k,FKCH*k);c.restore();}
 function sfxBones(v=1){if(!SND.ready)return;const t=SND.ctx.currentTime;for(let i=0;i<7;i++)noiseHit(t+i*.045+Math.random()*.02,.035,'bandpass',1800+Math.random()*1600,6,.09*v,SND.sfx);}
 function sfxRumble(dur=3,v=1){if(!SND.ready)return;const c=SND.ctx,t=c.currentTime;noiseHit(t,dur,'lowpass',140,1,.5*v,SND.sfx,60);const o=c.createOscillator(),g=c.createGain();o.type='sawtooth';o.frequency.setValueAtTime(42,t);o.frequency.linearRampToValueAtTime(30,t+dur);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.12*v,t+.3);g.gain.linearRampToValueAtTime(0,t+dur);const f=c.createBiquadFilter();f.type='lowpass';f.frequency.value=180;o.connect(f);f.connect(g);g.connect(SND.sfx);o.start(t);o.stop(t+dur+.1);}
 function spawnSkels(){const picks=WGRAVES.filter(g=>g.mound).map(g=>[WGRAVES.indexOf(g),0]);picks.forEach(([gi,dx],i)=>{const gr=WGRAVES[gi];WSKELS.push({kind:'skel',scene:'woods',x:gr.x+dx,y:gr.y+34,s:1,pack:1,calm:2.6+i*.5,dead:0,rise:-i*.5,ft:rnd(0,4),face:lum.x<gr.x?-1:1,col:['235,228,210','190,180,160','90,80,70']});});
