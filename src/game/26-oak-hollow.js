@@ -21,7 +21,7 @@ const dunH=y=>150+(clamp(y,380,768)-620)*.28;
 const DUNINT=[];
 /* the Hidden Spring under Stranglethorn: a drink restores everyone's HP */
 /* the Fox Hood waits on the Briar Den floor once both foxes there are gone */
-const HOOD={x:780,y:610};
+const HOOD={x:780,y:610},DEN_LINES=["The webs and roots are knotted solid. There's no way through down here.","Nothing past this point but webs and roots. This is as far as the den goes."];
 function hoodOut(){if(C1.hoodOut)return true;if(dfoesBuilt&&!DFOES.some(g=>g.room===8))C1.hoodOut=1;return !!C1.hoodOut;}
 const SPRING_DOOR={x:5*360+180,y:150},CELLAR_DOOR={x:11*360+180,y:10*300+66};
 function drinkSpring(){const all=Object.keys(HEROES).filter(id=>id!=='cosmic'&&(id!=='jak'||C1.jak));let hurt=false;for(const id of all){const h=HEROES[id];if(h.hp<h.maxHp)hurt=true;h.hp=h.maxHp;}
@@ -49,7 +49,8 @@ function setupDun(){DUNINT.length=0;const r=DUN.room,D=(x,y,reach,fn)=>DUNINT.pu
   if(r===7){D(470,612,64,()=>goScene(()=>{enterThorn();lum.x=CELLAR_DOOR.x;lum.y=CELLAR_DOOR.y+CMOUTH.ry+30;lum.face=1;cam.x=lum.x;cam.y=lum.y-50;resetJakFollow();}));
     D(950,545,80,()=>dunGo(8,780,705,1));}
   if(r===8){D(780,752,64,()=>dunGo(7,1040,560,-1));
-    DUNINT.push({x:HOOD.x,y:HOOD.y,reach:80,grab:()=>hoodOut()&&!C1.foxHood,onInteract:()=>{if(!hoodOut()||C1.foxHood)return;C1.foxHood=1;giveItem('foxhood');}});}
+    DUNINT.push({x:HOOD.x,y:HOOD.y,reach:80,grab:()=>hoodOut()&&!C1.foxHood,onInteract:()=>{if(!hoodOut()||C1.foxHood){say(DEN_LINES[(sayCount++)%2]);return;}C1.foxHood=1;giveItem('foxhood');}});
+    L(780,552,90,DEN_LINES);}
   if(r===5){D(700,760,70,()=>dunGo(4,705,440,1));if(!C1.bigVixen)DUNINT.push({x:700,y:615,reach:95,onInteract:()=>{const g=DFOES.find(f=>f.kind==='bigvixen');if(!g)return;talk([['Lum',"…This one is much bigger than the little thief. It could be dangerous."]],false,()=>askChoice("Wake the fox?",[["Yes",()=>{g.asleep=0;startEncounter(g,'normal');}],["No",()=>say("Let sleeping foxes lie.")]]));}});L(560,600,60,["So many eyes…"]);}}
 function webInteract(){if(C1.webCut){dunGo(4,700,730,-1);return;}
   if(POWDERS.thorn>0){talk([['Lum',"A thick wall of web stretches across the passage. It's sticky as honey."]],false,()=>askChoice("Throw Thornbane Powder?",[["Yes",()=>{POWDERS.thorn--;C1.webCut=1;sfxFizzle&&sfxFizzle(true);shake=3;for(let i=0;i<30;i++)PARTS.push({type:'fiz',col:'170,220,120',x:700+rnd(-70,70),y:520,z:rnd(20,180),vx:rnd(-30,30),vy:rnd(-6,6),vz:rnd(-10,60),life:0,max:rnd(.6,1.2),s:rnd(1.5,3)});

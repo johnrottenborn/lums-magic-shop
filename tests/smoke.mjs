@@ -211,6 +211,13 @@ const CASES = {
     check(JSON.stringify(bag) === JSON.stringify(['potion', 'potion', 'bucket']), 'old Healing Powder was not turned into potions: ' + JSON.stringify(bag));
     check(await p.evaluate(() => !window.__g.ITEMS.hpowder), 'Healing Powder still exists as an item');
   },
+  async 'briar-den-dead-end'(p) {
+    await startCh1(p);
+    await p.evaluate(() => { const g = window.__g; g.enterDun(8, 780, 560, 1); g.DFOES.length = 0; g.DLG.active = false; }); await wait(1300);
+    await p.evaluate(() => { const g = window.__g; g.DLG.active = false; g.C1X.foxHood = 1; g.lumS.x = 780; g.lumS.y = 560; }); await wait(400);
+    const line = await p.evaluate(() => { const g = window.__g; g.pressA(); return g.DLG.active && g.DLG.lines[0][1]; });
+    check(/no way through|as far as the den goes/.test(line || ''), 'the back of the den says nothing: ' + line);
+  },
   async 'deeproot-sleeping-fox'(p) {
     await startCh1(p);
     await p.evaluate(() => { const g = window.__g; g.C1X.bigVixen = 0; g.enterDun(5, 900, 600, -1);
