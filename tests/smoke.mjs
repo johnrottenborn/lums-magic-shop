@@ -228,6 +228,22 @@ const CASES = {
     await tapMenu(p, hits => hits.filter(h => h.w === 54 && h.h === 72)[0]);
     check(await p.evaluate(() => window.__g.PARTY.lum.head === 'bucket' && window.__g.BAG.includes('foxhood')), 'swapping from the slot card did not return the old item to the satchel');
   },
+  async 'web-well'(p) {
+    await p.evaluate(() => window.__g.startThornPreview()); await wait(1200);
+    const d = await p.evaluate(() => window.__g.WEBWELL_DOOR);
+    check(await p.evaluate(d => window.__g.thornFree(d.x - 75, d.y + 58) && !window.__g.thornFree(d.x, d.y), d), 'the web well is not solid, or its side is blocked');
+    await p.evaluate(d => { const g = window.__g; g.DLG.active = false; g.THFOES.length = 0; g.lum.x = d.x - 75; g.lum.y = d.y + 58; }, d); await wait(3600);
+    check(await p.evaluate(() => !!(window.__g.NEAR && window.__g.NEAR.door)), 'no door emote at the web well');
+    await p.evaluate(() => window.__g.pressA()); await wait(2200);
+    check(await p.evaluate(() => window.__g.SCENE === 'dun' && window.__g.DUN.room === 9), 'the web well did not lead to the Ember Hollow');
+    check(await p.evaluate(() => !window.__g.dunFree(792, 510)), 'Lum can walk onto the heat source');
+    await p.evaluate(() => { const g = window.__g; g.DLG.active = false; g.lumS.x = 792; g.lumS.y = 575; }); await wait(900);
+    check(await p.evaluate(() => !!(window.__g.NEAR && window.__g.NEAR.fire)), 'no mixing spot at the heat source');
+    await p.screenshot({ path: path.join(SHOTS, 'ember-hollow-' + (p.viewportSize().width < 600 ? 'phone' : 'desktop') + '.png') });
+    await p.evaluate(() => { const g = window.__g; g.lumS.x = 320; g.lumS.y = 670; }); await wait(800);
+    await p.evaluate(() => window.__g.pressA()); await wait(2200);
+    check(await p.evaluate(() => window.__g.SCENE === 'thorn'), 'the Ember Hollow stairs did not lead back up');
+  },
   async 'deeproot-sleeping-fox'(p) {
     await startCh1(p);
     await p.evaluate(() => { const g = window.__g; g.C1X.bigVixen = 0; g.enterDun(5, 900, 600, -1);

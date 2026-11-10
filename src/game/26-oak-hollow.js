@@ -10,6 +10,7 @@ const DROOMS={
      block:[{x:880,y:548,rx:46,ry:16}]},
   4:{name:"Gaia's Vault",sub:'a thief’s hiding place',dark:.82,floor:[[480,768],[520,640],[560,560],[620,470],[660,400],[760,400],[800,470],[850,560],[960,600],[1000,640],[920,768]],
      block:[{x:890,y:556,rx:48,ry:14}],light:[700,30,200]},
+  9:{name:'Ember Hollow',dark:.45,floor:[[230,700],[320,640],[430,600],[560,560],[640,520],[700,470],[760,432],[900,428],[970,455],[1010,500],[1070,560],[1130,625],[1180,700],[1200,768],[260,768]],block:[{x:792,y:510,rx:104,ry:30}]},
   8:{name:'Briar Den',dark:.55,floor:[[470,768],[500,690],[560,620],[640,570],[720,548],[880,548],[960,575],[1030,630],[1090,700],[1110,768]]},
   7:{name:'Thornroot Cellar',dark:.55,floor:[[330,640],[470,610],[600,575],[720,545],[1150,530],[1240,560],[1320,640],[1330,768],[420,768],[340,700]],block:[{x:945,y:614,rx:168,ry:38}]},
   6:{name:'Hidden Spring',dark:.5,floor:[[640,588],[760,576],[860,560],[1010,560],[1065,592],[1125,640],[1160,700],[1105,722],[1060,648],[980,614],[860,606],[740,608],[650,614]]},
@@ -23,7 +24,7 @@ const DUNINT=[];
 /* the Fox Hood waits on the Briar Den floor once both foxes there are gone */
 const HOOD={x:780,y:610},DEN_LINES=["The webs and roots are knotted solid. There's no way through down here.","Nothing past this point but webs and roots. This is as far as the den goes."];
 function hoodOut(){if(C1.hoodOut)return true;if(dfoesBuilt&&!DFOES.some(g=>g.room===8))C1.hoodOut=1;return !!C1.hoodOut;}
-const SPRING_DOOR={x:5*360+180,y:150},CELLAR_DOOR={x:11*360+180,y:10*300+66};
+const SPRING_DOOR={x:5*360+180,y:150},CELLAR_DOOR={x:11*360+180,y:10*300+66},WEBWELL_DOOR={x:5*360+180,y:4*300+58};
 function drinkSpring(){const all=Object.keys(HEROES).filter(id=>id!=='cosmic'&&(id!=='jak'||C1.jak));let hurt=false;for(const id of all){const h=HEROES[id];if(h.hp<h.maxHp)hurt=true;h.hp=h.maxHp;}
   sfxItem&&sfxItem();for(let i=0;i<16;i++)PARTS.push({type:'fdust',x:lum.x+rnd(-30,30),y:lum.y,z:rnd(10,80),vx:rnd(-10,10),vy:rnd(-4,4),vz:rnd(20,40),life:0,max:rnd(.6,1.1),s:rnd(1,2.2),col:'170,230,255'});
   say(hurt?(C1.jak?"Cool, clear water from deep under the forest… Every ache is gone. We're both good as new.":"Cool, clear water from deep under the forest… Every ache is gone. I'm good as new."):"The water is cool and clear. I already feel fine, but it's lovely all the same.");}
@@ -48,6 +49,9 @@ function setupDun(){DUNINT.length=0;const r=DUN.room,D=(x,y,reach,fn)=>DUNINT.pu
     DUNINT.push({x:800,y:608,reach:95,onInteract:drinkSpring});}
   if(r===7){D(470,612,64,()=>goScene(()=>{enterThorn();lum.x=CELLAR_DOOR.x;lum.y=CELLAR_DOOR.y+CMOUTH.ry+30;lum.face=1;cam.x=lum.x;cam.y=lum.y-50;resetJakFollow();}));
     D(950,545,80,()=>dunGo(8,780,705,1));}
+  if(r===9){D(300,660,72,()=>goScene(()=>{enterThorn();lum.x=WEBWELL_DOOR.x-75;lum.y=WEBWELL_DOOR.y+58;lum.face=1;cam.x=lum.x;cam.y=lum.y-50;resetJakFollow();}));
+    D(860,445,70,()=>say("The tunnel at the back winds on into the dark… I'll come back when I'm ready."));
+    DUNINT.push({x:792,y:540,reach:110,fire:true,onInteract:fireInteract});}
   if(r===8){D(780,752,64,()=>dunGo(7,1040,560,-1));
     DUNINT.push({x:HOOD.x,y:HOOD.y,reach:80,grab:()=>hoodOut()&&!C1.foxHood,onInteract:()=>{if(!hoodOut()||C1.foxHood){say(DEN_LINES[(sayCount++)%2]);return;}C1.foxHood=1;giveItem('foxhood');}});
     L(780,552,90,DEN_LINES);}

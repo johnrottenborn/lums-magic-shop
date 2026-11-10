@@ -35,7 +35,7 @@ function buildThorn(){if(THORN.built)return;THORN.built=true;const P=THORN.props
   // extra webs gather near the spider's tree and around Jak's hollow
   for(const [n,w,x,y,f] of [['thdec_stickweb',300,13*TCW+TCW/2,2*TCH+175,false],['thdec_fernweb',220,11*TCW+TCW/2,2*TCH+190,true],['thdec_smallweb',130,12*TCW+60,2*TCH+230,false],['thdec_litterweb',175,7*TCW+TCW*.62,9*TCH+200,true]])THORN.decals.push({n,w,x,y,flip:f});
   // berry bushes Lum can pick: a few scattered through open cells, some down the wrong turns
-  THORN.forage=[];{const busy_=(r,c)=>(r===0&&c===5)||(r===10&&c===11)||(r===TMZ.start&&c<=1)||(r===7&&c===1)||(r===TMZ.finish&&c>=11)||(r===2&&c>=11),cells=[];
+  THORN.forage=[];{const busy_=(r,c)=>(r===0&&c===5)||(r===4&&(c===4||c===5))||(r===10&&c===11)||(r===TMZ.start&&c<=1)||(r===7&&c===1)||(r===TMZ.finish&&c>=11)||(r===2&&c>=11),cells=[];
     for(let r=0;r<TMZ.R;r++)for(let c=0;c<TMZ.C;c++)if(prev.has(key(r,c))&&!busy_(r,c))cells.push([r,c]);cells.sort((a,b)=>H_(a[0],a[1],97)-H_(b[0],b[1],97));
     const KS=[6,0,4],got=[];for(const [r,c] of cells){if(got.length>=5)break;if(got.some(([a,b])=>Math.abs(a-r)+Math.abs(b-c)<4))continue;got.push([r,c]);
       const k=KS[got.length%3],side=H_(r,c,99)<.5?-1:1,x=c*TCW+TCW/2+side*(45+H_(r,c,101)*25),y=r*TCH+TCH*.42+(H_(r,c,103)-.5)*40;
@@ -48,7 +48,7 @@ function thornFree(x,y){if(x<18||y<14||y>TH_-14)return false;if(x>TW_-12&&Math.f
   if((nearL||nearR)&&(nearT||nearB)){const vr=r+(nearB?1:0),vc=c+(nearR?1:0);if(hW(vr,vc-1)||hW(vr,vc)||vW(vr-1,vc)||vW(vr,vc))return false;}
   // tree trunks that stand inside a corridor
   if(Math.hypot((x-(12*TCW+TCW/2))/110,(y-(2*TCH+62))/34)<1)return false;
-  for(const d of [CELLAR_DOOR,SPRING_DOOR])if(Math.hypot((x-d.x)/(CMOUTH.rx+6),(y-d.y)/(CMOUTH.ry+8))<1)return false;
+  for(const d of [CELLAR_DOOR,SPRING_DOOR,WEBWELL_DOOR])if(Math.hypot((x-d.x)/(CMOUTH.rx+6),(y-d.y)/(CMOUTH.ry+8))<1)return false;
   for(const f of THORN.forage||[])if(Math.hypot((x-f.x)/34,(y-f.y+4)/12)<1)return false;
   if(!C1.thornBoss&&r===TMZ.finish&&c>=13)return false;
   return true;}

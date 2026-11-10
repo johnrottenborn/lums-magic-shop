@@ -39,7 +39,7 @@ function jakInteract(){if(C1.jak)return;
   talk([['Lum',"A man, slumped against the roots. He's barely breathing."]],false,()=>askChoice("Use on the stranger?",opts));}
 /* the Thornroot Cellar's entrance: the designer's old overgrown well, feathered into the forest floor, with a few cobwebs */
 const CMOUTH={rx:92,ry:58};
-function drawCellarMouth(){drawThornWell(CELLAR_DOOR.x,CELLAR_DOOR.y);drawThornWell(SPRING_DOOR.x,SPRING_DOOR.y);}
+function drawCellarMouth(){drawThornWell(CELLAR_DOOR.x,CELLAR_DOOR.y);drawThornWell(SPRING_DOOR.x,SPRING_DOOR.y);drawThornWell(WEBWELL_DOOR.x,WEBWELL_DOOR.y);}
 function drawThornWell(x,y){const im=IMG.thorn_well;if(!ready(im))return;const w=205,h=w*im.naturalHeight/im.naturalWidth;
   ctx.drawImage(im,x-w*.4946,y-h*.462,w,h);
   ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,x,y+5,54,'200,60,50',.1+.05*Math.sin(T*1.6));ctx.restore();
@@ -49,7 +49,9 @@ const THINT=[{x:JAKREST.x,y:JAKREST.y,reach:95,onInteract:()=>jakInteract()},{x:
   {x:5*TCW+TCW/2,y:150,reach:100,door:true,onInteract:()=>{const go=()=>dunGo(6,935,590,-1);if(C1.springSeen){go();return;}
     talk([['Lum',"Wait… the roots here dip down into the ground. There's an underground passage!"]],false,()=>{C1.springSeen=1;go();});}},
   // the small pocket near the bottom right: stairs down to the Thornroot Cellar
-  {x:11*TCW+TCW/2,y:10*TCH+66,reach:100,door:true,onInteract:()=>dunGo(7,560,620,1)}];
+  {x:11*TCW+TCW/2,y:10*TCH+66,reach:100,door:true,onInteract:()=>dunGo(7,560,620,1)},
+  // under the spider web in the middle of the maze: a third well, down to the Ember Hollow
+  {x:5*TCW+TCW/2,y:4*TCH+58,reach:100,door:true,onInteract:()=>dunGo(9,370,650,1)}];
 
 // roaming creatures: spiders, Flora, red slimes and red foxes
 const THFOES=[];let thFoesBuilt=false;const THBOSS={kind:'bigspider',scene:'thorn',x:12*TCW+TCW/2,y:2*TCH+190,s:1,pack:1,calm:0,dead:0,ph:0,face:-1,boss:1};
