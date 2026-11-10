@@ -53,7 +53,7 @@ function setupDun(){DUNINT.length=0;const r=DUN.room,D=(x,y,reach,fn)=>DUNINT.pu
   if(r===9){D(300,660,72,()=>goScene(()=>{enterThorn();lum.x=WEBWELL_DOOR.x-75;lum.y=WEBWELL_DOOR.y+58;lum.face=1;cam.x=lum.x;cam.y=lum.y-50;resetJakFollow();}));
     D(860,445,70,()=>dunGo(10,260,660,1));
     DUNINT.push({x:792,y:540,reach:110,fire:true,onInteract:fireInteract});}
-  if(r===10){D(210,640,70,()=>dunGo(9,860,470,1));}
+  if(r===10){D(290,752,72,()=>dunGo(9,860,470,1));}
   if(r===8){D(780,752,64,()=>dunGo(7,1040,560,-1));
     DUNINT.push({x:HOOD.x,y:HOOD.y,reach:80,grab:()=>hoodOut()&&!C1.foxHood,onInteract:()=>{if(!hoodOut()||C1.foxHood){say(DEN_LINES[(sayCount++)%2]);return;}C1.foxHood=1;giveItem('foxhood');}});
     L(780,552,90,DEN_LINES);}

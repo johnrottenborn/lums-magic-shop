@@ -251,6 +251,7 @@ const CASES = {
     await p.evaluate(() => window.__g.pressA()); await wait(2200);
     check(await p.evaluate(() => window.__g.SCENE === 'dun' && window.__g.DUN.room === 10), 'the Ember Hollow tunnel did not lead to the Spider Lair');
     check(await p.evaluate(() => window.__g.DFOES.some(f => f.room === 10 && f.lair)), 'no boss in the Spider Lair');
+    check(await p.evaluate(() => { const g = window.__g; g.DLG.active = false; return g.dunFree(290, 745); }), 'the lair exit by the south wall is not walkable');
     await p.evaluate(() => { const g = window.__g; g.DLG.active = false; g.lumS.bumpT = 0; }); await wait(1500);
     await p.screenshot({ path: path.join(SHOTS, 'spider-lair-room-' + (p.viewportSize().width < 600 ? 'phone' : 'desktop') + '.png') });
     await p.evaluate(() => { const g = window.__g; g.lumS.x = 700; g.lumS.y = 670; }); await wait(1800);
