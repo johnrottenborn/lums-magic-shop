@@ -140,7 +140,7 @@ function c1FoeFrame(f){const B=BATTLE,me=B.foes[B.foeI]===f,ph=B.phase,t=B.t;
     if(me&&ph==='foeWind')return['strike',0];if(me&&ph==='foeLeap')return['strike',1+Math.min(2,Math.floor(B.t/B.leapD*3))];if(me&&ph==='foeBack')return['strike',4];if(f.charged)return['cast',2];return['idle',Math.floor(T*5+f.ph)];}
   return['idle',0];}
 /* Fokalur in battle: the prologue's Demon God art, large */
-function drawBattleFok(f){const S=bS(),B=BATTLE,x=f.x+f.ox,y=f.y+f.oy,h=Math.min(430*S,W*.95/FOKA_W)*(f.s||1),me=B.foes[B.foeI]===f,ph=B.phase;let n=Math.floor(T*4)%4;if(me&&ph==='foeWind')n=6;else if(me&&(ph==='foeLeap'||ph==='foeBack'))n=7;
+function drawBattleFok(f){const S=bS(),B=BATTLE,x=f.x+f.ox,y=f.y+f.oy,h=Math.min(430*S,W*.95/FOKA_W)*(f.s||1),me=B.foes[B.foeI]===f,ph=B.phase;let n=Math.floor(T*4)%4;if(me&&ph==='foeWind')n=6;else if(me&&(ph==='foeLeap'||ph==='foeBack'))n=7;else if(me&&ph==='fokSpell')n=5;
   bshadow(x,y,h*.28,h*.05,.4);ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,x,y-h*.5,h*.6,'160,30,80',.2+.06*Math.sin(T*3));ctx.restore();
   drawFokFrame(ctx,n,x+(f.hit>0?Math.sin(f.hit*50)*5:0),y,h,false,1);}
 function drawBattleC1Foe(f){const S=bS(),B=BATTLE,x=f.x+f.ox,y=f.y+f.oy,sh=f.type,H_={wisp:120,rskel:205,reaper:200,bat:150,vixen:150,bigvixen:185,spider:120,flora:175,rvixen:150,bigspider:250}[sh]*S*f.s;const __s=sh==='vixen'||sh==='bigvixen'?'fox':sh==='rvixen'?'fox_red':sh==='bigspider'?'spider_dark':sh;

@@ -95,8 +95,8 @@ function drawThorn(){const vw=W/zoom,vh=H/zoom,x0=cam.x-vw/2-60,y0=cam.y-vh/2-60
   drawCellarMouth();
   for(const f of THORN.flowers)if(f.x>x0-30&&f.x<x1+30&&f.y>y0-30&&f.y<y1)drawRedFlowers(f.x,f.y,f.s,f.seed);
   const L=[];for(const o of THORN.props)if(o.x>x0-o.w/2-40&&o.x<x1+o.w/2+40&&o.y>y0-20&&o.y<y1+o.w*1.4)L.push([o.y,o]);L.push([lum.y,null]);L.sort((a,b)=>a[0]-b[0]);
-  for(const g of THFOES)if(g.x>x0-150&&g.x<x1+150&&g.y>y0-60&&g.y<y1+260)L.push([g.y,{t:'thfoe',ref:g}]);if(!C1.thornBoss)L.push([THBOSS.y,{t:'boss'}]);for(const s_ of COSSEE)if(s_.st===1||s_.st===2)L.push([s_.y,{t:'cosghost',ref:s_}]);if(!C1.fkDone&&lum.x>TW_)L.push([FKS.cy,{t:'fks'}]);if(!C1.jak)L.push([JAKREST.y,{t:'jakrest'}]);else if(JAKF&&jakInParty())L.push([JAKF.y,{t:'jak'}]);L.sort((a,b)=>a[0]-b[0]);
-  THORN.blooms=[];let past=false;for(const [,o] of L){if(!o){drawLum();past=true;continue;}if(o.t==='thfoe'){drawThornFoe(o.ref);continue;}if(o.t==='boss'){drawThornBoss();continue;}if(o.t==='cosghost'){drawCosGhost(o.ref);continue;}if(o.t==='fks'){drawFKS();continue;}if(o.t==='jakrest'){drawJakResting();continue;}if(o.t==='jak'){drawJakOW();continue;}let fa=1;if(past){const kx=clamp(1-(Math.abs(o.x-lum.x)-o.w*.2)/(o.w*.3),0,1),ky=clamp(1-(o.y-lum.y-o.w*.7)/(o.w*.35),0,1);fa=1-kx*ky*(o.t==='arch'?.4:.58);}drawThornProp(o,fa);}
+  for(const g of THFOES)if(g.x>x0-150&&g.x<x1+150&&g.y>y0-60&&g.y<y1+260)L.push([g.y,{t:'thfoe',ref:g}]);if(!C1.thornBoss)L.push([THBOSS.y,{t:'boss'}]);for(const s_ of COSSEE)if(s_.st===1||s_.st===2)L.push([s_.y,{t:'cosghost',ref:s_}]);if(!C1.fkDone&&lum.x>TW_)L.push([FKS.cy,{t:'fks'}]);if(FKS.fire)L.push([FKS.fire.y,{t:'fkfire'}]);if(!C1.jak)L.push([JAKREST.y,{t:'jakrest'}]);else if(JAKF&&jakInParty()&&!FKS.fire)L.push([JAKF.y,{t:'jak'}]);L.sort((a,b)=>a[0]-b[0]);
+  THORN.blooms=[];let past=false;for(const [,o] of L){if(!o){drawLum();past=true;continue;}if(o.t==='thfoe'){drawThornFoe(o.ref);continue;}if(o.t==='boss'){drawThornBoss();continue;}if(o.t==='cosghost'){drawCosGhost(o.ref);continue;}if(o.t==='fks'){drawFKS();continue;}if(o.t==='fkfire'){drawFlames(ctx,FKS.fire.x,FKS.fire.y,260,1);continue;}if(o.t==='jakrest'){drawJakResting();continue;}if(o.t==='jak'){drawJakOW();continue;}let fa=1;if(past){const kx=clamp(1-(Math.abs(o.x-lum.x)-o.w*.2)/(o.w*.3),0,1),ky=clamp(1-(o.y-lum.y-o.w*.7)/(o.w*.35),0,1);fa=1-kx*ky*(o.t==='arch'?.4:.58);}drawThornProp(o,fa);}
   drawForage(THORN.forage||[]);drawThornCritters(x0,y0,x1,y1);drawThornWebs(x0,y0,x1,y1);
   drawThornMotes();
   ctx.save();ctx.globalCompositeOperation='lighter';for(const m of THORN.mist){if(m.x<x0-m.r||m.x>x1+m.r||m.y<y0-m.r||m.y>y1+m.r)continue;drawGlow(ctx,m.x+Math.sin(T*.08+m.ph)*50,m.y,m.r,'150,90,110',.05+.025*Math.sin(T*.4+m.ph));}ctx.restore();
@@ -108,7 +108,8 @@ function drawThorn(){const vw=W/zoom,vh=H/zoom,x0=cam.x-vw/2-60,y0=cam.y-vh/2-60
   const sx=(lum.x-cam.x)*zoom+W/2,sy=(lum.y-70-cam.y)*zoom+H/2,R=Math.min(W,H)*.5*(1+.025*Math.sin(T*7)+.018*Math.sin(T*17.3)+.01*Math.sin(T*31));const g=ctx.createRadialGradient(sx,sy,R*.12,sx,sy,R);
   g.addColorStop(0,'rgba(8,4,14,0)');g.addColorStop(.4,'rgba(8,4,14,.26)');g.addColorStop(.8,'rgba(6,3,12,.66)');g.addColorStop(1,'rgba(5,2,10,.8)');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
   ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,sx+lum.face*14*zoom,sy+10*zoom,90*zoom,'255,190,110',.16+.03*Math.sin(T*9));ctx.restore();
-  if(FKS.fa>0&&!C1.fkDone){ctx.save();ctx.setTransform(DPR*zoom,0,0,DPR*zoom,DPR*(W/2-cam.x*zoom),DPR*(H/2-cam.y*zoom));ctx.globalCompositeOperation='lighter';drawGlow(ctx,FKS.cx,FKS.cy-280,320,'170,40,90',.28*FKS.fa);ctx.globalCompositeOperation='source-over';drawFokFrame(ctx,FKS.st===2?(FKS.t<1.4?4:5):Math.floor(T*4)%4,FKS.cx,FKS.cy+4,520,false,.88*FKS.fa);ctx.globalAlpha=1;drawLum();if(jakInParty()&&JAKF)drawJakOW();ctx.restore();}
+  if(FKS.fa>0&&!C1.fkDone){ctx.save();ctx.setTransform(DPR*zoom,0,0,DPR*zoom,DPR*(W/2-cam.x*zoom),DPR*(H/2-cam.y*zoom));ctx.globalCompositeOperation='lighter';drawGlow(ctx,FKS.cx,FKS.cy-280,320,'170,40,90',.28*FKS.fa);ctx.globalCompositeOperation='source-over';drawFokFrame(ctx,FKS.st===2?(FKS.t<1.4?4:5):Math.floor(T*4)%4,FKS.cx,FKS.cy+4,520,false,.88*FKS.fa);ctx.globalAlpha=1;drawLum();if(jakInParty()&&JAKF&&!FKS.fire)drawJakOW();ctx.restore();}
+  if(FKS.fire){ctx.save();ctx.setTransform(DPR*zoom,0,0,DPR*zoom,DPR*(W/2-cam.x*zoom),DPR*(H/2-cam.y*zoom));drawFlames(ctx,FKS.fire.x,FKS.fire.y,260,1);ctx.restore();}
   drawThornFog(1);
   if(FKS.flash>0){ctx.fillStyle=`rgba(255,240,250,${Math.min(1,FKS.flash).toFixed(3)})`;ctx.fillRect(0,0,W,H);}
   // the guiding roses keep a faint warm glow so they read through the fog
@@ -159,6 +160,8 @@ function enterClearing(){SCENE='thorn';lum.x=CLR.x0+190;lum.y=CLR.cy;lum.face=1;
 function updateClearing(dt){if(C1.fkDone)return;FKS.t+=dt;FKS.flash=Math.max(0,FKS.flash-dt*.8);
   if(FKS.st===0&&!DLG.active&&!FADE.dir&&!BATTLE.on&&lum.x>CLR.x0&&Math.hypot(lum.x-FKS.cx,(lum.y-FKS.cy)*1.2)<215){FKS.st=1;fkMeet();}
   if(FKS.st===2){if(FKS.t>.6&&!FKS.flashed){FKS.flashed=1;FKS.flash=1;sfxRumble(2,1);}FKS.ca=Math.max(0,1-FKS.t/.8);FKS.fa=clamp((FKS.t-.6)/.8,0,1);if(FKS.t>2.4){FKS.st=3;fkReveal();}}
+  if(FKS.jakIn&&JAKF){const J_=FKS.jakIn,dx=J_.tx-JAKF.x,step=300*dt;JAKF.y=J_.ty;JAKF.dir='side';JAKF.face=1;
+    if(Math.abs(dx)<=step){JAKF.x=J_.tx;JAKF.moving=0;JAKF.mv=0;FKS.jakIn=null;talk([['Jak',"Lum! I couldn't let you face this alone."]],false,fkStand);}else{JAKF.x+=Math.sign(dx)*step;JAKF.moving=1;JAKF.mv=1;JAKF.ph+=step;}}
   if(FKS.st===6){FKS.fa=Math.max(0,FKS.fa-dt*.7);if(FKS.fa<=0){FKS.st=7;fkFarewell();}}}
 const fkJak=()=>jakInParty();
 function fkMeet(){WEVENT.on=true;lum.vx=lum.vy=0;lum.state='idle';lum.face=1;
@@ -166,12 +169,14 @@ function fkMeet(){WEVENT.on=true;lum.vx=lum.vy=0;lum.state='idle';lum.face=1;
   if(fkJak())L.push(['Jak',"Lum, wait. Something's wrong…"]);
   L.push(['Cosmic',"Master Lum… you shouldn't have followed me."],['Lum',"Come here, let's get you home."],['Cosmic',"Home…"],['Cosmic',"The boy can't hear you anymore, little witch."],['Lum',"…That voice? Cosmic, what's happened to you?"]);
   talk(L,false,()=>{FKS.st=2;FKS.t=0;sfxEerie();});}
-function fkReveal(){const L=[['Fokalur',"The child broke the seal with his own hands. His body now belongs to me."],['Fokalur',"I am Fokalur."]];
-  if(fkJak())L.push(['Jak',"Lum, get behind me!"]);
-  L.push(['Fokalur',fkJak()?"A shop owner and a broken warrior… prepare to die!":"Prepare to die!"]);
+function fkReveal(){talk([['Fokalur',"The child broke the seal with his own hands. His body now belongs to me."],['Fokalur',"I am Fokalur."]],false,()=>{if(fkJak())fkStand();else fkJakArrives();});}
+/* Lum came alone: Jak runs into the clearing to stand with her */
+function fkJakArrives(){if(!jakInParty()){PARTY_ORDER.length=1;PARTY_ORDER.push('jak');}C1.jak=1;HEROES.jak.hp=HEROES.jak.maxHp;
+  JAKF={x:lum.x-390,y:lum.y+4,face:1,moving:1,ph:0,dir:'side',mv:1};JAKCRUMB.length=0;FKS.jakIn={tx:lum.x-70,ty:lum.y+4};}
+function fkStand(){const L=[['Jak',"Lum, get behind me!"],['Fokalur',"A shop owner and a broken warrior… prepare to die!"]];
   talk(L,false,()=>{FKS.st=4;WEVENT.on=false;lum.bumpT=0;startEncounter({kind:'fokalur',scene:'thorn',x:FKS.cx,y:FKS.cy,s:1,pack:1,calm:0,dead:0,scripted:true,boss:1,onLose:fkAfterLoss},'normal');});}
 function fkAfterLoss(){for(const id of PARTY_ORDER)HEROES[id].hp=Math.max(1,Math.round(HEROES[id].maxHp*.25));
-  SCENE='thorn';lum.x=FKS.cx-240;lum.y=FKS.cy;lum.face=1;lum.vx=lum.vy=0;lum.state='idle';cam.x=lum.x+120;cam.y=lum.y-50;resetJakFollow();FKS.st=5;FKS.fa=1;FKS.ca=0;WEVENT.on=true;
+  SCENE='thorn';lum.x=FKS.cx-240;lum.y=FKS.cy;lum.face=1;lum.vx=lum.vy=0;lum.state='idle';cam.x=lum.x+120;cam.y=lum.y-50;resetJakFollow();LUMSTONE=1;FKS.fire={x:lum.x+120,y:lum.y+6};FKS.st=5;FKS.fa=1;FKS.ca=0;WEVENT.on=true;
   const fade=()=>{FKS.st=6;FKS.flash=.8;sfxRumble(3,.9);};
   setTimeout(()=>{if(fkJak())talk([['Fokalur',"Ha! The stone witch watches as her protector burn in hellfire!"]],false,fade);else fade();},900);}
 function fkFarewell(){const L=[['Lum',"…"]];

@@ -105,6 +105,7 @@ function startRound(){const B=BATTLE;B.cur=0;B.defending={};for(const h of B.her
 function nextFoe(){const B=BATTLE;B.foeI++;while(B.foeI<B.foes.length&&B.foes[B.foeI].dead)B.foeI++;
   if(B.foeI>=B.foes.length){if(B.heroes.some(h=>h.poison>0&&!h.ko)){B.phase='poisonTick';B.t=0;B.ptDone=0;return;}startRound();return;}
   const f=B.foes[B.foeI];f.tgt=aliveHeroes()[(Math.random()*aliveHeroes().length)|0];f.heavyNow=0;
+  if(f.type==='fokalur'){const al=aliveHeroes();f.tgt=al.find(h=>h.id==='lum')||al[0];f.spell=f.tgt.id==='lum'?'stone':'fire';B.phase='fokSpell';B.t=0;B.spellDone=0;pop(f.x,foeCenter(f).top-40*bS(),f.spell==='stone'?'Petrification!':'Hellfire!','info');sfxEerie&&sfxEerie();return;}
   if(f.skip>0){f.skip--;B.phase='foeSkip';B.t=0;pop(f.x,f.y-150*bS(),f.frozen?'Frozen solid!':f.drowsy?'Zzz…':'…dazed','info');if(f.frozen)f.thawT=1.1;f.drowsy=0;return;}
   if(f.type==='bigspider'){f.turn=(f.turn||0)+1;if(f.turn%3===0){f.web=1;pop(f.x,foeCenter(f).top-40*bS(),'Web Spray!','info');}}
   if(f.type==='flora'){f.turn=(f.turn||0)+1;if(f.turn%3===0&&f.hp<f.max){B.phase='foeRegrow';B.t=0;B.regrew=0;pop(f.x,foeCenter(f).top-40*bS(),'Closes into a bud…','info');return;}B.phase='foeWind';B.t=0;B.windD=.7+Math.random()*.35;B.cmd={guard:false,lock:0,tried:false};return;}
@@ -154,6 +155,11 @@ function updateBattle(dt){const B=BATTLE;if(B.hitstop>0){B.hitstop-=dt;return;}B
       if(B.t>.7&&!B.burstDone){B.burstDone=1;STATS.atk++;const st=heroStats(h.id);for(const f_ of aliveFoes()){const c_=foeCenter(f_);for(let i=0;i<34;i++)B.fx.push({k:'star',x:rnd(c_.l-30*S,c_.r+30*S),y:c_.top-rnd(60,260)*S,vx:rnd(-20,20)*S,vy:rnd(250,420)*S,rot:rnd(0,TAU),vr:rnd(-7,7),s:rnd(8,15)*S,t:-rnd(0,.35),max:rnd(.8,1.1),ph:rnd(0,TAU)});
         const dmg=Math.max(4,st.atk*2+2-f_.def);setTimeout(()=>{if(BATTLE.on&&!f_.dead)hurtFoe(f_,dmg,true,'STARFALL!');},380);}B.fx.push({k:'flash',x:W/2,y:H*.4,r:W*.7,col:'255,220,140',t:0,max:.9,soft:1});setTimeout(()=>{if(BATTLE.on){shake=16;BATTLE.hitstop=.14;}},380);}
       if(B.t>2.1){B.phase='pause';B.t=.5;B.after='nextHero';}break;}
+    case 'fokSpell':{const f_=B.foes[B.foeI],tg=f_.tgt,tx=tg.x+tg.ox,ty=tg.y+tg.oy;
+      if(B.t>1.2&&!B.spellDone){B.spellDone=1;const H_=HEROES[tg.id];STATS.dmg+=H_.hp;H_.hp=0;tg.ko=1;tg.hurt=0;shake=12;B.hitstop=.1;
+        if(f_.spell==='stone'){tg.stone=1;pop(Math.max(tx,W*.3),ty-160*S,'Turned to stone!','info');B.fx.push({k:'flash',x:tx,y:ty-80*S,r:170*S,col:'225,220,210',t:0,max:.7,soft:1});for(let i=0;i<16;i++)B.fx.push({k:'shard',x:tx+rnd(-30,30)*S,y:ty-rnd(20,150)*S,vx:rnd(-140,140)*S,vy:rnd(-160,40)*S,rot:rnd(0,TAU),vr:rnd(-8,8),s:rnd(4,8)*S,t:0,max:rnd(.6,1)});sfxGuard&&sfxGuard();}
+        else{tg.burn=.001;pop(Math.max(tx,W*.3),ty-180*S,'Engulfed in flames!','info');B.fx.push({k:'flash',x:tx,y:ty-80*S,r:230*S,col:'255,140,60',t:0,max:.9,soft:1});sfxRumble&&sfxRumble(1.5,.8);}}
+      if(B.t>2.8){if(!aliveHeroes().length){B.phase='lose';B.t=0;}else nextFoe();}break;}
     case 'foeRegrow':{const f_=B.foes[B.foeI];if(B.t>.7&&!B.regrew){B.regrew=1;const hl=Math.min(3,f_.max-f_.hp);f_.hp+=hl;f_.showHp=1;const c_=foeCenter(f_);pop(c_.x,c_.y,'+'+hl,'heal');for(let i=0;i<10;i++)B.fx.push({k:'leaf',x:c_.x+rnd(-30,30)*S,y:c_.bot-rnd(0,40)*S,vx:rnd(-60,60)*S,vy:-rnd(80,180)*S,rot:rnd(0,TAU),vr:rnd(-6,6),s:rnd(4,7)*S,t:0,max:rnd(.6,1)});}if(B.t>1.5)nextFoe();break;}
     case 'foeWind':{const f_=B.foes[B.foeI];f_.wind=Math.min(1,B.t/B.windD);if(B.t>=B.windD){B.phase='foeLeap';B.t=0;B.leapD=.42;f_.wind=0;sfxSlimeHop(1.2);}break;}
     case 'foeLeap':{const f_=B.foes[B.foeI],tg=f_.tgt,u=clamp(B.t/B.leapD,0,1);const tx=(tg.x+tg.ox+(f_.type==='jelly'||f_.type==='fslime'||f_.type==='rslime'?100:f_.type==='skel'||f_.type==='reaper'?120:f_.type==='wisp'||f_.type==='bat'||f_.type==='vixen'||f_.type==='bigvixen'||f_.type==='spider'||f_.type==='rvixen'?90:f_.type==='bigspider'?140:40)*S)-f_.x,ty=tg.y-f_.y,kk=f_.type==='fokalur'||f_.type==='slugking'||f_.type==='rskel'||f_.type==='flora'||(f_.type==='reaper'&&f_.heavyNow)?0:1;const uu=f_.second?1-.35*Math.sin(Math.PI*u):u;f_.ox=tx*uu*kk;f_.oy=ty*uu*kk;f_.z=['skel','slugking','wisp','rskel','reaper','flora'].includes(f_.type)?0:Math.sin(Math.PI*u)*90*S;
@@ -227,7 +233,10 @@ function drawBattleJak(h){const S=bS(),B=BATTLE,x=h.x+h.ox,y=h.y+h.oy,me=B.heroe
   if(h.stuck&&!h.ko){}}
 /* heroes without a KO animation (all but Jak) fade away when knocked out, and come back if revived */
 const KO_FADE=.9;
-function drawBattleHero(h){if(h.ko&&h.id!=='jak'){h.koF=(h.koF||0)+1/60;if(h.koF>=KO_FADE)return;ctx.save();ctx.globalAlpha*=1-h.koF/KO_FADE;drawBattleHero_(h);ctx.restore();return;}h.koF=0;drawBattleHero_(h);}
+function drawBattleHero(h){
+  if(h.stone){const S=bS(),t0=T,hu=h.hurt,ko=h.ko;withStone('bh'+h.id,h.x+h.ox-130*S,h.y+h.oy-300*S,260*S,330*S,()=>{T=0;h.hurt=0;h.ko=0;try{drawBattleHero_(h);}finally{T=t0;h.hurt=hu;h.ko=ko;}});return;}
+  if(h.burn){h.burn+=1/60;const a=clamp(1-(h.burn-.3)/1.2,0,1);if(a>0){const ko=h.ko;h.ko=0;ctx.save();ctx.globalAlpha*=a;drawBattleHero_(h);ctx.restore();h.ko=ko;}drawFlames(ctx,h.x+h.ox,h.y+h.oy+4,230*bS()*Math.min(1,.4+h.burn*1.5),1);return;}
+  if(h.ko&&h.id!=='jak'){h.koF=(h.koF||0)+1/60;if(h.koF>=KO_FADE)return;ctx.save();ctx.globalAlpha*=1-h.koF/KO_FADE;drawBattleHero_(h);ctx.restore();return;}h.koF=0;drawBattleHero_(h);}
 function drawBattleHero_(h){const S=bS(),sp=.62*S,x=h.x+h.ox,y=h.y+h.oy;
   bshadow(x,y+2,40*S,11*S,.35);
   if(h.id==='jak'){drawBattleJak(h);drawHeroStatus(h);if(BATTLE.defending&&BATTLE.defending[h.id]){ctx.strokeStyle='rgba(170,220,255,.6)';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(x,y-90*S,66*S,110*S,0,0,TAU);ctx.stroke();}return;}
