@@ -18,8 +18,8 @@ function lumPowderHit(h,f,c){const B=BATTLE,S=bS(),st=heroStats(h.id),p=B.powder
 
 
 /* ---------- foe special moves ---------- */
-/* foes whose hits can leave a hero stuck in goo (the Shimmer Slime only from Chapter 1 on, not in the prologue) */
-const SLIMEY=t=>t==='slime'||(t==='jelly'&&CH>0)||t==='fslime'||t==='rslime';
+/* foes whose hits can leave a hero stuck in goo: Chapter 1 on only, never in the prologue */
+const SLIMEY=t=>CH>0&&(t==='slime'||t==='jelly'||t==='fslime'||t==='rslime');
 function foeAbility(f,h,dmg,c){const B=BATTLE,S=bS(),t=f.type,fc=foeCenter(f),hx=h.x+h.ox,hy=h.y-90*S;
   if(t==='bat'&&dmg>0){const heal=Math.min(dmg,f.max-f.hp);f.hp+=heal;f.showHp=1;pop(fc.x,fc.top-50*S,'Life Leech!','info');if(heal>0)setTimeout(()=>{if(BATTLE.on)pop(fc.x+20*S,fc.y,'+'+heal,'heal');},350);
     for(let i=0;i<12;i++)B.fx.push({k:'drain',sx:hx+rnd(-14,14)*S,sy:hy+rnd(-30,30)*S,tx:fc.x,ty:fc.y,t:-i*.035,max:.6,a:rnd(-1,1)});}
