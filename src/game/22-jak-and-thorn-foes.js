@@ -23,7 +23,7 @@ function drawSparOW(F,alpha){if(!F)return;const vert=F.dir==='up'||F.dir==='down
   ctx.fillStyle='rgba(10,10,20,.25)';ctx.beginPath();ctx.ellipse(F.x,F.y+2,30,8,0,0,TAU);ctx.fill();c1Frame(ctx,'spar',an,fi,F.x,F.y+3,SPAR_H,!vert&&F.face<0,alpha??1,0);}
 function drawJakResting(){if(MATE==='spar'){drawSparResting();return;}drawJakResting_();}
 function drawSparResting(){if(C1.jak)return;const x=JAKREST.x,y=JAKREST.y,b=Math.sin(T*1.4);ctx.fillStyle='rgba(10,10,20,.3)';ctx.beginPath();ctx.ellipse(x+10,y+2,70,10,0,0,TAU);ctx.fill();
-  ctx.save();ctx.translate(x,y);ctx.rotate(-1.42);ctx.scale(1,1+.01*b);ctx.globalAlpha=.92;ctx.filter='brightness(.62) saturate(.7)';c1Frame(ctx,'spar','side',0,-8,52,SPAR_H,false,1,0);ctx.filter='none';ctx.restore();}
+  ctx.save();ctx.translate(x,y+4);ctx.rotate(-.95);ctx.scale(1,1+.01*b);ctx.filter='brightness(.9) saturate(.85)';c1Frame(ctx,'spar','side',0,-4,34,SPAR_H,false,1,0);ctx.filter='none';ctx.restore();}
 function drawJakResting_(){if(C1.jak)return;const x=JAKREST.x,y=JAKREST.y,H_=192,b=Math.sin(T*1.4);ctx.fillStyle='rgba(10,10,20,.3)';ctx.beginPath();ctx.ellipse(x,y+2,36,8,0,0,TAU);ctx.fill();
   ctx.save();ctx.translate(x,y);ctx.scale(1,.985+.008*b);ctx.translate(-x,-y);ctx.filter='brightness(.62) saturate(.7)';c1Frame(ctx,'jak','hurt',3,x-JAKDX*H_,y+3,H_,true,1,0);ctx.filter='none';ctx.restore();}
 function jakPos(){if(JAKF&&(SCENE==='thorn'||SCENE==='woods')&&jakInParty())return JAKF;if(SCENE==='thorn'&&!C1.jak)return JAKREST;return {x:lum.x-50,y:lum.y};}

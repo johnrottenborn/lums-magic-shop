@@ -409,6 +409,21 @@ const CASES = {
     await p.evaluate(() => { const g = window.__g, B = g.BATTLE; B.phase = 'sflame'; B.t = 0; B.burstDone = 0; }); await wait(800);
     await p.screenshot({ path: path.join(SHOTS, `spar-blazing-edge-${vp}.png`) });
   },
+  async 'battle-loot-resets'(p) {
+    await startCh1(p);
+    await p.evaluate(() => { const g = window.__g; g.BATTLE.loot = ['slimeparts']; g.BATTLE.rewarded = 1;
+      g.startEncounter({ kind: 'wisp', scene: 'dun', x: 0, y: 0, s: 1, pack: 1, calm: 0 }, 'normal'); });
+    for (let i = 0; i < 40 && !(await p.evaluate(() => window.__g.BATTLE.on)); i++) await wait(100);
+    const r = await p.evaluate(() => ({ loot: window.__g.BATTLE.loot.length, rewarded: window.__g.BATTLE.rewarded }));
+    check(r.loot === 0 && r.rewarded === 0, 'last battle\'s loot carried into a new battle: ' + JSON.stringify(r));
+  },
+  async 'spar-resting-closeup'(p) {
+    if (p.viewportSize().width > 600) return;
+    await p.evaluate(() => window.__g.startThornPreview()); await wait(1500);
+    await p.evaluate(() => { const g = window.__g, R = g.JAKRESTX; g.DLG.active = false; g.THFOES.length = 0; g.lum.x = R.x + 70; g.lum.y = R.y - 10; }); await wait(3800);
+    await p.evaluate(() => { window.__g.DLG.active = false; }); await wait(300);
+    await p.screenshot({ path: path.join(SHOTS, 'spar-resting-closeup.png') });
+  },
   async 'deeproot-sleeping-fox'(p) {
     await startCh1(p);
     await p.evaluate(() => { const g = window.__g; g.C1X.bigVixen = 0; g.enterDun(5, 900, 600, -1);
