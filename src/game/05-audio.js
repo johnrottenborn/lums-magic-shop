@@ -86,7 +86,16 @@ function sfxSplash(){if(!SND.ready)return;const t=SND.ctx.currentTime;noiseHit(t
     g.gain.setValueAtTime(.04,st);g.gain.exponentialRampToValueAtTime(.0005,st+.07);o.connect(g);g.connect(SND.sfx);o.start(st);o.stop(st+.09);}}
 function sfxWell(){if(!SND.ready)return;const t=SND.ctx.currentTime;[86,90,93,98,100,105].forEach((n,i)=>bell(t+i*.12,NOTE(n),.07,2.6,SND.sfx,(i-2.5)*.15));noiseHit(t,1.2,'highpass',6000,.5,.02,SND.sfxVerb);}
 function sfxFizzle(near){if(!SND.ready||!near)return;const t=SND.ctx.currentTime;[100,97,93,88].forEach((n,i)=>bell(t+i*.06,NOTE(n),.03,.5,SND.sfx,.2));noiseHit(t+.25,.3,'bandpass',900,1,.05,SND.sfx);}
-function sfxBlip(who){if(!SND.ready)return;const t=SND.ctx.currentTime;pluck(t,NOTE(who==='Cosmic'?81:76),.05,.35,SND.sfx,who==='Cosmic'?.2:-.2,.4);}
+/* possessed Cosmic (Chapter 1 on): a child's note that sags and splits into a low demonic growl, with a breathy whisper under it */
+function sfxPossessed(){if(!SND.ready)return;const c=SND.ctx,t=c.currentTime,out=SND.sfx;
+  const v=c.createOscillator(),vg=c.createGain();v.type='triangle';v.frequency.setValueAtTime(NOTE(81),t);v.frequency.exponentialRampToValueAtTime(NOTE(57),t+.55);
+  vg.gain.setValueAtTime(0,t);vg.gain.linearRampToValueAtTime(.05,t+.02);vg.gain.exponentialRampToValueAtTime(.001,t+.6);v.connect(vg);vg.connect(out);v.start(t);v.stop(t+.65);
+  const lp=c.createBiquadFilter();lp.type='lowpass';lp.Q.value=6;lp.frequency.setValueAtTime(900,t+.08);lp.frequency.exponentialRampToValueAtTime(180,t+1.1);
+  const gg=c.createGain();gg.gain.setValueAtTime(0,t+.08);gg.gain.linearRampToValueAtTime(.09,t+.22);gg.gain.exponentialRampToValueAtTime(.001,t+1.15);lp.connect(gg);gg.connect(out);gg.connect(SND.sfxVerb);
+  const trem=c.createOscillator(),tg=c.createGain();trem.frequency.value=23;tg.gain.value=.5;trem.connect(tg);tg.connect(gg.gain);trem.start(t);trem.stop(t+1.2);
+  for(const [n,d] of [[33,0],[33,-17],[40,9]]){const o=c.createOscillator();o.type='sawtooth';o.detune.value=d;o.frequency.setValueAtTime(NOTE(n+5),t+.08);o.frequency.exponentialRampToValueAtTime(NOTE(n-3),t+1.1);o.connect(lp);o.start(t+.08);o.stop(t+1.2);}
+  noiseHit(t+.05,.9,'bandpass',2400,4,.05,SND.sfxVerb,500);noiseHit(t+.1,.6,'lowpass',220,1,.12,out);}
+function sfxBlip(who){if(!SND.ready)return;if(who==='Cosmic'&&CH>0){sfxPossessed();return;}const t=SND.ctx.currentTime;pluck(t,NOTE(who==='Cosmic'?81:76),.05,.35,SND.sfx,who==='Cosmic'?.2:-.2,.4);}
 
 /* --- per-frame mix --- */
 function audioUpdate(dt){if(!SND.ready||!SND.on)return;scheduleMusic();const c=SND.ctx,now=c.currentTime;SND.runeCool-=dt;
