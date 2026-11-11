@@ -46,7 +46,7 @@ function buildThorn(){if(THORN.built)return;THORN.built=true;const P=THORN.props
   for(let y=CLR.cy-CLR.hh-60,k=0;y<=CLR.cy+CLR.hh+60;y+=75,k++)P.push({t:'hedge',x:CLR.x0+(H_(k,3,211)-.5)*16,y,w:150+H_(k,5,211)*24,flip:H_(k,7,211)<.5});
   THORN.mist=[];for(let i=0;i<40;i++)THORN.mist.push({x:hash(i,1,77)*TW_,y:hash(i,2,77)*TH_,r:160+hash(i,3,77)*220,ph:hash(i,4,77)*TAU});}
 /* glimpses of Cosmic at the edge of the lantern light along the red-rose path; each happens once */
-const COSSEE=[],COS_LINES=["Cosmic? I am coming for you!","Cosmic! Wait for me!","Was that… Cosmic? Don't run off!","I saw you, Cosmic! Hold on, I'm coming!","Cosmic! Don't go out there alone!"];
+const COSSEE=[],COS_LINES=["Cosmic? I am coming for you!","Cosmic! Wait for me!","Was that… Cosmic? Don't run off!","I saw you, Cosmic! Hold on, I'm coming!","Cosmic! Don't go…"];
 function buildCosSightings(){if(COSSEE.length)return;const p=THORN.path,n=p.length;[.22,.42,.62,.8].forEach((f,i)=>{const [r,c]=p[Math.round(f*(n-1))];COSSEE.push({i,x:c*TCW+TCW/2,y:r*TCH+TCH/2+20,st:0,t:0,a:0,face:-1});});COSSEE.push({i:4,x:TW_-70,y:TMZ.finish*TCH+TCH/2+20,st:0,t:0,a:0,face:-1,needBoss:1});}
 function updateCosSightings(dt){buildCosSightings();const Rw=Math.min(W,H)*.5/zoom,free=!DLG.active&&!BATTLE.on&&!BATTLE.pending&&!MENU.open&&!WEVENT.on&&!FADE.dir;
   for(const s of COSSEE){if(C1['cosSeen'+s.i]){s.st=3;continue;}if(s.needBoss&&!C1.thornBoss)continue;const d=Math.hypot(lum.x-s.x,(lum.y-s.y)*1.2);s.t+=dt;
@@ -69,7 +69,7 @@ function thornFree(x,y){if(x>TW_+40)return clrFree(x,y);if(x<18||y<14||y>TH_-14)
   if(!C1.thornBoss&&r===TMZ.finish&&c>=13)return false;
   return true;}
 function solveThorn(px,py,nx,ny){if(thornFree(nx,ny))return [nx,ny];if(thornFree(nx,py))return [nx,py];if(thornFree(px,ny))return [px,ny];return [px,py];}
-function enterThorn(){buildThorn();if(!THORN.fint){THORN.fint=1;for(const f of THORN.forage)THINT.push({x:f.x,y:f.y,reach:76,lum:true,forage:f,onInteract:()=>pickForage(f)});}for(const f of THORN.forage)f.picked=0;if(!THORN.spiders)buildThornCritters();buildThornFoes();SCENE='thorn';lum.x=40;lum.y=TMZ.start*TCH+TCH/2+10;lum.face=1;lum.vx=lum.vy=0;lum.state='idle';lum.alpha=1;cam.x=lum.x+120;cam.y=lum.y-50;THORN.t=0;resetJakFollow();if(!C1.jak&&!C1.jakSeenT)C1.jakSeenT=0;GOAL.tag='TASK';GOAL.text='Follow the red flowers through Stranglethorn';HINT.goalT=0;}
+function enterThorn(){buildThorn();if(!THORN.fint){THORN.fint=1;for(const f of THORN.forage)THINT.push({x:f.x,y:f.y,reach:76,lum:true,forage:f,onInteract:()=>pickForage(f)});}for(const f of THORN.forage)f.picked=0;if(!THORN.spiders)buildThornCritters();buildThornFoes();SCENE='thorn';lum.x=40;lum.y=TMZ.start*TCH+TCH/2+10;lum.face=1;lum.vx=lum.vy=0;lum.state='idle';lum.alpha=1;cam.x=lum.x+120;cam.y=lum.y-50;THORN.t=0;resetJakFollow();if(!C1.jak&&!C1.jakSeenT)C1.jakSeenT=0;GOAL.tag='TASK';GOAL.text='Search for Cosmic';HINT.goalT=0;}
 function startThornPreview(){SAVEC.finished=0;audioInit();c1Reset();C1.introDone=1;C1.hedgeSeen=1;C1I.on=false;WEVENT.on=false;INTRO.lumShown=true;if(!BAG.includes('lantern'))BAG.push('lantern');FADE.a=1;FADE.dir=-1;enterThorn();}
 function updateThorn(dt){updateThornAtmos(dt);updateCosSightings(dt);updateThornCritters(dt);updateThornFoes(dt);updateJakFollow(dt);
   if(!C1.jak&&!C1.jakSpotted&&!DLG.active&&!FADE.dir&&Math.hypot(lum.x-JAKREST.x,lum.y-JAKREST.y)<300){C1.jakSpotted=1;talk([['Lum',"Someone's there… slumped against the roots of that old oak."]]);}
@@ -172,9 +172,9 @@ function drawThornWebs(x0,y0,x1,y1){for(const w of THORN.webs||[]){if(w.cx<x0-25
 /* ---------- the edge of Stranglethorn without a lantern: a still view of the forest, and no way in ---------- */
 const THGATE={t:0};
 const THGINT=[{x:40,y:600,reach:110,door:true,onInteract:()=>goScene(()=>{SCENE='woods';lum.x=2610;lum.y=628;lum.face=-1;lum.state='idle';lum.vx=lum.vy=0;cam.x=lum.x+60;cam.y=lum.y-50;})},
-  {x:520,y:600,reach:470,onInteract:()=>say(["It's far too dark to go any further. I need a better way to bring light in here.","I can't find the path without a proper light.","The thorns swallow every bit of light. I'll need something brighter than this."][(sayCount++)%3])}];
+  {x:520,y:600,reach:470,onInteract:()=>say(["It's far too dark to go any further.","I can't find the path without a proper light.","The thorns swallow every bit of light. I will need something bright."][(sayCount++)%3])}];
 function enterThornGate(){SCENE='thgate';THGATE.t=0;WEVENT.on=true;lum.x=500;lum.y=600;lum.vx=lum.vy=0;lum.state='idle';lum.face=1;
-  setTimeout(()=>talk([['Lum',"The road ahead disappears into the dark of Stranglethorn Forest."],['Lum',"I can't see a thing past those first trees. I'll need a stronger light than this."]],false,()=>{WEVENT.on=false;}),900);}
+  setTimeout(()=>talk([['Lum',"The path disappears into the dark…"],['Lum',"I can't see a thing past the trees."]],false,()=>{WEVENT.on=false;}),900);}
 function drawThornGate(){THGATE.t+=1/60;const im=IMG.thorngate;ctx.setTransform(DPR,0,0,DPR,0,0);ctx.fillStyle='#0c0608';ctx.fillRect(0,0,W,H);
   let px=W*.6,py=H*.62;if(ready(im)){const k=1.04+THGATE.t*.006,sc=Math.max(W/im.naturalWidth,H/im.naturalHeight)*k,iw=im.naturalWidth*sc,ih=im.naturalHeight*sc,ix=(W-iw)/2,iy=(H-ih)/2;ctx.drawImage(im,ix,iy,iw,ih);px=ix+iw*.585;py=iy+ih*.69;}
   // as dark as Gaia's Hollow: only the faint glimmer of the path beyond shows through

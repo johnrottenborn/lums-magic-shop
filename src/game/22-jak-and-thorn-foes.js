@@ -17,26 +17,26 @@ function drawJakResting(){if(C1.jak)return;const x=JAKREST.x,y=JAKREST.y,H_=192,
   ctx.save();ctx.translate(x,y);ctx.scale(1,.985+.008*b);ctx.translate(-x,-y);ctx.filter='brightness(.62) saturate(.7)';c1Frame(ctx,'jak','hurt',3,x-JAKDX*H_,y+3,H_,true,1,0);ctx.filter='none';ctx.restore();}
 function jakPos(){if(JAKF&&(SCENE==='thorn'||SCENE==='woods')&&jakInParty())return JAKF;if(SCENE==='thorn'&&!C1.jak)return JAKREST;return {x:lum.x-50,y:lum.y};}
 function jakJoin(){if(!jakInParty()){PARTY_ORDER.length=1;PARTY_ORDER.push('jak');}C1.jak=1;HEROES.jak.hp=5;resetJakFollow();JAKF.x=JAKREST.x;JAKF.y=JAKREST.y;JAKF.face=-1;
-  GOAL.tag='JAK JOINED THE PARTY';GOAL.text='Follow the red roses through Stranglethorn';HINT.goalT=0;sfxNice&&sfxNice();if(typeof SAVEC!=='undefined')SAVEC.t=99;}
+  GOAL.tag='JAK JOINED THE PARTY';GOAL.text='Follow the red roses through Stranglethorn and find Cosmic';HINT.goalT=0;sfxNice&&sfxNice();if(typeof SAVEC!=='undefined')SAVEC.t=99;}
 function jakWake(item){const i=BAG.indexOf(item);if(i>=0)BAG.splice(i,1);sfxItem&&sfxItem();
   for(let k=0;k<16;k++)PARTS.push({type:'fdust',x:JAKREST.x+rnd(-30,30),y:JAKREST.y,z:rnd(20,140),vx:rnd(-8,8),vy:rnd(-4,4),vz:rnd(10,40),life:0,max:rnd(.6,1.2),s:rnd(1,2),col:'255,210,220'});
   C1.jakAwake=1;
   setTimeout(()=>talk([['Lum',"Hold still. This will help."],
-    ['Jak',"…Ngh. That smell… mint and starlight. Who…?"],
+    ['Jak',"…Ngh…"],
     ['Lum',"My name is Lum. You were barely breathing."],
-    ['Jak',"Jak. I'd be dead without you, I think."],
-    ['Jak',"A demon came through here. Huge, with black wings. It swallowed my friend whole… and took my light with it."],
-    ['Jak',"I've been lost in these thorns ever since. In the dark, every path looks the same."],
-    ['Lum',"Is there any way to tell the paths apart?"],
-    ['Jak',"The red roses. Travellers who crossed Stranglethorn dropped seeds as they went, so the rest could find the way."],
+    ['Jak',"I’m Jak. Thank you."],
+    ['Jak',"I've been lost in the dark, every path looks the same."],
+    ['Lum',"This forest is a maze."],
+    ['Jak',"Long ago, travelers who crossed Stranglethorn dropped seeds as they walked, so the rest could find the way."],
     ['Jak',"Not many have dared these woods lately, though. The roses are all that's left of them."],
-    ['Jak',"Follow the red flowers. If you don't see any, you've gone the wrong way. I learned that the hard way."],
-    ['Jak',"You have a light. Let me walk with you. My axe is yours until we're out of these woods."]],false,jakJoin),700);}
+    ['Lum',"I’m searching for my apprentice, Cosmic."],
+    ['Jak',"Follow the red flowers to find your way through these woods. If you don't see any, you're off the path."],
+    ['Jak',"You have a light. Let me walk with you. I’ll protect you until we're out of these woods."]],false,jakJoin),700);}
 function jakInteract(){if(C1.jak)return;
   const hasP=BAG.includes('potion');
   if(!hasP){talk([['Lum',"He's breathing, but only just. I need something to heal him… a healing potion."]]);return;}
   const opts=[];if(hasP)opts.push(["Healing Potion",()=>jakWake('potion')]);if(opts.length<2)opts.push(["Not yet",()=>{}]);
-  talk([['Lum',"A man, slumped against the roots. He's barely breathing."]],false,()=>askChoice("Use on the stranger?",opts));}
+  talk([['Lum',"A man, slumped against the roots. He's alive…"]],false,()=>askChoice("Use on the stranger?",opts));}
 /* the Thornroot Cellar's entrance: the designer's old overgrown well, feathered into the forest floor, with a few cobwebs */
 const CMOUTH={rx:92,ry:58};
 function drawCellarMouth(){drawThornWell(CELLAR_DOOR.x,CELLAR_DOOR.y);drawThornWell(SPRING_DOOR.x,SPRING_DOOR.y);drawThornWell(WEBWELL_DOOR.x,WEBWELL_DOOR.y);}
@@ -75,7 +75,7 @@ function updateThornFoes(dt){const ok=!DLG.active&&!WEVENT.on&&!MENU.open&&!FADE
       const mvx=g.x-ox;if(Math.abs(mvx)>sp*dt*.3&&!g.faceT){const nf=mvx<0?-1:1;if(nf!==g.face){g.face=nf;g.faceT=.4;}}g.moving=1;}else g.moving=0;}
   // the Broodmother waits beneath her web
   if(!C1.thornBoss){const B_=THBOSS;B_.ph+=dt;B_.calm=Math.max(0,B_.calm-dt);const d=Math.hypot(lum.x-B_.x,lum.y-B_.y);
-    if(ok&&!C1.bossSeen&&d<420&&Math.floor(lum.y/TCH)===TMZ.finish){C1.bossSeen=1;talk(jakInParty()?[['Jak',"Look at all these webs… something big lives here."],['Lum',"Stay close. The way out is just past that tree."]]:[['Lum',"So many webs… something big lives here."]]);}
+    if(ok&&!C1.bossSeen&&d<420&&Math.floor(lum.y/TCH)===TMZ.finish){C1.bossSeen=1;talk(jakInParty()?[['Jak',"Be wary of the webs…"]]:[['Lum',"Something big lives here…"]]);}
     else if(ok&&!B_.calm&&d<125&&lum.bumpT<=0)startEncounter(B_,'ambush');}}
 function drawThornFoe(g){if(CAPTURE.on&&g===BATTLE.capG)return;
   if(g.kind==='spider'){ctx.fillStyle='rgba(0,0,0,.3)';ctx.beginPath();ctx.ellipse(g.x,g.y,32,7,0,0,TAU);ctx.fill();c1Frame(ctx,'spider',g.moving?'crawl':'idle',Math.floor(g.ph*(g.moving?12:4))%(g.moving?5:4),g.x,g.y,96,g.moving?g.face>0:g.face<0,1,0);ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,g.x+(g.face<0?-14:14),g.y-34,7,'255,60,60',.5);ctx.restore();return;}
@@ -162,17 +162,19 @@ function updateClearing(dt){if(C1.fkDone)return;FKS.t+=dt;FKS.flash=Math.max(0,F
   if(FKS.st===6){FKS.fa=Math.max(0,FKS.fa-dt*.7);if(FKS.fa<=0){FKS.st=7;fkFarewell();}}}
 const fkJak=()=>jakInParty();
 function fkMeet(){WEVENT.on=true;lum.vx=lum.vy=0;lum.state='idle';lum.face=1;
-  const L=[['Lum',"Cosmic! Oh, thank the stars… I've been searching all night!"]];
-  if(fkJak())L.push(['Jak',"So that's your apprentice? …Lum, wait. Something's wrong with him."]);
-  L.push(['Cosmic',"Master Lum… you shouldn't have followed me."],['Lum',"Don't be silly. Come here, let's get you home. The shop's far too quiet without you."],['Cosmic',"Home…"],['Cosmic',"The boy can't hear you anymore, little witch."],['Lum',"…That isn't your voice. Cosmic, what's happened to you?"]);
+  const L=[['Lum',"Cosmic! I’ve found you!"]];
+  if(fkJak())L.push(['Jak',"Lum, wait. Something's wrong…"]);
+  L.push(['Cosmic',"Master Lum… you shouldn't have followed me."],['Lum',"Come here, let's get you home."],['Cosmic',"Home…"],['Cosmic',"The boy can't hear you anymore, little witch."],['Lum',"…That voice? Cosmic, what's happened to you?"]);
   talk(L,false,()=>{FKS.st=2;FKS.t=0;sfxEerie();});}
-function fkReveal(){const L=[['Fokalur',"Your apprentice broke my seal with his own hands. His body is mine now."],['Fokalur',"I am Fokalur. And you will not be taking him home."]];
+function fkReveal(){const L=[['Fokalur',"The child broke the seal with his own hands. His body now belongs to me."],['Fokalur',"I am Fokalur."]];
   if(fkJak())L.push(['Jak',"Lum, get behind me!"]);
+  L.push(['Fokalur',fkJak()?"A shop owner and a broken warrior… prepare to die!":"Prepare to die!"]);
   talk(L,false,()=>{FKS.st=4;WEVENT.on=false;lum.bumpT=0;startEncounter({kind:'fokalur',scene:'thorn',x:FKS.cx,y:FKS.cy,s:1,pack:1,calm:0,dead:0,scripted:true,boss:1,onLose:fkAfterLoss},'normal');});}
 function fkAfterLoss(){for(const id of PARTY_ORDER)HEROES[id].hp=Math.max(1,Math.round(HEROES[id].maxHp*.25));
   SCENE='thorn';lum.x=FKS.cx-240;lum.y=FKS.cy;lum.face=1;lum.vx=lum.vy=0;lum.state='idle';cam.x=lum.x+120;cam.y=lum.y-50;resetJakFollow();FKS.st=5;FKS.fa=1;FKS.ca=0;WEVENT.on=true;
-  setTimeout(()=>talk([['Fokalur',fkJak()?"Is that all? A powder-maker and a lost traveller, against a god.":"Is that all? A powder-maker, against a god."],['Fokalur',"I'll let you live, witch. I want you to watch this world fall… knowing whose hands brought it down."]],false,()=>{FKS.st=6;FKS.flash=.8;sfxRumble(3,.9);}),900);}
-function fkFarewell(){const L=[['Lum',"Cosmic… I'm not giving up on you. I'll find a way to bring you back. I promise."]];if(fkJak())L.push(['Jak',"Then we'll find it together."]);
+  const fade=()=>{FKS.st=6;FKS.flash=.8;sfxRumble(3,.9);};
+  setTimeout(()=>{if(fkJak())talk([['Fokalur',"Ha! The stone witch watches as her protector burn in hellfire!"]],false,fade);else fade();},900);}
+function fkFarewell(){const L=[['Lum',"…"]];
   talk(L,false,()=>{C1.fkDone=1;C1.chEnd=1;finishChapter('ch1');startCh1Results();});}
 function drawFKS(){const x=FKS.cx,y=FKS.cy;
   if(FKS.ca>0&&ready(catlas)){const A=COS_BLADE.idle,dw=CFW*CSPR,dh=CFH*CSPR;ctx.save();ctx.globalAlpha=FKS.ca;ctx.fillStyle='rgba(0,0,0,.3)';ctx.beginPath();ctx.ellipse(x,y+2,26,7,0,0,TAU);ctx.fill();
@@ -186,5 +188,5 @@ const C1RES={t:0};
 function startCh1Results(){RESULTS.ch='ch1';RESULTS.r=null;RESULTS.sealT=0;RESULTS.msgT=0;C1RES.t=.001;C1RES.t0=performance.now();WEVENT.on=true;}
 function drawC1Results(){if(!C1RES.t)return;C1RES.t=Math.max(.001,(performance.now()-C1RES.t0)/1000);const t=C1RES.t;ctx.save();ctx.setTransform(DPR,0,0,DPR,0,0);ctx.fillStyle=`rgba(0,0,0,${Math.min(1,t/2)})`;ctx.fillRect(0,0,W,H);
   if(t>6.5){ctx.restore();ctx.save();ctx.setTransform(DPR,0,0,DPR,0,0);drawResults(t-6.5);ctx.restore();return;}
-  ctx.globalAlpha=Math.max(0,Math.min(1,(t-2)/1.5,(6.5-t)/.8));ctx.textAlign='center';ctx.fillStyle='#e8e2f2';ctx.font='italic 20px Alegreya, Georgia, serif';ctx.fillText('Cosmic is gone… but not lost.',W/2,H*.45);
-  ctx.font='700 22px "Alegreya SC", Georgia, serif';ctx.fillStyle='rgba(232,226,242,.85)';ctx.fillText('End of Chapter 1',W/2,H*.45+40);ctx.restore();}
+  ctx.globalAlpha=Math.max(0,Math.min(1,(t-2)/1.5,(6.5-t)/.8));ctx.textAlign='center';
+  ctx.font='700 22px "Alegreya SC", Georgia, serif';ctx.fillStyle='rgba(232,226,242,.85)';ctx.fillText('End of Chapter 1',W/2,H*.47);ctx.restore();}
