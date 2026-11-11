@@ -293,6 +293,10 @@ const CASES = {
     await p.evaluate(() => { const g = window.__g, s = g.COSSEE[0]; g.lum.x = s.x - 60; }); await wait(400);
     const r = await p.evaluate(() => { const g = window.__g; return { st: g.COSSEE[0].st, seen: g.C1X.cosSeen0, line: g.DLG.active && g.DLG.lines[0][1] }; });
     check(r.st >= 2 && r.seen === 1 && /Cosmic/.test(r.line || ''), 'Cosmic did not vanish with a line from Lum: ' + JSON.stringify(r));
+    // he walks away in plain sight for a while before fading
+    await p.evaluate(() => { window.__g.DLG.active = false; }); await wait(1800);
+    await p.screenshot({ path: path.join(SHOTS, 'cosmic-walks-away-' + (p.viewportSize().width < 600 ? 'phone' : 'desktop') + '.png') });
+    { const q = await p.evaluate(() => { const s = window.__g.COSSEE[0]; return { st: s.st, a: s.a, w: s.w, t: s.t }; }); check(q.st === 2 && q.a > .9, 'Cosmic faded before walking away: ' + JSON.stringify(q)); }
   },
   async 'fokalur-clearing'(p) {
     const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop';

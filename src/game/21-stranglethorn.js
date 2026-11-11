@@ -49,13 +49,13 @@ function buildThorn(){if(THORN.built)return;THORN.built=true;const P=THORN.props
 const COSSEE=[],COS_LINES=["Cosmic? I am coming for you!","Cosmic! Wait for me!","Was that… Cosmic? Don't run off!","I saw you, Cosmic! Hold on, I'm coming!","Cosmic! Don't go…"];
 function buildCosSightings(){if(COSSEE.length)return;const p=THORN.path,n=p.length;[.22,.42,.62,.8].forEach((f,i)=>{const [r,c]=p[Math.round(f*(n-1))];COSSEE.push({i,x:c*TCW+TCW/2,y:r*TCH+TCH/2+20,st:0,t:0,a:0,face:-1});});COSSEE.push({i:4,x:TW_-70,y:TMZ.finish*TCH+TCH/2+20,st:0,t:0,a:0,face:-1,needBoss:1});}
 function updateCosSightings(dt){buildCosSightings();const Rw=Math.min(W,H)*.5/zoom,free=!DLG.active&&!BATTLE.on&&!BATTLE.pending&&!MENU.open&&!WEVENT.on&&!FADE.dir;
-  for(const s of COSSEE){if(C1['cosSeen'+s.i]){s.st=3;continue;}if(s.needBoss&&!C1.thornBoss)continue;const d=Math.hypot(lum.x-s.x,(lum.y-s.y)*1.2);s.t+=dt;
+  for(const s of COSSEE){if(C1['cosSeen'+s.i]&&s.st<2){s.st=3;continue;}if(s.st===3)continue;if(s.needBoss&&!C1.thornBoss)continue;const d=Math.hypot(lum.x-s.x,(lum.y-s.y)*1.2);s.t+=dt;
     if(s.st===0&&free&&d<Rw*.95){s.st=1;s.t=0;s.face=lum.x<s.x?-1:1;}
-    else if(s.st===1){s.a=Math.min(.95,s.a+dt*2);s.face=lum.x<s.x?-1:1;if(d<Rw*.5||s.t>2.4){s.st=2;s.t=0;s.face=-s.face;C1['cosSeen'+s.i]=1;if(!DLG.active)say(COS_LINES[s.i%COS_LINES.length]);}}
-    else if(s.st===2){s.x+=s.face*70*dt;s.a=Math.max(0,s.a-dt*.9);if(s.a<=0)s.st=3;}}}
+    else if(s.st===1){s.a=Math.min(.95,s.a+dt*2);s.face=lum.x<s.x?-1:1;if(d<Rw*.38||s.t>4.5){s.st=2;s.t=0;s.face=-s.face;C1['cosSeen'+s.i]=1;if(!DLG.active)say(COS_LINES[s.i%COS_LINES.length]);}}
+    else if(s.st===2){s.x+=s.face*55*dt;if(!DLG.active)s.w=(s.w||0)+dt;if(s.w>2.5)s.a=Math.max(0,s.a-dt*.8);if(s.a<=0)s.st=3;}}}
 function drawCosGhost(s){if(!ready(catlas)||s.a<=0)return;const A=s.st===2?COS_BLADE.walk:COS_BLADE.idle,fr=s.st===2?A.frames[Math.floor(s.t*10)%A.frames.length]:A.frames[0];
   ctx.save();ctx.globalAlpha=s.a;ctx.fillStyle='rgba(0,0,0,.25)';ctx.beginPath();ctx.ellipse(s.x,s.y+2,26,7,0,0,TAU);ctx.fill();
-  ctx.translate(s.x,s.y+3);if(s.face!==A.native)ctx.scale(-1,1);const dw=CFW*CSPR,dh=CFH*CSPR;ctx.filter='brightness(1.15) saturate(.85)';ctx.drawImage(catlas,fr*CFW,0,CFW,CFH,-dw/2,-dh*(264/270),dw,dh);ctx.restore();
+  ctx.translate(s.x,s.y+3);if(s.face!==A.native)ctx.scale(-1,1);const dw=CFW*CSPR,dh=CFH*CSPR;ctx.save();ctx.globalCompositeOperation='lighter';const bg=s.st===2?[18,-32,44]:[34,-66,44];drawGlow(ctx,bg[0],bg[1],bg[2],'255,40,50',.7+.12*Math.sin(T*5));ctx.restore();ctx.drawImage(catlas,fr*CFW,0,CFW,CFH,-dw/2,-dh*(264/270),dw,dh);ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,bg[0],bg[1],bg[2]*.5,'255,70,60',.45);ctx.restore();ctx.restore();
   ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,s.x,s.y-70,60,'140,170,255',.22*s.a);ctx.restore();}
 function thornFree(x,y){if(x>TW_+40)return clrFree(x,y);if(x<18||y<14||y>TH_-14)return false;if(x>TW_-12&&Math.floor(y/TCH)!==TMZ.finish)return false;if(x>TW_+30)return false;
   const c=clamp(Math.floor(x/TCW),0,TMZ.C-1),r=clamp(Math.floor(y/TCH),0,TMZ.R-1),lx=x-c*TCW,ly=y-r*TCH,T_=34,B_=24,SX=42;
