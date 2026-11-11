@@ -154,12 +154,13 @@ let BUBBLE_BASE=null;
 function bubbleAt(wx,wy,text,name,alpha,small){if(typeof text!=='string')return;let sx=(wx-cam.x)*zoom+W/2,sy=(wy-cam.y)*zoom+H/2;if(SCENE!=='garden'&&SCENE!=='woods'&&SCENE!=='thorn'&&SCENE!=='thgate'){const by_=BUBBLE_BASE??lum.y,k_=roomH(by_)/151;[sx,sy]=wellToScreen(wx,by_-(by_-wy)*k_);}ctx.save();ctx.globalAlpha=alpha;
   ctx.font=(small?'500 13px':'500 15px')+' Alegreya, "Palatino Linotype", Georgia, serif';const maxW=small?160:Math.min(240,W-80);
   const words=text.split(' '),lines=[];let cur='';for(const w_ of words){const t=cur?cur+' '+w_:w_;if(ctx.measureText(t).width>maxW&&cur){lines.push(cur);cur=w_;}else cur=t;}lines.push(cur);
-  const lh=small?17:20,top=name?16:0,bw=Math.max(...lines.map(l=>ctx.measureText(l).width),name?ctx.measureText(name).width:0)+28,bh=lines.length*lh+18+top;
+  const nameLbl=name?(name==='Fokalur'?'Demon God, Fokalur':name).toUpperCase():'',bodyF=ctx.font;let nameW=0;if(name){ctx.font='700 11px "Alegreya SC", Georgia, serif';nameW=ctx.measureText(nameLbl).width;ctx.font=bodyF;}
+  const lh=small?17:20,top=name?16:0,bw=Math.max(...lines.map(l=>ctx.measureText(l).width),nameW)+28,bh=lines.length*lh+18+top;
   const bx=clamp(sx-bw/2,14,W-14-bw),by=Math.max(14,sy-bh);
   ctx.fillStyle='rgba(60,50,30,.18)';rr(bx+2,by+4,bw,bh,14);ctx.fill();ctx.fillStyle='#fffaf0';rr(bx,by,bw,bh,14);ctx.fill();ctx.strokeStyle='rgba(120,96,60,.45)';ctx.lineWidth=1.5;ctx.stroke();
   const tx=clamp(sx,bx+20,bx+bw-20);ctx.beginPath();ctx.moveTo(tx-7,by+bh-1);ctx.lineTo(tx,by+bh+10);ctx.lineTo(tx+7,by+bh-1);ctx.fillStyle='#fffaf0';ctx.fill();
   ctx.textAlign='left';ctx.textBaseline='top';
-  if(name){ctx.font='700 11px "Alegreya SC", Georgia, serif';ctx.fillStyle=name==='Cosmic'?'#3f63a8':name==='Fokalur'?'#a3263a':'#7a4f9a';ctx.fillText((name==='Fokalur'?'Demon God, Fokalur':name).toUpperCase(),bx+14,by+9);ctx.font=(small?'500 13px':'500 15px')+' Alegreya, "Palatino Linotype", Georgia, serif';}
+  if(name){ctx.font='700 11px "Alegreya SC", Georgia, serif';ctx.fillStyle=name==='Cosmic'?'#3f63a8':name==='Fokalur'?'#a3263a':'#7a4f9a';ctx.fillText(nameLbl,bx+14,by+9);ctx.font=(small?'500 13px':'500 15px')+' Alegreya, "Palatino Linotype", Georgia, serif';}
   ctx.fillStyle='#4f4433';lines.forEach((l,i)=>ctx.fillText(l,bx+14,by+9+top+i*lh));ctx.restore();}
 function drawSay(){
   if(lum.quipT>0&&!DLG.active){bubbleAt(lum.x,lum.y-150,lum.quip,null,Math.min(1,lum.quipT*3,(2.4-lum.quipT)*6),true);}
