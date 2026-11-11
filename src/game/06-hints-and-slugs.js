@@ -34,7 +34,7 @@ function slugSteer(g,tx,ty,sp,dt){const want=Math.atan2(ty-g.y,tx-g.x);if(g.hd==
 function updateSlugs(dt){for(const g of SLUGS){g.t+=dt;g.shy=Math.max(0,g.shy-dt);g.flee=Math.max(0,g.flee-dt);
   const dl=Math.hypot(lum.x-g.x,lum.y-g.y);
   if(BATTLE.pending||BATTLE.on)continue;g.calm=Math.max(0,(g.calm||0)-dt);g.alert=Math.max(0,(g.alert||0)-dt);
-  const awake=!NIGHT.on&&PLAYER()&&!INTRO.on&&!DLG.active&&!MENU.open&&!WEVENT.on&&SCENE==='garden';
+  const awake=(!NIGHT.on||g.kind==='slugking')&&PLAYER()&&!INTRO.on&&!DLG.active&&!MENU.open&&!WEVENT.on&&SCENE==='garden';
   if(awake&&!g.chase&&!g.calm&&!g.shy&&dl<160){g.chase=true;g.alert=.9;g.state='crawl';sfxSlimeHop(.5);}
   if(g.chase&&(dl>280||g.calm||!awake))g.chase=false;
   if(g.rise!==undefined&&g.rise<1)continue;

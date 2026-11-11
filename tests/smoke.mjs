@@ -338,6 +338,11 @@ const CASES = {
     await p.evaluate(() => { const g = window.__g; g.DLG.active = false; g.WEV.fk = 1; g.WEV.foka = 3.2; g.talk([['Fokalur', 'Thank you, foolish apprentice. Your body will serve as a suitable vessel.']]); }); await wait(1600);
     check(await p.evaluate(() => window.__g.IMGX.fokalur === undefined && !!window.__g.IMGX.fokalur_hd), 'the old Demon God sprite is still loaded');
   },
+  async 'slug-king-night'(p) {
+    // the Slug King still fights at night (other slugs sleep)
+    await p.evaluate(() => { const g = window.__g; g.INTRO.on = false; g.INTRO.waiting = false; g.INTRO.fade = 0; g.INTRO.ui = 1; g.HINT.on = false; g.DLG.active = false; g.NIGHT.on = true; g.becomeCosmic(0, 900, 1); g.spawnKing(false); const k = g.SLUGS.find(s => s.kind === 'slugking'); k.calm = 0; k.x = g.lum.x + 40; k.y = g.lum.y; }); await wait(1500);
+    check(await p.evaluate(() => window.__g.BATTLE.on || window.__g.BATTLE.pending), 'the Slug King did not start a battle at night');
+  },
   async 'garden-hedge-cut'(p) {
     await p.evaluate(() => { const g = window.__g; g.INTRO.on = false; g.INTRO.waiting = false; g.INTRO.fade = 0; g.INTRO.ui = 1; g.HINT.on = false; g.DLG.active = false; g.NIGHT.on = true; g.becomeCosmic(0, 1490, 1); }); await wait(1200);
     const near = () => window.__g.ESTATE.filter(o => o.t === 'shrub' && Math.abs(o.x - 20) < 135 && o.y > 1575 && o.y < 1720).length;
