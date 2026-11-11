@@ -22,12 +22,12 @@ function drawJakOW_(){if(!JAKF||CAPTURE.on)return;const H_=192,vert=JAKF.dir==='
 function drawSparOW(F,alpha){if(!F)return;const vert=F.dir==='up'||F.dir==='down',an=vert?F.dir:'side',fi=F.moving?Math.floor((F.ph||0)/16)%5:0;
   ctx.fillStyle='rgba(10,10,20,.25)';ctx.beginPath();ctx.ellipse(F.x,F.y+2,30,8,0,0,TAU);ctx.fill();c1Frame(ctx,'spar',an,fi,F.x,F.y+3,SPAR_H,!vert&&F.face<0,alpha??1,0);}
 function drawJakResting(){if(MATE==='spar'){drawSparResting();return;}drawJakResting_();}
-function drawSparResting(){if(C1.jak)return;const x=JAKREST.x,y=JAKREST.y,b=Math.sin(T*1.4);ctx.fillStyle='rgba(10,10,20,.3)';ctx.beginPath();ctx.ellipse(x-8,y-70,44,10,0,0,TAU);ctx.fill();
-  ctx.save();ctx.translate(x-12,y-72);ctx.rotate(-.38);ctx.scale(1,1+.01*b);c1Frame(ctx,'spar','side',0,0,0,SPAR_H*.92,true,1,0);ctx.filter='none';ctx.restore();}
+function drawSparResting(){if(C1.jak)return;const x=JAKREST.x,y=JAKREST.y,b=Math.sin(T*1.4);ctx.fillStyle='rgba(10,10,20,.3)';ctx.beginPath();ctx.ellipse(x-6,y-110,34,9,0,0,TAU);ctx.fill();
+  ctx.save();ctx.translate(x-6,y-112);ctx.rotate(-.1);ctx.scale(1,1+.01*b);c1Frame(ctx,'spar','down',0,0,0,SPAR_H*.9,false,1,0);ctx.filter='none';ctx.restore();}
 function drawJakResting_(){if(C1.jak)return;const x=JAKREST.x,y=JAKREST.y,H_=192,b=Math.sin(T*1.4);ctx.fillStyle='rgba(10,10,20,.3)';ctx.beginPath();ctx.ellipse(x,y+2,36,8,0,0,TAU);ctx.fill();
   ctx.save();ctx.translate(x,y);ctx.scale(1,.985+.008*b);ctx.translate(-x,-y);ctx.filter='brightness(.62) saturate(.7)';c1Frame(ctx,'jak','hurt',3,x-JAKDX*H_,y+3,H_,true,1,0);ctx.filter='none';ctx.restore();}
-function jakPos(){if(JAKF&&(SCENE==='thorn'||SCENE==='woods')&&jakInParty())return JAKF;if(SCENE==='thorn'&&!C1.jak)return JAKREST;return {x:lum.x-50,y:lum.y};}
-function jakJoin(){if(!jakInParty()){PARTY_ORDER.length=1;PARTY_ORDER.push(MATE);}C1.jak=1;HEROES[MATE].hp=Math.round(HEROES[MATE].maxHp*.3);resetJakFollow();JAKF.x=JAKREST.x;JAKF.y=JAKREST.y;JAKF.face=-1;
+function jakPos(){if(JAKF&&(SCENE==='thorn'||SCENE==='woods')&&jakInParty())return JAKF;if(SCENE==='thorn'&&!C1.jak)return {x:JAKREST.x-6,y:JAKREST.y-110};return {x:lum.x-50,y:lum.y};}
+function jakJoin(){if(!jakInParty()){PARTY_ORDER.length=1;PARTY_ORDER.push(MATE);}C1.jak=1;HEROES[MATE].hp=Math.round(HEROES[MATE].maxHp*.3);resetJakFollow();JAKF.x=JAKREST.x-6;JAKF.y=JAKREST.y-110;JAKF.face=1;JAKF.dir='down';
   GOAL.tag='SPAR JOINED THE PARTY';GOAL.text='Follow the red roses through Stranglethorn and find Cosmic';HINT.goalT=0;sfxNice&&sfxNice();if(typeof SAVEC!=='undefined')SAVEC.t=99;}
 function jakWake(item){const i=BAG.indexOf(item);if(i>=0)BAG.splice(i,1);sfxItem&&sfxItem();
   for(let k=0;k<16;k++)PARTS.push({type:'fdust',x:JAKREST.x+rnd(-30,30),y:JAKREST.y,z:rnd(20,140),vx:rnd(-8,8),vy:rnd(-4,4),vz:rnd(10,40),life:0,max:rnd(.6,1.2),s:rnd(1,2),col:'255,210,220'});
@@ -55,7 +55,7 @@ function drawThornWell(x,y){const im=IMG.thorn_well;if(!ready(im))return;const w
   ctx.drawImage(im,x-w*.4946,y-h*.462,w,h);
   ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,x,y+5,54,'200,60,50',.1+.05*Math.sin(T*1.6));ctx.restore();
   for(const [n,dx,dy,ww,f] of [['thdec_smallweb',-92,34,85,false],['thdec_smallweb',94,-20,76,true]]){const wi=IMG[n];if(!ready(wi))continue;const wh=ww*wi.naturalHeight/wi.naturalWidth;ctx.save();ctx.globalAlpha=.85;ctx.translate(x+dx,y+dy);if(f)ctx.scale(-1,1);ctx.drawImage(wi,-ww/2,-wh/2,ww,wh);ctx.restore();}}
-const THINT=[{x:JAKREST.x-10,y:JAKREST.y-60,reach:100,onInteract:()=>jakInteract()},{x:30,y:TMZ.start*TCH+TCH/2+10,reach:60,door:true,onInteract:()=>goScene(()=>{buildWoods();buildWoodsC1();SCENE='woods';lum.x=2610;lum.y=628;lum.face=-1;lum.state='idle';lum.vx=lum.vy=0;cam.x=lum.x+60;cam.y=lum.y-50;resetJakFollow();})},
+const THINT=[{x:JAKREST.x-6,y:JAKREST.y-100,reach:100,onInteract:()=>jakInteract()},{x:30,y:TMZ.start*TCH+TCH/2+10,reach:60,door:true,onInteract:()=>goScene(()=>{buildWoods();buildWoodsC1();SCENE='woods';lum.x=2610;lum.y=628;lum.face=-1;lum.state='idle';lum.vx=lum.vy=0;cam.x=lum.x+60;cam.y=lum.y-50;resetJakFollow();})},
   // the top dead end: an underground passage down to the Hidden Spring
   {x:5*TCW+TCW/2,y:150,reach:100,door:true,onInteract:()=>{const go=()=>dunGo(6,935,590,-1);if(C1.springSeen){go();return;}
     talk([['Lum',"Wait… the roots here dip down into the ground. There's an underground passage!"]],false,()=>{C1.springSeen=1;go();});}},
@@ -106,7 +106,7 @@ function drawThorn(){const vw=W/zoom,vh=H/zoom,x0=cam.x-vw/2-60,y0=cam.y-vh/2-60
   drawCellarMouth();
   for(const f of THORN.flowers)if(f.x>x0-30&&f.x<x1+30&&f.y>y0-30&&f.y<y1)drawRedFlowers(f.x,f.y,f.s,f.seed);
   const L=[];for(const o of THORN.props)if(o.x>x0-o.w/2-40&&o.x<x1+o.w/2+40&&o.y>y0-20&&o.y<y1+o.w*1.4)L.push([o.y,o]);L.push([lum.y,null]);L.sort((a,b)=>a[0]-b[0]);
-  for(const g of THFOES)if(g.x>x0-150&&g.x<x1+150&&g.y>y0-60&&g.y<y1+260)L.push([g.y,{t:'thfoe',ref:g}]);if(!C1.thornBoss)L.push([THBOSS.y,{t:'boss'}]);for(const s_ of COSSEE)if(s_.st===1||s_.st===2)L.push([s_.y,{t:'cosghost',ref:s_}]);if(!C1.fkDone&&lum.x>TW_)L.push([FKS.cy,{t:'fks'}]);if(FKS.fire)L.push([FKS.fire.y,{t:'fkfire'}]);if(!C1.jak)L.push([JAKREST.y,{t:'jakrest'}]);else if(JAKF&&jakInParty()&&!FKS.fire)L.push([JAKF.y,{t:'jak'}]);L.sort((a,b)=>a[0]-b[0]);
+  for(const g of THFOES)if(g.x>x0-150&&g.x<x1+150&&g.y>y0-60&&g.y<y1+260)L.push([g.y,{t:'thfoe',ref:g}]);if(!C1.thornBoss)L.push([THBOSS.y,{t:'boss'}]);for(const s_ of COSSEE)if(s_.st===1||s_.st===2)L.push([s_.y,{t:'cosghost',ref:s_}]);if(!C1.fkDone&&lum.x>TW_)L.push([FKS.cy,{t:'fks'}]);if(FKS.fire)L.push([FKS.fire.y,{t:'fkfire'}]);if(!C1.jak)L.push([JAKREST.y-110,{t:'jakrest'}]);else if(JAKF&&jakInParty()&&!FKS.fire)L.push([JAKF.y,{t:'jak'}]);L.sort((a,b)=>a[0]-b[0]);
   THORN.blooms=[];let past=false;for(const [,o] of L){if(!o){drawLum();past=true;continue;}if(o.t==='thfoe'){drawThornFoe(o.ref);continue;}if(o.t==='boss'){drawThornBoss();continue;}if(o.t==='cosghost'){drawCosGhost(o.ref);continue;}if(o.t==='fks'){drawFKS();continue;}if(o.t==='fkfire'){drawFlames(ctx,FKS.fire.x,FKS.fire.y,260,1);continue;}if(o.t==='jakrest'){drawJakResting();continue;}if(o.t==='jak'){drawJakOW();continue;}let fa=1;if(past){const kx=clamp(1-(Math.abs(o.x-lum.x)-o.w*.2)/(o.w*.3),0,1),ky=clamp(1-(o.y-lum.y-o.w*.7)/(o.w*.35),0,1);fa=1-kx*ky*(o.t==='arch'?.4:.58);}drawThornProp(o,fa);}
   drawForage(THORN.forage||[]);drawThornCritters(x0,y0,x1,y1);drawThornWebs(x0,y0,x1,y1);
   drawThornMotes();
