@@ -101,7 +101,7 @@ function update(dt){
   if(INTRO.on)updateIntro(dt);
   if(DLG.active&&DLG.withCosmic&&!cos.hidden){const s_=Math.sign(cos.x-lum.x)||1;if(lum.state==='idle'||lum.state==='idleUp'){lum.face=s_;if(lum.state==='idleUp')lum.state='idle';}if(cos.state==='idle')cos.face=-s_;}else INTRO.ui=Math.min(1,INTRO.ui+dt*1.5);
   if(SCENE!==c1LastScene){if(SCENE==='garden'&&CH===1&&!C1I.on)resetForage();if(SCENE==='woods')for(const f of WFORAGE)f.picked=0;c1LastScene=SCENE;}
-  {const P=CH>0&&DLG.active?(SCENE==='vhut'?VHVANE:SCENE==='woods'&&VANE?VANE:null):null;lum.talkSide=!!P&&(lum.state==='idle'||lum.state==='idleUp');if(lum.talkSide){lum.face=P.x<lum.x?-1:1;lum.state='idle';}}
+  {const fk=fkFacing(),P=fk?fk:CH>0&&DLG.active?(SCENE==='vhut'?VHVANE:SCENE==='woods'&&VANE?VANE:null):null;lum.talkSide=!!P&&(lum.state==='idle'||lum.state==='idleUp');if(lum.talkSide){lum.face=P.x<lum.x?-1:1;lum.state='idle';}}
   if(C1I.on)updateC1Intro(dt);
 }
 let c1LastScene='';

@@ -19,7 +19,9 @@ function drawLumFollower(F){if(!F||!ready(atlas))return;const a=F.dir==='up'?LUM
 function drawJakOW_(){if(!JAKF||CAPTURE.on)return;const H_=192,vert=JAKF.dir==='up'||JAKF.dir==='down',flip=vert?false:JAKF.face<0;ctx.fillStyle='rgba(10,10,20,.25)';ctx.beginPath();ctx.ellipse(JAKF.x,JAKF.y+2,34,8,0,0,TAU);ctx.fill();
   c1Frame(ctx,'jak',vert?JAKF.dir:JAKF.moving?'walk':'idle',vert?(JAKF.moving?Math.floor(JAKF.ph/16)%5:0):JAKF.moving?Math.floor(JAKF.ph/16)%8:0,JAKF.x+JAKDX*H_*(flip?-1:1),JAKF.y+3,H_,flip,1,0);}
 /* Spar on the overworld: down / up / side walks (side faces right) */
-function drawSparOW(F,alpha){if(!F)return;const vert=F.dir==='up'||F.dir==='down',an=vert?F.dir:'side',fi=F.moving?Math.floor((F.ph||0)/16)%5:0;
+/* during the Fokalur scene in the clearing, Lum and Spar stand facing him */
+function fkFacing(){return SCENE==='thorn'&&typeof FKS!=='undefined'&&FKS.st>=1&&FKS.st<7&&!C1.fkDone&&lum.x>CLR.x0?{x:FKS.cx,y:FKS.cy}:null;}
+function drawSparOW(F,alpha){if(!F)return;if(F===JAKF&&fkFacing()&&!FKS.jakIn){F.dir='side';F.face=F.x<FKS.cx?1:-1;F.moving=0;}const vert=F.dir==='up'||F.dir==='down',an=vert?F.dir:'side',fi=F.moving?Math.floor((F.ph||0)/16)%5:0;
   ctx.fillStyle='rgba(10,10,20,.25)';ctx.beginPath();ctx.ellipse(F.x,F.y+2,30,8,0,0,TAU);ctx.fill();c1Frame(ctx,'spar',an,fi,F.x,F.y+3,SPAR_H,!vert&&F.face<0,alpha??1,0);}
 function drawJakResting(){if(MATE==='spar'){drawSparResting();return;}drawJakResting_();}
 function drawSparResting(){if(C1.jak)return;const x=JAKREST.x,y=JAKREST.y,b=Math.sin(T*1.4);ctx.fillStyle='rgba(10,10,20,.3)';ctx.beginPath();ctx.ellipse(x-6,y-110,34,9,0,0,TAU);ctx.fill();

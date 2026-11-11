@@ -319,8 +319,11 @@ const CASES = {
     check(await p.evaluate(() => window.__g.FKS.st >= 1 && window.__g.DLG.active), 'walking up to Cosmic did not start the scene');
     check(await until(() => window.__g.FKS.st === 3), 'Cosmic did not transform');
     await wait(400); await p.screenshot({ path: path.join(SHOTS, `fokalur-clearing-reveal-${vp}.png`) });
+    check(await p.evaluate(() => { const g = window.__g; return g.lum.talkSide && g.lum.face === 1; }), 'Lum is not facing Fokalur');
     check(await until(() => !!window.__g.FKS.jakIn, 45000), 'Spar did not run into the clearing when Lum came alone');
     await wait(500); await p.screenshot({ path: path.join(SHOTS, `fokalur-spar-arrives-${vp}.png`) });
+    check(await until(() => !window.__g.FKS.jakIn, 8000), 'Spar never reached Lum');
+    await wait(300); await p.screenshot({ path: path.join(SHOTS, `fokalur-facing-${vp}.png`) });
     check(await until(() => window.__g.BATTLE.on && window.__g.BATTLE.foes && window.__g.BATTLE.foes[0] && window.__g.BATTLE.foes[0].name === 'Fokalur'), 'the Fokalur battle did not start');
     check(await p.evaluate(() => window.__g.BATTLE.heroes.map(h => h.id).join(',')) === 'lum,spar', 'Lum and Spar should fight Fokalur together');
     await wait(3500);
