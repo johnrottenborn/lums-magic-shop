@@ -257,7 +257,6 @@ function drawBattleHero_(h){const S=bS(),sp=.62*S,x=h.x+h.ox,y=h.y+h.oy;
   if(h.id==='jak'){drawBattleJak(h);drawHeroStatus(h);if(BATTLE.defending&&BATTLE.defending[h.id]){ctx.strokeStyle='rgba(170,220,255,.6)';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(x,y-90*S,66*S,110*S,0,0,TAU);ctx.stroke();}return;}
   if(h.id==='lum'){drawBattleLum(h);if(BATTLE.defending&&BATTLE.defending[h.id]){ctx.strokeStyle='rgba(170,220,255,.6)';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(x,y-75*S,60*S,98*S,0,0,TAU);ctx.stroke();}return;}
   if(!ready(catlas))return;ctx.save();ctx.translate(x,y+3);
-  if(h.ko){const u=Math.min(1,BATTLE.t/.5);ctx.rotate(-u*1.35);ctx.translate(0,-u*10);}
   if(h.hurt>0)ctx.translate(Math.sin(h.hurt*60)*4,0);
   if(h.face<0)ctx.scale(-1,1);
   if(h.fr===16&&!h.ko){const b=Math.sin(T*2.3);ctx.scale(1-.004*b,1+.009*b);}
@@ -265,7 +264,7 @@ function drawBattleHero_(h){const S=bS(),sp=.62*S,x=h.x+h.ox,y=h.y+h.oy;
   if(PARTY[h.id]&&PARTY[h.id].head==='bucket'){ctx.save();ctx.translate(-dw/2,-dh*(264/270));ctx.scale(sp,sp);drawBucketHat(ctx,bf);ctx.restore();}
   if(h.hurt>0){ctx.globalCompositeOperation='source-atop';}
   ctx.restore();
-  if(h.ko){for(let i=0;i<3;i++){const a=T*3+i*TAU/3;drawGlow(ctx,x-30*S+Math.cos(a)*22*S,y-40*S+Math.sin(a)*7*S,8,'255,240,150',.8);}}
+
   if(BATTLE.defending&&BATTLE.defending[h.id]){ctx.strokeStyle='rgba(170,220,255,.6)';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(x,y-70*S,58*S,92*S,0,0,TAU);ctx.stroke();}}
 function bshadow(x,y,rx,ry,a){if(WHITEPASS||a<=0)return;ctx.fillStyle=`rgba(10,10,20,${a.toFixed(3)})`;ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,TAU);ctx.fill();}
 function drawBattleFoe(f){const S=bS();if(f.type==='fokalur'){drawBattleFok(f);return;}if(f.type==='skel'){drawBattleSkel(f);return;}if(f.type==='slugking'){drawBattleKing(f);return;}if(f.type==='wisp'||f.type==='rskel'||f.type==='reaper'||f.type==='bat'||f.type==='vixen'||f.type==='bigvixen'||f.type==='spider'||f.type==='flora'||f.type==='rvixen'||f.type==='bigspider'){drawBattleC1Foe(f);return;}if(f.type==='fslime'||f.type==='rslime'){drawBattleJelly(f);return;}if(f.dead>.6)return;if(f.type==='slug'){drawBattleSlug(f);return;}if(f.type==='jelly'){drawBattleJelly(f);return;}if(f.type==='mimic'){drawBattleMimic(f);return;}const g={...f,x:f.x+f.ox,y:f.y+f.oy,z:f.z/((1.3*S))};

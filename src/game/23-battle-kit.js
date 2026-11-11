@@ -120,7 +120,7 @@ function drawPowderMenu(){const B=BATTLE;if(B.phase!=='powders')return;B.itemHit
 /* ---------- drawing Lum and the new foes in battle ---------- */
 function drawBattleLum(h){const S=bS(),sp=.6*S,x=h.x+h.ox,y=h.y+h.oy,B=BATTLE,me=B.heroes[B.cur]===h,ph=B.phase;if(!ready(atlas))return;
   let fr=29;if(me&&(ph==='bonkRun'||ph==='bonkBack'||ph==='run'||ph==='fled'))fr=27+(Math.floor(B.t*10)%4);else if(me&&ph==='bonkWind')fr=32;else if(me&&ph==='bonkHit')fr=35;
-  ctx.save();ctx.translate(x,y+3);if(h.ko){const u=Math.min(1,B.t/.5);ctx.rotate(-u*1.2);}if(h.hurt>0)ctx.translate(Math.sin(h.hurt*60)*4,0);if(h.face<0)ctx.scale(-1,1);if(fr===29){const b=Math.sin(T*2.3);ctx.scale(1-.004*b,1+.009*b);}
+  ctx.save();ctx.translate(x,y+3);if(h.hurt>0)ctx.translate(Math.sin(h.hurt*60)*4,0);if(h.face<0)ctx.scale(-1,1);if(fr===29){const b=Math.sin(T*2.3);ctx.scale(1-.004*b,1+.009*b);}
   const dw=FW*sp,dh=FH*sp;ctx.drawImage(atlas,fr*FW,0,FW,FH,-dw/2,-dh*(274/280),dw,dh);ctx.restore();
   if(h.chill){ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,x,y-80*S,50*S,'160,210,255',.25+.1*Math.sin(T*4));ctx.restore();}
   if(me&&ph==='bonkWind'){const p=B.powder||'spark';ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,x+40*S,y-90*S,22*S,PCOL[p],.7);ctx.restore();}
