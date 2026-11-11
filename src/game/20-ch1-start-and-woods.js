@@ -12,7 +12,7 @@ function c1Frame(c,sh,anim,i,x,y,h,flip,alpha,flash){const im=IMG[sh],A=C1ATL[sh
   c.save();c.translate(x,y);if(flip)c.scale(-1,1);c.globalAlpha*=alpha;if(flash>0)c.filter='brightness(1.8)';c.drawImage(im,i*A.cw,r*A.ch,A.cw,A.ch,-A.cw*k/2,-A.ch*k*.985,A.cw*k,A.ch*k);c.filter='none';c.restore();}
 const UNDEAD=t=>t==='rskel'||t==='reaper'||t==='skel';
 /* ---------- starting the chapter ---------- */
-function c1Reset(){dfoesBuilt=false;DFOES.length=0;CH=1;HERO='lum';PARTY_ORDER.length=1;PARTY_ORDER[0]='lum';HEROES.jak.hp=5;HEROES.spar.hp=HEROES.spar.maxHp;C1.comboS=0;thFoesBuilt=false;THFOES.length=0;JAKF=null;PC='lum';ANIM=LUM_ANIM;
+function c1Reset(){ZOOMK=1;dfoesBuilt=false;DFOES.length=0;CH=1;HERO='lum';PARTY_ORDER.length=1;PARTY_ORDER[0]='lum';HEROES.jak.hp=5;HEROES.spar.hp=HEROES.spar.maxHp;C1.comboS=0;thFoesBuilt=false;THFOES.length=0;JAKF=null;PC='lum';ANIM=LUM_ANIM;
   Object.assign(PARTY.lum,{main:'lumpouch',off:null,head:null,chest:'lumrobe',boots:null,charm:null});Object.assign(PARTY.jak,{main:'jakaxe',off:'jakstick',head:null,chest:'jakcoat',boots:null,charm:null});equipStartingKeepsake();
   HEROES.lum.hp=HEROES.lum.maxHp;syncMaxHp();HEROES.lum.hp=HEROES.lum.maxHp;
   BAG.length=0;BAG.push('potion','potion','potion');for(const k in MATS)delete MATS[k];Object.assign(POWDERS,{frost:3,thorn:3,moon:3});

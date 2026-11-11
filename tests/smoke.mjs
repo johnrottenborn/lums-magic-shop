@@ -303,7 +303,7 @@ const CASES = {
     check(await p.evaluate(() => window.__g.FKS.st >= 1 && window.__g.DLG.active), 'walking up to Cosmic did not start the scene');
     check(await until(() => window.__g.FKS.st === 3), 'Cosmic did not transform');
     await wait(400); await p.screenshot({ path: path.join(SHOTS, `fokalur-clearing-reveal-${vp}.png`) });
-    check(await until(() => !!window.__g.FKS.jakIn), 'Spar did not run into the clearing when Lum came alone');
+    check(await until(() => !!window.__g.FKS.jakIn, 45000), 'Spar did not run into the clearing when Lum came alone');
     await wait(500); await p.screenshot({ path: path.join(SHOTS, `fokalur-spar-arrives-${vp}.png`) });
     check(await until(() => window.__g.BATTLE.on && window.__g.BATTLE.foes && window.__g.BATTLE.foes[0] && window.__g.BATTLE.foes[0].name === 'Fokalur'), 'the Fokalur battle did not start');
     check(await p.evaluate(() => window.__g.BATTLE.heroes.map(h => h.id).join(',')) === 'lum,spar', 'Lum and Spar should fight Fokalur together');
@@ -317,6 +317,8 @@ const CASES = {
     check(await until(() => window.__g.FKS.st === 5 && !window.__g.BATTLE.on, 15000), 'the lost battle did not return to the clearing');
     await wait(1600); await p.screenshot({ path: path.join(SHOTS, `fokalur-aftermath-${vp}.png`) });
     check(await p.evaluate(() => window.__g.LUMSTONE === 1 && !!window.__g.FKS.fire), 'no stone Lum and fire in the clearing after the battle');
+    check(await until(() => window.__g.FKS.st === 8, 40000), 'the scene did not pull back after Lum\'s last line');
+    await wait(1800); await p.screenshot({ path: path.join(SHOTS, `fokalur-pullback-${vp}.png`) });
     check(await until(() => window.__g.C1X.fkDone === 1, 40000), 'the scene after the battle did not finish the chapter');
     check(await p.evaluate(() => window.__g.readSave() === null && window.__g.C1X.chEnd === 1), 'Chapter 1 end did not clear the save');
     await wait(8500);

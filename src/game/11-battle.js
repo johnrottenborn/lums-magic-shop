@@ -373,7 +373,7 @@ function drawBattleBanner(){const B=BATTLE,S=bS();
       ctx.fillStyle='#8a6a3a';ctx.font='700 10px "Alegreya SC", Georgia, serif';ctx.fillText(`THE ${B.foes[0].name.toUpperCase()} DROPPED`,W/2+18,yy+24);const lid=B.loot[0];drawGlow(ctx,x+38,yy+40,26,lid==='boneparts'?'200,170,255':'190,245,205',.6);drawIcon(ctx,lid,x+38,yy+40,34);
       ctx.fillStyle='#4f3c22';ctx.font='700 18px "Alegreya SC", Georgia, serif';ctx.fillText(`${ITEMS[B.loot[0]].name}  ×${B.loot.length}`,W/2+18,yy+48);}
     if(B.t>1.6){ctx.globalAlpha=.6+.4*Math.sin(T*4);ctx.font='italic 14px Alegreya, Georgia, serif';ctx.fillStyle='#fdf6e4';ctx.fillText(tw('tap to continue','click or press Space to continue'),W/2,H*.86);}ctx.restore();}
-  if(B.phase==='lose'){const a=Math.min(1,B.t/1.2);ctx.save();ctx.globalAlpha=a;ctx.textAlign='center';ctx.font=`italic ${Math.round(20*S)}px Alegreya, Georgia, serif`;ctx.fillStyle='#fdf6e4';ctx.shadowColor='rgba(0,0,0,.6)';ctx.shadowBlur=8;ctx.fillText('Cosmic is all out of breath…',W/2,H*.3);ctx.restore();}}
+  if(B.phase==='lose'){const a=Math.min(1,B.t/1.2);ctx.save();ctx.globalAlpha=a;ctx.textAlign='center';ctx.font=`italic ${Math.round(20*S)}px Alegreya, Georgia, serif`;ctx.fillStyle='#fdf6e4';ctx.shadowColor='rgba(0,0,0,.6)';ctx.shadowBlur=8;ctx.fillText(CH>0?'Foolish mortals…':'Cosmic is all out of breath…',W/2,H*.3);ctx.restore();}}
 
 /* ---------- battle music: a bouncy little march in D dorian ---------- */
 const BPROG=[[38,[62,65,69]],[34,[58,62,65]],[36,[60,64,67]],[33,[61,64,69]]];

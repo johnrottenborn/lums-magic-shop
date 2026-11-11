@@ -172,26 +172,34 @@ function updateClearing(dt){if(C1.fkDone)return;FKS.t+=dt;FKS.flash=Math.max(0,F
   if(FKS.st===0&&!DLG.active&&!FADE.dir&&!BATTLE.on&&lum.x>CLR.x0&&Math.hypot(lum.x-FKS.cx,(lum.y-FKS.cy)*1.2)<215){FKS.st=1;fkMeet();}
   if(FKS.st===2){if(FKS.t>.6&&!FKS.flashed){FKS.flashed=1;FKS.flash=1;sfxRumble(2,1);}FKS.ca=Math.max(0,1-FKS.t/.8);FKS.fa=clamp((FKS.t-.6)/.8,0,1);if(FKS.t>2.4){FKS.st=3;fkReveal();}}
   if(FKS.jakIn&&JAKF){const J_=FKS.jakIn,dx=J_.tx-JAKF.x,step=300*dt;JAKF.y=J_.ty;JAKF.dir='side';JAKF.face=1;
-    if(Math.abs(dx)<=step){JAKF.x=J_.tx;JAKF.moving=0;JAKF.mv=0;FKS.jakIn=null;talk([['Spar',"Lum! I couldn't let you face this alone."]],false,fkStand);}else{JAKF.x+=Math.sign(dx)*step;JAKF.moving=1;JAKF.mv=1;JAKF.ph+=step;}}
+    if(Math.abs(dx)<=step){JAKF.x=J_.tx;JAKF.moving=0;JAKF.mv=0;FKS.jakIn=null;talk([['Spar',"Lum!"]],false,fkStand);}else{JAKF.x+=Math.sign(dx)*step;JAKF.moving=1;JAKF.mv=1;JAKF.ph+=step;}}
+  if(FKS.st===8){ZOOMK=1-.22*easeIO(Math.min(1,FKS.t/4));if(FKS.t>2.6&&!FKS.ended){FKS.ended=1;C1.fkDone=1;C1.chEnd=1;finishChapter('ch1');startCh1Results();}}
   if(FKS.st===6){FKS.fa=Math.max(0,FKS.fa-dt*.7);if(FKS.fa<=0){FKS.st=7;fkFarewell();}}}
 const fkJak=()=>jakInParty();
+/* ZOOMK: the slow pull-back at the end of the clearing (1 = normal view) */
+let ZOOMK=1;const easeIO=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
 function fkMeet(){WEVENT.on=true;lum.vx=lum.vy=0;lum.state='idle';lum.face=1;
   const L=[['Lum',"Cosmic! I’ve found you!"]];
-  if(fkJak())L.push(['Spar',"Lum, wait. Something's wrong…"]);
-  L.push(['Cosmic',"Master Lum… you shouldn't have followed me."],['Lum',"Come here, let's get you home."],['Cosmic',"Home…"],['Cosmic',"The boy can't hear you anymore, little witch."],['Lum',"…That voice? Cosmic, what's happened to you?"]);
+  if(fkJak())L.push(['Spar',"Lum, wait. Something is wrong…"]);
+  L.push(['Cosmic',"Master Lum… why didn’t you protect me!"],['Lum',"Let’s get you home, Cosmic!"],['Cosmic',"…get you home… Cosmic…"],['Cosmic',"That poor child can't hear you anymore, little witch!"],['Lum',"Cosmic, what has happened to you?"]);
   talk(L,false,()=>{FKS.st=2;FKS.t=0;sfxEerie();});}
-function fkReveal(){talk([['Fokalur',"The child broke the seal with his own hands. His body now belongs to me."],['Fokalur',"I am Fokalur."]],false,()=>{if(fkJak())fkStand();else fkJakArrives();});}
+function fkReveal(){const L=[['Fokalur',"One thousand years… trapped in darkness."],['Fokalur',"Bound by ancient magic, forgotten by the world, condemned to listen as centuries passed above me."],['Fokalur',"And then… a child."],
+    ['Fokalur',"So eager to explore, so desperate to understand things they cannot possibly comprehend."],['Fokalur',"No fear of the unknown. No suspicion of a friendly voice whispering from afar…"],
+    ['Fokalur',"I did not need strength to break my chains. I needed only a little curiosity. A child’s hand reaching where it should never have reached."],['Fokalur',"And now, little one… look what you've done."],
+    ['Fokalur',"One thousand years of patience… rewarded by the innocence of a child."],['Fokalur',"How delightfully easy it is to open a door when someone else turns the key."],['Fokalur',"I am Demon God, Fokalur."],['Lum',"…"]];
+  if(fkJak())L.push(['Spar',"Fokalur!?"]);
+  talk(L,false,()=>{if(fkJak())fkStand();else fkJakArrives();});}
 /* Lum came alone: Jak runs into the clearing to stand with her */
 function fkJakArrives(){if(!jakInParty()){PARTY_ORDER.length=1;PARTY_ORDER.push(MATE);}C1.jak=1;HEROES[MATE].hp=HEROES[MATE].maxHp;
   JAKF={x:lum.x-390,y:lum.y+4,face:1,moving:1,ph:0,dir:'side',mv:1};JAKCRUMB.length=0;FKS.jakIn={tx:lum.x-70,ty:lum.y+4};}
-function fkStand(){const L=[['Spar',"Lum, get behind me!"],['Fokalur',"A shop owner and a broken warrior… prepare to die!"]];
+function fkStand(){const L=[['Spar',"I do not fear death."],['Fokalur',"A shop owner and a broken warrior… prepare to die!"]];
   talk(L,false,()=>{FKS.st=4;WEVENT.on=false;lum.bumpT=0;startEncounter({kind:'fokalur',scene:'thorn',x:FKS.cx,y:FKS.cy,s:1,pack:1,calm:0,dead:0,scripted:true,boss:1,onLose:fkAfterLoss},'normal');});}
 function fkAfterLoss(){for(const id of PARTY_ORDER)HEROES[id].hp=Math.max(1,Math.round(HEROES[id].maxHp*.25));
   SCENE='thorn';lum.x=FKS.cx-240;lum.y=FKS.cy;lum.face=1;lum.vx=lum.vy=0;lum.state='idle';cam.x=lum.x+120;cam.y=lum.y-50;resetJakFollow();LUMSTONE=1;FKS.fire={x:lum.x+120,y:lum.y+6};FKS.st=5;FKS.fa=1;FKS.ca=0;WEVENT.on=true;
   const fade=()=>{FKS.st=6;FKS.flash=.8;sfxRumble(3,.9);};
-  setTimeout(()=>{if(fkJak())talk([['Fokalur',"Ha! The stone witch watches as her protector burn in hellfire!"]],false,fade);else fade();},900);}
+  setTimeout(()=>{const L=[['Fokalur',"My reign of terror has only just begun."]];if(fkJak())L.push(['Fokalur',"Ha! A stone witch watches as her protector burns in hellfire!"]);L.push(['Fokalur',"Let every living soul learn the true meaning of suffering."]);talk(L,false,fade);},900);}
 function fkFarewell(){const L=[['Lum',"…"]];
-  talk(L,false,()=>{C1.fkDone=1;C1.chEnd=1;finishChapter('ch1');startCh1Results();});}
+  talk(L,false,()=>{FKS.st=8;FKS.t=0;});}
 function drawFKS(){const x=FKS.cx,y=FKS.cy;
   if(FKS.ca>0&&ready(catlas)){const A=COS_BLADE.idle,dw=CFW*CSPR,dh=CFH*CSPR;ctx.save();ctx.globalAlpha=FKS.ca;ctx.fillStyle='rgba(0,0,0,.3)';ctx.beginPath();ctx.ellipse(x,y+2,26,7,0,0,TAU);ctx.fill();
     ctx.translate(x,y+3);if(-1!==A.native)ctx.scale(-1,1);ctx.drawImage(catlas,A.frames[0]*CFW,0,CFW,CFH,-dw/2,-dh*(264/270),dw,dh);ctx.restore();
@@ -202,7 +210,7 @@ function drawFKS(){const x=FKS.cx,y=FKS.cy;
 /* Chapter 1's results: fade to black, a closing line, then the same results card as the prologue */
 const C1RES={t:0};
 function startCh1Results(){RESULTS.ch='ch1';RESULTS.r=null;RESULTS.sealT=0;RESULTS.msgT=0;C1RES.t=.001;C1RES.t0=performance.now();WEVENT.on=true;}
-function drawC1Results(){if(!C1RES.t)return;C1RES.t=Math.max(.001,(performance.now()-C1RES.t0)/1000);const t=C1RES.t;ctx.save();ctx.setTransform(DPR,0,0,DPR,0,0);ctx.fillStyle=`rgba(0,0,0,${Math.min(1,t/2)})`;ctx.fillRect(0,0,W,H);
+function drawC1Results(){if(!C1RES.t)return;C1RES.t=Math.max(.001,(performance.now()-C1RES.t0)/1000);const t=C1RES.t;if(t>2)ZOOMK=1;ctx.save();ctx.setTransform(DPR,0,0,DPR,0,0);ctx.fillStyle=`rgba(0,0,0,${Math.min(1,t/2)})`;ctx.fillRect(0,0,W,H);
   if(t>6.5){ctx.restore();ctx.save();ctx.setTransform(DPR,0,0,DPR,0,0);drawResults(t-6.5);ctx.restore();return;}
   ctx.globalAlpha=Math.max(0,Math.min(1,(t-2)/1.5,(6.5-t)/.8));ctx.textAlign='center';
   ctx.font='700 22px "Alegreya SC", Georgia, serif';ctx.fillStyle='rgba(232,226,242,.85)';ctx.fillText('End of Chapter 1',W/2,H*.47);ctx.restore();}
