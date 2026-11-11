@@ -227,6 +227,18 @@ const CASES = {
     const line = await p.evaluate(() => { const g = window.__g; g.pressA(); return g.DLG.active && g.DLG.lines[0][1]; });
     check(/no way through|as far as the den goes/.test(line || ''), 'the back of the den says nothing: ' + line);
   },
+  async 'satchel-overfull'(p) {
+    // a full satchel + Fox Ring pickup, then wearing the ring: the Moon Charm goes back to the satchel and must be visible there
+    await startCh1(p);
+    await p.evaluate(() => { const g = window.__g; g.DLG.active = false; g.PARTY.lum.charm = 'mooncharm'; g.BAG.length = 0; g.BAG.push('potion', 'lantern', 'vanecharm', 'crystalpouch', 'foxhood', 'foxsuit', 'foxboots', 'bucket', 'foxring'); g.openMenu(); }); await wait(700);
+    await p.evaluate(() => { const g = window.__g; g.MENU.sel = { kind: 'slot', slot: 'charm' }; g.MENU.pick = null; }); await wait(400);
+    await tapMenu(p, hits => hits.filter(h => h.w === 54 && h.h === 72).slice(-1)[0]);
+    check(await p.evaluate(() => window.__g.PARTY.lum.charm === 'foxring' && window.__g.BAG.includes('mooncharm')), 'wearing the Fox Ring did not put the Moon Charm in the satchel');
+    await p.evaluate(() => { const g = window.__g; g.MENU.sel = null; g.MENU.page = 'bag'; g.MENU.tab = 'bag'; }); await wait(500);
+    const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop';
+    await p.screenshot({ path: path.join(SHOTS, `satchel-overfull-${vp}.png`) });
+    check(await p.evaluate(() => window.__g.MENU.hits ? window.__g.MENU.hits.filter(h => h.w === h.h && h.w > 40).length >= 9 : true), 'not every satchel item has a slot');
+  },
   async 'equip-from-slot'(p) {
     await startCh1(p);
     await p.evaluate(() => { const g = window.__g; g.DLG.active = false; g.PARTY.lum.head = null; g.BAG.push('foxhood', 'bucket'); g.openMenu(); }); await wait(700);

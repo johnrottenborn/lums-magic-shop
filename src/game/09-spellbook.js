@@ -81,8 +81,9 @@ function drawBagPage(c,x,y,w,h,MH){const col=HCOL[MH]||'#7a4f9a',showIng=MH!=='c
     c.fillStyle=on?'#fbf3dd':'#5a3d22';c.textAlign='center';c.fillText(l,tx+tw2/2,ty+26);hit(tx,ty-4,tw2,48,()=>{MENU.tab=k;MENU.sel=null;MENU.pick=null;sfxPage(.35);});tx+=tw2+8;}
   const gy=ty+58;
   if(tb==='ing'){drawIngTab(c,x,w,gy,y+h-10);return;}
-  const VIS=bagVis(MH),bagN=id=>BAG.filter(b=>b===id).length,gap=10,cs=Math.min(84,(w-36-gap*3)/4),gx=x+(w-(cs*4+gap*3))/2;
-  for(let i=0;i<8;i++){const cx=gx+(i%4)*(cs+gap),cy=gy+Math.floor(i/4)*(cs+gap),bi=VIS[i],id=bi===undefined?undefined:BAG[bi],sel=bi!==undefined&&MENU.sel&&MENU.sel.kind==='bag'&&MENU.sel.i===bi;
+  /* every item is shown: a satchel pushed past 8 (pickups, swapping gear) grows extra rows instead of hiding things */
+  const VIS=bagVis(MH),bagN=id=>BAG.filter(b=>b===id).length,gap=10,rows=Math.max(2,Math.ceil(VIS.length/4)),cs=Math.min(84,(w-36-gap*3)/4,(y+h-gy-48-gap*(rows-1))/rows),gx=x+(w-(cs*4+gap*3))/2;
+  for(let i=0;i<rows*4;i++){const cx=gx+(i%4)*(cs+gap),cy=gy+Math.floor(i/4)*(cs+gap),bi=VIS[i],id=bi===undefined?undefined:BAG[bi],sel=bi!==undefined&&MENU.sel&&MENU.sel.kind==='bag'&&MENU.sel.i===bi;
     if(!id){c.strokeStyle='#e3d3ab';c.lineWidth=2;c.setLineDash([5,4]);rr(cx,cy,cs,cs,12);c.stroke();c.setLineDash([]);continue;}
     if(sel)drawGlow(c,cx+cs/2,cy+cs/2,cs*.85,'255,215,120',.45);
     c.fillStyle='#f3e6c4';rr(cx,cy,cs,cs,12);c.fill();c.strokeStyle=sel?col:'#d6c39a';c.lineWidth=sel?3:2;rr(cx,cy,cs,cs,12);c.stroke();
@@ -90,7 +91,7 @@ function drawBagPage(c,x,y,w,h,MH){const col=HCOL[MH]||'#7a4f9a',showIng=MH!=='c
     {const nn=ITEMS[id].kind==='mat'?(MATS[id]||0):bagN(id);if(nn>1||ITEMS[id].kind==='mat'){c.fillStyle='#3b2a1c';c.font='700 15px "Alegreya SC", Georgia, serif';c.textAlign='right';c.fillText('×'+nn,cx+cs-6,cy+cs-6);}}
     hit(cx,cy,cs,cs,()=>{MENU.sel={kind:'bag',i:bi};MENU.pick=null;sfxPage(.35);if(TUT.stage===2&&id==='bucket'){TUT.stage=3;TUT.t=0;}});
     if(TUT.stage===2&&id==='bucket'){tutRing(c,cx+cs/2,cy+cs/2,cs*.55);tutArrow(c,cx+cs/2,cy-6,1);}}
-  c.font='italic 14px Alegreya, Georgia, serif';c.fillStyle='#8a7050';c.textAlign='center';c.fillText(BAG.some(b=>MH==='cosmic'||(ITEMS[b]&&ITEMS[b].kind!=='mat'))?tw('Tap an item to read about it.','Click an item to read about it.'):'Your satchel is empty… for now.',x+w/2,gy+cs*2+gap+34);}
+  c.font='italic 14px Alegreya, Georgia, serif';c.fillStyle='#8a7050';c.textAlign='center';c.fillText(BAG.some(b=>MH==='cosmic'||(ITEMS[b]&&ITEMS[b].kind!=='mat'))?tw('Tap an item to read about it.','Click an item to read about it.'):'Your satchel is empty… for now.',x+w/2,gy+cs*rows+gap*(rows-1)+34);}
 /* the parchment card for whatever is selected */
 function drawItemCard(c,cx,cy,cw,MH,members){let id=null,fromSlot=null;if(MENU.sel.kind==='bag')id=BAG[MENU.sel.i];else{fromSlot=MENU.sel.slot;id=PARTY[MH][fromSlot];}
   const it=id?ITEMS[id]:null,pick=!!MENU.pick;
