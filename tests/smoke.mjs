@@ -338,6 +338,16 @@ const CASES = {
     await p.evaluate(() => { const g = window.__g; g.DLG.active = false; g.WEV.fk = 1; g.WEV.foka = 3.2; g.talk([['Fokalur', 'Thank you, foolish apprentice. Your body will serve as a suitable vessel.']]); }); await wait(1600);
     check(await p.evaluate(() => window.__g.IMGX.fokalur === undefined && !!window.__g.IMGX.fokalur_hd), 'the old Demon God sprite is still loaded');
   },
+  async 'moon-charm-kept'(p) {
+    // returning Vane's cross from the satchel must not take Lum's equipped Moon Charm
+    await startCh1(p);
+    await p.evaluate(() => { const g = window.__g; g.PARTY.lum.charm = 'mooncharm'; g.BAG.push('vanecharm'); g.vaneTrade(); }); await wait(300);
+    const r = await p.evaluate(() => ({ charm: window.__g.PARTY.lum.charm, cross: window.__g.BAG.includes('vanecharm') }));
+    check(r.charm === 'mooncharm' && !r.cross, 'Moon Charm lost when returning the cross: ' + JSON.stringify(r));
+    // and wearing the cross: it comes off, nothing else is lost
+    await p.evaluate(() => { const g = window.__g; g.DLG.active = false; g.PARTY.lum.charm = 'vanecharm'; g.vaneTrade(); }); await wait(300);
+    check(await p.evaluate(() => window.__g.PARTY.lum.charm === null), 'the worn cross was not handed back');
+  },
   async 'slug-king-night'(p) {
     // the Slug King still fights at night (other slugs sleep)
     await p.evaluate(() => { const g = window.__g; g.INTRO.on = false; g.INTRO.waiting = false; g.INTRO.fade = 0; g.INTRO.ui = 1; g.HINT.on = false; g.DLG.active = false; g.NIGHT.on = true; g.becomeCosmic(0, 900, 1); g.spawnKing(false); const k = g.SLUGS.find(s => s.kind === 'slugking'); k.calm = 0; k.x = g.lum.x + 40; k.y = g.lum.y; }); await wait(1500);
