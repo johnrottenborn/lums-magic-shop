@@ -236,7 +236,7 @@ function drawBattleSpar(h){const S=bS(),B=BATTLE,x=h.x+h.ox,y=h.y+h.oy,me=B.hero
   else if(me&&ph==='bonkWind'){an='bidle';fi=0;rot=-.14*Math.min(1,t/B.windD);}
   else if(me&&ph==='bonkHit'){an='brun';if(t<.07){fi=1;rot=.06;}else{fi=0;rot=.16*Math.max(0,1-(t-.07)/.38);}}
   else if(me&&ph==='sflame'){an='bidle';fi=0;}
-  bshadow(x,y+2,40*S,11*S,.35);ctx.save();ctx.translate(x,y+3);if(h.hurt>0)ctx.translate(Math.sin(h.hurt*60)*4,0);ctx.rotate(rot);if(an==='bidle'){const b=Math.sin(T*2.1);ctx.scale(1-.004*b,1+.008*b);}
+  bshadow(x,y+2,40*S,11*S,.35);ctx.save();ctx.translate(x,y+3);if(h.hurt>0)ctx.translate(Math.sin(h.hurt*60)*4,0);ctx.rotate(rot);if(an==='bidle'&&ph!=='bonkWind'){/* relaxed: slow, deep breaths and an easy weight-shift sway */const b=Math.sin(T*1.3);ctx.rotate(.025*Math.sin(T*.8)-.02);ctx.scale(1-.006*b,1+.014*b);}
   c1Frame(ctx,'spar',an,fi,0,0,H_,flip,1,h.hurt>.3?1:0);ctx.restore();
   if(me&&ph==='sflame'){ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,x-40*S,y-180*S,45*S,'255,120,40',.8);ctx.restore();}}
 function drawBattleJak(h){const S=bS(),B=BATTLE,x=h.x+h.ox,y=h.y+h.oy,me=B.heroes[B.cur]===h,ph=B.phase,t=B.t,H_=206*S;let an='idle',fi=0,flip=false;
