@@ -7,7 +7,7 @@ const C1={hedgeSeen:0,tracksSeen:0,cemSeen:0,reaper:0,vane:0,endSeen:0,woodsSeen
 const WFOES=[];let REAPER=null,VANE=null;
 C1ATL.fox_red=C1ATL.fox;C1ATL.spider_dark=C1ATL.spider;
 C1ATL.spar={"cw": 261, "ch": 306, "rows": {"down": [0, 5], "up": [1, 5], "side": [2, 5], "bidle": [3, 4], "brun": [4, 5]}}; // Spar: down/up/side walks (side faces right), battle idle + run with his sword (run faces left)
-const SPAR_H=154,SPAR_BH=182; // overworld / battle draw heights (a head taller than Lum)
+const SPAR_H=139,SPAR_BH=164; // overworld / battle draw heights (a head taller than Lum)
 function c1Frame(c,sh,anim,i,x,y,h,flip,alpha,flash){const im=IMG[sh],A=C1ATL[sh];if(!ready(im)||!A.rows[anim])return;const [r,n]=A.rows[anim];i=clamp(i|0,0,n-1);const k=h/A.ch;
   c.save();c.translate(x,y);if(flip)c.scale(-1,1);c.globalAlpha*=alpha;if(flash>0)c.filter='brightness(1.8)';c.drawImage(im,i*A.cw,r*A.ch,A.cw,A.ch,-A.cw*k/2,-A.ch*k*.985,A.cw*k,A.ch*k);c.filter='none';c.restore();}
 const UNDEAD=t=>t==='rskel'||t==='reaper'||t==='skel';
