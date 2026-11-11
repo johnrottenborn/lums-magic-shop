@@ -6,11 +6,13 @@ const C1ATL={"jak": {"cw": 560, "ch": 300, "rows": {"idle": [0, 5], "walk": [1, 
 const C1={hedgeSeen:0,tracksSeen:0,cemSeen:0,reaper:0,vane:0,endSeen:0,woodsSeen:0};
 const WFOES=[];let REAPER=null,VANE=null;
 C1ATL.fox_red=C1ATL.fox;C1ATL.spider_dark=C1ATL.spider;
+C1ATL.spar={"cw": 261, "ch": 306, "rows": {"down": [0, 5], "up": [1, 5], "side": [2, 5], "bidle": [3, 4], "brun": [4, 5]}}; // Spar: down/up/side walks (side faces right), battle idle + run with his sword (run faces left)
+const SPAR_H=154,SPAR_BH=182; // overworld / battle draw heights (a head taller than Lum)
 function c1Frame(c,sh,anim,i,x,y,h,flip,alpha,flash){const im=IMG[sh],A=C1ATL[sh];if(!ready(im)||!A.rows[anim])return;const [r,n]=A.rows[anim];i=clamp(i|0,0,n-1);const k=h/A.ch;
   c.save();c.translate(x,y);if(flip)c.scale(-1,1);c.globalAlpha*=alpha;if(flash>0)c.filter='brightness(1.8)';c.drawImage(im,i*A.cw,r*A.ch,A.cw,A.ch,-A.cw*k/2,-A.ch*k*.985,A.cw*k,A.ch*k);c.filter='none';c.restore();}
 const UNDEAD=t=>t==='rskel'||t==='reaper'||t==='skel';
 /* ---------- starting the chapter ---------- */
-function c1Reset(){dfoesBuilt=false;DFOES.length=0;CH=1;HERO='lum';PARTY_ORDER.length=1;PARTY_ORDER[0]='lum';HEROES.jak.hp=5;thFoesBuilt=false;THFOES.length=0;JAKF=null;PC='lum';ANIM=LUM_ANIM;
+function c1Reset(){dfoesBuilt=false;DFOES.length=0;CH=1;HERO='lum';PARTY_ORDER.length=1;PARTY_ORDER[0]='lum';HEROES.jak.hp=5;HEROES.spar.hp=HEROES.spar.maxHp;C1.comboS=0;thFoesBuilt=false;THFOES.length=0;JAKF=null;PC='lum';ANIM=LUM_ANIM;
   Object.assign(PARTY.lum,{main:'lumpouch',off:null,head:null,chest:'lumrobe',boots:null,charm:null});Object.assign(PARTY.jak,{main:'jakaxe',off:'jakstick',head:null,chest:'jakcoat',boots:null,charm:null});equipStartingKeepsake();
   HEROES.lum.hp=HEROES.lum.maxHp;syncMaxHp();HEROES.lum.hp=HEROES.lum.maxHp;
   BAG.length=0;BAG.push('potion','potion','potion');for(const k in MATS)delete MATS[k];Object.assign(POWDERS,{frost:3,thorn:3,moon:3});
@@ -30,7 +32,7 @@ function c1Bedroom(){const door=BEDINT[0];BEDINT.length=0;BEDINT.push(door);cons
   L(205,680,100,["His treasure chest. A frog-shaped rock, three marbles, and a feather he's saving for a hat."]);
   L(790,640,90,["My reading glasses, and 'Quiet Magic for Loud Apprentices.' I bought it as a joke. He didn't laugh."]);
   L(140,640,90,["The birches look dull this morning. Something has drained the glow right out of them."]);}
-function applySaveC1(d){c1Reset();Object.assign(C1,d.c1||{});if(C1.jak){PARTY_ORDER.length=1;PARTY_ORDER.push('jak');HEROES.jak.hp=clamp(C1.jakHp||5,1,HEROES.jak.maxHp);}C1.endCard=0;C1.title=0;Object.assign(POWDERS,d.powders||{});if(d.stats)Object.assign(STATS,d.stats,{found:Object.assign({},d.stats.found||{})});
+function applySaveC1(d){c1Reset();Object.assign(C1,d.c1||{});if(C1.jak){PARTY_ORDER.length=1;PARTY_ORDER.push(MATE);HEROES[MATE].hp=clamp(C1.jakHp||5,1,HEROES[MATE].maxHp);}C1.endCard=0;C1.title=0;Object.assign(POWDERS,d.powders||{});if(d.stats)Object.assign(STATS,d.stats,{found:Object.assign({},d.stats.found||{})});
   BAG.length=0;BAG.push(...(d.bag||[]));for(const k in MATS)delete MATS[k];Object.assign(MATS,d.mats||{});if(d.party&&d.party.lum)Object.assign(PARTY.lum,d.party.lum);if(d.party&&d.party.jak)Object.assign(PARTY.jak,d.party.jak);syncMaxHp();HEROES.lum.hp=clamp(d.hp||HEROES.lum.maxHp,1,HEROES.lum.maxHp);
   if(C1.reaper===1)C1.reaper=0;if(C1.vane===1)C1.vane=0;
   if(d.c1built||d.scene==='woods'){buildWoods();buildWoodsC1();if(d.wf){const keep=new Set(d.wf);for(let i=WFOES.length-1;i>=0;i--)if(!keep.has(WFOES[i].id))WFOES.splice(i,1);}}

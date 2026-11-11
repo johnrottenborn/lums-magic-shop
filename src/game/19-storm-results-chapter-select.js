@@ -242,5 +242,5 @@ function drawBattleKing(f){const S=bS(),B=BATTLE,me=B.foes[B.foeI]===f,h=170*S*f
   if(f.showHp>0&&!f.dead){const bw=80*S,bx=x-bw/2,by=y+16*S;ctx.save();ctx.globalAlpha=Math.min(1,f.showHp*3);ctx.fillStyle='rgba(20,20,30,.55)';rr(bx-2,by-2,bw+4,10,5);ctx.fill();ctx.fillStyle='#7ee08a';rr(bx,by,bw*f.hp/f.max,6,3);ctx.fill();
     ctx.fillStyle='#fff';ctx.font='700 10px "Alegreya SC", Georgia, serif';ctx.textAlign='center';ctx.fillText(`${f.hp}/${f.max}`,bx+bw/2,by+20);ctx.restore();}
   if(B.phase==='target'&&B.foes[B.target]===f)tutArrow(ctx,f.x,f.y-h*.95,1);}
-function syncMaxHp(who=HERO){const H_=HEROES[who];let b=0;for(const k in PARTY[who]){const it=ITEMS[PARTY[who][k]];if(it&&it.hp)b+=it.hp;}H_.maxHp=(who==='lum'?14:who==='jak'?20:12)+b;H_.hp=Math.min(H_.hp,H_.maxHp);}
+function syncMaxHp(who=HERO){const H_=HEROES[who];let b=0;for(const k in PARTY[who]){const it=ITEMS[PARTY[who][k]];if(it&&it.hp)b+=it.hp;}H_.maxHp=(who==='lum'?14:who==='jak'?20:who==='spar'?18:12)+b;H_.hp=Math.min(H_.hp,H_.maxHp);}
 

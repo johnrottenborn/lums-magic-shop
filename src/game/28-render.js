@@ -50,6 +50,7 @@ function drawLumGhost(){if(!OCC||!ready(atlas))return;const a=ANIM[lum.state];le
 let LUMSTONE=0;
 function drawLum(){if(LUMSTONE&&!drawLum.raw){const t0=T;withStone('lumow',lum.x-110,lum.y-250,220,270,()=>{drawLum.raw=1;T=0;try{drawLum();}finally{T=t0;drawLum.raw=0;}});return;}
   if(!INTRO.lumShown||CAPTURE.on)return;
+  if(PC==='spar'){const st=lum.state,F={x:lum.x,y:lum.y,face:lum.face,dir:st==='walkUp'?'up':st==='walkDown'?'down':'side',moving:st==='walk'||st==='walkUp'||st==='walkDown',ph:(lum.ft||0)*16};drawSparOW(F,lum.alpha);return;}
   const a=ANIM[lum.state]||ANIM.idle;let fr=a.frames[lum.state==='idle'?lum.fi%a.frames.length:lum.fi];if(fr===undefined)fr=a.frames[0];
   if(lum.state==='idle'&&lum.blink>0)fr=a.blink;
   if(PC!=='cosmic'&&lum.talkSide&&lum.state==='idle')fr=29;
@@ -163,7 +164,7 @@ function bubbleAt(wx,wy,text,name,alpha,small){if(typeof text!=='string')return;
 function drawSay(){
   if(lum.quipT>0&&!DLG.active){bubbleAt(lum.x,lum.y-150,lum.quip,null,Math.min(1,lum.quipT*3,(2.4-lum.quipT)*6),true);}
   if(DLG.active&&DLG.lines[DLG.i][0]==='???'){drawEerie(DLG.lines[DLG.i][1],DLG.t);return;}
-  if(DLG.active){const [who,text]=DLG.lines[DLG.i];const pcName=PC==='cosmic'?'Cosmic':'Lum';const clr_=SCENE==='thorn'&&typeof FKS!=='undefined'&&FKS.st>0&&!C1.fkDone;let sp=who==='Fokalur'?(clr_?{x:FKS.cx,y:FKS.cy}:lum):who==='Cosmic'&&clr_?{x:FKS.cx,y:FKS.cy}:who===pcName?lum:who==='Jak'?jakPos():who==='Vane'&&SCENE==='vhut'?VHVANE:who==='Vane'&&VANE?VANE:who==='Voice'?{x:HUTDOOR.x,y:HUTDOOR.y}:(who==='Cosmic'?cos:{x:0,y:-30});if(who==='Lum'&&PC==='cosmic')sp=SCENE==='shop'?SHOPLUM:{x:0,y:-30};BUBBLE_BASE=sp.y;const h=who==='Fokalur'?505:who==='Jak'?190:who==='Cosmic'?160:who==='Vane'?165:who==='Voice'?120:(PC!=='cosmic'&&who==='Lum'?160:182);const a=Math.min(1,DLG.t*6);if(SCENE==='thgate'&&THGATE.lx){bubbleAt(cam.x+(THGATE.lx-W/2)/zoom,cam.y+(THGATE.ly-H/2)/zoom,text,who,a,false);}else bubbleAt(sp.x,sp.y-h,text,who,a,false);BUBBLE_BASE=null;}
+  if(DLG.active){const [who,text]=DLG.lines[DLG.i];const pcName=PC==='cosmic'?'Cosmic':PC==='spar'?'Spar':'Lum';const clr_=SCENE==='thorn'&&typeof FKS!=='undefined'&&FKS.st>0&&!C1.fkDone;let sp=who==='Fokalur'?(clr_?{x:FKS.cx,y:FKS.cy}:lum):who==='Cosmic'&&clr_?{x:FKS.cx,y:FKS.cy}:who===pcName?lum:who==='Jak'||who==='Spar'?jakPos():who==='Vane'&&SCENE==='vhut'?VHVANE:who==='Vane'&&VANE?VANE:who==='Voice'?{x:HUTDOOR.x,y:HUTDOOR.y}:(who==='Cosmic'?cos:{x:0,y:-30});if(who==='Lum'&&PC==='cosmic')sp=SCENE==='shop'?SHOPLUM:{x:0,y:-30};BUBBLE_BASE=sp.y;const h=who==='Fokalur'?505:who==='Jak'?190:who==='Spar'?150:who==='Cosmic'?160:who==='Vane'?165:who==='Voice'?120:(PC!=='cosmic'&&who==='Lum'?160:182);const a=Math.min(1,DLG.t*6);if(SCENE==='thgate'&&THGATE.lx){bubbleAt(cam.x+(THGATE.lx-W/2)/zoom,cam.y+(THGATE.ly-H/2)/zoom,text,who,a,false);}else bubbleAt(sp.x,sp.y-h,text,who,a,false);BUBBLE_BASE=null;}
   else if(cos.bubble>0&&!cos.hidden){bubbleAt(cos.x,cos.y-150,cos.bubbleText,null,Math.min(1,cos.bubble*3,(2.4-cos.bubble)*6),true);}}
 function rr(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();}
 function drawUI(){drawUIinner();drawC1IntroUI();drawC1Title();drawMix();drawChoice();drawSceneFade();drawWipe();}

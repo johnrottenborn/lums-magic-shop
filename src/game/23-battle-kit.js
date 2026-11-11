@@ -89,6 +89,7 @@ function drawBattleFx(){const B=BATTLE,S=bS();ctx.save();
     if(p.k==='burst'){const big=p.big,R=(big?70:46)*S*(1-Math.pow(1-u,2.4));ctx.globalCompositeOperation='lighter';drawGlow(ctx,p.x,p.y,(big?70:44)*S*(1-u*.4),p.col,(big?.9:.6)*(1-u));
       ctx.globalCompositeOperation='source-over';ctx.globalAlpha=1-u;ctx.strokeStyle=`rgb(${p.col})`;ctx.lineWidth=(big?5:3)*S*(1-u)+.5;ctx.beginPath();ctx.arc(p.x,p.y,R,0,TAU);ctx.stroke();
       ctx.strokeStyle='#fffaf0';ctx.lineWidth=(big?3.4:2.2)*S;ctx.lineCap='round';const n=big?10:7;for(let k=0;k<n;k++){const a=k/n*TAU+hash(k,p.x|0,3),r0=R*.55,r1=R*(1.05+.35*hash(k,2,9));ctx.beginPath();ctx.moveTo(p.x+Math.cos(a)*r0,p.y+Math.sin(a)*r0);ctx.lineTo(p.x+Math.cos(a)*r1,p.y+Math.sin(a)*r1);ctx.stroke();}ctx.globalAlpha=1;}
+    else if(p.k==='flame'){drawFlames(ctx,p.x,p.y,p.h*Math.min(1,u*4)*(1-Math.max(0,u-.6)*1.5),1-Math.max(0,u-.7)/.3);}
     else if(p.k==='flash'){ctx.globalCompositeOperation='lighter';drawGlow(ctx,p.x,p.y,p.r*(p.soft?1+u*.3:1-u*.3),p.col,(p.soft?.45:.75)*(p.soft?Math.sin(Math.PI*u):1-u));}
     else if(p.k==='star'){const a=Math.min(1,(1-u)*3)*(.75+.25*Math.sin(p.t*18+p.ph));ctx.globalCompositeOperation='lighter';drawGlow(ctx,p.x,p.y,p.s*2.6,'255,214,110',.55*a);ctx.globalCompositeOperation='source-over';
       ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.rot);ctx.globalAlpha=a;ctx.fillStyle='#ffe58a';ctx.strokeStyle='rgba(170,110,20,.8)';ctx.lineWidth=1;starPath(ctx,p.s);ctx.fill();ctx.stroke();ctx.fillStyle='#fffbe6';starPath(ctx,p.s*.42);ctx.fill();ctx.restore();}

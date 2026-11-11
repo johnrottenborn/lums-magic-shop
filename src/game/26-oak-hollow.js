@@ -26,7 +26,7 @@ const DUNINT=[];
 const HOOD={x:780,y:610},DEN_LINES=["The webs and roots are knotted solid. There's no way through.","Nothing past this point but webs and roots. This is as far as the den goes."];
 function hoodOut(){if(C1.hoodOut)return true;if(dfoesBuilt&&!DFOES.some(g=>g.room===8))C1.hoodOut=1;return !!C1.hoodOut;}
 const SPRING_DOOR={x:5*360+180,y:150},CELLAR_DOOR={x:11*360+180,y:10*300+66},WEBWELL_DOOR={x:5*360+180,y:4*300+58};
-function drinkSpring(){const all=Object.keys(HEROES).filter(id=>id!=='cosmic'&&(id!=='jak'||C1.jak));let hurt=false;for(const id of all){const h=HEROES[id];if(h.hp<h.maxHp)hurt=true;h.hp=h.maxHp;}
+function drinkSpring(){const all=PARTY_ORDER.filter(id=>HEROES[id]);let hurt=false;for(const id of all){const h=HEROES[id];if(h.hp<h.maxHp)hurt=true;h.hp=h.maxHp;}
   sfxItem&&sfxItem();for(let i=0;i<16;i++)PARTS.push({type:'fdust',x:lum.x+rnd(-30,30),y:lum.y,z:rnd(10,80),vx:rnd(-10,10),vy:rnd(-4,4),vz:rnd(20,40),life:0,max:rnd(.6,1.1),s:rnd(1,2.2),col:'170,230,255'});
   say(hurt?(C1.jak?"Every ache is gone. We're both good as new.":"Every ache is gone. I'm good as new."):"The water is cool and clear. I’m already full.");}
 function dunGo(room,x,y,face){goScene(()=>enterDun(room,x,y,face));}

@@ -65,10 +65,10 @@ const CASES = {
     await p.evaluate(() => { const g = window.__g; g.MENU.page = 'bag'; g.MENU.sel = { kind: 'bag', i: g.BAG.indexOf('potion') }; }); await wait(300);
     await tapMenu(p, hits => hits.filter(h => h.h === 46)[0]); // Use
     check(await p.evaluate(() => !!window.__g.MENU.pick), 'Use did not ask who the potion is for');
-    const before = await p.evaluate(() => window.__g.HEROES.jak.hp);
-    await tapMenu(p, hits => { const top = hits.filter(h => h.y < -20); return top[top.length - 1]; }); // Jak's portrait
-    const after = await p.evaluate(() => window.__g.HEROES.jak.hp);
-    check(after > before, `potion did not heal Jak (${before} -> ${after})`);
+    const before = await p.evaluate(() => window.__g.HEROES.spar.hp);
+    await tapMenu(p, hits => { const top = hits.filter(h => h.y < -20); return top[top.length - 1]; }); // Spar's portrait
+    const after = await p.evaluate(() => window.__g.HEROES.spar.hp);
+    check(after > before, `potion did not heal Spar (${before} -> ${after})`);
   },
   async battle(p) {
     await startCh1(p);
@@ -299,17 +299,17 @@ const CASES = {
     check(await p.evaluate(() => window.__g.FKS.st >= 1 && window.__g.DLG.active), 'walking up to Cosmic did not start the scene');
     check(await until(() => window.__g.FKS.st === 3), 'Cosmic did not transform');
     await wait(400); await p.screenshot({ path: path.join(SHOTS, `fokalur-clearing-reveal-${vp}.png`) });
-    check(await until(() => !!window.__g.FKS.jakIn), 'Jak did not run into the clearing when Lum came alone');
-    await wait(500); await p.screenshot({ path: path.join(SHOTS, `fokalur-jak-arrives-${vp}.png`) });
+    check(await until(() => !!window.__g.FKS.jakIn), 'Spar did not run into the clearing when Lum came alone');
+    await wait(500); await p.screenshot({ path: path.join(SHOTS, `fokalur-spar-arrives-${vp}.png`) });
     check(await until(() => window.__g.BATTLE.on && window.__g.BATTLE.foes && window.__g.BATTLE.foes[0] && window.__g.BATTLE.foes[0].name === 'Fokalur'), 'the Fokalur battle did not start');
-    check(await p.evaluate(() => window.__g.BATTLE.heroes.map(h => h.id).join(',')) === 'lum,jak', 'Lum and Jak should fight Fokalur together');
+    check(await p.evaluate(() => window.__g.BATTLE.heroes.map(h => h.id).join(',')) === 'lum,spar', 'Lum and Spar should fight Fokalur together');
     await wait(3500);
     // Fokalur's turns: petrify Lum, then burn Jak
     await p.evaluate(() => { const g = window.__g; g.BATTLE.foeI = -1; g.nextFoe(); }); await wait(3300);
     check(await p.evaluate(() => { const h = window.__g.BATTLE.heroes.find(h => h.id === 'lum'); return h.stone === 1 && h.ko === 1; }), 'Fokalur did not turn Lum to stone');
     await p.evaluate(() => { const g = window.__g; g.BATTLE.foeI = -1; g.nextFoe(); }); await wait(1900);
     await p.screenshot({ path: path.join(SHOTS, `fokalur-battle-${vp}.png`) });
-    check(await p.evaluate(() => !!window.__g.BATTLE.heroes.find(h => h.id === 'jak').burn), 'Fokalur did not engulf Jak in flames');
+    check(await p.evaluate(() => !!window.__g.BATTLE.heroes.find(h => h.id === 'spar').burn), 'Fokalur did not engulf Spar in flames');
     check(await until(() => window.__g.FKS.st === 5 && !window.__g.BATTLE.on, 15000), 'the lost battle did not return to the clearing');
     await wait(1600); await p.screenshot({ path: path.join(SHOTS, `fokalur-aftermath-${vp}.png`) });
     check(await p.evaluate(() => window.__g.LUMSTONE === 1 && !!window.__g.FKS.fire), 'no stone Lum and fire in the clearing after the battle');
@@ -379,6 +379,35 @@ const CASES = {
     const r = await p.evaluate(() => { const B = window.__g.BATTLE; return { koF: B.heroes.find(h => h.id === 'lum').koF, dead: B.foes[0].dead }; });
     check(r.koF >= 0.9, 'a knocked-out Lum did not fade away: ' + JSON.stringify(r));
     check(r.dead > 0.72, 'the spider did not finish fading: ' + JSON.stringify(r));
+  },
+  async 'spar'(p) {
+    const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop';
+    await p.evaluate(() => window.__g.startThornPreview()); await wait(1500);
+    await p.evaluate(() => { const g = window.__g; g.DLG.active = false; g.THFOES.length = 0; const R = g.JAKRESTX; let best = null; for (let dx = -260; dx <= 260; dx += 20) for (let dy = -40; dy <= 220; dy += 20) { const x = R.x + dx, y = R.y + dy, d = Math.hypot(dx, dy); if (d > 110 && g.thornFree(x, y) && (!best || d < best.d)) best = { x, y, d }; } g.lum.x = best.x; g.lum.y = best.y; g.lum.face = R.x < best.x ? -1 : 1; }); await wait(1500);
+    await p.screenshot({ path: path.join(SHOTS, `spar-resting-${vp}.png`) });
+    await p.evaluate(() => { const g = window.__g; g.DLG.active = false; g.jakJoin(); g.C1X.fkDone = 1; g.enterClearing(); g.lum.x = g.CLR.x0 + 300; g.lum.y = g.CLR.cy; }); await wait(600);
+    // walk east so he follows
+    await p.evaluate(() => { const g = window.__g; g.lum.x = g.TMZX.start === undefined ? g.lum.x : g.lum.x; }); for (const k of ['ArrowLeft', 'ArrowDown', 'ArrowRight', 'ArrowUp']) { await p.keyboard.down(k); await wait(450); await p.keyboard.up(k); }
+    await wait(400);
+    const f = await p.evaluate(() => { const g = window.__g; return { inParty: g.PARTY_ORDER.join(','), moved: !!g.JAKFX && Math.round(Math.hypot(g.JAKFX.x - g.JAKRESTX.x, g.JAKFX.y - g.JAKRESTX.y)), near: !!g.JAKFX && Math.round(Math.hypot(g.lum.x - g.JAKFX.x, g.lum.y - g.JAKFX.y)) }; });
+    check(f.inParty === 'lum,spar' && f.moved > 30 && f.near < 220, 'Spar did not join and follow Lum: ' + JSON.stringify(f));
+    await p.screenshot({ path: path.join(SHOTS, `spar-follow-${vp}.png`) });
+    // Spar can lead, alone
+    await p.evaluate(() => { const g = window.__g; g.becomeSpar(g.lum.x, g.lum.y, 1, false); }); await wait(300);
+    for (const k of ['ArrowRight', 'ArrowDown']) { await p.keyboard.down(k); await wait(500); await p.keyboard.up(k); } await wait(300);
+    await p.screenshot({ path: path.join(SHOTS, `spar-leads-lum-${vp}.png`) });
+    await p.evaluate(() => { const g = window.__g; g.becomeSpar(g.lum.x, g.lum.y, 1, true); }); await wait(300);
+    await p.keyboard.down('ArrowDown'); await wait(500); await p.keyboard.up('ArrowDown'); await wait(200);
+    check(await p.evaluate(() => window.__g.PC === 'spar' && window.__g.PARTY_ORDER.join(',') === 'spar'), 'Spar could not lead alone');
+    await p.screenshot({ path: path.join(SHOTS, `spar-leader-${vp}.png`) });
+    await p.evaluate(() => window.__g.startEncounter({ kind: 'spider', scene: 'thorn', x: 0, y: 0, s: 1, pack: 1, calm: 0 }, 'normal'));
+    for (let i = 0; i < 50; i++) { await wait(150); if (await p.evaluate(() => window.__g.BATTLE.phase) === 'heroMenu') break; }
+    check(await p.evaluate(() => window.__g.BATTLE.heroes.map(h => h.id).join(',')) === 'spar', 'Spar did not fight alone');
+    await p.evaluate(() => { window.__g.C1X.comboS = 5; }); await wait(1800);
+    await p.screenshot({ path: path.join(SHOTS, `spar-battle-${vp}.png`) });
+    check(await p.evaluate(() => window.__g.battleMenuOpts().some(o => o[0] === 'burst' && o[1] === 'Blazing Edge')), 'no Blazing Edge combo at 5 stars');
+    await p.evaluate(() => { const g = window.__g, B = g.BATTLE; B.phase = 'sflame'; B.t = 0; B.burstDone = 0; }); await wait(800);
+    await p.screenshot({ path: path.join(SHOTS, `spar-blazing-edge-${vp}.png`) });
   },
   async 'deeproot-sleeping-fox'(p) {
     await startCh1(p);

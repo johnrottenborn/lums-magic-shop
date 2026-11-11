@@ -104,6 +104,9 @@ const ease=t=>t<=0?0:t>=1?1:t*t*(3-2*t);
 function beginIntro(){audioInit();INTRO.waiting=false;}
 function introStart(){INTRO.on=true;INTRO.t=0;INTRO.lumShown=false;lum.x=0;lum.y=4;lum.face=1;cos.x=6;cos.y=560;cos.state='idle';cos.wait=999;cos.run=false;
   for(let i=0;i<3;i++){const b=BIRDS[i];spawnBird(b);b.y=BACK.y+H/zoom*(.3+i*.12);b.x=cam.x+(b.vx>0?-1:1)*(W/zoom/2+40+i*90);}}
+/* make Spar the one the player walks as (Lum may be absent or follow); his battles use PARTY_ORDER, leader first */
+function becomeSpar(x,y,face,solo){PC='spar';lum.x=x;lum.y=y;lum.face=face;lum.state='idle';lum.ft=0;lum.fi=0;lum.vx=lum.vy=0;lum.alpha=1;INTRO.lumShown=true;HERO='spar';
+  PARTY_ORDER.length=0;PARTY_ORDER.push('spar');if(!solo)PARTY_ORDER.push('lum');}
 function becomeCosmic(x,y,face){PC='cosmic';ANIM=COS_ANIM;lum.x=x;lum.y=y;lum.face=face;lum.state='idle';lum.ft=0;lum.fi=0;lum.vx=lum.vy=0;lum.alpha=1;lum.cool=0;
   cos.hidden=true;cos.talked=1;INTRO.lumShown=true;HINT.on=true;HINT.t=0;HINT.goalT=0;}
 function introFinish(){INTRO.on=false;INTRO.fade=0;DLG.active=false;DLG.withCosmic=false;const here=INTRO.cosHere;becomeCosmic(here?cos.x:62,here?cos.y:150,here?cos.face:-1);}
