@@ -310,7 +310,10 @@ const CASES = {
   },
   async 'garden-door-into-shop'(p) {
     check(await p.evaluate(() => window.__g.shopFree(1150, 640)), 'the shop arrival spot is not walkable');
-    await p.evaluate(() => { const g = window.__g; g.INTRO.on = false; g.INTRO.waiting = false; g.INTRO.fade = 0; g.INTRO.ui = 1; g.HINT.on = false; g.DLG.active = false; g.becomeCosmic(0, 160, 1); g.tryEnterShop(); }); await wait(2200);
+    await p.evaluate(() => { const g = window.__g; g.INTRO.on = false; g.INTRO.waiting = false; g.INTRO.fade = 0; g.INTRO.ui = 1; g.HINT.on = false; g.DLG.active = false; g.becomeCosmic(0, 160, 1); g.tryEnterShop({ x: 0, y: 52 }); }); await wait(2200);
+    const front = await p.evaluate(() => { const g = window.__g; g.DLG.active = false; return { scene: g.SCENE, x: Math.round(g.lum.x), y: Math.round(g.lum.y) }; });
+    check(front.scene === 'shop' && front.x === 300 && front.y === 700, 'the front door did not land by the grinder bench: ' + JSON.stringify(front));
+    await p.evaluate(() => { const g = window.__g; g.SCENE = 'garden'; g.becomeCosmic(0, 160, 1); g.tryEnterShop({ x: 900, y: 52 }); }); await wait(2200);
     const at = await p.evaluate(() => { const g = window.__g; g.DLG.active = false; return { scene: g.SCENE, x: Math.round(g.lum.x), y: Math.round(g.lum.y) }; });
     check(at.scene === 'shop' && at.x === 1150 && at.y === 640, 'the garden door did not land by the globes: ' + JSON.stringify(at));
     await wait(2500);

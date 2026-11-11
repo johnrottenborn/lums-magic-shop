@@ -41,7 +41,7 @@ function setupShop(){SHOPINT.length=0;
 function enterShop(door){SCENE='shop';shopDoor=door||shopDoor;lum.x=300;lum.y=700;lum.face=1;lum.vx=lum.vy=0;lum.state='idleUp';WCAM.x=500;WTITLE.t=0;setupShop();
   SHOPLUM.x=885;SHOPLUM.y=520;SHOPLUM.walking=false;SHOPLUM.wait=2;}
 function enterGardenFromShop(){SCENE='garden';lum.x=shopDoor.x;lum.y=shopDoor.y;lum.face=1;lum.vx=lum.vy=0;lum.state='idle';cam.x=lum.x;cam.y=lum.y-50;}
-function tryEnterShop(door){if(PARTY[HERO].main==='blade'){talk([['Cosmic',"Wait! I can't let Master Lum see this sword…"],['Cosmic',"I'd better tuck it away in my satchel before I go inside."]]);return;}goScene(()=>{enterShop(door);lum.x=1150;lum.y=640;lum.face=-1;lum.state='idle';});}
+function tryEnterShop(door){if(PARTY[HERO].main==='blade'){talk([['Cosmic',"Wait! I can't let Master Lum see this sword…"],['Cosmic',"I'd better tuck it away in my satchel before I go inside."]]);return;}goScene(()=>{enterShop(door);if(door&&door.x!==0){lum.x=1150;lum.y=640;lum.face=-1;lum.state='idle';}});}
 function updateShopLum(dt){const L=SHOPLUM;const talking=DLG.active&&DLG.lines.some(l=>l[0]==='Lum');L.walking=false;
   if(talking){L.back=0;return;}
   L.wait-=dt;if(L.wait<=0){if(L.back){L.back=0;L.wait=rnd(3,6);}else{L.back=1;L.wait=rnd(1.6,2.6);
