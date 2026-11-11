@@ -38,7 +38,7 @@ function applySaveC1(d){c1Reset();Object.assign(C1,d.c1||{});if(C1.jak){PARTY_OR
   lum.x=d.x;lum.y=d.y;lum.face=d.face||1;lum.state='idle';lum.vx=lum.vy=0;cam.x=lum.x+(sc==='woods'?60:0);cam.y=lum.y-50;WCAM.x=lum.x;
   GOAL.tag='TASK';GOAL.text=(d.goal&&d.goal.text)||GOAL.text;HINT.goalT=0;}
 function startChapter1(){SAVEC.finished=0;audioInit();c1Reset();FADE.a=1;FADE.dir=-1;c1IntroStart();}
-function removeHedge(){for(let i=ESTATE.length-1;i>=0;i--){const o=ESTATE[i];if((o.t==='shrub'||o.t==='img')&&Math.abs(o.x-20)<120&&o.y>1575&&o.y<1720)ESTATE.splice(i,1);}}
+function removeHedge(){for(let i=ESTATE.length-1;i>=0;i--){const o=ESTATE[i];if((o.t==='shrub'||o.t==='img')&&Math.abs(o.x-20)<135&&o.y>1575&&o.y<1720)ESTATE.splice(i,1);}}
 /* ---------- the woods, the morning after ---------- */
 let woodsC1Built=false;
 function buildWoodsC1(){if(woodsC1Built)return;woodsC1Built=true;WFOES.length=0;

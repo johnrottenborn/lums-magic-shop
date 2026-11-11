@@ -313,9 +313,7 @@ const CASES = {
     await p.evaluate(() => { const g = window.__g; g.INTRO.on = false; g.INTRO.waiting = false; g.INTRO.fade = 0; g.INTRO.ui = 1; g.HINT.on = false; g.DLG.active = false; g.becomeCosmic(0, 160, 1); g.tryEnterShop({ x: 0, y: 52 }); }); await wait(2200);
     const front = await p.evaluate(() => { const g = window.__g; g.DLG.active = false; return { scene: g.SCENE, x: Math.round(g.lum.x), y: Math.round(g.lum.y) }; });
     check(front.scene === 'shop' && front.x === 300 && front.y === 700, 'the front door did not land by the grinder bench: ' + JSON.stringify(front));
-    await p.evaluate(() => { const g = window.__g; g.SCENE = 'garden'; g.becomeCosmic(0, 160, 1); g.tryEnterShop({ x: 900, y: 52 }); }); await wait(2200);
-    const at = await p.evaluate(() => { const g = window.__g; g.DLG.active = false; return { scene: g.SCENE, x: Math.round(g.lum.x), y: Math.round(g.lum.y) }; });
-    check(at.scene === 'shop' && at.x === 1150 && at.y === 640, 'the garden door did not land by the globes: ' + JSON.stringify(at));
+
     await wait(2500);
   },
   async 'prologue-demon-god'(p) {
@@ -323,10 +321,19 @@ const CASES = {
     await p.evaluate(() => { const g = window.__g; g.DLG.active = false; g.WEV.fk = 1; g.WEV.foka = 3.2; g.talk([['Fokalur', 'Thank you, foolish apprentice. Your body will serve as a suitable vessel.']]); }); await wait(1600);
     check(await p.evaluate(() => window.__g.IMGX.fokalur === undefined && !!window.__g.IMGX.fokalur_hd), 'the old Demon God sprite is still loaded');
   },
-  async 'garden-south-path-clear'(p) {
-    await p.evaluate(() => { const g = window.__g; g.INTRO.on = false; g.INTRO.waiting = false; g.INTRO.fade = 0; g.INTRO.ui = 1; g.HINT.on = false; g.DLG.active = false; g.becomeCosmic(0, 1520, 1); }); await wait(1800);
-    check(await p.evaluate(() => !window.__g.ESTATE.some(o => o.t === 'shrub' && Math.abs(o.x) < 75 && o.y > 1560)), 'a shrub still sits over the south path');
+  async 'garden-hedge-cut'(p) {
+    await p.evaluate(() => { const g = window.__g; g.INTRO.on = false; g.INTRO.waiting = false; g.INTRO.fade = 0; g.INTRO.ui = 1; g.HINT.on = false; g.DLG.active = false; g.NIGHT.on = true; g.becomeCosmic(0, 1490, 1); }); await wait(1200);
+    const near = () => window.__g.ESTATE.filter(o => o.t === 'shrub' && Math.abs(o.x - 20) < 135 && o.y > 1575 && o.y < 1720).length;
+    check(await p.evaluate(near) > 0, 'the hedge wall is missing before the cut');
+    await p.evaluate(() => window.__g.cutHedge()); await wait(1500);
+    check(await p.evaluate(near) === 0 && !(await p.evaluate(() => window.__g.ESTATE.some(o => o.t === 'shrub' && Math.abs(o.x + 106) < 25 && Math.abs(o.y - 1608) < 25))), 'the weeping shrub over the path is still there after the cut');
+    await p.evaluate(() => { window.__g.DLG.active = false; }); await wait(1500);
   },
+  async 'garden-sealed-side-door'(p) {
+    const line = await p.evaluate(() => { const g = window.__g; g.INTRO.on = false; g.INTRO.waiting = false; g.DLG.active = false; const d = g.INTERACTABLES.find(o => /powerful magic/.test(String(o.onInteract))); if (!d) return null; d.onInteract(); return g.DLG.active ? g.DLG.lines[0][1] : (g.lum.quip || ''); });
+    check(/shut by a powerful magic/.test(line || ''), 'the side door did not say it is sealed: ' + line);
+  },
+
   async 'ch1-scoring'(p) {
     const r = await p.evaluate(() => { const g = window.__g, C = g.C1X, S = g.STATS, F = ['dunChest', 'foxRing', 'foxHood', 'lairBoss', 'bigVixen'];
       Object.assign(S, { time: 1800, atk: 10, nice: 10, foeAtk: 10, guards: 10, kos: 0 });
@@ -336,6 +343,8 @@ const CASES = {
     check(r.all === 5 && r.allFox === 5, 'a perfect run with every Fox item should be 5 stars: ' + JSON.stringify(r));
     check(r.four <= 4.5, 'missing a Fox item still gave 5 stars');
     check(r.k5 === 'foxtotem' && r.k4 === 'foxpendant' && r.k3 === 'foxtails' && r.k2 === null, 'wrong keepsake charms: ' + JSON.stringify(r));
+    const stole = await p.evaluate(() => { const g = window.__g, rnd = Math.random; g.PARTY.lum.charm = 'foxtotem'; const b = g.MATS.slimeparts || 0; Math.random = () => 0.1; g.foxRingSteal({ type: 'slime', x: 0, y: 0 }); Math.random = rnd; return (g.MATS.slimeparts || 0) - b; });
+    check(stole === 1, 'the Carved Fox Totem did not steal on a successful roll');
   },
   async 'deeproot-sleeping-fox'(p) {
     await startCh1(p);

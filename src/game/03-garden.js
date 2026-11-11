@@ -140,7 +140,7 @@ function placeEstate(){
   // hedges of potion shrubs close the west, east and south edges
   {let k=0;const RK=['rock1','rock2','rock3','rock4'];const hedge=(x,y)=>{k++;if(hash(k,9,811)<.22){const img=RK[(hash(k,10,811)*4)|0];ESTATE.push({t:'img',img,x:x+(hash(k,2,811)-.5)*30,y:y+20,ax:.5,ay:.72,s:.8+hash(k,4,811)*.4,shadow:1,flip:hash(k,5,811)<.5});return;}const i=(hash(k,7,811)*SHR.length)|0;ESTATE.push({t:'shrub',k:i,x:x+(hash(k,2,811)-.5)*36,y:y+(hash(k,3,811)-.5)*24,s:SHR[i].s*(1.15+hash(k,4,811)*.3),flip:hash(k,5,811)<.5,ph:hash(k,8,811)*TAU});};
     for(let y=120;y<=1560;y+=70){hedge(-960,y);hedge(-1030,y+35);hedge(1070,y);hedge(1140,y+35);}
-    for(let x=-1000;x<=1160;x+=80){if(Math.abs(x)>60){hedge(x,1600);}if(Math.abs(x+40)>100)hedge(x+40,1660);}
+    for(let x=-1000;x<=1160;x+=80){if(Math.abs(x)>60){hedge(x,1600);}hedge(x+40,1660);}
     for(let x=-1000;x<=-700;x+=60){hedge(x,-60);}}
   // herb beds either side of the path, with a potion shrub at the end of each row
   let seed=100;
@@ -173,7 +173,7 @@ function placeEstate(){
     OBST.push({k:'ell',x,y:y-4,rx:34,ry:13});INTERACTABLES.push({x,y,reach:72,onInteract:()=>say(line)});}
   // the road south, and a marker where it meets the hedge
   INTERACTABLES.push({x:0,y:14,reach:95,onInteract:()=>tryEnterShop({x:0,y:52})});
-  INTERACTABLES.push({x:hx(1040),y:14,reach:80,onInteract:()=>tryEnterShop({x:hx(1040),y:52})});
+  INTERACTABLES.push({x:hx(1040),y:14,reach:80,door:true,onInteract:()=>say("This door is shut by a powerful magic.")});
   INTERACTABLES.push({x:WELL.x,y:WELL.y-10,reach:130,onInteract:wellInteract});
   INTERACTABLES.push({x:20,y:1528,reach:95,hedge:1,onInteract:()=>{if(NIGHT.cut)return;
     if(!NIGHT.on){say("The road ends in a wall of thick hedges. Beyond them is the dark forest. Master Lum says the garden ends here for a reason.");return;}

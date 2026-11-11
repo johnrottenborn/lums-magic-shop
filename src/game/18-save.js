@@ -26,7 +26,7 @@ function applySave(d){if(d.ch===1){applySaveC1(d);return;}const f=d.f||{};if(d.s
   if(L_.slugs!=null)SLUGS.splice(L_.slugs);kingState=f.kingState||0;if(kingState===1)spawnKing(false);syncMaxHp();
   Object.assign(WEV,d.wev||{});
   if(d.night&&d.night.on){NIGHT.on=true;BED.night=1;BED.sleeping=true;BED.cosAwake=true;BED.slept=true;
-    if(d.night.cut){NIGHT.cut=true;addHedgeDoor();for(let i=ESTATE.length-1;i>=0;i--){const o=ESTATE[i];if((o.t==='shrub'||o.t==='img')&&Math.abs(o.x-20)<120&&o.y>1575&&o.y<1720)ESTATE.splice(i,1);}}
+    if(d.night.cut){NIGHT.cut=true;addHedgeDoor();for(let i=ESTATE.length-1;i>=0;i--){const o=ESTATE[i];if((o.t==='shrub'||o.t==='img')&&Math.abs(o.x-20)<135&&o.y>1575&&o.y<1720)ESTATE.splice(i,1);}}
     NIGHT.nudged=d.night.nudged||0;if(d.night.rain){NIGHT.rain=true;setTimeout(()=>{NIGHT.rainSrc=null;startRain();},600);}}
   if(d.shopDoor)shopDoor=d.shopDoor;if(d.pondReturn)pondReturn=d.pondReturn;
   const sc=d.scene||'garden';

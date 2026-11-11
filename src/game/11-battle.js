@@ -24,7 +24,7 @@ function drawWipe(){if(WIPE.p<=0)return;const e=WIPE.p<1?(1-Math.cos(Math.PI*WIP
 
 /* ---------- starting and ending ---------- */
 /* Fox Ring (charm): a 50% chance on First Strike to steal the foe's ingredient */
-function foxRingSteal(f){const d=FOE_TYPES[f.type]&&FOE_TYPES[f.type].drop;if(!d||!Object.values(PARTY).some(p=>p&&p.charm==='foxring')||Math.random()>=.5)return;
+function foxRingSteal(f){const d=FOE_TYPES[f.type]&&FOE_TYPES[f.type].drop;if(!d||!Object.values(PARTY).some(p=>p&&(p.charm==='foxring'||p.charm==='foxtotem'))||Math.random()>=.5)return;
   MATS[d]=(MATS[d]||0)+1;if(!BAG.includes(d))BAG.push(d);BATTLE.loot&&BATTLE.loot.push(d);setTimeout(()=>pop(f.x,f.y-175*bS(),'Stole '+ITEMS[d].name+'!','info'),450);sfxItem&&sfxItem();}
 function startEncounter(g,mode){if(BATTLE.on||WIPE.dir||WEVENT.on||g.dead||g.calm>0)return;BATTLE.capG=g;CAPTURE.want=true;BATTLE.pending=true;lum.vx=lum.vy=0;sfxEncounter();WIPE.label=mode==='first'?'First Strike!':g.kind==='bigvixen'?'The Elder Vixen awakens!':g.kind==='vixen'?'The Vixen bares her teeth!':g.kind==='slugking'?'The Slug King appears!':g.kind==='reaper'?'The Grave Reaper attacks!':g.kind==='fokalur'?'Fokalur, the Demon God!':g.kind==='bigspider'?`The ${(g.over&&g.over.name)||'Broodmother'} descends!`:(n=>`${/^[AEIOU]/.test(n)?'An':'A'} ${n} appears!`)(FOE_TYPES[g.kind||'slime'].name.split(' ').pop());
   pageTurn(()=>setupBattle(g,mode));}
