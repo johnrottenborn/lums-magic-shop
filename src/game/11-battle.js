@@ -238,7 +238,7 @@ function drawBattleSpar(h){const S=bS(),B=BATTLE,x=h.x+h.ox,y=h.y+h.oy,me=B.hero
   else if(me&&ph==='sflame'){an='bidle';fi=0;}
   bshadow(x,y+2,40*S,11*S,.35);ctx.save();ctx.translate(x,y+3);if(h.hurt>0)ctx.translate(Math.sin(h.hurt*60)*4,0);ctx.rotate(rot);if(an==='bidle'){const b=Math.sin(T*2.1);ctx.scale(1-.004*b,1+.008*b);}
   c1Frame(ctx,'spar',an,fi,0,0,H_,flip,1,h.hurt>.3?1:0);ctx.restore();
-  if(me&&(ph==='bonkHit'||ph==='sflame'&&t<.7)){const u=ph==='bonkHit'?Math.min(1,t/.18):t/.7;ctx.save();ctx.globalCompositeOperation='lighter';ctx.lineCap='round';
+  if(me&&ph==='sflame'&&t<.7){const u=t/.7;ctx.save();ctx.globalCompositeOperation='lighter';ctx.lineCap='round';
     for(let k=0;k<3;k++){ctx.strokeStyle=['rgba(255,90,30,.75)','rgba(255,170,60,.7)','rgba(255,240,170,.8)'][k];ctx.lineWidth=(14-k*4)*S;ctx.beginPath();ctx.arc(x+60*S,y-95*S,(80-k*6)*S,-1.9+u*.4,-1.9+u*2.6);ctx.stroke();}ctx.restore();}
   if(me&&ph==='sflame'){ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,x-40*S,y-180*S,45*S,'255,120,40',.8);ctx.restore();}}
 function drawBattleJak(h){const S=bS(),B=BATTLE,x=h.x+h.ox,y=h.y+h.oy,me=B.heroes[B.cur]===h,ph=B.phase,t=B.t,H_=206*S;let an='idle',fi=0,flip=false;
