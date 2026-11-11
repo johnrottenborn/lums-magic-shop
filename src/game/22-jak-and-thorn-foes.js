@@ -35,7 +35,7 @@ function jakWake(item){const i=BAG.indexOf(item);if(i>=0)BAG.splice(i,1);sfxItem
   setTimeout(()=>talk([['Lum',"Hold still. This will help."],
     ['Spar',"…Ngh…"],
     ['Lum',"My name is Lum. You were barely breathing."],
-    ['Spar',"I’m Jak. Thank you."],
+    ['Spar',"I’m Spar. Thank you."],
     ['Spar',"I've been lost in the dark, every path looks the same."],
     ['Lum',"This forest is a maze."],
     ['Spar',"Long ago, travelers who crossed Stranglethorn dropped seeds as they walked, so the rest could find the way."],
