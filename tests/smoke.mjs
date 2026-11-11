@@ -324,6 +324,10 @@ const CASES = {
   async 'garden-hedge-cut'(p) {
     await p.evaluate(() => { const g = window.__g; g.INTRO.on = false; g.INTRO.waiting = false; g.INTRO.fade = 0; g.INTRO.ui = 1; g.HINT.on = false; g.DLG.active = false; g.NIGHT.on = true; g.becomeCosmic(0, 1490, 1); }); await wait(1200);
     const near = () => window.__g.ESTATE.filter(o => o.t === 'shrub' && Math.abs(o.x - 20) < 135 && o.y > 1575 && o.y < 1720).length;
+    check(await p.evaluate(() => window.__g.ESTATE.some(o => o.t === 'shrub' && o.x === 20 && o.y === 1612)), 'no bush across the path before the cut');
+    await p.evaluate(() => { const g = window.__g; g.NIGHT.on = false; }); await wait(900);
+    await p.screenshot({ path: path.join(SHOTS, 'garden-path-blocked-' + (p.viewportSize().width < 600 ? 'phone' : 'desktop') + '.png') });
+    await p.evaluate(() => { window.__g.NIGHT.on = true; });
     check(await p.evaluate(near) > 0, 'the hedge wall is missing before the cut');
     await p.evaluate(() => window.__g.cutHedge()); await wait(1500);
     check(await p.evaluate(near) === 0 && !(await p.evaluate(() => window.__g.ESTATE.some(o => o.t === 'shrub' && Math.abs(o.x + 106) < 25 && Math.abs(o.y - 1608) < 25))), 'the weeping shrub over the path is still there after the cut');
