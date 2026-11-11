@@ -230,9 +230,11 @@ function renderBattle(){const B=BATTLE,S=bS();ctx.setTransform(DPR,0,0,DPR,0,0);
   drawPartyHUD();drawBattleMenu();drawPowderMenu();drawPowderPuff();drawBattleBanner();
   drawSoundBtn();drawWipe();drawSceneFade();}
 /* Spar in battle: idle with his sword raised; runs in, lunges with a fiery slash. His sheet's run faces left, so it's flipped */
-function drawBattleSpar(h){const S=bS(),B=BATTLE,x=h.x+h.ox,y=h.y+h.oy,me=B.heroes[B.cur]===h,ph=B.phase,t=B.t,H_=SPAR_BH*S;let an='bidle',fi=Math.floor(T*5)%4,flip=false,rot=0;
-  if(me&&(ph==='bonkRun'||ph==='bonkBack'||ph==='run'||ph==='fled')){an='brun';fi=Math.floor(t*12)%5;flip=ph!=='bonkBack'&&ph!=='run'&&ph!=='fled';}
-  else if(me&&ph==='bonkWind'){an='bidle';fi=0;rot=-.12*Math.min(1,t/B.windD);}else if(me&&ph==='bonkHit'){an='brun';fi=1;flip=true;rot=.25;}
+function drawBattleSpar(h){const S=bS(),B=BATTLE,x=h.x+h.ox,y=h.y+h.oy,me=B.heroes[B.cur]===h,ph=B.phase,t=B.t,H_=SPAR_BH*S;let an='bidle',fi=0,flip=false,rot=0;
+  /* idle holds the sword-up pose and breathes (frame 2 of that row kicks a leg out, so it is not cycled); the run row faces right, toward the foes */
+  if(me&&(ph==='bonkRun'||ph==='bonkBack'||ph==='run'||ph==='fled')){an='brun';fi=Math.floor(t*12)%5;flip=ph!=='bonkRun';}
+  else if(me&&ph==='bonkWind'){an='bidle';fi=0;rot=-.14*Math.min(1,t/B.windD);}
+  else if(me&&ph==='bonkHit'){an='brun';if(t<.07){fi=1;rot=.06;}else{fi=0;rot=.16*Math.max(0,1-(t-.07)/.38);}}
   else if(me&&ph==='sflame'){an='bidle';fi=0;}
   bshadow(x,y+2,40*S,11*S,.35);ctx.save();ctx.translate(x,y+3);if(h.hurt>0)ctx.translate(Math.sin(h.hurt*60)*4,0);ctx.rotate(rot);if(an==='bidle'){const b=Math.sin(T*2.1);ctx.scale(1-.004*b,1+.008*b);}
   c1Frame(ctx,'spar',an,fi,0,0,H_,flip,1,h.hurt>.3?1:0);ctx.restore();

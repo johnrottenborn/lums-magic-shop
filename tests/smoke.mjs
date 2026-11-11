@@ -403,6 +403,13 @@ const CASES = {
     await p.evaluate(() => window.__g.startEncounter({ kind: 'spider', scene: 'thorn', x: 0, y: 0, s: 1, pack: 1, calm: 0 }, 'normal'));
     for (let i = 0; i < 50; i++) { await wait(150); if (await p.evaluate(() => window.__g.BATTLE.phase) === 'heroMenu') break; }
     check(await p.evaluate(() => window.__g.BATTLE.heroes.map(h => h.id).join(',')) === 'spar', 'Spar did not fight alone');
+    // sword attack: runs right toward the foe, winds up, swings forward (no running backwards)
+    const ox0 = await p.evaluate(() => { const g = window.__g; g.startBonk(); return g.BATTLE.heroes[0].ox; }); await wait(200);
+    await p.screenshot({ path: path.join(SHOTS, `spar-attack-run-${vp}.png`) });
+    check(await p.evaluate(o => window.__g.BATTLE.heroes[0].ox > o, ox0), 'Spar did not run toward the foe');
+    for (let i = 0; i < 30 && await p.evaluate(() => window.__g.BATTLE.phase) !== 'bonkHit'; i++) await wait(60);
+    await wait(150); await p.screenshot({ path: path.join(SHOTS, `spar-attack-swing-${vp}.png`) });
+    for (let i = 0; i < 80 && await p.evaluate(() => window.__g.BATTLE.phase) !== 'heroMenu'; i++) await wait(150);
     await p.evaluate(() => { window.__g.C1X.comboS = 5; }); await wait(1800);
     await p.screenshot({ path: path.join(SHOTS, `spar-battle-${vp}.png`) });
     check(await p.evaluate(() => window.__g.battleMenuOpts().some(o => o[0] === 'burst' && o[1] === 'Blazing Edge')), 'no Blazing Edge combo at 5 stars');
