@@ -8,7 +8,7 @@ const HCOMBO={lum:'Starfall',jak:'Staff Bolt'};
 const FACEIMG={lum:'face_lum',jak:'face_jak',cosmic:'face_cosmic'};
 const STATIMG={atk:'stat_atk',def:'stat_def',mag:'stat_mag',spd:'stat_spd'};
 const BK={spread:false,W:380,H:590,top:108,bot:104,r:30};
-function menuLayout(){const sp=W>H*1.15&&W>=640;BK.spread=sp;if(sp)Object.assign(BK,{W:780,H:500,top:118,bot:46,r:35});else Object.assign(BK,{W:380,H:590,top:108,bot:104,r:30});}
+function menuLayout(){const sp=W>H*1.15&&W>=640;BK.spread=sp;if(sp)Object.assign(BK,{W:780,H:500,top:118,bot:46,r:35});else Object.assign(BK,{W:380,H:590,top:108,bot:104,r:30});BK.task=GOAL&&GOAL.text?52:0;BK.top+=BK.task;}
 function wrapText(c,text,maxW){const words=text.split(' '),out=[];let cur='';for(const w_ of words){const t=cur?cur+' '+w_:w_;if(c.measureText(t).width>maxW&&cur){out.push(cur);cur=w_;}else cur=t;}out.push(cur);return out;}
 function hit(x,y,w,h,act){MENU.hits.push({x,y,w,h,act});}
 function tutRing(c,x,y,r){const p=.5+.5*Math.sin(T*6);c.save();c.strokeStyle=`rgba(232,170,60,${(.6+.4*p).toFixed(3)})`;c.lineWidth=3;c.beginPath();c.arc(x,y,r+4+p*3,0,TAU);c.stroke();c.restore();}
@@ -23,7 +23,10 @@ function useOn(who){const P=MENU.pick;if(!P)return;const it=ITEMS[P.id],H_=HEROE
   if(H_.hp>=H_.maxHp){MENU.note=H_.name+' is already feeling great!';MENU.noteT=2;return;}
   const amt=healRoll(it);H_.hp=Math.min(H_.maxHp,H_.hp+amt);BAG.splice(i,1);STATS.items++;sfxItem();MENU.note=`${H_.name} healed ${amt} HP!`;MENU.noteT=1.8;MENU.pick=null;MENU.sel=null;}
 /* round portraits for everyone in the party; the open page's hero glows */
-function drawParty(c,members,MH){const r=BK.r,cy=-BK.top+10+r,gap=r*.8+12,tot=members.length*r*2+(members.length-1)*gap;let x=BK.W/2-tot/2+r;const pick=!!MENU.pick;
+/* the current task, like the in-game TASK banner, above the party */
+function drawMenuTask(c){if(!BK.task)return;const w=Math.min(BK.W-20,360),x=BK.W/2-w/2,y=-BK.top+4,h=44;c.save();c.fillStyle='rgba(24,26,22,.82)';rr(x,y,w,h,12);c.fill();c.textAlign='center';c.textBaseline='alphabetic';
+  c.fillStyle='#e2c27a';c.font='700 11px "Alegreya SC", Georgia, serif';c.fillText('TASK',BK.W/2,y+16);c.fillStyle='#f4ecdc';c.font='15px Alegreya, Georgia, serif';let t=GOAL.text;while(c.measureText(t).width>w-24&&t.length>4)t=t.slice(0,-2);if(t!==GOAL.text)t=t.trimEnd()+'…';c.fillText(t,BK.W/2,y+35);c.restore();}
+function drawParty(c,members,MH){drawMenuTask(c);const r=BK.r,cy=-BK.top+BK.task+10+r,gap=r*.8+12,tot=members.length*r*2+(members.length-1)*gap;let x=BK.W/2-tot/2+r;const pick=!!MENU.pick;
   for(const id of members){const H_=HEROES[id],on=id===MH,col=HCOL[id]||'#666';
     if(pick)drawGlow(c,x,cy,r*1.9,'255,215,120',.4+.2*Math.sin(T*5));else if(on)drawGlow(c,x,cy,r*1.7,'255,215,120',.32);
     c.fillStyle='rgba(0,0,0,.35)';c.beginPath();c.arc(x+1,cy+3,r+3,0,TAU);c.fill();
@@ -97,7 +100,7 @@ function drawItemCard(c,cx,cy,cw,MH,members){let id=null,fromSlot=null;if(MENU.s
   const cmp=previewDelta(MH),nm=it?it.name:'Empty '+SLOTS.find(s=>s[0]===fromSlot)[1];
   const cnt=it&&!fromSlot?(it.kind==='mat'?(MATS[id]||0):BAG.filter(b=>b===id).length):0;
   const lab=pick?null:fromSlot&&id?'Unequip':it&&it.slot&&!fromSlot?'Equip':it&&it.heal?'Use':null;
-  const chH=22+80+40+20+lines.length*19+(cmp?44:0)+(pick?58:0)+optH+74;const x0=cx-cw/2,y0=Math.max(-BK.top+90,cy-chH/2);
+  const chH=22+80+40+20+lines.length*19+(cmp?44:0)+(pick?58:0)+optH+74;const x0=cx-cw/2,y0=Math.max(-BK.top+BK.task+90,cy-chH/2);
   c.fillStyle='rgba(20,10,10,.35)';rr(x0+3,y0+8,cw,chH,18);c.fill();c.fillStyle='#fbf3dd';rr(x0,y0,cw,chH,18);c.fill();c.strokeStyle='#c49a4e';c.lineWidth=3;c.stroke();
   hit(x0,y0,cw,chH,()=>{});
   let yy=y0+22;c.fillStyle='#f3e6c4';c.beginPath();c.arc(cx,yy+40,40,0,TAU);c.fill();if(id){drawGlow(c,cx,yy+40,46,'255,225,150',.3);drawIcon(c,id,cx,yy+41,52);}else{c.save();c.globalAlpha=.7;drawIcon(c,SLOT_GHOST[fromSlot],cx,yy+40,50,true);c.restore();}

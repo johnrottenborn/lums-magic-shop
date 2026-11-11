@@ -156,7 +156,7 @@ function drawSkelFrame(c,n,x,y,h,flip,alpha,flash){const im=IMG.skel;if(!ready(i
 /* Fokalur, painted: one large cut-out, brought to life in code. h is the full image height; feet sit at y.
    Frames 4–7 (the old sheet's casting/transforming rows) mean "casting": the staff orb flares. */
 const FOKA_W=975/576,FOKA_ORB=[300/975,112/576],FOKA_BODY=.512;
-function drawFokFrame(c,n,x,y,h,flip,alpha){const hd=IMG.fokalur_hd;if(ready(hd)){drawFokHD(c,n,x,y,h,flip,alpha);return;}drawFokSheet(c,n,x,y,h,flip,alpha);}
+function drawFokFrame(c,n,x,y,h,flip,alpha){if(ready(IMG.fokalur_hd))drawFokHD(c,n,x,y,h,flip,alpha);}
 function drawFokHD(c,n,x,y,h,flip,alpha){const im=IMG.fokalur_hd,w=h*FOKA_W,cast=n>=4,bob=Math.sin(T*1.5)*h*.012,br=Math.sin(T*1.5+1);
   c.save();c.translate(x,y+bob);if(flip)c.scale(-1,1);c.globalAlpha=alpha;
   // dark mist pooling at his feet and around him
@@ -169,7 +169,6 @@ function drawFokHD(c,n,x,y,h,flip,alpha){const im=IMG.fokalur_hd,w=h*FOKA_W,cast
   // the eyes
   drawGlow(c,0,-h+.245*h,h*.022,'255,220,120',(.5+.2*Math.sin(T*2.3))*alpha);
   c.restore();c.restore();}
-function drawFokSheet(c,n,x,y,h,flip,alpha){const im=IMG.fokalur;if(!ready(im))return;const k=h/FKCH,sx=(n%4)*FKCW,sy=((n/4)|0)*FKCH;c.save();c.translate(x,y);if(flip)c.scale(-1,1);c.globalAlpha=alpha;c.drawImage(im,sx,sy,FKCW,FKCH,-130*k,-246*k,FKCW*k,FKCH*k);c.restore();}
 function sfxBones(v=1){if(!SND.ready)return;const t=SND.ctx.currentTime;for(let i=0;i<7;i++)noiseHit(t+i*.045+Math.random()*.02,.035,'bandpass',1800+Math.random()*1600,6,.09*v,SND.sfx);}
 function sfxRumble(dur=3,v=1){if(!SND.ready)return;const c=SND.ctx,t=c.currentTime;noiseHit(t,dur,'lowpass',140,1,.5*v,SND.sfx,60);const o=c.createOscillator(),g=c.createGain();o.type='sawtooth';o.frequency.setValueAtTime(42,t);o.frequency.linearRampToValueAtTime(30,t+dur);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.12*v,t+.3);g.gain.linearRampToValueAtTime(0,t+dur);const f=c.createBiquadFilter();f.type='lowpass';f.frequency.value=180;o.connect(f);f.connect(g);g.connect(SND.sfx);o.start(t);o.stop(t+dur+.1);}
 function spawnSkels(){const picks=WGRAVES.filter(g=>g.mound).map(g=>[WGRAVES.indexOf(g),0]);picks.forEach(([gi,dx],i)=>{const gr=WGRAVES[gi];WSKELS.push({kind:'skel',scene:'woods',x:gr.x+dx,y:gr.y+34,s:1,pack:1,calm:2.6+i*.5,dead:0,rise:-i*.5,ft:rnd(0,4),face:lum.x<gr.x?-1:1,col:['235,228,210','190,180,160','90,80,70']});});
@@ -211,8 +210,8 @@ function drawSealFx(){if(!WEV.seal)return;const t=WEV.seal,x=lum.x,y=lum.y;ctx.s
     ctx.strokeStyle=`rgba(255,70,60,${(.7*a).toFixed(3)})`;ctx.lineWidth=2.5;for(let i=0;i<9;i++){const an=i/9*TAU+.3,len=t*90*(0.7+hash(i,3,9)*.6);ctx.beginPath();ctx.moveTo(x,y);let px=x,py=y;for(let k=1;k<=5;k++){px=x+Math.cos(an+(hash(i,k,7)-.5)*.5)*len*k/5;py=y+Math.sin(an+(hash(i,k,8)-.5)*.5)*len*k/5*.5;ctx.lineTo(px,py);}ctx.stroke();}}
   else{const a=Math.max(0,1-(t-2.6)/4);drawGlow(ctx,x,y-120,220,'170,40,90',.35*a+.12);}
   ctx.restore();}
-function drawFokalur(){const t=WEV.foka,h=560;let n=Math.floor(T*4)%4;if(t<.5)n=4;else if(t<2.2)n=5;else if(WEV.quake)n=6+(Math.floor(T*3)%2?0:0);else if(t<3)n=7;
+function drawFokalur(){const t=WEV.foka,h=520;let n=Math.floor(T*4)%4;if(t<.5)n=4;else if(t<2.2)n=5;else if(WEV.quake)n=6+(Math.floor(T*3)%2?0:0);else if(t<3)n=7;
   ctx.fillStyle='rgba(10,0,10,.45)';ctx.beginPath();ctx.ellipse(lum.x,lum.y,140,28,0,0,TAU);ctx.fill();
   ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,lum.x,lum.y-280,300,'160,30,80',.22+.08*Math.sin(T*3));ctx.restore();
-  drawFokFrame(ctx,n,lum.x,lum.y+4,h,lum.face<0,Math.min(1,t*3));}
+  drawFokFrame(ctx,n,lum.x,lum.y+4,h,false,Math.min(1,t*3));}
 

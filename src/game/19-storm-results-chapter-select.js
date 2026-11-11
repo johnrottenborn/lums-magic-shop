@@ -185,15 +185,13 @@ function kingFrame(c,anim,i,x,y,h,flip,alpha,flash){const im=IMG.slugking;if(!re
 function kingSpot(){const C=[[-150,760],[300,960],[-330,560],[80,1180],[400,520]];let best=null,bd=-1;for(const [x,y] of C){const [sx,sy]=solveEstate(x,y);if(Math.hypot(sx-x,sy-y)>.5||inStream(x,y,-30)||inPond(x,y,-40))continue;const d=Math.hypot(x-lum.x,y-lum.y),sc_=d<230?9999+d:d;if(bd<0||sc_<bd){bd=sc_;best=[x,y];}}return best||slugSpot();}
 function spawnKing(rise){if(SLUGS.some(g=>g.kind==='slugking'))return;const [x,y]=kingSpot();SLUGS.push({kind:'slugking',scene:'garden',x,y,tx:x,ty:y,s:1,row:2,ft:0,state:'crawl',t:0,sp:9,trailT:0,ph:0,shy:0,flee:0,calm:rise?4:1.5,rise:rise?0:1,pack:1});kingState=1;}
 function kingArrives(){spawnKing(true);sfxRumble&&sfxRumble(1.6,.5);GOAL.tag='NEW TASK';GOAL.text='Defeat the Slug King';HINT.goalT=0;
-  setTimeout(()=>talk([['Cosmic',"Huh? The ground is… bubbling?"],['Cosmic',"A giant slug… wearing a crown?! That must be the Slug King!"]]),1800);}
+  setTimeout(()=>talk([['Cosmic',"Huh? The ground is… bubbling?"],['Cosmic',"A giant slug?! That must be the Slug King!"]]),1800);}
 function drawKing(g){if(CAPTURE.on&&g===BATTLE.capG)return;const h=150;if(g.rise<1){g.rise=Math.min(1,g.rise+1/60/1.6);for(let k=0;k<2;k++)TRAIL.push({x:g.x+rnd(-50,50),y:g.y+rnd(-10,10),a:rnd(0,TAU),t:30});}
   const e=g.rise<1?1-Math.pow(1-g.rise,2):1,flip=Math.cos(g.hd||0)<0,moving=g.chase||g.state==='crawl';
   ctx.fillStyle='rgba(30,50,40,.25)';ctx.beginPath();ctx.ellipse(g.x,g.y+2,62*e,13*e,0,0,TAU);ctx.fill();
   drawGlow(ctx,g.x,g.y-50,80,'190,240,255',.2+.08*Math.sin(T*1.3));
   ctx.save();ctx.beginPath();ctx.rect(g.x-200,g.y-300,400,300+4);ctx.clip();kingFrame(ctx,moving?'move':'idle',Math.floor(T*(moving?9:6))%8,g.x,g.y+4+(1-e)*h,h,flip,1,0);ctx.restore();
-  // a little golden crown so everyone knows who's in charge
-  const hx=g.x+(flip?-1:1)*30,hy=g.y-h*.84*e+(1-e)*h+Math.sin(T*3)*1.5;ctx.save();ctx.translate(hx,hy);ctx.fillStyle='#f2c440';ctx.strokeStyle='#7a5410';ctx.lineWidth=1.4;ctx.beginPath();ctx.moveTo(-11,4);ctx.lineTo(-11,-5);ctx.lineTo(-5,0);ctx.lineTo(0,-8);ctx.lineTo(5,0);ctx.lineTo(11,-5);ctx.lineTo(11,4);ctx.closePath();ctx.fill();ctx.stroke();
-  ctx.fillStyle='#d24a5a';ctx.beginPath();ctx.arc(0,-1,1.8,0,TAU);ctx.fill();ctx.restore();ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,hx,hy,14,'255,220,120',.35+.15*Math.sin(T*4));ctx.restore();}
+  }
 function drawBattleKing(f){const S=bS(),B=BATTLE,me=B.foes[B.foeI]===f,h=170*S*f.s,x=f.x+f.ox,y=f.y+f.oy;let anim='idle',fi=Math.floor(T*6+f.ph)%8;
   if(f.dead){anim='die';fi=Math.min(7,Math.floor(f.dead/.18));}else if(f.hit>0){anim='hurt';fi=Math.min(5,Math.floor((.4-f.hit)/.07));}
   else if(me&&B.phase==='foeWind'){anim='spell';fi=Math.min(5,Math.floor(f.wind*6));}else if(me&&(B.phase==='foeLeap')){anim='spell';fi=5;}else if(me&&B.phase==='foeJiggle'){anim='move';fi=Math.floor(B.t*10)%8;}
@@ -201,7 +199,6 @@ function drawBattleKing(f){const S=bS(),B=BATTLE,me=B.foes[B.foeI]===f,h=170*S*f
   bshadow(x,y-4,h*.36,h*.06,.35*al);
   drawGlow(ctx,x,y-h*.35,h*.5,'190,240,255',.2*al);
   kingFrame(ctx,anim,fi,x+(f.hit>0?Math.sin(f.hit*50)*4:0),y,h,true,al,0);
-  if(!f.dead){const hx=x-30*S,hy=y-h*.84+Math.sin(T*3)*1.5;ctx.save();ctx.translate(hx,hy);ctx.scale(1.3*S,1.3*S);ctx.fillStyle='#f2c440';ctx.strokeStyle='#7a5410';ctx.lineWidth=1.4;ctx.beginPath();ctx.moveTo(-11,4);ctx.lineTo(-11,-5);ctx.lineTo(-5,0);ctx.lineTo(0,-8);ctx.lineTo(5,0);ctx.lineTo(11,-5);ctx.lineTo(11,4);ctx.closePath();ctx.fill();ctx.stroke();ctx.fillStyle='#d24a5a';ctx.beginPath();ctx.arc(0,-1,1.8,0,TAU);ctx.fill();ctx.restore();}
   // the spell: a bolt of starry slime from his shell to the hero
   if(me&&B.phase==='foeLeap'&&f.tgt){const u=Math.min(1,B.t/B.leapD),sx=x-h*.25,sy=y-h*.5,tx=f.tgt.x+f.tgt.ox,ty=f.tgt.y-80*S,px=sx+(tx-sx)*u,py=sy+(ty-sy)*u-Math.sin(Math.PI*u)*40*S;
     ctx.save();ctx.globalCompositeOperation='lighter';for(let k=0;k<6;k++){const v=u-k*.04;if(v<0)continue;drawGlow(ctx,sx+(tx-sx)*v,sy+(ty-sy)*v-Math.sin(Math.PI*v)*40*S,(16-k*2)*S,'170,230,255',.7-k*.1);}drawGlow(ctx,px,py,26*S,'220,250,255',.9);ctx.restore();

@@ -160,9 +160,14 @@ const CASES = {
     check(await p.evaluate(() => /underground passage/.test(window.__g.DLG.lines[0][1])), 'Lum did not notice the passage');
     await p.evaluate(() => window.__g.pressA()); await wait(2200);
     check(await p.evaluate(() => window.__g.SCENE === 'dun' && window.__g.DUN.room === 6), 'did not reach the Hidden Spring');
-    await p.evaluate(() => { const g = window.__g; g.DLG.active = false; g.HEROES_X.lum.hp = 3; g.lum.x = 800; g.lum.y = 610; }); await wait(900);
+    await p.evaluate(() => { const g = window.__g; g.DLG.active = false; g.HEROES_X.lum.hp = 3; g.lumS.x = 760; g.lumS.y = 618; }); await wait(900);
     await p.evaluate(() => window.__g.pressA()); await wait(400);
+    check(await p.evaluate(() => window.__g.CHOICE.on && /Drink/.test(window.__g.CHOICE.q)), 'the spring did not offer a drink');
+    await p.screenshot({ path: path.join(SHOTS, 'hidden-spring-drink-' + (p.viewportSize().width < 600 ? 'phone' : 'desktop') + '.png') });
+    await p.keyboard.press('Enter'); await wait(400);
     check(await p.evaluate(() => window.__g.HEROES_X.lum.hp === window.__g.HEROES_X.lum.maxHp), 'drinking did not restore HP');
+    await p.evaluate(() => { const g = window.__g; g.DLG.active = false; g.lumS.x = 935; g.lumS.y = 478; }); await wait(700);
+    check(await p.evaluate(() => window.__g.dunFree(935, 478) && !!(window.__g.NEAR && window.__g.NEAR.door)), 'no door emote up the spring stairs');
     await wait(800);
   },
   async 'thornroot-cellar'(p) {
@@ -299,6 +304,22 @@ const CASES = {
     await p.evaluate(() => { const B = window.__g.BATTLE; B.phase = 'lose'; B.t = 3; B.ending = 0; });
     check(await until(() => window.__g.C1X.fkDone === 1, 40000), 'the scene after the battle did not finish the chapter');
     check(await p.evaluate(() => window.__g.readSave() === null && window.__g.C1X.chEnd === 1), 'Chapter 1 end did not clear the save');
+  },
+  async 'garden-door-into-shop'(p) {
+    check(await p.evaluate(() => window.__g.shopFree(1150, 640)), 'the shop arrival spot is not walkable');
+    await p.evaluate(() => { const g = window.__g; g.INTRO.on = false; g.INTRO.waiting = false; g.INTRO.fade = 0; g.INTRO.ui = 1; g.HINT.on = false; g.DLG.active = false; g.becomeCosmic(0, 160, 1); g.tryEnterShop(); }); await wait(2200);
+    const at = await p.evaluate(() => { const g = window.__g; g.DLG.active = false; return { scene: g.SCENE, x: Math.round(g.lum.x), y: Math.round(g.lum.y) }; });
+    check(at.scene === 'shop' && at.x === 1150 && at.y === 640, 'the garden door did not land by the globes: ' + JSON.stringify(at));
+    await wait(2500);
+  },
+  async 'prologue-demon-god'(p) {
+    await p.evaluate(() => { const g = window.__g; g.INTRO.on = false; g.INTRO.waiting = false; g.INTRO.fade = 0; g.INTRO.ui = 1; g.HINT.on = false; g.DLG.active = false; g.NIGHT.on = true; g.enterWoods(); g.becomeCosmic(700, 640, 1); }); await wait(1500);
+    await p.evaluate(() => { const g = window.__g; g.DLG.active = false; g.WEV.fk = 1; g.WEV.foka = 3.2; g.talk([['Fokalur', 'Thank you, foolish apprentice. Your body will serve as a suitable vessel.']]); }); await wait(1600);
+    check(await p.evaluate(() => window.__g.IMGX.fokalur === undefined && !!window.__g.IMGX.fokalur_hd), 'the old Demon God sprite is still loaded');
+  },
+  async 'garden-south-path-clear'(p) {
+    await p.evaluate(() => { const g = window.__g; g.INTRO.on = false; g.INTRO.waiting = false; g.INTRO.fade = 0; g.INTRO.ui = 1; g.HINT.on = false; g.DLG.active = false; g.becomeCosmic(0, 1520, 1); }); await wait(1800);
+    check(await p.evaluate(() => !window.__g.ESTATE.some(o => o.t === 'shrub' && Math.abs(o.x) < 75 && o.y > 1560)), 'a shrub still sits over the south path');
   },
   async 'deeproot-sleeping-fox'(p) {
     await startCh1(p);

@@ -14,7 +14,7 @@ const DROOMS={
   9:{name:'Ember Hollow',dark:.66,floor:[[230,700],[320,640],[430,600],[560,560],[640,520],[700,470],[760,432],[900,428],[970,455],[1010,500],[1070,560],[1130,625],[1180,700],[1200,768],[260,768]],block:[{x:792,y:510,rx:104,ry:30}]},
   8:{name:'Briar Den',dark:.76,floor:[[470,768],[500,690],[560,620],[640,570],[720,548],[880,548],[960,575],[1030,630],[1090,700],[1110,768]]},
   7:{name:'Thornroot Cellar',dark:.74,floor:[[330,640],[470,610],[600,575],[720,545],[1150,530],[1240,560],[1320,640],[1330,768],[420,768],[340,700]],block:[{x:945,y:614,rx:168,ry:38}]},
-  6:{name:'Hidden Spring',dark:.72,floor:[[640,588],[760,576],[860,560],[1010,560],[1065,592],[1125,640],[1160,700],[1105,722],[1060,648],[980,614],[860,606],[740,608],[650,614]]},
+  6:{name:'Hidden Spring',dark:.72,floor:[[640,588],[760,576],[860,560],[885,505],[912,462],[958,462],[992,505],[1010,560],[1065,592],[1125,640],[1160,700],[1105,722],[1060,648],[980,614],[860,606],[740,608],[650,614]]},
   5:{name:'Deeproot',sub:'turn back',dark:.86,floor:[[420,768],[480,640],[560,580],[620,540],[700,540],[800,580],[950,620],[1050,700],[1080,768]]}};
 const EYES5=[[200,144],[290,106],[275,181],[331,319],[500,140],[652,129],[625,238],[731,190],[512,422],[612,444],[212,481],[212,512],[440,275],[420,412],[610,282]];
 function dunFree(x,y){const R=DROOMS[DUN.room];if(!inPoly(x,y,R.floor))return false;for(const b of (R.block||[]))if(((x-b.x)/b.rx)**2+((y-b.y)/b.ry)**2<1)return false;return true;}
@@ -46,8 +46,8 @@ function setupDun(){DUNINT.length=0;const r=DUN.room,D=(x,y,reach,fn)=>DUNINT.pu
     DUNINT.push({x:880,y:575,reach:66,grab:()=>C1.vixen&&!C1.charmFound,onInteract:()=>{if(!C1.vixen){say("A nest of shiny things… and a fox curled right on top of it.");return;}if(C1.charmFound){say("A nest of twigs, buttons, and shiny bits.");return;}
       C1.charmFound=1;giveItem('vanecharm');talk([['Lum',C1.charmQ===1?"Wooden beads and a little carved cross. Vane's lucky cross!":"Wooden beads and a little carved cross, worn smooth. Somebody must be missing this."]],false,()=>{if(C1.charmQ===1){GOAL.tag='NEW TASK';GOAL.text="Return Vane's lucky cross (wear it so he sees)";HINT.goalT=0;}});}});
   }
-  if(r===6){D(935,568,62,()=>goScene(()=>{enterThorn();lum.x=SPRING_DOOR.x;lum.y=SPRING_DOOR.y+CMOUTH.ry+30;lum.face=1;cam.x=lum.x;cam.y=lum.y-50;resetJakFollow();}));
-    DUNINT.push({x:800,y:608,reach:95,onInteract:drinkSpring});}
+  if(r===6){D(935,470,60,()=>goScene(()=>{enterThorn();lum.x=SPRING_DOOR.x;lum.y=SPRING_DOOR.y+CMOUTH.ry+30;lum.face=1;cam.x=lum.x;cam.y=lum.y-50;resetJakFollow();}));
+    DUNINT.push({x:760,y:612,reach:85,onInteract:()=>askChoice("Drink from the spring?",[["Drink",drinkSpring],["Not now",()=>{}]])});}
   if(r===7){D(470,612,64,()=>goScene(()=>{enterThorn();lum.x=CELLAR_DOOR.x;lum.y=CELLAR_DOOR.y+CMOUTH.ry+30;lum.face=1;cam.x=lum.x;cam.y=lum.y-50;resetJakFollow();}));
     D(950,545,80,()=>dunGo(8,780,705,1));}
   if(r===9){D(300,660,72,()=>goScene(()=>{enterThorn();lum.x=WEBWELL_DOOR.x-75;lum.y=WEBWELL_DOOR.y+58;lum.face=1;cam.x=lum.x;cam.y=lum.y-50;resetJakFollow();}));

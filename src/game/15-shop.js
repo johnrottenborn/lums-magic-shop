@@ -7,7 +7,7 @@ function shopFree(x,y){if(!inPoly(x,y,SHOPFLOOR))return false;for(const o of SHO
 function solveShop(px,py,nx,ny){if(shopFree(nx,ny))return [nx,ny];if(shopFree(nx,py))return [nx,py];if(shopFree(px,ny))return [px,ny];return [px,py];}
 const shopH=y=>192+(clamp(y,460,768)-500)*.3;
 const SHOPCOUNTER=[[626,482],[650,468],[800,470],[860,464],[905,469],[1000,468],[1086,470],[1102,500],[1092,704],[648,704],[630,560]];
-const SHOPOCC=[{base:9999,poly:[[335,642],[470,614],[700,640],[915,690],[920,768],[335,768]]}];
+const SHOPOCC=[{base:9999,x0:345,poly:[[338,768],[338,702],[392,668],[428,630],[500,617],[560,638],[612,645],[662,660],[718,684],[800,690],[915,690],[920,768]]}];
 const SHOPINT=[];let shopTalk=0,restTalk=false,shopDoor={x:0,y:52};
 const SHOPLUM={x:885,y:520,face:1,walking:false,ft:0,wait:3,tgt:null,talkFace:false};
 const SHOPSPOTS=[[720,468],[880,468],[1035,468]];
@@ -41,7 +41,7 @@ function setupShop(){SHOPINT.length=0;
 function enterShop(door){SCENE='shop';shopDoor=door||shopDoor;lum.x=300;lum.y=700;lum.face=1;lum.vx=lum.vy=0;lum.state='idleUp';WCAM.x=500;WTITLE.t=0;setupShop();
   SHOPLUM.x=885;SHOPLUM.y=520;SHOPLUM.walking=false;SHOPLUM.wait=2;}
 function enterGardenFromShop(){SCENE='garden';lum.x=shopDoor.x;lum.y=shopDoor.y;lum.face=1;lum.vx=lum.vy=0;lum.state='idle';cam.x=lum.x;cam.y=lum.y-50;}
-function tryEnterShop(door){if(PARTY[HERO].main==='blade'){talk([['Cosmic',"Wait! I can't let Master Lum see this sword…"],['Cosmic',"I'd better tuck it away in my satchel before I go inside."]]);return;}goScene(()=>enterShop(door));}
+function tryEnterShop(door){if(PARTY[HERO].main==='blade'){talk([['Cosmic',"Wait! I can't let Master Lum see this sword…"],['Cosmic',"I'd better tuck it away in my satchel before I go inside."]]);return;}goScene(()=>{enterShop(door);lum.x=1150;lum.y=640;lum.face=-1;lum.state='idle';});}
 function updateShopLum(dt){const L=SHOPLUM;const talking=DLG.active&&DLG.lines.some(l=>l[0]==='Lum');L.walking=false;
   if(talking){L.back=0;return;}
   L.wait-=dt;if(L.wait<=0){if(L.back){L.back=0;L.wait=rnd(3,6);}else{L.back=1;L.wait=rnd(1.6,2.6);
@@ -75,7 +75,7 @@ function drawShop(){const im=IMG.shoproom;if(!ready(im))return;const [rz,oy]=roo
   // exit arrow at the front of the shop
   {const d=Math.hypot(lum.x-205,lum.y-740);if(d<170){const a=Math.max(0,1-d/170)*(.55+.25*Math.sin(T*3));ctx.save();ctx.globalAlpha=a;ctx.translate(205,752+Math.sin(T*3)*3);ctx.rotate(Math.PI/2);ctx.fillStyle='rgba(255,226,160,.9)';for(let i=0;i<2;i++){ctx.beginPath();ctx.moveTo(-i*14,0);ctx.lineTo(12-i*14,-9);ctx.lineTo(8-i*14,0);ctx.lineTo(12-i*14,9);ctx.closePath();ctx.fill();}ctx.restore();}}
   const L_=[[lum.y,()=>{const k=shopH(lum.y)/151;ctx.save();ctx.translate(lum.x,lum.y);ctx.scale(k,k);ctx.translate(-lum.x,-lum.y);drawLum();ctx.restore();}],[SHOPLUM.y,()=>{if(!NIGHT.on&&CH===0)drawShopLum();}]];
-  for(const o of SHOPOCC){const ys=[lum.y,SHOPLUM.y];if(!ys.some(v=>v<o.base))continue;L_.push([o.base,()=>{ctx.save();ctx.beginPath();if(o.r)ctx.rect(...o.r);else{o.poly.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y));ctx.closePath();}ctx.clip();ctx.drawImage(im,0,0,1375,768);ctx.restore();}]);}
+  for(const o of SHOPOCC){const ys=[lum.y,SHOPLUM.y];if(!ys.some(v=>v<o.base))continue;L_.push([o.x0!==undefined&&lum.x<o.x0?lum.y-1:o.base,()=>{ctx.save();ctx.beginPath();if(o.r)ctx.rect(...o.r);else{o.poly.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y));ctx.closePath();}ctx.clip();ctx.drawImage(im,0,0,1375,768);ctx.restore();}]);}
   L_.sort((a,b)=>a[0]-b[0]);for(const [,f] of L_)f();
   for(const p of PARTS)if(p.type==='fiz'||p.type==='puff'||p.type==='dust'){const k=shopH(p.y)/151;ctx.save();ctx.translate(p.x,p.y);ctx.scale(k,k);ctx.translate(-p.x,-p.y);drawPartWell(p);ctx.restore();}
   ctx.setTransform(DPR,0,0,DPR,0,0);
