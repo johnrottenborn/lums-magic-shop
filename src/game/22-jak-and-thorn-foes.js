@@ -22,8 +22,8 @@ function drawJakOW_(){if(!JAKF||CAPTURE.on)return;const H_=192,vert=JAKF.dir==='
 function drawSparOW(F,alpha){if(!F)return;const vert=F.dir==='up'||F.dir==='down',an=vert?F.dir:'side',fi=F.moving?Math.floor((F.ph||0)/16)%5:0;
   ctx.fillStyle='rgba(10,10,20,.25)';ctx.beginPath();ctx.ellipse(F.x,F.y+2,30,8,0,0,TAU);ctx.fill();c1Frame(ctx,'spar',an,fi,F.x,F.y+3,SPAR_H,!vert&&F.face<0,alpha??1,0);}
 function drawJakResting(){if(MATE==='spar'){drawSparResting();return;}drawJakResting_();}
-function drawSparResting(){if(C1.jak)return;const x=JAKREST.x,y=JAKREST.y,b=Math.sin(T*1.4);ctx.fillStyle='rgba(10,10,20,.3)';ctx.beginPath();ctx.ellipse(x+10,y+2,70,10,0,0,TAU);ctx.fill();
-  ctx.save();ctx.translate(x,y+4);ctx.rotate(-.95);ctx.scale(1,1+.01*b);ctx.filter='brightness(.9) saturate(.85)';c1Frame(ctx,'spar','side',0,-4,34,SPAR_H,false,1,0);ctx.filter='none';ctx.restore();}
+function drawSparResting(){if(C1.jak)return;const x=JAKREST.x,y=JAKREST.y,b=Math.sin(T*1.4);ctx.fillStyle='rgba(10,10,20,.3)';ctx.beginPath();ctx.ellipse(x-8,y-70,44,10,0,0,TAU);ctx.fill();
+  ctx.save();ctx.translate(x-12,y-72);ctx.rotate(-.38);ctx.scale(1,1+.01*b);c1Frame(ctx,'spar','side',0,0,0,SPAR_H*.92,true,1,0);ctx.filter='none';ctx.restore();}
 function drawJakResting_(){if(C1.jak)return;const x=JAKREST.x,y=JAKREST.y,H_=192,b=Math.sin(T*1.4);ctx.fillStyle='rgba(10,10,20,.3)';ctx.beginPath();ctx.ellipse(x,y+2,36,8,0,0,TAU);ctx.fill();
   ctx.save();ctx.translate(x,y);ctx.scale(1,.985+.008*b);ctx.translate(-x,-y);ctx.filter='brightness(.62) saturate(.7)';c1Frame(ctx,'jak','hurt',3,x-JAKDX*H_,y+3,H_,true,1,0);ctx.filter='none';ctx.restore();}
 function jakPos(){if(JAKF&&(SCENE==='thorn'||SCENE==='woods')&&jakInParty())return JAKF;if(SCENE==='thorn'&&!C1.jak)return JAKREST;return {x:lum.x-50,y:lum.y};}
@@ -55,7 +55,7 @@ function drawThornWell(x,y){const im=IMG.thorn_well;if(!ready(im))return;const w
   ctx.drawImage(im,x-w*.4946,y-h*.462,w,h);
   ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,x,y+5,54,'200,60,50',.1+.05*Math.sin(T*1.6));ctx.restore();
   for(const [n,dx,dy,ww,f] of [['thdec_smallweb',-92,34,85,false],['thdec_smallweb',94,-20,76,true]]){const wi=IMG[n];if(!ready(wi))continue;const wh=ww*wi.naturalHeight/wi.naturalWidth;ctx.save();ctx.globalAlpha=.85;ctx.translate(x+dx,y+dy);if(f)ctx.scale(-1,1);ctx.drawImage(wi,-ww/2,-wh/2,ww,wh);ctx.restore();}}
-const THINT=[{x:JAKREST.x,y:JAKREST.y,reach:95,onInteract:()=>jakInteract()},{x:30,y:TMZ.start*TCH+TCH/2+10,reach:60,door:true,onInteract:()=>goScene(()=>{buildWoods();buildWoodsC1();SCENE='woods';lum.x=2610;lum.y=628;lum.face=-1;lum.state='idle';lum.vx=lum.vy=0;cam.x=lum.x+60;cam.y=lum.y-50;resetJakFollow();})},
+const THINT=[{x:JAKREST.x-10,y:JAKREST.y-60,reach:100,onInteract:()=>jakInteract()},{x:30,y:TMZ.start*TCH+TCH/2+10,reach:60,door:true,onInteract:()=>goScene(()=>{buildWoods();buildWoodsC1();SCENE='woods';lum.x=2610;lum.y=628;lum.face=-1;lum.state='idle';lum.vx=lum.vy=0;cam.x=lum.x+60;cam.y=lum.y-50;resetJakFollow();})},
   // the top dead end: an underground passage down to the Hidden Spring
   {x:5*TCW+TCW/2,y:150,reach:100,door:true,onInteract:()=>{const go=()=>dunGo(6,935,590,-1);if(C1.springSeen){go();return;}
     talk([['Lum',"Wait… the roots here dip down into the ground. There's an underground passage!"]],false,()=>{C1.springSeen=1;go();});}},
