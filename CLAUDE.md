@@ -52,7 +52,7 @@ To find something, grep `src/game` for the function or constant name. Don't read
 ## Standing rules from the game's designer (always follow)
 
 - The game must work on **mobile and desktop**, with the standard controls on each (touch: drag left side to walk, tap to interact; desktop: WASD/arrows, E/Enter, Space, I for the spellbook).
-- **Chapter 1 must stay playable and selectable** from chapter select for playtesting. The prologue is final; don't change it unless asked.
+- **Chapter 1 is locked until the Prologue is finished**: on chapter select its card is greyed out with "Finish the Prologue to unlock". Keep it playable once unlocked. The prologue is final; don't change it unless asked. (Stranglethorn's preview card was removed; tests still reach it with `startThornPreview()`.)
 - **Only use icon art the designer provided** for items and equipment. Don't draw item icons in code.
 - **Enemies always face left and attack to the left.** If a sprite sheet row faces the wrong way, flip that row.
 - **Lum and Vane face each other when talking.**

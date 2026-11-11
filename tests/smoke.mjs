@@ -350,6 +350,16 @@ const CASES = {
     const stole = await p.evaluate(() => { const g = window.__g, rnd = Math.random; g.PARTY.lum.charm = 'foxtotem'; const b = g.MATS.slimeparts || 0; Math.random = () => 0.1; g.foxRingSteal({ type: 'slime', x: 0, y: 0 }); Math.random = rnd; return (g.MATS.slimeparts || 0) - b; });
     check(stole === 1, 'the Carved Fox Totem did not steal on a successful roll');
   },
+  async 'chapter-select-lock'(p) {
+    const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop';
+    await p.evaluate(() => { localStorage.removeItem('lums-magic-shop-progress'); window.__g.openChapterSelect(); }); await wait(900);
+    check(await p.evaluate(() => window.__g.CHAPTERS.map(c => c.id).join(',')) === 'prologue,ch1', 'chapter list should be Prologue and Chapter 1 only');
+    await p.screenshot({ path: path.join(SHOTS, `chapter-select-locked-${vp}.png`) });
+    check(await p.evaluate(() => { const g = window.__g; g.chselPick(1); return g.CHSEL.confirm === null && /unlock/.test(g.CHSEL.note); }), 'Chapter 1 could be picked before finishing the Prologue');
+    await p.evaluate(() => { localStorage.setItem('lums-magic-shop-progress', JSON.stringify({ prologue: { done: 1, best: 5 }, ch1: { done: 1, best: 4 } })); const g = window.__g; g.CHSEL.noteT = 0; g.CHSEL.t = 1; }); await wait(700);
+    await p.screenshot({ path: path.join(SHOTS, `chapter-select-open-${vp}.png`) });
+    check(await p.evaluate(() => { const g = window.__g; g.chselPick(1); return g.CHSEL.confirm === 1; }), 'Chapter 1 stayed locked after finishing the Prologue');
+  },
   async 'deeproot-sleeping-fox'(p) {
     await startCh1(p);
     await p.evaluate(() => { const g = window.__g; g.C1X.bigVixen = 0; g.enterDun(5, 900, 600, -1);
