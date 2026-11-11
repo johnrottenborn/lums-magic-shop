@@ -59,6 +59,7 @@ const CASES = {
     check(r[0] === 4 && r[1] === 'bucket', 'Equip did not put the bucket on Cosmic: ' + r);
   },
   async 'ch1-spellbook-potion'(p) {
+    const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop';
     await startCh1(p);
     await p.evaluate(() => { const g = window.__g; g.jakJoin(); g.DLG.active = false; g.BAG.push('potion'); }); await wait(200);
     await p.evaluate(() => { window.__g.DLG.active = false; window.__g.openMenu(); }); await wait(700);
@@ -69,6 +70,9 @@ const CASES = {
     await tapMenu(p, hits => { const top = hits.filter(h => h.y < -20); return top[top.length - 1]; }); // Spar's portrait
     const after = await p.evaluate(() => window.__g.HEROES.spar.hp);
     check(after > before, `potion did not heal Spar (${before} -> ${after})`);
+    // Spar's character page shows his combo and stars, like Lum's
+    await p.evaluate(() => { const g = window.__g; g.MENU.pick = null; g.MENU.page = 'char'; g.MENU.sel = null; g.MENU.who = 'spar'; g.C1X.comboS = 3; }); await wait(400);
+    await p.screenshot({ path: path.join(SHOTS, `spar-character-page-${vp}.png`) });
   },
   async battle(p) {
     await startCh1(p);

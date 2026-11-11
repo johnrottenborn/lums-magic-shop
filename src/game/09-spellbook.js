@@ -4,7 +4,7 @@
    Everything is drawn in "book space" and scaled to fit the screen. */
 const HCOL={lum:'#7a4f9a',jak:'#7a5a32',cosmic:'#4a6fb5',spar:'#9a2f2f'};
 const HSUB={lum:"Keeper of the magic shop  ·  powder-maker",jak:"Lost traveller  ·  axeman",spar:"Young swordsman  ·  fire blade",cosmic:"Lum's apprentice  ·  aspiring wizard"};
-const HCOMBO={lum:'Starfall',jak:'Staff Bolt'};
+const HCOMBO={lum:'Starfall',jak:'Staff Bolt',spar:'Blazing Edge'};
 const FACEIMG={lum:'face_lum',jak:'face_jak',cosmic:'face_cosmic',spar:'face_spar'};
 const STATIMG={atk:'stat_atk',def:'stat_def',mag:'stat_mag',spd:'stat_spd'};
 const BK={spread:false,W:380,H:590,top:108,bot:104,r:30};
