@@ -53,11 +53,11 @@ function fmtTime(t){t=Math.floor(t);const h=Math.floor(t/3600),m=Math.floor(t/60
 function drawStar(x,y,r,fill){ctx.save();ctx.translate(x,y);ctx.beginPath();for(let k=0;k<10;k++){const a=k/10*TAU-Math.PI/2,rr_=k%2?r*.45:r;ctx.lineTo(Math.cos(a)*rr_,Math.sin(a)*rr_);}ctx.closePath();
   ctx.fillStyle='rgba(255,255,255,.08)';ctx.fill();if(fill>0){ctx.save();ctx.clip();ctx.fillStyle='#f5c542';ctx.fillRect(-r,-r,2*r*fill,2*r);ctx.restore();ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,0,0,r*1.6,'255,200,90',.25*fill);ctx.restore();}
   ctx.strokeStyle=fill>0?'#ffe7a0':'rgba(232,226,242,.45)';ctx.lineWidth=1.6;ctx.stroke();ctx.restore();}
-function drawResults(t){if(!RESULTS.r){RESULTS.r=prologueScore();RESULTS.badges=earnedBadges(RESULTS.r);RESULTS.keep=keepsakeFor(RESULTS.r.stars);recordPrologue(RESULTS.r.stars,RESULTS.badges,RESULTS.keep);finishChapter('prologue');RESULTS.fired=[];RESULTS.sp=[];}
+function drawResults(t){const C_=RESCH[RESULTS.ch||'prologue'];if(!RESULTS.r){RESULTS.r=C_.score();RESULTS.badges=C_.badges(RESULTS.r);RESULTS.keep=C_.keep(RESULTS.r.stars);C_.record(RESULTS.r.stars,RESULTS.badges,RESULTS.keep);finishChapter(RESULTS.ch||'prologue');RESULTS.fired=[];RESULTS.sp=[];}
   const R=RESULTS.r,S_=STATS,a=Math.min(1,t/1.2),dt=1/60;RESULTS.hits=[];ctx.save();ctx.globalAlpha=a;ctx.textAlign='center';ctx.textBaseline='alphabetic';
   const pw=Math.min(W-32,390),px=W/2-pw/2;let y=Math.max(46,H*.06);
-  ctx.fillStyle='rgba(232,226,242,.6)';ctx.font='italic 14px Alegreya, Georgia, serif';ctx.fillText('End of Prologue',W/2,y);y+=30;
-  ctx.fillStyle='#efe6ff';ctx.font='700 25px "Alegreya SC", Georgia, serif';ctx.fillText('Prologue Complete',W/2,y);y+=40;
+  ctx.fillStyle='rgba(232,226,242,.6)';ctx.font='italic 14px Alegreya, Georgia, serif';ctx.fillText(C_.end,W/2,y);y+=30;
+  ctx.fillStyle='#efe6ff';ctx.font='700 25px "Alegreya SC", Georgia, serif';ctx.fillText(C_.done,W/2,y);y+=40;
   // stars: each one chimes and bursts into sparkles as it fills
   const sy=y;for(let i=0;i<5;i++){const u=clamp((t-1-i*.32)/.35,0,1),f=clamp(R.stars-i,0,1)*u,sc=1+.35*Math.sin(Math.PI*u)*(f>0?1:0),sx=W/2+(i-2)*46;
     if(u>.35&&!RESULTS.fired[i]){RESULTS.fired[i]=1;if(R.stars-i>0){starChime(i);for(let k=0;k<16;k++){const an=rnd(0,TAU),sp=rnd(60,190);RESULTS.sp.push({x:sx,y:sy,vx:Math.cos(an)*sp,vy:Math.sin(an)*sp-40,t:0,max:rnd(.5,1),gold:R.stars>=5});}}}
@@ -66,31 +66,58 @@ function drawResults(t){if(!RESULTS.r){RESULTS.r=prologueScore();RESULTS.badges=
   // a perfect run earns the wax seal
   if(R.stars>=5&&t>2.9){const u=clamp((t-2.9)/.35,0,1),sc=1+1.6*(1-u)*(1-u),cx=W/2+pw/2-34,cy=sy-46;if(u>.9&&!RESULTS.sealT){RESULTS.sealT=1;sealThud();}
     ctx.save();ctx.translate(cx,cy);ctx.rotate(-.18);ctx.scale(sc,sc);ctx.globalAlpha*=u;ctx.fillStyle='#8e1f2a';ctx.beginPath();for(let k=0;k<18;k++){const an=k/18*TAU,rr_=30+(k%2?2.5:0)+Math.sin(k*2.3)*1.2;ctx.lineTo(Math.cos(an)*rr_,Math.sin(an)*rr_);}ctx.closePath();ctx.fill();
-    ctx.strokeStyle='rgba(255,190,190,.45)';ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(0,0,22,0,TAU);ctx.stroke();ctx.fillStyle='#ffe2d8';ctx.font='700 7.5px "Alegreya SC", Georgia, serif';ctx.textAlign='center';ctx.fillText('LEGENDARY',0,-2);ctx.fillText('APPRENTICE',0,9);ctx.restore();}
+    ctx.strokeStyle='rgba(255,190,190,.45)';ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(0,0,22,0,TAU);ctx.stroke();ctx.fillStyle='#ffe2d8';ctx.font='700 7.5px "Alegreya SC", Georgia, serif';ctx.textAlign='center';ctx.fillText('LEGENDARY',0,-2);ctx.fillText(C_.seal,0,9);ctx.restore();}
   y+=38;ctx.fillStyle=`rgba(255,226,140,${clamp((t-2.7)/.6,0,1)})`;ctx.font='italic 600 18px Alegreya, Georgia, serif';ctx.fillText(R.rank,W/2,y);y+=18;
   // stats
-  const rows=[['Time to complete',fmtTime(S_.time)],['Steps taken',S_.steps.toLocaleString()],['Hidden treasures',`${R.fnd} / ${HIDDEN.length}`],['Secret places found',`${R.places} / 4`],
-    ['Timed strikes landed',S_.atk?Math.round(R.strike*100)+'%':'—'],['Enemy attacks guarded',S_.foeAtk?Math.round(R.guard*100)+'%':'—'],['Enemies defeated',String(S_.kills)],['Items used',String(S_.items)],
-    ['Damage taken',String(S_.dmg)],['Times knocked out',String(S_.kos)],['Battles fled',String(S_.flees)]];
+  const rows=C_.rows(R,S_);
   const lh=clamp((H-y-275)/rows.length,17,27),fs=Math.round(clamp(lh*.56,12,15));ctx.fillStyle='rgba(20,14,34,.55)';rr(px,y,pw,rows.length*lh+12,14);ctx.fill();ctx.strokeStyle='rgba(196,154,78,.45)';ctx.lineWidth=1.2;ctx.stroke();y+=6;
   rows.forEach(([k,v],i)=>{const ra=clamp((t-1.6-i*.07)/.3,0,1);ctx.globalAlpha=a*ra;const yy=y+i*lh+lh*.68;ctx.font=`500 ${fs}px Alegreya, Georgia, serif`;ctx.textAlign='left';ctx.fillStyle='rgba(232,226,242,.82)';ctx.fillText(k,px+16,yy);
-    ctx.textAlign='right';ctx.font=`700 ${fs}px "Alegreya SC", Georgia, serif`;ctx.fillStyle=(k==='Hidden treasures'&&R.fnd===HIDDEN.length)||(k==='Secret places found'&&R.places===4)?'#ffe27a':'#fdf6e4';ctx.fillText(v,px+pw-16,yy);});
+    ctx.textAlign='right';ctx.font=`700 ${fs}px "Alegreya SC", Georgia, serif`;ctx.fillStyle=C_.gold(k,R)?'#ffe27a':'#fdf6e4';ctx.fillText(v,px+pw-16,yy);});
   y+=rows.length*lh+18;ctx.globalAlpha=a;
   // badges
   const bA=clamp((t-3.3)/.5,0,1),bw_=pw/RESULTS.badges.length;RESULTS.badges.forEach((b,i)=>{const cx=px+bw_*(i+.5),cy=y+22,pop=clamp((t-3.3-i*.15)/.3,0,1);ctx.save();ctx.globalAlpha=a*bA*(b.got?1:.38);ctx.translate(cx,cy);const s_=(pop<1?1+.3*Math.sin(Math.PI*pop):1)*.88;ctx.scale(s_,s_);drawBadge(b.id,b.got);ctx.restore();
     ctx.save();ctx.globalAlpha=a*bA*(b.got?1:.45);ctx.textAlign='center';ctx.font='700 10px "Alegreya SC", Georgia, serif';ctx.fillStyle=b.got?'#ffe7a8':'#c8c0d4';const nw=b.name.split(' ');ctx.fillText(nw[0],cx,cy+33);if(nw[1])ctx.fillText(nw[1],cx,cy+45);ctx.restore();});
   y+=84;
   // keepsake
-  ctx.globalAlpha=a*clamp((t-3.8)/.5,0,1);ctx.textAlign='center';ctx.font='italic 13px Alegreya, Georgia, serif';ctx.fillStyle='rgba(232,226,242,.7)';ctx.fillText('Keepsake for Chapter 1',W/2,y);y+=19;
+  ctx.globalAlpha=a*clamp((t-3.8)/.5,0,1);ctx.textAlign='center';ctx.font='italic 13px Alegreya, Georgia, serif';ctx.fillStyle='rgba(232,226,242,.7)';ctx.fillText(C_.keepFor,W/2,y);y+=19;
   if(RESULTS.keep){ctx.font='700 15px "Alegreya SC", Georgia, serif';ctx.fillStyle='#ffe2a0';ctx.fillText(RESULTS.keep.name,W/2,y);ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,W/2-ctx.measureText(RESULTS.keep.name).width/2-12,y-5,8,'255,220,150',.8);ctx.restore();}
-  else{const bk=bestKeepsake();ctx.font='italic 14px Alegreya, Georgia, serif';ctx.fillStyle='rgba(232,226,242,.6)';ctx.fillText(bk?`You still carry ${bk.name}`:'Earn 3 stars or more to receive one',W/2,y);}y+=20;
+  else{const bk=C_.best();ctx.font='italic 14px Alegreya, Georgia, serif';ctx.fillStyle='rgba(232,226,242,.6)';ctx.fillText(bk?`You still carry ${bk.name}`:'Earn 3 stars or more to receive one',W/2,y);}y+=20;
   // buttons
   if(t>3.6){const ba=Math.min(1,(t-3.6)*2),bh=44,gap=12,bw2=(pw-gap)/2,by=Math.min(H-bh-14,y+6);ctx.globalAlpha=ba;
     [['Share Results',true,shareResults],['Back to Title',false,backToTitle]].forEach(([lab,pri,fn],k)=>{const x=px+k*(bw2+gap);const g=ctx.createLinearGradient(0,by,0,by+bh);if(pri){g.addColorStop(0,'#f0c060');g.addColorStop(1,'#c88a2a');}else{g.addColorStop(0,'rgba(232,226,242,.18)');g.addColorStop(1,'rgba(232,226,242,.08)');}
       ctx.fillStyle=g;rr(x,by,bw2,bh,22);ctx.fill();ctx.strokeStyle=pri?'#fff2c8':'rgba(232,226,242,.5)';ctx.lineWidth=1.5;ctx.stroke();ctx.fillStyle=pri?'#3a2410':'#efe6ff';ctx.font='700 15px "Alegreya SC", Georgia, serif';ctx.textAlign='center';ctx.fillText(lab,x+bw2/2,by+bh/2+5);RESULTS.hits.push({x,y:by,w:bw2,h:bh,act:fn});});
     if(RESULTS.msgT>0){RESULTS.msgT-=dt;ctx.globalAlpha=Math.min(1,RESULTS.msgT*2);ctx.font='italic 13px Alegreya, Georgia, serif';ctx.fillStyle='#efe6ff';ctx.fillText(RESULTS.msg,W/2,by-8);}}
   ctx.restore();}
-const RESULTS={r:null,hits:[],msg:'',msgT:0};
+const RESULTS={r:null,hits:[],msg:'',msgT:0,ch:'prologue'};
+/* Chapter 1 scoring: the five Fox items are needed for 5 stars */
+const FOX5=[['crystalpouch','dunChest'],['foxring','foxRing'],['foxhood','foxHood'],['foxsuit','lairBoss'],['foxboots','bigVixen']],C1PLACES=[6,7,8,9,10];
+const owns=id=>BAG.includes(id)||Object.values(PARTY).some(p=>p&&Object.values(p).includes(id));
+function ch1Score(){const S_=STATS,fox=FOX5.filter(([id,f])=>C1[f]||owns(id)).length,places=C1PLACES.filter(r=>C1['seen'+r]).length;
+  const strike=S_.atk?S_.nice/S_.atk:0,guard=S_.foeAtk?S_.guards/S_.foeAtk:1,mins=S_.time/60;
+  const pts=fox/5+Math.min(1,strike/.8)+Math.min(1,guard/.6)+(S_.kos===0?1:S_.kos===1?.5:0)+(mins<=45?1:mins>=100?0:1-(mins-45)/55);
+  let stars=Math.round(clamp(pts,0,5)*2)/2;if(fox<5)stars=Math.min(stars,4.5);
+  const rank=stars>=5?'Legendary Witch':stars>=4?'Brilliant Witch':stars>=3?'Promising Witch':stars>=2?'Curious Witch':'Sleepy Witch';
+  return {stars,rank,fox,places,strike,guard};}
+function ch1Badges(R){const S_=STATS;return [{id:'fox',name:'Fox Collector',got:R.fox>=5},{id:'shield',name:'Untouchable',got:S_.kos===0},{id:'hourglass',name:'Swift Path',got:S_.time<=2700},{id:'target',name:'Perfect Timing',got:S_.atk>=3&&S_.nice/S_.atk>=.9},{id:'spider',name:'Spider Slayer',got:!!(C1.thornBoss&&C1.lairBoss)}];}
+function ch1Keepsake(st){return st>=5?{id:'foxtotem',name:'Carved Fox Totem',tier:3}:st>=4?{id:'foxpendant',name:'Fox Pendant',tier:2}:st>=3?{id:'foxtails',name:'Fox Tail Charm',tier:1}:null;}
+/* progress for any chapter: best stars, badges ever earned, best keepsake by tier (Chapter 2 starts with it) */
+function recordChapterProg(ch,stars,badges,keep){try{const p=readProg(),c=p[ch]=p[ch]||{};c.done=1;c.best=Math.max(c.best||0,stars);c.badges=c.badges||{};for(const b of badges||[])if(b.got)c.badges[b.id]=1;if(keep&&(!c.keepsake||(c.keepsake.tier||0)<keep.tier))c.keepsake=keep;localStorage.setItem(PROG_KEY,JSON.stringify(p));}catch(e){}}
+function bestCh1Keepsake(){const p=readProg();return (p.ch1&&p.ch1.keepsake)||null;}
+const RESCH={
+  prologue:{end:'End of Prologue',done:'Prologue Complete',seal:'APPRENTICE',keepFor:'Keepsake for Chapter 1',file:'lums-magic-shop-prologue.png',share:'the Prologue',
+    score:()=>prologueScore(),badges:R=>earnedBadges(R),keep:st=>keepsakeFor(st),record:(s,b,k)=>recordPrologue(s,b,k),best:()=>bestKeepsake(),
+    rows:(R,S_)=>[['Time to complete',fmtTime(S_.time)],['Steps taken',S_.steps.toLocaleString()],['Hidden treasures',`${R.fnd} / ${HIDDEN.length}`],['Secret places found',`${R.places} / 4`],
+      ['Timed strikes landed',S_.atk?Math.round(R.strike*100)+'%':'—'],['Enemy attacks guarded',S_.foeAtk?Math.round(R.guard*100)+'%':'—'],['Enemies defeated',String(S_.kills)],['Items used',String(S_.items)],
+      ['Damage taken',String(S_.dmg)],['Times knocked out',String(S_.kos)],['Battles fled',String(S_.flees)]],
+    gold:(k,R)=>(k==='Hidden treasures'&&R.fnd===HIDDEN.length)||(k==='Secret places found'&&R.places===4),
+    card:(R,S_)=>[['Time',fmtTime(S_.time)],['Treasures',`${R.fnd}/${HIDDEN.length}`],['Timed strikes',S_.atk?Math.round(R.strike*100)+'%':'—'],['Guards',S_.foeAtk?Math.round(R.guard*100)+'%':'—'],['Enemies',String(S_.kills)],['Steps',S_.steps.toLocaleString()]]},
+  ch1:{end:'End of Chapter 1',done:'Chapter 1 Complete',seal:'WITCH',keepFor:'Keepsake for Chapter 2',file:'lums-magic-shop-chapter-1.png',share:'Chapter 1',
+    score:ch1Score,badges:ch1Badges,keep:ch1Keepsake,record:(s,b,k)=>recordChapterProg('ch1',s,b,k),best:bestCh1Keepsake,
+    rows:(R,S_)=>[['Time to complete',fmtTime(S_.time)],['Steps taken',S_.steps.toLocaleString()],['Fox items found',`${R.fox} / 5`],['Hidden rooms found',`${R.places} / ${C1PLACES.length}`],
+      ['Timed strikes landed',S_.atk?Math.round(R.strike*100)+'%':'—'],['Enemy attacks guarded',S_.foeAtk?Math.round(R.guard*100)+'%':'—'],['Enemies defeated',String(S_.kills)],['Items used',String(S_.items)],
+      ['Damage taken',String(S_.dmg)],['Times knocked out',String(S_.kos)],['Battles fled',String(S_.flees)]],
+    gold:(k,R)=>(k==='Fox items found'&&R.fox===5)||(k==='Hidden rooms found'&&R.places===C1PLACES.length),
+    card:(R,S_)=>[['Time',fmtTime(S_.time)],['Fox items',`${R.fox}/5`],['Timed strikes',S_.atk?Math.round(R.strike*100)+'%':'—'],['Guards',S_.foeAtk?Math.round(R.guard*100)+'%':'—'],['Enemies',String(S_.kills)],['Steps',S_.steps.toLocaleString()]]}};
 function earnedBadges(R){const S_=STATS;return [{id:'treasure',name:'Treasure Hunter',got:R.fnd>=HIDDEN.length},{id:'shield',name:'Untouchable',got:S_.kos===0},{id:'hourglass',name:'Quick Study',got:S_.time<=1200},{id:'target',name:'Perfect Timing',got:S_.atk>=3&&S_.nice/S_.atk>=.9},{id:'crown',name:'Royal Slayer',got:!!S_.kingSlain}];}
 function keepsakeFor(st){return st>=5?{id:'mooncharm',name:"Lum's Moon Charm",tier:3}:st>=4?{id:'moonmint',name:'Silver Moonmint Sprig',tier:2}:st>=3?{id:'duskflower',name:'Pressed Duskberry Blossom',tier:1}:null;}
 /* Chapter 1 opens with the best keepsake ever earned in the Prologue already in the Charm slot */
@@ -103,6 +130,10 @@ function drawBadge(id,got){const c=ctx;c.save();const g=c.createRadialGradient(-
   if(id==='treasure'){c.fillStyle=got?'#8a5a2a':'#4a4450';c.beginPath();c.rect(-11,-3,22,13);c.fill();c.stroke();c.beginPath();c.moveTo(-11,-3);c.quadraticCurveTo(0,-15,11,-3);c.closePath();c.fill();c.stroke();c.fillStyle=got?'#ffd56a':'#aaa';c.fillRect(-2.5,-1,5,6);}
   else if(id==='shield'){c.fillStyle=got?'#4a6fb0':'#4a4450';c.beginPath();c.moveTo(0,-13);c.quadraticCurveTo(8,-10,11,-11);c.quadraticCurveTo(11,5,0,13);c.quadraticCurveTo(-11,5,-11,-11);c.quadraticCurveTo(-8,-10,0,-13);c.fill();c.stroke();c.fillStyle=got?'#ffd56a':'#aaa';c.beginPath();c.arc(0,-1,3.5,0,TAU);c.fill();}
   else if(id==='hourglass'){c.beginPath();c.moveTo(-8,-12);c.lineTo(8,-12);c.lineTo(1.5,0);c.lineTo(8,12);c.lineTo(-8,12);c.lineTo(-1.5,0);c.closePath();c.fillStyle=got?'rgba(255,240,210,.9)':'#777';c.fill();c.stroke();c.fillStyle=got?'#e0a83a':'#999';c.beginPath();c.moveTo(-5,10);c.lineTo(5,10);c.lineTo(0,4);c.closePath();c.fill();}
+  else if(id==='fox'){c.fillStyle=got?'#e0893a':'#666';c.beginPath();c.moveTo(-11,-12);c.lineTo(-5,-4);c.lineTo(5,-4);c.lineTo(11,-12);c.lineTo(10,0);c.quadraticCurveTo(6,9,0,12);c.quadraticCurveTo(-6,9,-10,0);c.closePath();c.fill();c.stroke();
+    c.fillStyle=got?'#fff3dc':'#aaa';c.beginPath();c.moveTo(-6,3);c.quadraticCurveTo(0,5,6,3);c.quadraticCurveTo(3,10,0,11);c.quadraticCurveTo(-3,10,-6,3);c.fill();c.fillStyle='#3a2410';c.beginPath();c.arc(-4,0,1.4,0,TAU);c.arc(4,0,1.4,0,TAU);c.fill();c.beginPath();c.arc(0,10,1.5,0,TAU);c.fill();}
+  else if(id==='spider'){for(const sd of [-1,1])for(let k=0;k<4;k++){const a=-.9+k*.55;c.beginPath();c.moveTo(0,1);c.lineTo(sd*8*Math.cos(a)*1.2,1+8*Math.sin(a));c.lineTo(sd*13*Math.cos(a),4+11*Math.sin(a));c.stroke();}
+    c.fillStyle=got?'#4a3a5a':'#555';c.beginPath();c.ellipse(0,4,6,7,0,0,TAU);c.fill();c.stroke();c.beginPath();c.arc(0,-5,4,0,TAU);c.fill();c.stroke();c.fillStyle=got?'#e0404a':'#888';c.beginPath();c.arc(-1.6,-5.5,1,0,TAU);c.arc(1.6,-5.5,1,0,TAU);c.fill();}
   else if(id==='crown'){c.fillStyle=got?'#f2c440':'#888';c.beginPath();c.moveTo(-12,7);c.lineTo(-12,-6);c.lineTo(-6,0);c.lineTo(0,-10);c.lineTo(6,0);c.lineTo(12,-6);c.lineTo(12,7);c.closePath();c.fill();c.stroke();c.fillStyle=got?'#5cc08a':'#666';c.beginPath();c.arc(0,2,2.6,0,TAU);c.fill();}
   else{c.beginPath();c.arc(0,0,11,0,TAU);c.stroke();c.beginPath();c.arc(0,0,5.5,0,TAU);c.stroke();c.fillStyle=got?'#c8323e':'#666';c.beginPath();c.arc(0,0,2.6,0,TAU);c.fill();}
   c.restore();}
@@ -113,20 +144,20 @@ function makeResultCard(){const cw=1080,ch=1350,c=document.createElement('canvas
   x.save();x.beginPath();x.roundRect?x.roundRect(60,60,cw-120,470,36):x.rect(60,60,cw-120,470);x.clip();const bg=IMG.forest_bg,co=IMG.cottage;if(ready(bg)){const s=Math.max((cw-120)/bg.naturalWidth,470/bg.naturalHeight);x.drawImage(bg,60+((cw-120)-bg.naturalWidth*s)/2,60+(470-bg.naturalHeight*s)*.35,bg.naturalWidth*s,bg.naturalHeight*s);}
   if(ready(co)){const h=440,w=h*co.naturalWidth/co.naturalHeight;x.drawImage(co,cw*.6-w/2,60+470-h+20,w,h);}const gg=x.createLinearGradient(0,300,0,530);gg.addColorStop(0,'rgba(13,11,24,0)');gg.addColorStop(1,'rgba(13,11,24,.85)');x.fillStyle=gg;x.fillRect(60,60,cw-120,470);x.restore();
   x.strokeStyle='#c49a4e';x.lineWidth=4;x.beginPath();x.roundRect?x.roundRect(60,60,cw-120,470,36):x.rect(60,60,cw-120,470);x.stroke();
-  x.textAlign='left';x.fillStyle='#fdf6e4';x.font='700 64px "Alegreya SC", Georgia, serif';x.fillText("Lum's Magic Shop",100,440);x.font='italic 38px Alegreya, Georgia, serif';x.fillStyle='rgba(253,246,228,.85)';x.fillText('Prologue Complete',100,495);
+  x.textAlign='left';x.fillStyle='#fdf6e4';x.font='700 64px "Alegreya SC", Georgia, serif';x.fillText("Lum's Magic Shop",100,440);x.font='italic 38px Alegreya, Georgia, serif';x.fillStyle='rgba(253,246,228,.85)';x.fillText(RESCH[RESULTS.ch||'prologue'].done,100,495);
   // stars and rank
   ctx=x;for(let i=0;i<5;i++)drawStar(cw/2+(i-2)*120,640,46,clamp(R.stars-i,0,1));ctx=sv;
   x.textAlign='center';x.fillStyle='#ffe28c';x.font='italic 600 48px Alegreya, Georgia, serif';x.fillText(R.rank,cw/2,745);
   // badges
   ctx=x;RESULTS.badges.forEach((b,i)=>{x.save();x.globalAlpha=b.got?1:.35;x.translate(cw/2+(i-2)*190,850);x.scale(2,2);drawBadge(b.id,b.got);x.restore();x.save();x.globalAlpha=b.got?1:.45;x.textAlign='center';x.fillStyle=b.got?'#ffe7a8':'#c8c0d4';x.font='700 24px "Alegreya SC", Georgia, serif';x.fillText(b.name,cw/2+(i-2)*190,935);x.restore();});ctx=sv;
   // a few stats
-  const st=[['Time',fmtTime(S_.time)],['Treasures',`${R.fnd}/${HIDDEN.length}`],['Timed strikes',S_.atk?Math.round(R.strike*100)+'%':'—'],['Guards',S_.foeAtk?Math.round(R.guard*100)+'%':'—'],['Enemies',String(S_.kills)],['Steps',S_.steps.toLocaleString()]];
+  const st=RESCH[RESULTS.ch||'prologue'].card(R,S_);
   st.forEach(([k,v],i)=>{const col=i%3,row=(i/3)|0,cx=cw/2+(col-1)*300,cy=1020+row*110;x.textAlign='center';x.fillStyle='rgba(232,226,242,.7)';x.font='500 30px Alegreya, Georgia, serif';x.fillText(k,cx,cy);x.fillStyle='#fdf6e4';x.font='700 44px "Alegreya SC", Georgia, serif';x.fillText(v,cx,cy+50);});
   x.fillStyle='rgba(232,226,242,.55)';x.font='italic 30px Alegreya, Georgia, serif';x.fillText('lums-magic-shop.vercel.app',cw/2,ch-50);return c;}
-async function shareResults(){try{const c=makeResultCard();const blob=await new Promise(r=>c.toBlob(r,'image/png'));const file=new File([blob],'lums-magic-shop-prologue.png',{type:'image/png'});
-    const text=`I finished the Prologue of Lum's Magic Shop with ${RESULTS.r.stars} stars — ${RESULTS.r.rank}! https://lums-magic-shop.vercel.app`;
+async function shareResults(){try{const c=makeResultCard();const blob=await new Promise(r=>c.toBlob(r,'image/png'));const file=new File([blob],RESCH[RESULTS.ch||'prologue'].file,{type:'image/png'});
+    const text=`I finished ${RESCH[RESULTS.ch||'prologue'].share} of Lum's Magic Shop with ${RESULTS.r.stars} stars — ${RESULTS.r.rank}! https://lums-magic-shop.vercel.app`;
     if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:"Lum's Magic Shop",text});return;}
-    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='lums-magic-shop-prologue.png';document.body.appendChild(a);a.click();a.remove();RESULTS.msg='Result card saved!';RESULTS.msgT=2.5;}
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=RESCH[RESULTS.ch||'prologue'].file;document.body.appendChild(a);a.click();a.remove();RESULTS.msg='Result card saved!';RESULTS.msgT=2.5;}
   catch(e){if(e&&e.name==='AbortError')return;RESULTS.msg="Couldn't share from here, sorry!";RESULTS.msgT=2.5;}}
 
 

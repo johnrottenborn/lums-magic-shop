@@ -53,7 +53,7 @@ function updateCosSightings(dt){buildCosSightings();const Rw=Math.min(W,H)*.5/zo
     if(s.st===0&&free&&d<Rw*.95){s.st=1;s.t=0;s.face=lum.x<s.x?-1:1;}
     else if(s.st===1){s.a=Math.min(.95,s.a+dt*2);s.face=lum.x<s.x?-1:1;if(d<Rw*.5||s.t>2.4){s.st=2;s.t=0;s.face=-s.face;C1['cosSeen'+s.i]=1;if(!DLG.active)say(COS_LINES[s.i%COS_LINES.length]);}}
     else if(s.st===2){s.x+=s.face*70*dt;s.a=Math.max(0,s.a-dt*.9);if(s.a<=0)s.st=3;}}}
-function drawCosGhost(s){if(!ready(catlas)||s.a<=0)return;const A=s.st===2?COS_ANIM.walk:COS_ANIM.idle,fr=s.st===2?A.frames[Math.floor(s.t*10)%A.frames.length]:A.frames[0];
+function drawCosGhost(s){if(!ready(catlas)||s.a<=0)return;const A=s.st===2?COS_BLADE.walk:COS_BLADE.idle,fr=s.st===2?A.frames[Math.floor(s.t*10)%A.frames.length]:A.frames[0];
   ctx.save();ctx.globalAlpha=s.a;ctx.fillStyle='rgba(0,0,0,.25)';ctx.beginPath();ctx.ellipse(s.x,s.y+2,26,7,0,0,TAU);ctx.fill();
   ctx.translate(s.x,s.y+3);if(s.face!==A.native)ctx.scale(-1,1);const dw=CFW*CSPR,dh=CFH*CSPR;ctx.filter='brightness(1.15) saturate(.85)';ctx.drawImage(catlas,fr*CFW,0,CFW,CFH,-dw/2,-dh*(264/270),dw,dh);ctx.restore();
   ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,s.x,s.y-70,60,'140,170,255',.22*s.a);ctx.restore();}

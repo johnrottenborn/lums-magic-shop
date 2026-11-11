@@ -304,6 +304,9 @@ const CASES = {
     await p.evaluate(() => { const B = window.__g.BATTLE; B.phase = 'lose'; B.t = 3; B.ending = 0; });
     check(await until(() => window.__g.C1X.fkDone === 1, 40000), 'the scene after the battle did not finish the chapter');
     check(await p.evaluate(() => window.__g.readSave() === null && window.__g.C1X.chEnd === 1), 'Chapter 1 end did not clear the save');
+    await wait(8500);
+    check(await p.evaluate(() => window.__g.RESULTS.ch === 'ch1' && !!window.__g.RESULTS.r), 'the Chapter 1 results card did not appear');
+    await wait(4500); await p.screenshot({ path: path.join(SHOTS, `ch1-results-${vp}.png`) });
   },
   async 'garden-door-into-shop'(p) {
     check(await p.evaluate(() => window.__g.shopFree(1150, 640)), 'the shop arrival spot is not walkable');
@@ -320,6 +323,16 @@ const CASES = {
   async 'garden-south-path-clear'(p) {
     await p.evaluate(() => { const g = window.__g; g.INTRO.on = false; g.INTRO.waiting = false; g.INTRO.fade = 0; g.INTRO.ui = 1; g.HINT.on = false; g.DLG.active = false; g.becomeCosmic(0, 1520, 1); }); await wait(1800);
     check(await p.evaluate(() => !window.__g.ESTATE.some(o => o.t === 'shrub' && Math.abs(o.x) < 75 && o.y > 1560)), 'a shrub still sits over the south path');
+  },
+  async 'ch1-scoring'(p) {
+    const r = await p.evaluate(() => { const g = window.__g, C = g.C1X, S = g.STATS, F = ['dunChest', 'foxRing', 'foxHood', 'lairBoss', 'bigVixen'];
+      Object.assign(S, { time: 1800, atk: 10, nice: 10, foeAtk: 10, guards: 10, kos: 0 });
+      F.forEach(f => C[f] = 1); const all = g.ch1Score();
+      C.foxHood = 0; const four = g.ch1Score();
+      return { all: all.stars, allFox: all.fox, four: four.stars, k5: g.ch1Keepsake(5).id, k4: g.ch1Keepsake(4).id, k3: g.ch1Keepsake(3).id, k2: g.ch1Keepsake(2.5) }; });
+    check(r.all === 5 && r.allFox === 5, 'a perfect run with every Fox item should be 5 stars: ' + JSON.stringify(r));
+    check(r.four <= 4.5, 'missing a Fox item still gave 5 stars');
+    check(r.k5 === 'foxtotem' && r.k4 === 'foxpendant' && r.k3 === 'foxtails' && r.k2 === null, 'wrong keepsake charms: ' + JSON.stringify(r));
   },
   async 'deeproot-sleeping-fox'(p) {
     await startCh1(p);

@@ -166,7 +166,7 @@ function drawSay(){
 function rr(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();}
 function drawUI(){drawUIinner();drawC1IntroUI();drawC1Title();drawMix();drawChoice();drawSceneFade();drawWipe();}
 let menuLast=performance.now();
-function drawUIinner(){const _n=performance.now(),_dt=Math.min(.05,(_n-menuLast)/1000);menuLast=_n;drawIntroOverlay();drawSoundBtn();if(INTRO.on&&!INTRO.talking)return;if(!INTRO.on&&!WEV.end){ctx.save();UI_FADE=INTRO.ui;drawUI_();drawBookBtn();drawToast();ctx.restore();UI_FADE=1;drawMenu(_dt);}if(INTRO.on&&INTRO.talking){drawSay();}}
+function drawUIinner(){const _n=performance.now(),_dt=Math.min(.05,(_n-menuLast)/1000);menuLast=_n;drawIntroOverlay();drawSoundBtn();if(INTRO.on&&!INTRO.talking)return;if(!INTRO.on&&!WEV.end&&!C1RES.t){ctx.save();UI_FADE=INTRO.ui;drawUI_();drawBookBtn();drawToast();ctx.restore();UI_FADE=1;drawMenu(_dt);}if(INTRO.on&&INTRO.talking){drawSay();}}
 let UI_FADE=1;
 const STICKUI={a:1,idle:0,touch:(()=>{try{return matchMedia('(pointer: coarse)').matches||navigator.maxTouchPoints>0;}catch(e){return false;}})()};
 addEventListener('pointerdown',e=>{if(e.pointerType==='touch')STICKUI.touch=true;else if(e.pointerType==='mouse'&&!navigator.maxTouchPoints)STICKUI.touch=false;},{capture:true});

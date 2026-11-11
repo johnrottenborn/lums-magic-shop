@@ -114,7 +114,7 @@ function drawThorn(){const vw=W/zoom,vh=H/zoom,x0=cam.x-vw/2-60,y0=cam.y-vh/2-60
   // the guiding roses keep a faint warm glow so they read through the fog
   ctx.save();ctx.globalCompositeOperation='lighter';for(const [bx,by] of THORN.blooms||[]){const px=(bx-cam.x)*zoom+W/2,py=(by-cam.y)*zoom+H/2;drawGlow(ctx,px,py,26*zoom,'235,40,60',.32+.06*Math.sin(T*2+bx));}ctx.restore();
   {const vg=ctx.createRadialGradient(W/2,H*.48,Math.min(W,H)*.32,W/2,H*.48,Math.max(W,H)*.78);vg.addColorStop(0,'rgba(4,3,10,0)');vg.addColorStop(1,'rgba(4,3,10,.6)');ctx.fillStyle=vg;ctx.fillRect(0,0,W,H);}
-  drawC1EndCard();
+  drawC1EndCard();drawC1Results();
   if(THORN.t<4.5){const a=Math.min(1,THORN.t*1.5,(4.5-THORN.t)*1.2);ctx.save();ctx.globalAlpha=a;ctx.textAlign='center';ctx.fillStyle='rgba(20,5,10,.45)';ctx.fillRect(0,H*.3-40,W,80);
     ctx.fillStyle='#f0dede';ctx.font='700 26px "Alegreya SC", Georgia, serif';ctx.fillText('Stranglethorn Forest',W/2,H*.3+10);ctx.restore();}}
 function hutDoorC1(){if(C1.vane>=2){if(VANE)return;goScene(enterVHut);return;}
@@ -173,10 +173,18 @@ function fkAfterLoss(){for(const id of PARTY_ORDER)HEROES[id].hp=Math.max(1,Math
   SCENE='thorn';lum.x=FKS.cx-240;lum.y=FKS.cy;lum.face=1;lum.vx=lum.vy=0;lum.state='idle';cam.x=lum.x+120;cam.y=lum.y-50;resetJakFollow();FKS.st=5;FKS.fa=1;FKS.ca=0;WEVENT.on=true;
   setTimeout(()=>talk([['Fokalur',fkJak()?"Is that all? A powder-maker and a lost traveller, against a god.":"Is that all? A powder-maker, against a god."],['Fokalur',"I'll let you live, witch. I want you to watch this world fall… knowing whose hands brought it down."]],false,()=>{FKS.st=6;FKS.flash=.8;sfxRumble(3,.9);}),900);}
 function fkFarewell(){const L=[['Lum',"Cosmic… I'm not giving up on you. I'll find a way to bring you back. I promise."]];if(fkJak())L.push(['Jak',"Then we'll find it together."]);
-  talk(L,false,()=>{C1.fkDone=1;C1.chEnd=1;finishChapter('ch1');C1.endCard=.001;});}
+  talk(L,false,()=>{C1.fkDone=1;C1.chEnd=1;finishChapter('ch1');startCh1Results();});}
 function drawFKS(){const x=FKS.cx,y=FKS.cy;
-  if(FKS.ca>0&&ready(catlas)){const A=COS_ANIM.idle,dw=CFW*CSPR,dh=CFH*CSPR;ctx.save();ctx.globalAlpha=FKS.ca;ctx.fillStyle='rgba(0,0,0,.3)';ctx.beginPath();ctx.ellipse(x,y+2,26,7,0,0,TAU);ctx.fill();
+  if(FKS.ca>0&&ready(catlas)){const A=COS_BLADE.idle,dw=CFW*CSPR,dh=CFH*CSPR;ctx.save();ctx.globalAlpha=FKS.ca;ctx.fillStyle='rgba(0,0,0,.3)';ctx.beginPath();ctx.ellipse(x,y+2,26,7,0,0,TAU);ctx.fill();
     ctx.translate(x,y+3);if(-1!==A.native)ctx.scale(-1,1);ctx.drawImage(catlas,A.frames[0]*CFW,0,CFW,CFH,-dw/2,-dh*(264/270),dw,dh);ctx.restore();
     if(FKS.st>=1){ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,x,y-70,70,'170,40,90',.18*FKS.ca+.1*Math.sin(T*4)*FKS.ca);ctx.restore();}}
   if(FKS.fa>0){const h=520,n=FKS.st===2?(FKS.t<1.4?4:5):Math.floor(T*4)%4;ctx.save();ctx.globalAlpha=FKS.fa;ctx.fillStyle='rgba(10,0,10,.45)';ctx.beginPath();ctx.ellipse(x,y,140,28,0,0,TAU);ctx.fill();ctx.restore();
     ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,x,y-280,300,'160,30,80',(.22+.08*Math.sin(T*3))*FKS.fa);ctx.restore();drawFokFrame(ctx,n,x,y+4,h,false,FKS.fa);}}
+
+/* Chapter 1's results: fade to black, a closing line, then the same results card as the prologue */
+const C1RES={t:0};
+function startCh1Results(){RESULTS.ch='ch1';RESULTS.r=null;RESULTS.sealT=0;RESULTS.msgT=0;C1RES.t=.001;C1RES.t0=performance.now();WEVENT.on=true;}
+function drawC1Results(){if(!C1RES.t)return;C1RES.t=Math.max(.001,(performance.now()-C1RES.t0)/1000);const t=C1RES.t;ctx.save();ctx.setTransform(DPR,0,0,DPR,0,0);ctx.fillStyle=`rgba(0,0,0,${Math.min(1,t/2)})`;ctx.fillRect(0,0,W,H);
+  if(t>6.5){ctx.restore();ctx.save();ctx.setTransform(DPR,0,0,DPR,0,0);drawResults(t-6.5);ctx.restore();return;}
+  ctx.globalAlpha=Math.max(0,Math.min(1,(t-2)/1.5,(6.5-t)/.8));ctx.textAlign='center';ctx.fillStyle='#e8e2f2';ctx.font='italic 20px Alegreya, Georgia, serif';ctx.fillText('Cosmic is gone… but not lost.',W/2,H*.45);
+  ctx.font='700 22px "Alegreya SC", Georgia, serif';ctx.fillStyle='rgba(232,226,242,.85)';ctx.fillText('End of Chapter 1',W/2,H*.45+40);ctx.restore();}
