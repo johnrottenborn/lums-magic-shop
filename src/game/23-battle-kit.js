@@ -144,7 +144,7 @@ function drawBattleFok(f){const S=bS(),B=BATTLE,x=f.x+f.ox,y=f.y+f.oy,h=Math.min
   bshadow(x,y,h*.28,h*.05,.4);ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,x,y-h*.5,h*.6,'160,30,80',.2+.06*Math.sin(T*3));ctx.restore();
   drawFokFrame(ctx,n,x+(f.hit>0?Math.sin(f.hit*50)*5:0),y,h,false,1);}
 function drawBattleC1Foe(f){const S=bS(),B=BATTLE,x=f.x+f.ox,y=f.y+f.oy,sh=f.type,H_={wisp:120,rskel:205,reaper:200,bat:150,vixen:150,bigvixen:185,spider:120,flora:175,rvixen:150,bigspider:250}[sh]*S*f.s;const __s=sh==='vixen'||sh==='bigvixen'?'fox':sh==='rvixen'?'fox_red':sh==='bigspider'?'spider_dark':sh;
-  let al=1;if(f.dead){const lim=sh==='reaper'?1.4:1.1;if(f.dead>lim)al=Math.max(0,1-(f.dead-lim)/.6);if(al<=0)return;}
+  let al=1;if(f.dead){const lim=sh==='wisp'||sh==='rskel'||sh==='flora'?1.1:.12;if(f.dead>lim)al=Math.max(0,1-(f.dead-lim)/.6);if(al<=0)return;}
   bshadow(x,y-2,H_*(sh==='wisp'?.32:sh==='bat'?.16:.22),H_*.05,(sh==='bat'?.22:.32)*al);
   const [an,fi]=c1FoeFrame(f);let yy=y;if(sh==='wisp')yy-=12*S+Math.sin(T*2.2+f.ph)*5*S;if(sh==='rskel')yy-=10*S+Math.sin(T*1.8+f.ph)*5*S;if(sh==='bat'){yy-=70*S+Math.sin(T*3+f.ph)*8*S;if(f.dead)yy+=Math.min(1,f.dead/.8)*70*S;}
   ctx.save();if(sh==='reaper'&&f.dead){const u=Math.min(1,f.dead/1.4);ctx.translate(0,u*30*S);ctx.globalAlpha=1-u*.6;}

@@ -360,6 +360,15 @@ const CASES = {
     await p.screenshot({ path: path.join(SHOTS, `chapter-select-open-${vp}.png`) });
     check(await p.evaluate(() => { const g = window.__g; g.chselPick(1); return g.CHSEL.confirm === 1; }), 'Chapter 1 stayed locked after finishing the Prologue');
   },
+  async 'battle-ko-fade'(p) {
+    await startCh1(p);
+    await p.evaluate(() => window.__g.startEncounter({ kind: 'spider', scene: 'dun', x: 0, y: 0, s: 1, pack: 1, calm: 0 }, 'normal'));
+    for (let i = 0; i < 50; i++) { await wait(150); if (await p.evaluate(() => window.__g.BATTLE.phase) === 'heroMenu') break; }
+    await p.evaluate(() => { const B = window.__g.BATTLE; const h = B.heroes.find(h => h.id === 'lum'); h.ko = 1; B.foes[0].dead = .001; }); await wait(1400);
+    const r = await p.evaluate(() => { const B = window.__g.BATTLE; return { koF: B.heroes.find(h => h.id === 'lum').koF, dead: B.foes[0].dead }; });
+    check(r.koF >= 0.9, 'a knocked-out Lum did not fade away: ' + JSON.stringify(r));
+    check(r.dead > 0.72, 'the spider did not finish fading: ' + JSON.stringify(r));
+  },
   async 'deeproot-sleeping-fox'(p) {
     await startCh1(p);
     await p.evaluate(() => { const g = window.__g; g.C1X.bigVixen = 0; g.enterDun(5, 900, 600, -1);

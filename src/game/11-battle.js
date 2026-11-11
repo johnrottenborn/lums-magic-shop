@@ -225,7 +225,10 @@ function drawBattleJak(h){const S=bS(),B=BATTLE,x=h.x+h.ox,y=h.y+h.oy,me=B.heroe
   if(h.ko)h.koT=(h.koT||0)+1/60;else h.koT=0;ctx.save();ctx.translate(x,y+3);if(an==='idle'&&!h.ko){const b=Math.sin(T*2.1);ctx.scale(1-.004*b,1+.008*b);}
   c1Frame(ctx,'jak',an,fi,JAKDX*H_*(flip?-1:1),0,H_,flip,1,h.hurt>.3?1:0);ctx.restore();
   if(h.stuck&&!h.ko){}}
-function drawBattleHero(h){const S=bS(),sp=.62*S,x=h.x+h.ox,y=h.y+h.oy;
+/* heroes without a KO animation (all but Jak) fade away when knocked out, and come back if revived */
+const KO_FADE=.9;
+function drawBattleHero(h){if(h.ko&&h.id!=='jak'){h.koF=(h.koF||0)+1/60;if(h.koF>=KO_FADE)return;ctx.save();ctx.globalAlpha*=1-h.koF/KO_FADE;drawBattleHero_(h);ctx.restore();return;}h.koF=0;drawBattleHero_(h);}
+function drawBattleHero_(h){const S=bS(),sp=.62*S,x=h.x+h.ox,y=h.y+h.oy;
   bshadow(x,y+2,40*S,11*S,.35);
   if(h.id==='jak'){drawBattleJak(h);drawHeroStatus(h);if(BATTLE.defending&&BATTLE.defending[h.id]){ctx.strokeStyle='rgba(170,220,255,.6)';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(x,y-90*S,66*S,110*S,0,0,TAU);ctx.stroke();}return;}
   if(h.id==='lum'){drawBattleLum(h);if(BATTLE.defending&&BATTLE.defending[h.id]){ctx.strokeStyle='rgba(170,220,255,.6)';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(x,y-75*S,60*S,98*S,0,0,TAU);ctx.stroke();}return;}
