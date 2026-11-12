@@ -11,7 +11,7 @@ const CPATH_CTRL=[[CLR.cx+CLR.rx-470,CPATH.y+20],[CLR.cx+CLR.rx-300,CPATH.y+6],[
 const CPATH_PTS=splinePts(CPATH_CTRL,20);let CPATHP=null;
 function cpathDist(x,y){let best=1e9;for(let i=0;i<CPATH_PTS.length-1;i++){const [ax,ay]=CPATH_PTS[i],[bx,by]=CPATH_PTS[i+1],dx=bx-ax,dy=by-ay,t=clamp(((x-ax)*dx+(y-ay)*dy)/(dx*dx+dy*dy),0,1),d=Math.hypot(x-ax-dx*t,y-ay-dy*t);if(d<best)best=d;}return best;}
 const clrOnPath=(x,y)=>CH>=2&&cpathDist(x,y)<CPATH.hw;
-function clrFree(x,y){if(x<CLR.x0+(CH>=2?190:70)||!(clrIn(x,y)||clrOnPath(x,y)))return false;if(!C1.fkDone&&Math.hypot((x-(CLR.x0+640))/70,(y-CLR.cy)/26)<1)return false;return true;}
+function clrFree(x,y){if(CH>=2&&typeof STONELUM!=='undefined'&&Math.hypot((x-STONELUM.x)/34,(y-STONELUM.y)/16)<1)return false;if(x<CLR.x0+(CH>=2?190:70)||!(clrIn(x,y)||clrOnPath(x,y)))return false;if(!C1.fkDone&&Math.hypot((x-(CLR.x0+640))/70,(y-CLR.cy)/26)<1)return false;return true;}
 const THORN={built:false,props:[],flowers:[],path:[],pockets:[],t:0,lightK:1};
 // wall lines: hW(line,c) = horizontal wall on the top edge of row `line` at column c; vW(r,line) = vertical wall on the left edge of column `line` at row r
 function hW(line,c){if(c<0||c>=TMZ.C)return false;if(line<=0||line>=TMZ.R)return true;return TMZ.dn[line-1][c]==='1';}

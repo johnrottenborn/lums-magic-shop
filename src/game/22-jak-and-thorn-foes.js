@@ -23,6 +23,28 @@ function drawJakOW_(){if(!JAKF||CAPTURE.on)return;const H_=192,vert=JAKF.dir==='
 function fkFacing(){return SCENE==='thorn'&&typeof FKS!=='undefined'&&FKS.st>=1&&FKS.st<7&&!C1.fkDone&&lum.x>CLR.x0?{x:FKS.cx,y:FKS.cy}:null;}
 /* the dirt path from the clearing's east side through the pines to the gatehouse: painted like the woods road */
 function drawClrPath(x0,x1){if(!CPATHP)CPATHP=buildPath(CPATH_CTRL,150,5.3,320);drawPath(CPATHP,x0,x1);}
+/* ---------- Chapter 2: the clearing after the battle ----------
+   the grass inside the clearing is scorched, with small fires still burning; petrified Lum stands where the battle ended, in a pile of black ash */
+const STONELUM={get x(){return FKS.cx-240},get y(){return FKS.cy}};
+function clrScorchPts(){if(clrScorchPts.c)return clrScorchPts.c;const out=[];for(let i=0;i<34;i++){const a=hash(i,1,411)*TAU,r=Math.sqrt(hash(i,2,411))*.9,x=CLR.cx+Math.cos(a)*(CLR.rx-90)*r,y=CLR.cy+Math.sin(a)*(CLR.ry-70)*r;
+  if(Math.hypot(x-STONELUM.x,(y-STONELUM.y)*1.6)<120||cpathDist(x,y)<CPATH.hw+20)continue;out.push([x,y,hash(i,3,411)]);}return clrScorchPts.c=out;}
+function drawClrScorch(x0,y0,x1,y1){ctx.save();ctx.beginPath();ctx.ellipse(CLR.cx,CLR.cy,CLR.rx+20,CLR.ry+30,0,0,TAU);ctx.clip();
+  // charred grass: dark patches with soft edges, darkest toward where Fokalur stood
+  for(let i=0;i<60;i++){const a=hash(i,5,413)*TAU,r=Math.sqrt(hash(i,6,413)),x=CLR.cx+Math.cos(a)*CLR.rx*r,y=CLR.cy+Math.sin(a)*CLR.ry*r,rr=90+hash(i,7,413)*130;if(x+rr<x0||x-rr>x1||y+rr<y0||y-rr>y1)continue;
+    const g=ctx.createRadialGradient(x,y,0,x,y,rr);const k=.45+.25*(1-Math.min(1,Math.hypot(x-FKS.cx,y-FKS.cy)/700));g.addColorStop(0,`rgba(26,18,12,${k})`);g.addColorStop(.6,`rgba(40,28,18,${k*.55})`);g.addColorStop(1,'rgba(40,28,18,0)');
+    ctx.fillStyle=g;ctx.beginPath();ctx.ellipse(x,y,rr,rr*.6,0,0,TAU);ctx.fill();}
+  // ash flecks and singed grass blades
+  for(let i=0;i<260;i++){const a=hash(i,8,415)*TAU,r=Math.sqrt(hash(i,9,415)),x=CLR.cx+Math.cos(a)*CLR.rx*r,y=CLR.cy+Math.sin(a)*CLR.ry*r;if(x<x0||x>x1||y<y0||y>y1)continue;
+    if(hash(i,10,415)<.6){ctx.fillStyle=hash(i,11,415)<.5?'rgba(14,10,8,.5)':'rgba(120,112,104,.35)';ctx.beginPath();ctx.ellipse(x,y,2+hash(i,12,415)*4,1.4+hash(i,13,415)*2,0,0,TAU);ctx.fill();}
+    else{ctx.strokeStyle='rgba(30,20,12,.55)';ctx.lineWidth=1.3;ctx.beginPath();ctx.moveTo(x,y);ctx.quadraticCurveTo(x+3,y-6,x+6+hash(i,14,415)*4,y-9);ctx.stroke();}}
+  ctx.restore();
+  // the pile of black ash around petrified Lum
+  {const x=STONELUM.x,y=STONELUM.y+4;const g=ctx.createRadialGradient(x,y,0,x,y,110);g.addColorStop(0,'rgba(10,8,8,.92)');g.addColorStop(.55,'rgba(18,14,14,.75)');g.addColorStop(1,'rgba(30,24,22,0)');ctx.fillStyle=g;ctx.beginPath();ctx.ellipse(x,y,110,46,0,0,TAU);ctx.fill();
+   for(let i=0;i<70;i++){const a=hash(i,1,417)*TAU,r=Math.sqrt(hash(i,2,417)),px=x+Math.cos(a)*100*r,py=y+Math.sin(a)*40*r;ctx.fillStyle=hash(i,3,417)<.75?'rgba(8,6,6,.8)':'rgba(140,132,126,.5)';ctx.beginPath();ctx.ellipse(px,py,2+hash(i,4,417)*6,1.5+hash(i,5,417)*3,0,0,TAU);ctx.fill();}}
+  // small fires still burning in the grass
+  for(const [x,y,v] of clrScorchPts()){if(x<x0-60||x>x1+60||y<y0-60||y>y1+80)continue;ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,x,y,40,'255,110,40',.18);ctx.restore();drawFlames(ctx,x,y,34+v*26,.95);}}
+function drawStoneLum(){const sv={x:lum.x,y:lum.y,face:lum.face,state:lum.state,vx:lum.vx,vy:lum.vy,stepF:lum.stepF},st=LUMSTONE;
+  lum.x=STONELUM.x;lum.y=STONELUM.y;lum.face=1;lum.state='idle';lum.vx=lum.vy=0;LUMSTONE=1;try{drawLum();}finally{Object.assign(lum,sv);LUMSTONE=st;}}
 function drawSparOW(F,alpha){if(!F)return;if(F===JAKF&&fkFacing()&&!FKS.jakIn){F.dir='side';F.face=F.x<FKS.cx?1:-1;F.moving=0;}const vert=F.dir==='up'||F.dir==='down',an=vert?F.dir:'side',fi=F.moving?Math.floor((F.ph||0)/16)%5:0;
   ctx.fillStyle='rgba(10,10,20,.25)';ctx.beginPath();ctx.ellipse(F.x,F.y+2,30,8,0,0,TAU);ctx.fill();c1Frame(ctx,'spar',an,fi,F.x,F.y+3,SPAR_H,!vert&&F.face<0,alpha??1,0);}
 function drawJakResting(){if(MATE==='spar'){drawSparResting();return;}drawJakResting_();}
@@ -72,6 +94,7 @@ const THINT=[{x:JAKREST.x-6,y:JAKREST.y-100,reach:100,onInteract:()=>jakInteract
   // and back again, before Lum reaches Cosmic
   // Chapter 2: the gatehouse's dark archway leads into the Worldbind Passage (the passage itself is still to be built)
   {x:CPATH.xt+3,y:CPATH.ytop+30,get reach(){return CH>=2?90:0},dynDoor:true,get door(){return CH>=2},onInteract:()=>{if(CH<2)return;if(typeof enterWorldbind==='function')goScene(enterWorldbind);}},
+  {x:TW_+260+120,y:TMZ.finish*TCH+TCH/2+10,get reach(){return CH>=2?150:0},onInteract:()=>{if(CH>=2)say('These are not ordinary flames.');}},
   // (in Chapter 2 the hellfire still burns across this entrance: no door, no way back into Stranglethorn)
   {x:TW_+260+95,y:TMZ.finish*TCH+TCH/2+10,get reach(){return CH>=2?0:80},dynDoor:true,get door(){return CH<2},onInteract:()=>{if(FKS.st||CH>=2)return;goScene(()=>{lum.x=TW_-120;lum.y=TMZ.finish*TCH+TCH/2+10;lum.face=-1;cam.x=lum.x;cam.y=lum.y-50;resetJakFollow();});}}];
 
@@ -110,12 +133,12 @@ function drawThorn(){const vw=W/zoom,vh=H/zoom,x0=cam.x-vw/2-60,y0=cam.y-vh/2-60
   // fallen petals and a darker rim outside the maze
   ctx.fillStyle='rgba(10,8,12,.55)';if(x0<0)ctx.fillRect(x0,y0,-x0,y1-y0);if(x1>TW_&&CH<2)ctx.fillRect(TW_,y0,x1-TW_,y1-y0);if(y0<0)ctx.fillRect(x0,y0,x1-x0,-y0);
   for(const d of THORN.decals||[]){const im=IMG[d.n];if(!ready(im))continue;const h=d.w*im.naturalHeight/im.naturalWidth;if(d.x+d.w/2<x0||d.x-d.w/2>x1||d.y+h/2<y0||d.y-h/2>y1)continue;ctx.save();ctx.translate(d.x,d.y);if(d.flip)ctx.scale(-1,1);ctx.drawImage(im,-d.w/2,-h/2,d.w,h);ctx.restore();}
-  drawClrPath(x0,x1);
+  drawClrPath(x0,x1);if(CH>=2)drawClrScorch(x0,y0,x1,y1);
   drawCellarMouth();
   for(const f of THORN.flowers)if(f.x>x0-30&&f.x<x1+30&&f.y>y0-30&&f.y<y1)drawRedFlowers(f.x,f.y,f.s,f.seed);
   const L=[];for(const o of THORN.props)if(o.x>x0-o.w/2-40&&o.x<x1+o.w/2+40&&o.y>y0-20&&o.y<y1+o.w*1.4)L.push([o.y,o]);L.push([lum.y,null]);L.sort((a,b)=>a[0]-b[0]);
-  for(const g of THFOES)if(g.x>x0-150&&g.x<x1+150&&g.y>y0-60&&g.y<y1+260)L.push([g.y,{t:'thfoe',ref:g}]);if(!C1.thornBoss)L.push([THBOSS.y,{t:'boss'}]);for(const s_ of COSSEE)if(s_.st===1||s_.st===2)L.push([s_.y,{t:'cosghost',ref:s_}]);if(!C1.fkDone&&lum.x>TW_)L.push([FKS.cy,{t:'fks'}]);if(FKS.fire)L.push([FKS.fire.y,{t:'fkfire'}]);if(!C1.jak)L.push([JAKREST.y-110,{t:'jakrest'}]);else if(JAKF&&jakInParty()&&!FKS.fire)L.push([JAKF.y,{t:'jak'}]);L.sort((a,b)=>a[0]-b[0]);
-  THORN.blooms=[];let past=false;for(const [,o] of L){if(!o){drawLum();past=true;continue;}if(o.t==='thfoe'){drawThornFoe(o.ref);continue;}if(o.t==='boss'){drawThornBoss();continue;}if(o.t==='cosghost'){drawCosGhost(o.ref);continue;}if(o.t==='fks'){drawFKS();continue;}if(o.t==='fkfire'){drawFlames(ctx,FKS.fire.x,FKS.fire.y,260,1);continue;}if(o.t==='jakrest'){drawJakResting();continue;}if(o.t==='jak'){drawJakOW();continue;}let fa=1;if(past){const kx=clamp(1-(Math.abs(o.x-lum.x)-o.w*.2)/(o.w*.3),0,1),ky=clamp(1-(o.y-lum.y-o.w*.7)/(o.w*.35),0,1);fa=1-kx*ky*(o.t==='arch'?.4:.58);}drawThornProp(o,fa);}
+  for(const g of THFOES)if(g.x>x0-150&&g.x<x1+150&&g.y>y0-60&&g.y<y1+260)L.push([g.y,{t:'thfoe',ref:g}]);if(!C1.thornBoss)L.push([THBOSS.y,{t:'boss'}]);for(const s_ of COSSEE)if(s_.st===1||s_.st===2)L.push([s_.y,{t:'cosghost',ref:s_}]);if(!C1.fkDone&&lum.x>TW_)L.push([FKS.cy,{t:'fks'}]);if(FKS.fire)L.push([FKS.fire.y,{t:'fkfire'}]);if(CH>=2)L.push([STONELUM.y,{t:'stonelum'}]);if(!C1.jak)L.push([JAKREST.y-110,{t:'jakrest'}]);else if(JAKF&&jakInParty()&&!FKS.fire)L.push([JAKF.y,{t:'jak'}]);L.sort((a,b)=>a[0]-b[0]);
+  THORN.blooms=[];let past=false;for(const [,o] of L){if(!o){drawLum();past=true;continue;}if(o.t==='thfoe'){drawThornFoe(o.ref);continue;}if(o.t==='boss'){drawThornBoss();continue;}if(o.t==='cosghost'){drawCosGhost(o.ref);continue;}if(o.t==='fks'){drawFKS();continue;}if(o.t==='fkfire'){drawFlames(ctx,FKS.fire.x,FKS.fire.y,260,1);continue;}if(o.t==='jakrest'){drawJakResting();continue;}if(o.t==='stonelum'){drawStoneLum();continue;}if(o.t==='jak'){drawJakOW();continue;}let fa=1;if(past){const kx=clamp(1-(Math.abs(o.x-lum.x)-o.w*.2)/(o.w*.3),0,1),ky=clamp(1-(o.y-lum.y-o.w*.7)/(o.w*.35),0,1);fa=1-kx*ky*(o.t==='arch'?.4:.58);}drawThornProp(o,fa);}
   drawForage(THORN.forage||[]);drawThornCritters(x0,y0,x1,y1);drawThornWebs(x0,y0,x1,y1);
   drawThornMotes();
   ctx.save();ctx.globalCompositeOperation='lighter';for(const m of THORN.mist){if(m.x<x0-m.r||m.x>x1+m.r||m.y<y0-m.r||m.y>y1+m.r)continue;drawGlow(ctx,m.x+Math.sin(T*.08+m.ph)*50,m.y,m.r,'150,90,110',.05+.025*Math.sin(T*.4+m.ph));}ctx.restore();

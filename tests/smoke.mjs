@@ -366,6 +366,9 @@ const CASES = {
     const ok = await p.evaluate(() => { const g = window.__g, P = g.CPATH; const tries = [[g.CLR.cx, g.CLR.cy], [g.CLR.x1 + 200, P.y], [P.xt, P.y - 200], [P.xt, P.ytop + 60]]; return tries.map(([x, y]) => g.thornFree(x, y)); });
     check(ok.every(Boolean), 'clearing/path not walkable: ' + JSON.stringify(ok));
     check(await p.evaluate(() => { const g = window.__g; return !g.thornFree(g.CLR.x0 + 120, g.CLR.cy); }), 'the burning west entrance can still be walked through in Chapter 2');
+    const fl = await p.evaluate(async () => { const g = window.__g; g.lum.x = g.CLR.x0 + 200; g.lum.y = g.CLR.cy; await new Promise(r => setTimeout(r, 500)); const n = g.NEAR; if (n) n.onInteract(); await new Promise(r => setTimeout(r, 200)); const L = g.DLG.lines && g.DLG.lines[0]; g.DLG.active = false; return L ? L[1] : null; });
+    check(fl === 'These are not ordinary flames.', 'the flames at the Stranglethorn entrance did not speak: ' + fl);
+    check(await p.evaluate(() => { const g = window.__g; return !g.thornFree(g.FKSX ? g.FKSX.cx - 240 : g.CLR.x0 + 400, g.CLR.cy); }), 'Lum can walk through her petrified self');
     await p.evaluate(() => { const g = window.__g, P = g.CPATH; g.lum.x = P.xt; g.lum.y = P.y - 150; g.cam.x = g.lum.x; g.cam.y = g.lum.y; }); await wait(1500);
     await p.screenshot({ path: path.join(SHOTS, `ch2-gatehouse-path-${vp}.png`) });
     await p.evaluate(() => { const g = window.__g, P = g.CPATH; g.lum.x = P.xt; g.lum.y = P.ytop + 80; }); await wait(800);
