@@ -238,7 +238,7 @@ function drawBattleSpar(h){const S=bS(),B=BATTLE,x=h.x+h.ox,y=h.y+h.oy,me=B.hero
   else if(me&&ph==='sflame'){guard=false;an='bidle';fi=0;}
   bshadow(x,y+2,40*S,11*S,.35);ctx.save();ctx.translate(x,y+3);if(h.hurt>0)ctx.translate(Math.sin(h.hurt*60)*4,0);ctx.rotate(rot);if(guard){const b=Math.sin(T*1.6);ctx.scale(1-.005*b,1+.012*b);}
   c1Frame(ctx,'spar',an,fi,0,0,H_,flip,1,h.hurt>.3?1:0);ctx.restore();
-  if(me&&ph==='sflame'){ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,x-40*S,y-180*S,45*S,'255,120,40',.8);ctx.restore();}}
+  if(me&&ph==='sflame')drawFlames(ctx,x-66*S,y-143*S,40*S,1);/* a small flame burning at the tip of his raised sword */}
 function drawBattleJak(h){const S=bS(),B=BATTLE,x=h.x+h.ox,y=h.y+h.oy,me=B.heroes[B.cur]===h,ph=B.phase,t=B.t,H_=206*S;let an='idle',fi=0,flip=false;
   if(h.ko){an='ko';fi=Math.min(3,Math.floor((h.koT||0)/.14));}else if(h.hurt>0){an='hurt';fi=Math.min(3,Math.floor((.5-h.hurt)/.1));}else if(me&&ph==='bonkRun'){an='run';fi=Math.floor(t*12)%5;}else if(me&&(ph==='bonkBack'||ph==='run'||ph==='fled')){an='run';fi=Math.floor(t*12)%5;flip=h.face<0||ph==='bonkBack';}
   else if(me&&ph==='bonkWind'){an='chop';fi=Math.min(4,Math.floor(t/B.windD*5));}else if(me&&ph==='bonkHit'){an='swing';fi=Math.min(4,Math.floor(t/.08));}else if(me&&ph==='jbolt'){an='cast';fi=Math.min(7,Math.floor(t/.1));}
