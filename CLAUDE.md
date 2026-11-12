@@ -36,6 +36,7 @@ Live at https://lums-magic-shop.vercel.app. Story and lore: `docs/story.md`. Mak
 | 24-vane-hut-and-mixing | Vane's hut and mixing at the fire |
 | 25-ch1-opening-and-foraging | Chapter 1 opening cutscene, foraging, ingredients |
 | 26-oak-hollow | the five-room root dungeon under the old oak |
+| 26b-ch2-start | Chapter 2 start (`startChapter2`): the clearing after Fokalur, walk-around only for now (no story, no saving) |
 | 27-update / 28-render / 29-loop | the main update, the main draw, and the frame loop plus `window.__g` (test hooks) |
 
 To find something, grep `src/game` for the function or constant name. Don't read whole files.
@@ -65,6 +66,7 @@ To find something, grep `src/game` for the function or constant name. Don't read
 - **From Chapter 1 on, Cosmic is always drawn holding the red Ancient Blade** (the `COS_BLADE` frames), never the plain `COS_ANIM` ones.
 - **Chapter results:** each chapter ends with the shared results card (`RESCH` in 19-storm-results-chapter-select). Chapter 1 needs all five Fox items (Foxfire Pouch, Fox Ring, Fox Hood, Fox Suit, Vixenstep Boots) for 5 stars, and gives a keepsake charm for 3/4/5 stars (Fox Tail Charm +1 SPD / Fox Pendant +1 SPD +1 MAG / Carved Fox Totem +1 SPD +1 MAG and the Fox Ring's 50% First Strike steal). The best one is stored in progress (`bestCh1Keepsake()`); **Chapter 2 must start with it equipped**, like Chapter 1 does with the prologue's.
 - The spellbook party row shows only members who have joined (1–4). No empty placeholders.
+- **The clearing** (`CLR`/`CPATH` in 21-stranglethorn) is one map shared by Chapter 1's ending and Chapter 2's start: a big round clearing (brambles and red trees west/north/south, evergreens east), a dirt path east through the pines that turns north to the gatehouse (`outpost`) in the Worldbind mountain face (`worldbind_cliff`). In Chapter 1 everything east of the clearing stays dark and the path is closed; from Chapter 2 on it is open. Chapter 2 is locked until Chapter 1 is finished.
 - Chapter 1 has no final name yet. The title card "The Morning After" and the chapter-select labels are placeholders.
 - Talk the story through with the designer before building new story content. Ask before big changes.
 

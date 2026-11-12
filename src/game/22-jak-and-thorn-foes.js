@@ -21,6 +21,11 @@ function drawJakOW_(){if(!JAKF||CAPTURE.on)return;const H_=192,vert=JAKF.dir==='
 /* Spar on the overworld: down / up / side walks (side faces right) */
 /* during the Fokalur scene in the clearing, Lum and Spar stand facing him */
 function fkFacing(){return SCENE==='thorn'&&typeof FKS!=='undefined'&&FKS.st>=1&&FKS.st<7&&!C1.fkDone&&lum.x>CLR.x0?{x:FKS.cx,y:FKS.cy}:null;}
+/* the dirt path from the clearing's east side through the pines, turning north to the gatehouse */
+function drawClrPath(){const P=CPATH,pts=[];for(let x=CLR.cx+CLR.rx-260;x<=P.xt;x+=28)pts.push([x,P.y]);for(let y=P.y;y>=P.ytop-10;y-=28)pts.push([P.xt,y]);
+  ctx.save();for(let pass=0;pass<2;pass++){ctx.fillStyle=pass?'rgba(150,118,78,.55)':'rgba(92,70,44,.6)';for(let i=0;i<pts.length;i++){const [x,y]=pts[i],j=hash(i,pass,301),r=(pass?P.hw*.78:P.hw*1.05)*(.9+j*.2),fade=Math.min(1,(x-(CLR.cx+CLR.rx-260))/220);if(fade<=0)continue;
+    ctx.globalAlpha=fade;ctx.beginPath();ctx.ellipse(x+(j-.5)*14,y+(hash(i,pass,303)-.5)*10,r,r*.62,0,0,TAU);ctx.fill();}}
+  ctx.globalAlpha=1;ctx.fillStyle='rgba(60,46,30,.35)';for(let i=0;i<pts.length;i+=2){const [x,y]=pts[i];if(x<CLR.cx+CLR.rx-120)continue;ctx.beginPath();ctx.ellipse(x+(hash(i,7,305)-.5)*80,y+(hash(i,8,305)-.5)*40,6+hash(i,9,305)*8,4,0,0,TAU);ctx.fill();}ctx.restore();}
 function drawSparOW(F,alpha){if(!F)return;if(F===JAKF&&fkFacing()&&!FKS.jakIn){F.dir='side';F.face=F.x<FKS.cx?1:-1;F.moving=0;}const vert=F.dir==='up'||F.dir==='down',an=vert?F.dir:'side',fi=F.moving?Math.floor((F.ph||0)/16)%5:0;
   ctx.fillStyle='rgba(10,10,20,.25)';ctx.beginPath();ctx.ellipse(F.x,F.y+2,30,8,0,0,TAU);ctx.fill();c1Frame(ctx,'spar',an,fi,F.x,F.y+3,SPAR_H,!vert&&F.face<0,alpha??1,0);}
 function drawJakResting(){if(MATE==='spar'){drawSparResting();return;}drawJakResting_();}
@@ -105,6 +110,7 @@ function drawThorn(){const vw=W/zoom,vh=H/zoom,x0=cam.x-vw/2-60,y0=cam.y-vh/2-60
   // fallen petals and a darker rim outside the maze
   ctx.fillStyle='rgba(10,8,12,.55)';if(x0<0)ctx.fillRect(x0,y0,-x0,y1-y0);if(x1>TW_)ctx.fillRect(TW_,y0,x1-TW_,y1-y0);if(y0<0)ctx.fillRect(x0,y0,x1-x0,-y0);
   for(const d of THORN.decals||[]){const im=IMG[d.n];if(!ready(im))continue;const h=d.w*im.naturalHeight/im.naturalWidth;if(d.x+d.w/2<x0||d.x-d.w/2>x1||d.y+h/2<y0||d.y-h/2>y1)continue;ctx.save();ctx.translate(d.x,d.y);if(d.flip)ctx.scale(-1,1);ctx.drawImage(im,-d.w/2,-h/2,d.w,h);ctx.restore();}
+  drawClrPath();
   drawCellarMouth();
   for(const f of THORN.flowers)if(f.x>x0-30&&f.x<x1+30&&f.y>y0-30&&f.y<y1)drawRedFlowers(f.x,f.y,f.s,f.seed);
   const L=[];for(const o of THORN.props)if(o.x>x0-o.w/2-40&&o.x<x1+o.w/2+40&&o.y>y0-20&&o.y<y1+o.w*1.4)L.push([o.y,o]);L.push([lum.y,null]);L.sort((a,b)=>a[0]-b[0]);
@@ -182,7 +188,7 @@ function updateClearing(dt){if(C1.fkDone)return;FKS.t+=dt;FKS.flash=Math.max(0,F
   if(FKS.st===6){FKS.fa=Math.max(0,FKS.fa-dt*.7);if(FKS.fa<=0){FKS.st=7;fkFarewell();}}}
 const fkJak=()=>jakInParty();
 /* ZOOMK: the slow pull-back at the end of the clearing (1 = normal view) */
-let ZOOMK=1;const easeIO=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
+let ZOOMK=1,ZOOM0=1;const easeIO=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
 function fkMeet(){WEVENT.on=true;lum.vx=lum.vy=0;lum.state='idle';lum.face=1;
   const L=[['Lum',"Cosmic! I’ve found you!"]];
   if(fkJak())L.push(['Spar',"Lum, wait. Something is wrong…"]);

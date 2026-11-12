@@ -357,6 +357,19 @@ const CASES = {
     await p.evaluate(() => { const g = window.__g; g.DLG.active = false; g.WEV.fk = 1; g.WEV.foka = 3.2; g.talk([['Fokalur', 'Thank you, foolish apprentice. Your body will serve as a suitable vessel.']]); }); await wait(1600);
     check(await p.evaluate(() => window.__g.IMGX.fokalur === undefined && !!window.__g.IMGX.fokalur_hd), 'the old Demon God sprite is still loaded');
   },
+  async 'ch2-clearing'(p) {
+    // Chapter 2 opens in the big round clearing; the path east then north reaches the gatehouse
+    const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop';
+    await p.evaluate(() => window.__g.startChapter2()); await wait(2500);
+    await p.evaluate(() => { window.__g.DLG.active = false; }); await wait(400);
+    await p.screenshot({ path: path.join(SHOTS, `ch2-clearing-${vp}.png`) });
+    const ok = await p.evaluate(() => { const g = window.__g, P = g.CPATH; const tries = [[g.CLR.cx, g.CLR.cy], [g.CLR.x1 + 200, P.y], [P.xt, P.y - 200], [P.xt, P.ytop + 60]]; return tries.map(([x, y]) => g.thornFree(x, y)); });
+    check(ok.every(Boolean), 'clearing/path not walkable: ' + JSON.stringify(ok));
+    await p.evaluate(() => { const g = window.__g, P = g.CPATH; g.lum.x = P.xt; g.lum.y = P.y - 150; g.cam.x = g.lum.x; g.cam.y = g.lum.y; }); await wait(1500);
+    await p.screenshot({ path: path.join(SHOTS, `ch2-gatehouse-path-${vp}.png`) });
+    await p.evaluate(() => { const g = window.__g; g.lum.x = g.CLR.x1 + 150; g.lum.y = g.CPATH.y; }); await wait(1500);
+    await p.screenshot({ path: path.join(SHOTS, `ch2-path-east-${vp}.png`) });
+  },
   async 'moon-charm-kept'(p) {
     // returning Vane's cross from the satchel must not take Lum's equipped Moon Charm
     await startCh1(p);

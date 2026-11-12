@@ -3,7 +3,7 @@ let grainCv=null;
 function resize(){
   const r=game.getBoundingClientRect();W=r.width;H=r.height;DPR=Math.min(devicePixelRatio||1,2.5);
   cv.width=Math.round(W*DPR);cv.height=Math.round(H*DPR);
-  zoom=Math.min(W/620,H/1150)*ZOOMK;
+  ZOOM0=Math.min(W/620,H/1150);zoom=ZOOM0*ZOOMK;
   {const nr=Math.min(1.5,zoom*DPR);if(Math.abs(nr-riverR)>.15||!estCv||!creekCv){buildCreek(nr);buildPond(Math.min(1.6,nr*1.2));dirtCache.clear();buildEstateGround(Math.min(1.5,nr*1.3));}}
   layoutButtons();
   if(!grainCv){grainCv=document.createElement('canvas');grainCv.width=grainCv.height=256;const g=grainCv.getContext('2d');const id=g.createImageData(256,256);

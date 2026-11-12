@@ -167,13 +167,14 @@ function readProg(){try{return JSON.parse(localStorage.getItem(PROG_KEY)||'{}')|
 function recordPrologue(stars,badges,keep){try{const p=readProg();p.prologue=p.prologue||{};p.prologue.done=1;p.prologue.best=Math.max(p.prologue.best||0,stars);p.prologue.badges=p.prologue.badges||{};for(const b of badges||[])if(b.got)p.prologue.badges[b.id]=1;const KR={duskflower:1,moonmint:2,mooncharm:3},cur=p.prologue.keepsake&&KR[p.prologue.keepsake.id]?p.prologue.keepsake:null;if(keep&&(!cur||KR[cur.id]<KR[keep.id]))p.prologue.keepsake=keep;else p.prologue.keepsake=cur;localStorage.setItem(PROG_KEY,JSON.stringify(p));}catch(e){}}
 const PLAYTEST=true; // New Game always opens chapter select; Chapter 1 stays locked (greyed) until the Prologue is finished
 const CHSEL={on:false,sel:0,confirm:null,note:'',noteT:0,hits:[],t:0};
-const CHAPTERS=[{id:'prologue',title:'Prologue'},{id:'ch1',title:'Chapter 1',art:'ch1_card'}];
-const chLocked=c=>c.id==='ch1'&&!(readProg().prologue&&readProg().prologue.done);
+const CHAPTERS=[{id:'prologue',title:'Prologue'},{id:'ch1',title:'Chapter 1',art:'ch1_card'},{id:'ch2',title:'Chapter 2',art:'ch2_card'}];
+const CH_NEEDS={ch1:['prologue','Prologue'],ch2:['ch1','Chapter 1']};
+const chLocked=c=>{const n=CH_NEEDS[c.id];if(!n)return false;const p=readProg();return !(p[n[0]]&&p[n[0]].done);};
 function openChapterSelect(){CHSEL.on=true;CHSEL.sel=0;CHSEL.confirm=null;CHSEL.t=0;sfxPage&&sfxPage(.8);}
-function chselPick(i){CHSEL.sel=i;if(chLocked(CHAPTERS[i])){CHSEL.note='Finish the Prologue to unlock Chapter 1';CHSEL.noteT=2.6;return;}CHSEL.confirm=i;sfxPage&&sfxPage(.6);}
+function chselPick(i){CHSEL.sel=i;if(chLocked(CHAPTERS[i])){CHSEL.note='Finish the '+CH_NEEDS[CHAPTERS[i].id][1]+' to unlock '+CHAPTERS[i].title;CHSEL.noteT=2.6;return;}CHSEL.confirm=i;sfxPage&&sfxPage(.6);}
 function chselStart(){const c=CHAPTERS[CHSEL.confirm];CHSEL.confirm=null;
   if(c.id==='prologue'){CHSEL.on=false;newGame();return;}
-  if(chLocked(c))return;CHSEL.on=false;startChapter1();}
+  if(chLocked(c))return;CHSEL.on=false;if(c.id==='ch2')startChapter2();else startChapter1();}
 function chselTap(x,y){for(const h of CHSEL.hits)if(x>h.x&&x<h.x+h.w&&y>h.y&&y<h.y+h.h){h.act();return;}if(CHSEL.confirm!==null)CHSEL.confirm=null;}
 function chselKey(code){if(CHSEL.confirm!==null){if(code==='Enter'||code==='Space'||code==='KeyE')chselStart();if(code==='Escape'||code==='Backspace')CHSEL.confirm=null;return;}
   if(code==='ArrowUp'||code==='KeyW')CHSEL.sel=Math.max(0,CHSEL.sel-1);if(code==='ArrowDown'||code==='KeyS')CHSEL.sel=Math.min(CHAPTERS.length-1,CHSEL.sel+1);
@@ -196,7 +197,7 @@ function drawChapterSelect(){const dt=1/60;CHSEL.t+=dt;CHSEL.noteT=Math.max(0,CH
     else if(c.art){const lk=chLocked(c),cb=(prog[c.id]&&prog[c.id].best)||0;ctx.save();if(lk)ctx.filter='grayscale(1) brightness(.8)';coverImg(IMG[c.art],bx,y,bw,h,.5,.5);ctx.restore();
       const g=ctx.createLinearGradient(0,y+h*.35,0,y+h);g.addColorStop(0,'rgba(20,16,30,0)');g.addColorStop(1,'rgba(20,16,30,.78)');ctx.fillStyle=g;ctx.fillRect(bx,y,bw,h);if(lk){ctx.fillStyle='rgba(60,56,66,.35)';ctx.fillRect(bx,y,bw,h);}
       ctx.textAlign='left';ctx.fillStyle=lk?'#d8d4de':'#fdf6e4';ctx.font='700 26px "Alegreya SC", Georgia, serif';ctx.fillText(c.title,bx+18,y+h-46);
-      if(lk){ctx.font='italic 15px Alegreya, Georgia, serif';ctx.fillStyle='#d8d4de';ctx.fillText('Finish the Prologue to unlock',bx+18,y+h-18);}else for(let k=0;k<5;k++)drawStar(bx+30+k*30,y+h-18,11,clamp(cb-k,0,1));}
+      if(lk){ctx.font='italic 15px Alegreya, Georgia, serif';ctx.fillStyle='#d8d4de';ctx.fillText('Finish the '+CH_NEEDS[c.id][1]+' to unlock',bx+18,y+h-18);}else for(let k=0;k<5;k++)drawStar(bx+30+k*30,y+h-18,11,clamp(cb-k,0,1));}
     else{const g=ctx.createLinearGradient(bx,y,bx,y+h);g.addColorStop(0,'#efe4cc');g.addColorStop(1,'#dccaa4');ctx.fillStyle=g;ctx.fillRect(bx,y,bw,h);
       ctx.strokeStyle='rgba(120,90,50,.18)';ctx.lineWidth=1;for(let k=0;k<8;k++){ctx.beginPath();ctx.moveTo(bx,y+h*(k+.5)/8);ctx.bezierCurveTo(bx+bw*.3,y+h*(k+.2)/8,bx+bw*.7,y+h*(k+.8)/8,bx+bw,y+h*(k+.5)/8);ctx.stroke();}
       ctx.textAlign='left';ctx.fillStyle='#3a2c1a';ctx.font='700 24px "Alegreya SC", Georgia, serif';ctx.fillText(c.title,bx+18,y+h*.42);ctx.font='italic 16px Alegreya, Georgia, serif';ctx.fillStyle='#6a5232';ctx.fillText(c.sub,bx+18,y+h*.72);}

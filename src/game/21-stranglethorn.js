@@ -1,8 +1,13 @@
 /* ---------- Stranglethorn Forest: the bramble maze (art preview, no NPCs or enemies yet) ---------- */
 const TMZ={R:12,C:15,rt:["110011101001001","100001101101011","011000000010000","100110010000011","011101010111101","111010100010101","111010110011011","000100100101001","101101001010111","111000011000111","011010001101011","010000000000001"],dn:["001110001010011","010111011010110","010101110111110","101001101101101","000011010100000","000100101100101","010101001110010","001101011101100","001010110011000","100011110010010","010111110001010","111111111111111"],start:6,finish:2};
 const TCW=360,TCH=300,TW_=TMZ.C*TCW,TH_=TMZ.R*TCH;/* the clearing past the maze's exit, about the size of the woods graveyard */
-const CLR={x0:TW_+260,x1:TW_+70+920,cy:TMZ.finish*TCH+TCH/2+10,hh:230};
-function clrFree(x,y){if(x<CLR.x0+70||x>CLR.x1-30||Math.abs(y-CLR.cy)>CLR.hh)return false;if(!C1.fkDone&&Math.hypot((x-(CLR.x0+640))/70,(y-CLR.cy)/26)<1)return false;return true;}
+/* the great round clearing where Stranglethorn meets the evergreens and the Worldbind mountains (Chapter 1's end, Chapter 2's start):
+   west: the door back into the maze; north/south: brambles and red trees; east: pines, and a dirt path that runs east, then turns north up to the gatehouse in the mountain face */
+const CLR={x0:TW_+260,cx:TW_+260+760,cy:TMZ.finish*TCH+TCH/2+10,rx:760,ry:440,x1:TW_+260+1520,hh:440};
+const CPATH={y:CLR.cy+130,xt:CLR.x1+430,ytop:CLR.cy-430,hw:72};
+const clrIn=(x,y)=>((x-CLR.cx)/(CLR.rx-70))**2+((y-CLR.cy)/(CLR.ry-60))**2<1;
+const clrOnPath=(x,y)=>CH>=2&&((x>CLR.cx&&x<CPATH.xt+CPATH.hw&&Math.abs(y-CPATH.y)<CPATH.hw)||(Math.abs(x-CPATH.xt)<CPATH.hw&&y>CPATH.ytop+30&&y<CPATH.y+CPATH.hw));
+function clrFree(x,y){if(x<CLR.x0+70||!(clrIn(x,y)||clrOnPath(x,y)))return false;if(!C1.fkDone&&Math.hypot((x-(CLR.x0+640))/70,(y-CLR.cy)/26)<1)return false;return true;}
 const THORN={built:false,props:[],flowers:[],path:[],pockets:[],t:0,lightK:1};
 // wall lines: hW(line,c) = horizontal wall on the top edge of row `line` at column c; vW(r,line) = vertical wall on the left edge of column `line` at row r
 function hW(line,c){if(c<0||c>=TMZ.C)return false;if(line<=0||line>=TMZ.R)return true;return TMZ.dn[line-1][c]==='1';}
@@ -43,14 +48,25 @@ function buildThorn(){if(THORN.built)return;THORN.built=true;const P=THORN.props
     const KS=[6,0,4],got=[];for(const [r,c] of cells){if(got.length>=5)break;if(got.some(([a,b])=>Math.abs(a-r)+Math.abs(b-c)<4))continue;got.push([r,c]);
       const k=KS[got.length%3],side=H_(r,c,99)<.5?-1:1,x=c*TCW+TCW/2+side*(45+H_(r,c,101)*25),y=r*TCH+TCH*.42+(H_(r,c,103)-.5)*40;
       P.push({t:'shrub',k,x,y,s:SHR[k].s*1.05,flip:side>0,ph:x*.01,w:180});THORN.forage.push({x,y,id:FORAGE_MAP[k],n:2,picked:0});}}
-  for(let y=CLR.cy-CLR.hh-60,k=0;y<=CLR.cy+CLR.hh+60;y+=75,k++)P.push({t:'hedge',x:CLR.x0+(H_(k,3,211)-.5)*16,y,w:150+H_(k,5,211)*24,flip:H_(k,7,211)<.5});
-  // the clearing's north and south walls: the same brambles and red trees as the maze
-  {const xa=CLR.x0+60,xb=CLR.x1+260,yn=CLR.cy-CLR.hh-24,ys=CLR.cy+CLR.hh+46,SM=['bwood_small_a','bwood_small_b','bwood2_small_a','bwood2_small_b'];
-   for(let x=xa,k=0;x<=xb;x+=190,k++){P.push({t:'hedge',x:x+(H_(k,1,221)-.5)*24,y:yn+(H_(k,2,221)-.5)*10,w:225+H_(k,3,221)*30,flip:H_(k,4,221)<.5});
-     P.push({t:'hedge',x:x+(H_(k,5,221)-.5)*24,y:ys+(H_(k,6,221)-.5)*10,w:225+H_(k,7,221)*30,flip:H_(k,8,221)<.5});}
-   for(let x=xa+80,k=0;x<=xb;x+=300,k++){P.push({t:'tree',img:SM[Math.floor(H_(k,9,221)*4)],x:x+(H_(k,10,221)-.5)*80,y:yn-40,w:430+H_(k,11,221)*90,flip:H_(k,12,221)<.5});}
-   // the east wall: a small outpost against the mountain (hidden in Chapter 1; Chapter 2 opens here)
-   P.push({t:'tree',img:'outpost',x:CLR.x1+640,y:CLR.cy-70,w:430,flip:false});}
+  // the clearing's rim: brambles all round the west half (red trees behind the north side), pines on the east side, a gap where the path leaves
+  {const SM=['bwood_small_a','bwood_small_b','bwood2_small_a','bwood2_small_b'],per=2*Math.PI*Math.sqrt((CLR.rx*CLR.rx+CLR.ry*CLR.ry)/2),n=Math.round(per/150);
+   for(let k=0;k<n;k++){const th=k/n*TAU,c=Math.cos(th),sn=Math.sin(th),deg=((th*180/Math.PI)+360)%360,east=deg<62||deg>298;if(east)continue;
+     const off=30+95*Math.max(0,sn),x=CLR.cx+(CLR.rx+off)*c+(H_(k,1,231)-.5)*20,y=CLR.cy+(CLR.ry+off)*sn+(H_(k,2,231)-.5)*12;
+     P.push({t:'hedge',x,y,w:(Math.abs(c)>.7?170:225)+H_(k,3,231)*28,flip:H_(k,4,231)<.5});}
+   for(let k=0;k<9;k++){const th=Math.PI*(1.12+k*.095),x=CLR.cx+(CLR.rx+190)*Math.cos(th)+(H_(k,5,231)-.5)*60,y=CLR.cy+(CLR.ry+170)*Math.sin(th);
+     P.push({t:'tree',img:SM[Math.floor(H_(k,6,231)*4)],x,y,w:440+H_(k,7,231)*90,flip:H_(k,8,231)<.5});}
+   // the evergreens: the east rim, and both sides of the path (spruce and tall pine most often, saplings and twisted ones mixed in)
+   const PN=[['pine_spruce',290],['pine_tall',250],['pine_spruce',300],['pine_twist_a',330],['pine_tall',240],['pine_sapling',270],['pine_twist_b',340]];
+   const LOW=PN.filter(p=>p[0]!=='pine_tall');
+   const pine=(x,y,k,s0=1,low=false)=>{const L_=low?LOW:PN,[img,w]=L_[Math.floor(H_(k,9,233)*L_.length)];P.push({t:'tree',img,x:x+(H_(k,10,233)-.5)*40,y:y+(H_(k,11,233)-.5)*20,w:w*s0*(.9+H_(k,12,233)*.25),flip:H_(k,13,233)<.5,base:.95});};
+   let q=0;for(let d=-60;d<=60;d+=13){if(d>4&&d<32)continue;const th=d*Math.PI/180;pine(CLR.cx+(CLR.rx+60)*Math.cos(th),CLR.cy+(CLR.ry+60+40*Math.max(0,Math.sin(th)))*Math.sin(th),q++);}
+   // path sides: trunks kept clear of the dirt so the trees never hide Lum on the path
+   for(let x=CLR.x1+60;x<CPATH.xt+300;x+=210){pine(x,CPATH.y+CPATH.hw+430,q++,.95,true);if(x<CPATH.xt-260)pine(x,CPATH.y-CPATH.hw-20,q++,.95);}
+   for(let y=CPATH.ytop+150;y<CPATH.y-CPATH.hw;y+=210){pine(CPATH.xt-CPATH.hw-200,y,q++,.95);pine(CPATH.xt+CPATH.hw+200,y+60,q++,.95);}
+   // the Worldbind: cliff faces behind the gatehouse and along the path's east side; the gatehouse sits in the mountain face where the path ends
+   P.push({t:'tree',img:'worldbind_cliff',x:CPATH.xt+200,y:CPATH.ytop-40,w:2300,flip:false,cliff:1});
+   P.push({t:'tree',img:'worldbind_cliff',x:CPATH.xt+1350,y:CPATH.y+420,w:2300,flip:true,cliff:1});
+   P.push({t:'tree',img:'outpost',x:CPATH.xt+52,y:CPATH.ytop+18,w:430,flip:false});}
   THORN.mist=[];for(let i=0;i<40;i++)THORN.mist.push({x:hash(i,1,77)*TW_,y:hash(i,2,77)*TH_,r:160+hash(i,3,77)*220,ph:hash(i,4,77)*TAU});}
 /* glimpses of Cosmic at the edge of the lantern light along the red-rose path; each happens once */
 const COSSEE=[],COS_LINES=["Cosmic? I am coming for you!","Cosmic! Wait for me!","Was that… Cosmic? Don't run off!","I saw you, Cosmic! Hold on, I'm coming!","Cosmic! Don't go…"];
@@ -80,7 +96,7 @@ function enterThorn(){buildThorn();if(!THORN.fint){THORN.fint=1;for(const f of T
 function startThornPreview(){SAVEC.finished=0;audioInit();c1Reset();C1.introDone=1;C1.hedgeSeen=1;C1I.on=false;WEVENT.on=false;INTRO.lumShown=true;if(!BAG.includes('lantern'))BAG.push('lantern');FADE.a=1;FADE.dir=-1;enterThorn();}
 function updateThorn(dt){updateThornAtmos(dt);updateCosSightings(dt);updateThornCritters(dt);updateThornFoes(dt);updateJakFollow(dt);
   if(!C1.jak&&!C1.jakSpotted&&!DLG.active&&!FADE.dir&&Math.hypot(lum.x-JAKREST.x,lum.y-JAKREST.y)<300){C1.jakSpotted=1;talk([['Lum',"Someone's there… slumped against the roots of that old oak."]]);}
-  if(!C1.thornBoss&&lum.x<TW_&&lum.x>12*TCW+TCW*.8&&Math.floor(lum.y/TCH)===2){lum.x=12*TCW+TCW*.8;}const k=Math.min(1,dt*4.5),fkCam=typeof FKS!=='undefined'&&FKS.st>=1&&FKS.st<7&&!C1.fkDone&&lum.x>TW_;cam.x+=((fkCam?(lum.x+FKS.cx)/2:lum.x+40)-cam.x)*k*(fkCam?.5:1);cam.y+=((fkCam?FKS.cy-250:lum.y-50)-cam.y)*k*(fkCam?.5:1);const vw=W/zoom,vh=H/zoom;cam.x=clamp(cam.x,vw/2-80,(lum.x>TW_+40?CLR.x1+(fkCam?420:60):TW_+80)-vw/2);cam.y=clamp(cam.y,-200+vh/2,TH_+60-vh/2);THORN.t+=dt;
+  if(!C1.thornBoss&&lum.x<TW_&&lum.x>12*TCW+TCW*.8&&Math.floor(lum.y/TCH)===2){lum.x=12*TCW+TCW*.8;}const k=Math.min(1,dt*4.5),fkCam=typeof FKS!=='undefined'&&FKS.st>=1&&FKS.st<7&&!C1.fkDone&&lum.x>TW_;cam.x+=((fkCam?(lum.x+FKS.cx)/2:lum.x+40)-cam.x)*k*(fkCam?.5:1);cam.y+=((fkCam?FKS.cy-250:lum.y-50)-cam.y)*k*(fkCam?.5:1);const vw=W/zoom,vh=H/zoom;cam.x=clamp(cam.x,vw/2-80,(lum.x>TW_+40?(CH>=2?CPATH.xt+900:CLR.x1+(fkCam?420:60)):TW_+80)-vw/2);cam.y=clamp(cam.y,-200+vh/2,TH_+60-vh/2);THORN.t+=dt;
   updateClearing(dt);}
 function drawRedFlowers(x,y,s,seed){ctx.save();ctx.translate(x,y);ctx.scale(s,s);
   for(let i=0;i<4;i++){const a=hash(seed,i,61)*TAU,l=10+hash(seed,i,63)*8;ctx.fillStyle='#2f4a24';ctx.beginPath();ctx.ellipse(Math.cos(a)*l*.6,Math.sin(a)*l*.3+2,l*.55,3,a,0,TAU);ctx.fill();}
@@ -92,7 +108,7 @@ function drawRedFlowers(x,y,s,seed){ctx.save();ctx.translate(x,y);ctx.scale(s,s)
 function drawThornProp(o,alpha){if(o.t==='shrub'){drawShrub(o);return;}const name=o.t==='hedge'?'bramble_hedge':o.t==='arch'?'bramble_arch':o.t==='oak'?'oak_big':o.t==='web'?'webtree':o.img;const im=IMG[name];if(!ready(im))return;
   const w=o.w,h=w*im.naturalHeight/im.naturalWidth;ctx.save();ctx.globalAlpha=alpha;ctx.translate(o.x,o.y);if(o.flip)ctx.scale(-1,1);
   if(o.t==='rose'&&THORN.blooms){const tw=o.img==='rose_twin';THORN.blooms.push([o.x+(tw?w*.3*(o.flip?-1:1):0),o.y-h*(o.img==='rose_bud'?.9:tw?.86:.88)]);}
-  const base=o.t==='oak'?.99:o.t==='web'?.97:o.t==='tree'?.985:.94;ctx.drawImage(im,-w/2,-h*base,w,h);ctx.restore();
+  const base=o.base||(o.t==='oak'?.99:o.t==='web'?.97:o.t==='tree'?.985:.94);ctx.drawImage(im,-w/2,-h*base,w,h);ctx.restore();
   if(o.t==='oak'){ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,o.x-w*.32,o.y-h*.2,60,'120,230,220',.35+.12*Math.sin(T*2));ctx.restore();}}
 
 /* ---------- Stranglethorn atmosphere: drifting fog, motes, petals, cold grade, haunted sound ---------- */
