@@ -113,6 +113,8 @@ function drawThorn(){const vw=W/zoom,vh=H/zoom,x0=cam.x-vw/2-60,y0=cam.y-vh/2-60
   drawForage(THORN.forage||[]);drawThornCritters(x0,y0,x1,y1);drawThornWebs(x0,y0,x1,y1);
   drawThornMotes();
   ctx.save();ctx.globalCompositeOperation='lighter';for(const m of THORN.mist){if(m.x<x0-m.r||m.x>x1+m.r||m.y<y0-m.r||m.y>y1+m.r)continue;drawGlow(ctx,m.x+Math.sin(T*.08+m.ph)*50,m.y,m.r,'150,90,110',.05+.025*Math.sin(T*.4+m.ph));}ctx.restore();
+  /* Chapter 1 never shows the clearing's east side (the outpost and mountain belong to Chapter 2's opening): it stays in darkness */
+  if(CH===1){const g=ctx.createLinearGradient(CLR.x1+30,0,CLR.x1+190,0);g.addColorStop(0,'rgba(6,5,10,0)');g.addColorStop(1,'rgba(6,5,10,.98)');ctx.fillStyle=g;ctx.fillRect(CLR.x1+30,y0-200,160,y1-y0+600);ctx.fillStyle='rgba(6,5,10,.98)';ctx.fillRect(CLR.x1+189,y0-200,x1-CLR.x1+800,y1-y0+600);}
   ctx.setTransform(DPR,0,0,DPR,0,0);
   // cold, washed-out grade
   ctx.save();ctx.globalCompositeOperation='saturation';ctx.fillStyle='rgba(128,128,128,.32)';ctx.fillRect(0,0,W,H);ctx.globalCompositeOperation='multiply';ctx.fillStyle='rgb(190,192,214)';ctx.fillRect(0,0,W,H);ctx.restore();
