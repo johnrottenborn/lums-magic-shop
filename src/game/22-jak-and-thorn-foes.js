@@ -70,6 +70,8 @@ const THINT=[{x:JAKREST.x-6,y:JAKREST.y-100,reach:100,onInteract:()=>jakInteract
   // the maze's exit, once the Broodmother is gone: on to the clearing
   {x:TW_,y:TMZ.finish*TCH+TCH/2+10,reach:165,door:true,onInteract:()=>goScene(enterClearing)},
   // and back again, before Lum reaches Cosmic
+  // Chapter 2: the gatehouse's dark archway leads into the Worldbind Passage (the passage itself is still to be built)
+  {x:CPATH.xt+3,y:CPATH.ytop+30,get reach(){return CH>=2?90:0},dynDoor:true,get door(){return CH>=2},onInteract:()=>{if(CH<2)return;if(typeof enterWorldbind==='function')goScene(enterWorldbind);}},
   // (in Chapter 2 the hellfire still burns across this entrance: no door, no way back into Stranglethorn)
   {x:TW_+260+95,y:TMZ.finish*TCH+TCH/2+10,get reach(){return CH>=2?0:80},dynDoor:true,get door(){return CH<2},onInteract:()=>{if(FKS.st||CH>=2)return;goScene(()=>{lum.x=TW_-120;lum.y=TMZ.finish*TCH+TCH/2+10;lum.face=-1;cam.x=lum.x;cam.y=lum.y-50;resetJakFollow();});}}];
 

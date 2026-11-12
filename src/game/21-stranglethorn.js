@@ -7,7 +7,7 @@ const CLR={x0:TW_+260,cx:TW_+260+760,cy:TMZ.finish*TCH+TCH/2+10,rx:760,ry:440,x1
 const CPATH={y:CLR.cy+130,xt:CLR.x1+430,ytop:CLR.cy-430,hw:72};
 const clrIn=(x,y)=>((x-CLR.cx)/(CLR.rx-70))**2+((y-CLR.cy)/(CLR.ry-60))**2<1;
 /* the path is a gentle curve drawn with the woods' road painter (buildPath/drawPath in 17): east out of the clearing, bending up north to the gatehouse arch */
-const CPATH_CTRL=[[CLR.cx+CLR.rx-470,CPATH.y+20],[CLR.cx+CLR.rx-300,CPATH.y+6],[CLR.x1+40,CPATH.y-4],[CPATH.xt-260,CPATH.y+14],[CPATH.xt-90,CPATH.y-60],[CPATH.xt-20,CPATH.y-250],[CPATH.xt+6,CPATH.ytop+120],[CPATH.xt,CPATH.ytop+20]];
+const CPATH_CTRL=[[CLR.cx+CLR.rx-470,CPATH.y+20],[CLR.cx+CLR.rx-300,CPATH.y+6],[CLR.x1+40,CPATH.y-4],[CPATH.xt-260,CPATH.y+14],[CPATH.xt-90,CPATH.y-60],[CPATH.xt-20,CPATH.y-250],[CPATH.xt+6,CPATH.ytop+120],[CPATH.xt+2,CPATH.ytop+10],[CPATH.xt+3,CPATH.ytop-40]];
 const CPATH_PTS=splinePts(CPATH_CTRL,20);let CPATHP=null;
 function cpathDist(x,y){let best=1e9;for(let i=0;i<CPATH_PTS.length-1;i++){const [ax,ay]=CPATH_PTS[i],[bx,by]=CPATH_PTS[i+1],dx=bx-ax,dy=by-ay,t=clamp(((x-ax)*dx+(y-ay)*dy)/(dx*dx+dy*dy),0,1),d=Math.hypot(x-ax-dx*t,y-ay-dy*t);if(d<best)best=d;}return best;}
 const clrOnPath=(x,y)=>CH>=2&&cpathDist(x,y)<CPATH.hw;
