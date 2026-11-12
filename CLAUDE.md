@@ -36,7 +36,7 @@ Live at https://lums-magic-shop.vercel.app. Story and lore: `docs/story.md`. Mak
 | 24-vane-hut-and-mixing | Vane's hut and mixing at the fire |
 | 25-ch1-opening-and-foraging | Chapter 1 opening cutscene, foraging, ingredients |
 | 26-oak-hollow | the five-room root dungeon under the old oak |
-| 26b-ch2-start | Chapter 2 start (`startChapter2`): the clearing after Fokalur, walk-around only for now (no story, no saving) |
+| 26b-ch2-start | Chapter 2 "The Ashes of Awakening": opening cutscene (`C2`: narration on black, Amroth from the gatehouse, Stonebreak Elixir frees Lum, baby in Spar's ashes), Amroth follower (`AMR`); no saving yet |
 | 27-update / 28-render / 29-loop | the main update, the main draw, and the frame loop plus `window.__g` (test hooks) |
 
 To find something, grep `src/game` for the function or constant name. Don't read whole files.
@@ -75,4 +75,5 @@ To find something, grep `src/game` for the function or constant name. Don't read
 - **Lum**: party colour `#7a4f9a`. Fights with powders and uses potions; only she can mix at fires.
 - **Spar**: a young swordsman, a head taller than Lum. He is Lum's companion in Stranglethorn (rescued at the old oak, joins, follows, fights; Jak used to have this role). Sprite atlas `spar` (`C1ATL.spar`: down/up/side walks, battle idle + run), portrait `face_spar`, item `sparsword` (icon cut from his portrait art). Combo: **Blazing Edge**, a fire sword attack (5 stars). Base ATK 3, DEF 1, MAG 1, SPD 2, 18 HP. He can lead (`becomeSpar(x,y,face,solo)`); then Lum follows, or he is alone. In code the companion slot keeps its old names (`JAKF`, `jakInParty`, `C1.jak`, `drawJakOW`) and `MATE='spar'` says who fills it.
 - **Jak**: moves to **Chapter 2** (not in Chapter 1 any more). His sprite, gear and battle code stay for then. colour `#7a5a32`. Lost traveller with a sack and an axe. Simple Axe (+1 ATK), Walking Stick (no stats), coat (+1 DEF). Base ATK 3, DEF 1, MAG 2, 20 HP.
+- **Amroth**: the gatekeeper who patrols the Worldbind passage; Lum looks exactly like his wife Alma. Joins Lum at the start of Chapter 2 and follows her, but has no battle role yet (not in `PARTY_ORDER`). Drawn with Spar's sprite as a stand-in until his art arrives.
 - **Cosmic**: colour `#4a6fb5`. The prologue hero. He is gone in Chapter 1 (the Demon God Fokalur uses his body).

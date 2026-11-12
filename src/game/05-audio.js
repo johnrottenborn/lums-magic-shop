@@ -86,6 +86,12 @@ function sfxSplash(){if(!SND.ready)return;const t=SND.ctx.currentTime;noiseHit(t
     g.gain.setValueAtTime(.04,st);g.gain.exponentialRampToValueAtTime(.0005,st+.07);o.connect(g);g.connect(SND.sfx);o.start(st);o.stop(st+.09);}}
 function sfxWell(){if(!SND.ready)return;const t=SND.ctx.currentTime;[86,90,93,98,100,105].forEach((n,i)=>bell(t+i*.12,NOTE(n),.07,2.6,SND.sfx,(i-2.5)*.15));noiseHit(t,1.2,'highpass',6000,.5,.02,SND.sfxVerb);}
 function sfxFizzle(near){if(!SND.ready||!near)return;const t=SND.ctx.currentTime;[100,97,93,88].forEach((n,i)=>bell(t+i*.06,NOTE(n),.03,.5,SND.sfx,.2));noiseHit(t+.25,.3,'bandpass',900,1,.05,SND.sfx);}
+/* a baby's single cry from under the ashes (Chapter 2 opening): a wavering wail that rises and falls, through a vocal-ish filter */
+function sfxBabyCry(v=1){if(!SND.ready)return;const c=SND.ctx,t=c.currentTime,o=c.createOscillator(),f=c.createBiquadFilter(),f2=c.createBiquadFilter(),g=c.createGain(),vib=c.createOscillator(),vg=c.createGain();
+  o.type='sawtooth';o.frequency.setValueAtTime(430,t);o.frequency.linearRampToValueAtTime(560,t+.25);o.frequency.linearRampToValueAtTime(520,t+.75);o.frequency.exponentialRampToValueAtTime(330,t+1.15);
+  vib.frequency.value=6.5;vg.gain.value=14;vib.connect(vg);vg.connect(o.frequency);f.type='bandpass';f.frequency.value=1150;f.Q.value=3;f2.type='bandpass';f2.frequency.value=2600;f2.Q.value=4;
+  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.13*v,t+.08);g.gain.setValueAtTime(.13*v,t+.8);g.gain.exponentialRampToValueAtTime(.001,t+1.2);
+  o.connect(f);o.connect(f2);f.connect(g);f2.connect(g);g.connect(SND.sfx);g.connect(SND.sfxVerb);o.start(t);vib.start(t);o.stop(t+1.25);vib.stop(t+1.25);}
 /* possessed Cosmic (Chapter 1 on): a child's note that sags and splits into a low demonic growl, with a breathy whisper under it */
 function sfxPossessed(){if(!SND.ready)return;const c=SND.ctx,t=c.currentTime,out=SND.sfx;
   const v=c.createOscillator(),vg=c.createGain();v.type='triangle';v.frequency.setValueAtTime(NOTE(81),t);v.frequency.exponentialRampToValueAtTime(NOTE(57),t+.55);

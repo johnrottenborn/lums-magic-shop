@@ -11,7 +11,7 @@ const CPATH_CTRL=[[CLR.cx+CLR.rx-470,CPATH.y+20],[CLR.cx+CLR.rx-300,CPATH.y+6],[
 const CPATH_PTS=splinePts(CPATH_CTRL,20);let CPATHP=null;
 function cpathDist(x,y){let best=1e9;for(let i=0;i<CPATH_PTS.length-1;i++){const [ax,ay]=CPATH_PTS[i],[bx,by]=CPATH_PTS[i+1],dx=bx-ax,dy=by-ay,t=clamp(((x-ax)*dx+(y-ay)*dy)/(dx*dx+dy*dy),0,1),d=Math.hypot(x-ax-dx*t,y-ay-dy*t);if(d<best)best=d;}return best;}
 const clrOnPath=(x,y)=>CH>=2&&cpathDist(x,y)<CPATH.hw;
-function clrFree(x,y){if(CH>=2&&typeof STONELUM!=='undefined'&&Math.hypot((x-STONELUM.x)/34,(y-STONELUM.y)/16)<1)return false;if(x<CLR.x0+(CH>=2?190:70)||!(clrIn(x,y)||clrOnPath(x,y)))return false;if(!C1.fkDone&&Math.hypot((x-(CLR.x0+640))/70,(y-CLR.cy)/26)<1)return false;return true;}
+function clrFree(x,y){if(x<CLR.x0+(CH>=2?190:70)||!(clrIn(x,y)||clrOnPath(x,y)))return false;if(!C1.fkDone&&Math.hypot((x-(CLR.x0+640))/70,(y-CLR.cy)/26)<1)return false;return true;}
 const THORN={built:false,props:[],flowers:[],path:[],pockets:[],t:0,lightK:1};
 // wall lines: hW(line,c) = horizontal wall on the top edge of row `line` at column c; vW(r,line) = vertical wall on the left edge of column `line` at row r
 function hW(line,c){if(c<0||c>=TMZ.C)return false;if(line<=0||line>=TMZ.R)return true;return TMZ.dn[line-1][c]==='1';}
@@ -108,7 +108,7 @@ function enterThorn(){buildThorn();if(!THORN.fint){THORN.fint=1;for(const f of T
 function startThornPreview(){SAVEC.finished=0;audioInit();c1Reset();C1.introDone=1;C1.hedgeSeen=1;C1I.on=false;WEVENT.on=false;INTRO.lumShown=true;if(!BAG.includes('lantern'))BAG.push('lantern');FADE.a=1;FADE.dir=-1;enterThorn();}
 function updateThorn(dt){updateThornAtmos(dt);updateCosSightings(dt);updateThornCritters(dt);updateThornFoes(dt);updateJakFollow(dt);
   if(!C1.jak&&!C1.jakSpotted&&!DLG.active&&!FADE.dir&&Math.hypot(lum.x-JAKREST.x,lum.y-JAKREST.y)<300){C1.jakSpotted=1;talk([['Lum',"Someone's there… slumped against the roots of that old oak."]]);}
-  if(!C1.thornBoss&&lum.x<TW_&&lum.x>12*TCW+TCW*.8&&Math.floor(lum.y/TCH)===2){lum.x=12*TCW+TCW*.8;}const k=Math.min(1,dt*4.5),fkCam=typeof FKS!=='undefined'&&FKS.st>=1&&FKS.st<7&&!C1.fkDone&&lum.x>TW_;cam.x+=((fkCam?(lum.x+FKS.cx)/2:lum.x+40)-cam.x)*k*(fkCam?.5:1);cam.y+=((fkCam?FKS.cy-250:lum.y-50)-cam.y)*k*(fkCam?.5:1);const vw=W/zoom,vh=H/zoom;cam.x=clamp(cam.x,vw/2-80,(lum.x>TW_+40?(CH>=2?CPATH.xt+900:CLR.x1+(fkCam?420:60)):TW_+80)-vw/2);cam.y=clamp(cam.y,-200+vh/2,TH_+60-vh/2);THORN.t+=dt;
+  if(!C1.thornBoss&&lum.x<TW_&&lum.x>12*TCW+TCW*.8&&Math.floor(lum.y/TCH)===2){lum.x=12*TCW+TCW*.8;}const k=Math.min(1,dt*4.5),fkCam=typeof FKS!=='undefined'&&FKS.st>=1&&FKS.st<7&&!C1.fkDone&&lum.x>TW_;const c2c=CH>=2&&typeof C2!=='undefined'&&C2.on&&C2.cam;cam.x+=((c2c?C2.cam.x:fkCam?(lum.x+FKS.cx)/2:lum.x+40)-cam.x)*k*(fkCam||c2c?.5:1);cam.y+=((c2c?C2.cam.y:fkCam?FKS.cy-250:lum.y-50)-cam.y)*k*(fkCam||c2c?.5:1);const vw=W/zoom,vh=H/zoom;cam.x=clamp(cam.x,vw/2-80,(lum.x>TW_+40?(CH>=2?CPATH.xt+900:CLR.x1+(fkCam?420:60)):TW_+80)-vw/2);cam.y=clamp(cam.y,-200+vh/2,TH_+60-vh/2);THORN.t+=dt;
   updateClearing(dt);}
 function drawRedFlowers(x,y,s,seed){ctx.save();ctx.translate(x,y);ctx.scale(s,s);
   for(let i=0;i<4;i++){const a=hash(seed,i,61)*TAU,l=10+hash(seed,i,63)*8;ctx.fillStyle='#2f4a24';ctx.beginPath();ctx.ellipse(Math.cos(a)*l*.6,Math.sin(a)*l*.3+2,l*.55,3,a,0,TAU);ctx.fill();}

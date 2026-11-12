@@ -357,10 +357,29 @@ const CASES = {
     await p.evaluate(() => { const g = window.__g; g.DLG.active = false; g.WEV.fk = 1; g.WEV.foka = 3.2; g.talk([['Fokalur', 'Thank you, foolish apprentice. Your body will serve as a suitable vessel.']]); }); await wait(1600);
     check(await p.evaluate(() => window.__g.IMGX.fokalur === undefined && !!window.__g.IMGX.fokalur_hd), 'the old Demon God sprite is still loaded');
   },
+  async 'ch2-opening'(p) {
+    // narration on black, then Amroth (Spar stand-in) comes down from the gatehouse, frees Lum, finds the baby, and joins
+    const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop', g_ = f => p.evaluate(f);
+    await g_(() => window.__g.startChapter2()); await wait(1500);
+    await p.screenshot({ path: path.join(SHOTS, `ch2-narration-${vp}.png`) });
+    check(await g_(() => window.__g.C2.narr === 0 && window.__g.LUMSTONEX === 1), 'Chapter 2 did not open on narration with Lum in stone');
+    for (let i = 0; i < 12 && await g_(() => window.__g.C2.narr >= 0); i++) { await wait(700); await p.keyboard.press('Enter'); }
+    check(await g_(() => window.__g.C2.narr < 0), 'narration did not finish');
+    await wait(2600); await p.screenshot({ path: path.join(SHOTS, `ch2-gatehouse-${vp}.png`) });
+    const shots = { 5: 'alma', 7: 'stonebreak', 11: 'ashes', 15: 'leaving' }, seen = {};
+    for (let i = 0; i < 400 && await g_(() => window.__g.C2.on); i++) {
+      const st = await g_(() => window.__g.C2.st);
+      if (shots[st] && !seen[st]) { seen[st] = 1; await wait(st === 7 ? 1800 : 300); await p.screenshot({ path: path.join(SHOTS, `ch2-${shots[st]}-${vp}.png`) }); }
+      if (await g_(() => window.__g.DLG.active)) { await wait(250); await p.keyboard.press('Enter'); } else await wait(250);
+    }
+    const r = await g_(() => ({ on: window.__g.C2.on, joined: window.__g.C2.joined, stone: window.__g.LUMSTONEX, party: window.__g.PARTY_ORDER.join(',') }));
+    check(!r.on && r.joined && !r.stone && r.party === 'lum', 'opening did not end with Lum free and Amroth along (not in battle party): ' + JSON.stringify(r));
+    await wait(1500); await p.screenshot({ path: path.join(SHOTS, `ch2-after-${vp}.png`) });
+  },
   async 'ch2-clearing'(p) {
     // Chapter 2 opens in the big round clearing; the path east then north reaches the gatehouse
     const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop';
-    await p.evaluate(() => window.__g.startChapter2()); await wait(2500);
+    await p.evaluate(() => { window.__g.startChapter2(); window.__g.c2Skip(); }); await wait(2500);
     await p.evaluate(() => { window.__g.DLG.active = false; }); await wait(400);
     await p.screenshot({ path: path.join(SHOTS, `ch2-clearing-${vp}.png`) });
     const ok = await p.evaluate(() => { const g = window.__g, P = g.CPATH; const tries = [[g.CLR.cx, g.CLR.cy], [g.CLR.x1 + 200, P.y], [P.xt, P.y - 200], [P.xt, P.ytop + 60]]; return tries.map(([x, y]) => g.thornFree(x, y)); });
@@ -368,7 +387,6 @@ const CASES = {
     check(await p.evaluate(() => { const g = window.__g; return !g.thornFree(g.CLR.x0 + 120, g.CLR.cy); }), 'the burning west entrance can still be walked through in Chapter 2');
     const fl = await p.evaluate(async () => { const g = window.__g; g.lum.x = g.CLR.x0 + 200; g.lum.y = g.CLR.cy; await new Promise(r => setTimeout(r, 500)); const n = g.NEAR; if (n) n.onInteract(); await new Promise(r => setTimeout(r, 200)); const L = g.DLG.lines && g.DLG.lines[0]; g.DLG.active = false; return L ? L[1] : null; });
     check(fl === 'These are not ordinary flames.', 'the flames at the Stranglethorn entrance did not speak: ' + fl);
-    check(await p.evaluate(() => { const g = window.__g; return !g.thornFree(g.FKSX ? g.FKSX.cx - 240 : g.CLR.x0 + 400, g.CLR.cy); }), 'Lum can walk through her petrified self');
     await p.evaluate(() => { const g = window.__g, P = g.CPATH; g.lum.x = P.xt; g.lum.y = P.y - 150; g.cam.x = g.lum.x; g.cam.y = g.lum.y; }); await wait(1500);
     await p.screenshot({ path: path.join(SHOTS, `ch2-gatehouse-path-${vp}.png`) });
     await p.evaluate(() => { const g = window.__g, P = g.CPATH; g.lum.x = P.xt; g.lum.y = P.ytop + 80; }); await wait(800);
