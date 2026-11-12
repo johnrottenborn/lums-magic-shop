@@ -50,11 +50,13 @@ function fkChaosPts(){if(fkChaosPts.c)return fkChaosPts.c;const o=FKS.fire||{x:F
   for(let i=0;i<46;i++){const a=hash(i,1,601)*TAU,r=Math.sqrt(hash(i,2,601))*.95,x=CLR.cx+Math.cos(a)*(CLR.rx-60)*r,y=CLR.cy+Math.sin(a)*(CLR.ry-50)*r;if(Math.hypot(x-(FKS.cx-240),(y-FKS.cy)*1.5)<90)continue;out.push([x,y,70+hash(i,3,601)*110,Math.hypot(x-o.x,y-o.y)/260]);}
   for(let i=0;i<26;i++){const a=i/26*TAU+hash(i,4,603)*.2,x=CLR.cx+Math.cos(a)*(CLR.rx+30),y=CLR.cy+Math.sin(a)*(CLR.ry+40);out.push([x,y,170+hash(i,5,603)*120,1.4+hash(i,6,603)*2.2]);}
   return fkChaosPts.c=out.sort((a,b)=>a[1]-b[1]);}
-function drawFkChaos(){const t=FKS.chaos,vw=W/zoom,vh=H/zoom,x0=cam.x-vw/2-200,x1=cam.x+vw/2+200,y0=cam.y-vh/2-200,y1=cam.y+vh/2+300;
+function drawFkChaos(front){const t=FKS.chaos,vw=W/zoom,vh=H/zoom,x0=cam.x-vw/2-200,x1=cam.x+vw/2+200,y0=cam.y-vh/2-200,y1=cam.y+vh/2+300;
   ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,CLR.cx,CLR.cy-80,CLR.rx*1.3,'255,70,20',Math.min(.32,t*.08));ctx.restore();
-  for(const [x,y,h,d] of fkChaosPts()){const u=Math.min(1,(t-d)/1.2);if(u<=0||x<x0||x>x1||y<y0||y>y1)continue;ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,x,y-h*.3,h*.7,'255,90,30',.22*u);ctx.restore();drawFlames(ctx,x,y,h*u,u);}
+  for(const [x,y,h,d] of fkChaosPts()){const u=Math.min(1,(t-d)/1.2);if(u<=0||x<x0||x>x1||y<y0||y>y1)continue;const inFront=y>FKS.cy+10||FKS.fa<=0;ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,x,y-h*.3,h*.8,'255,90,30',(front?.3:.2)*u);ctx.restore();if(front!==inFront)continue;drawFlames(ctx,x,y,h*u,u);drawFlames(ctx,x+h*.12,y+4,h*.7*u,u);}
+  if(!front){
   // smoke rolling over everything, embers swirling up
   for(let i=0;i<14;i++){const q=(T*.06+hash(i,1,607))%1,x=CLR.cx+(hash(i,2,607)-.5)*CLR.rx*2.2+Math.sin(T*.3+i)*60,y=CLR.cy+CLR.ry*.5-q*CLR.ry*2.4,r=160+q*240;ctx.save();ctx.globalAlpha=Math.min(1,t*.3)*(1-q)*Math.min(1,q*4)*.55;drawGlow(ctx,x,y,r,'50,40,44',1);ctx.restore();}
+  return;}
   ctx.save();ctx.globalCompositeOperation='lighter';for(let i=0;i<60;i++){const q=(T*(.18+hash(i,3,609)*.25)+hash(i,4,609))%1,x=CLR.cx+(hash(i,5,609)-.5)*CLR.rx*2+Math.sin(T*1.3+i)*30*q,y=CLR.cy+CLR.ry*.6-q*CLR.ry*2.2;ctx.fillStyle=`rgba(255,${140+(hash(i,6,609)*90)|0},60,${Math.min(1,t*.4)*(1-q)})`;ctx.beginPath();ctx.arc(x,y,2.4*(1-q)+.8,0,TAU);ctx.fill();}ctx.restore();}
 function drawSparOW(F,alpha){if(!F)return;if(F===JAKF&&fkFacing()&&!FKS.jakIn){F.dir='side';F.face=F.x<FKS.cx?1:-1;F.moving=0;}const vert=F.dir==='up'||F.dir==='down',an=vert?F.dir:'side',fi=F.moving?Math.floor((F.ph||0)/16)%5:0;
   ctx.fillStyle='rgba(10,10,20,.25)';ctx.beginPath();ctx.ellipse(F.x,F.y+2,30,8,0,0,TAU);ctx.fill();c1Frame(ctx,'spar',an,fi,F.x,F.y+3,SPAR_H,!vert&&F.face<0,alpha??1,0);}
@@ -144,7 +146,7 @@ function drawThorn(){const vw=W/zoom,vh=H/zoom,x0=cam.x-vw/2-60,y0=cam.y-vh/2-60
   // fallen petals and a darker rim outside the maze
   ctx.fillStyle='rgba(10,8,12,.55)';if(x0<0)ctx.fillRect(x0,y0,-x0,y1-y0);if(x1>TW_&&CH<2)ctx.fillRect(TW_,y0,x1-TW_,y1-y0);if(y0<0)ctx.fillRect(x0,y0,x1-x0,-y0);
   for(const d of THORN.decals||[]){const im=IMG[d.n];if(!ready(im))continue;const h=d.w*im.naturalHeight/im.naturalWidth;if(d.x+d.w/2<x0||d.x-d.w/2>x1||d.y+h/2<y0||d.y-h/2>y1)continue;ctx.save();ctx.translate(d.x,d.y);if(d.flip)ctx.scale(-1,1);ctx.drawImage(im,-d.w/2,-h/2,d.w,h);ctx.restore();}
-  drawClrPath(x0,x1);if(CH>=2){drawClrScorch(x0,y0,x1,y1);drawAshMound();}
+  drawClrPath(x0,x1);if(CH===1&&FKS.chaos)drawFkChaos(false);if(CH>=2){drawClrScorch(x0,y0,x1,y1);drawAshMound();}
   drawCellarMouth();
   for(const f of THORN.flowers)if(f.x>x0-30&&f.x<x1+30&&f.y>y0-30&&f.y<y1)drawRedFlowers(f.x,f.y,f.s,f.seed);
   const L=[];for(const o of THORN.props)if(o.x>x0-o.w/2-40&&o.x<x1+o.w/2+40&&o.y>y0-20&&o.y<y1+o.w*1.4)L.push([o.y,o]);L.push([lum.y,null]);L.sort((a,b)=>a[0]-b[0]);
@@ -155,7 +157,7 @@ function drawThorn(){const vw=W/zoom,vh=H/zoom,x0=cam.x-vw/2-60,y0=cam.y-vh/2-60
   ctx.save();ctx.globalCompositeOperation='lighter';for(const m of THORN.mist){if(m.x<x0-m.r||m.x>x1+m.r||m.y<y0-m.r||m.y>y1+m.r)continue;drawGlow(ctx,m.x+Math.sin(T*.08+m.ph)*50,m.y,m.r,'150,90,110',.05+.025*Math.sin(T*.4+m.ph));}ctx.restore();
   /* Chapter 2: flames from the hellfire block the way back into Stranglethorn */
   if(CH>=2){for(let k=0;k<7;k++){const fy=CLR.cy-150+k*50,fx=CLR.x0+70+Math.sin(k*2.1)*22;ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,fx,fy-40,110,'255,120,40',.22+.06*Math.sin(T*3+k));ctx.restore();drawFlames(ctx,fx,fy,150+30*Math.sin(k*1.7),1);}}
-  drawC2World();if(CH>=2&&NIGHT.rain)drawRain(1/60);if(CH===1&&FKS.chaos)drawFkChaos();
+  drawC2World();if(CH>=2&&NIGHT.rain)drawRain(1/60);
   /* Chapter 1 never shows the clearing's east side (the outpost and mountain belong to Chapter 2's opening): it stays in darkness */
   if(CH===1){const g=ctx.createLinearGradient(CLR.x1+30,0,CLR.x1+190,0);g.addColorStop(0,'rgba(6,5,10,0)');g.addColorStop(1,'rgba(6,5,10,.98)');ctx.fillStyle=g;ctx.fillRect(CLR.x1+30,y0-200,160,y1-y0+600);ctx.fillStyle='rgba(6,5,10,.98)';ctx.fillRect(CLR.x1+189,y0-200,x1-CLR.x1+800,y1-y0+600);}
   ctx.setTransform(DPR,0,0,DPR,0,0);
@@ -174,6 +176,8 @@ function drawThorn(){const vw=W/zoom,vh=H/zoom,x0=cam.x-vw/2-60,y0=cam.y-vh/2-60
   // the guiding roses keep a faint warm glow so they read through the fog
   ctx.save();ctx.globalCompositeOperation='lighter';for(const [bx,by] of THORN.blooms||[]){const px=(bx-cam.x)*zoom+W/2,py=(by-cam.y)*zoom+H/2;drawGlow(ctx,px,py,26*zoom,'235,40,60',.32+.06*Math.sin(T*2+bx));}ctx.restore();
   {const vg=ctx.createRadialGradient(W/2,H*.48,Math.min(W,H)*.32,W/2,H*.48,Math.max(W,H)*.78);vg.addColorStop(0,'rgba(4,3,10,0)');vg.addColorStop(1,`rgba(4,3,10,${C2_?.3:.6})`);ctx.fillStyle=vg;ctx.fillRect(0,0,W,H);}
+  /* the spreading hellfire is drawn above the forest's darkness so it lights the scene */
+  if(CH===1&&FKS.chaos){ctx.save();ctx.setTransform(DPR*zoom,0,0,DPR*zoom,DPR*(W/2-cam.x*zoom),DPR*(H/2-cam.y*zoom));drawFkChaos(true);ctx.restore();ctx.save();ctx.globalCompositeOperation='lighter';ctx.fillStyle=`rgba(120,30,10,${Math.min(.22,FKS.chaos*.05)})`;ctx.fillRect(0,0,W,H);ctx.restore();}
   drawC1EndCard();drawC1Results();
   if(THORN.t<4.5){const a=Math.min(1,THORN.t*1.5,(4.5-THORN.t)*1.2);ctx.save();ctx.globalAlpha=a;ctx.textAlign='center';ctx.fillStyle='rgba(20,5,10,.45)';ctx.fillRect(0,H*.3-40,W,80);
     ctx.fillStyle='#f0dede';ctx.font='700 26px "Alegreya SC", Georgia, serif';ctx.fillText('Stranglethorn Forest',W/2,H*.3+10);ctx.restore();}}
