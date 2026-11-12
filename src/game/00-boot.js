@@ -49,13 +49,12 @@ function withStone(key,bx,by,bw,bh,fn){const m=ctx.getTransform(),sc=Math.max(.5
     e=STONE[key]={k,c:oc};}
   ctx.drawImage(e.c,bx,by,bw,bh);}
 /* a column of fire: flickering tongues, a hot glow and rising embers. x,y is the base, h its height */
-function drawFlames(c,x,y,h,a){if(a<=0||h<=0)return;c.save();c.globalAlpha=a;
-  c.globalCompositeOperation='lighter';drawGlow(c,x,y-h*.3,h*.7,'255,90,30',.3);c.globalCompositeOperation='source-over';
-  const tongue=(ox,w,hh,sway,c0,c1)=>{const g=c.createLinearGradient(0,y,0,y-hh);g.addColorStop(0,c0);g.addColorStop(.55,c1);g.addColorStop(1,'rgba(255,200,90,0)');c.fillStyle=g;
-    c.beginPath();c.moveTo(x+ox-w/2,y);c.bezierCurveTo(x+ox-w*.75,y-hh*.35,x+ox-w*.2+sway*.5,y-hh*.7,x+ox+sway,y-hh);c.bezierCurveTo(x+ox+w*.2+sway*.5,y-hh*.7,x+ox+w*.75,y-hh*.35,x+ox+w/2,y);c.closePath();c.fill();};
-  // outer flames: red-orange, tallest in the middle, each flickering on its own
-  for(let i=0;i<7;i++){const u=(i-3)/3,f=.75+.25*Math.sin(T*8+i*2.3)+.08*Math.sin(T*17+i),hh=h*(1-.5*Math.abs(u))*f,w=h*.2;tongue(u*h*.22,w,hh,Math.sin(T*5+i*1.7)*w*.5,'rgba(200,50,20,.95)','rgba(245,110,30,.8)');}
-  // hot core: yellow-white, shorter
-  for(let i=0;i<4;i++){const u=(i-1.5)/1.5,f=.75+.25*Math.sin(T*11+i*1.9),hh=h*.55*(1-.35*Math.abs(u))*f,w=h*.14;tongue(u*h*.12,w,hh,Math.sin(T*7+i)*w*.4,'rgba(255,200,80,.95)','rgba(255,235,150,.7)');}
-  c.globalCompositeOperation='lighter';for(let i=0;i<10;i++){const u=(T*.7+i/10)%1,ex=x+Math.sin(i*7.3+T*2)*h*.22,ey=y-h*.3-u*h*.9;c.fillStyle=`rgba(255,${170+((i*37)%70)},80,${(1-u)*.9})`;c.beginPath();c.arc(ex,ey,Math.max(1,h*.012*(1-u*.5)),0,TAU);c.fill();}
-  c.restore();}
+/* flames (every fire in the game: clearing, root fires, Spar's hellfire, battle): soft glowing particles that rise slowly, shrink and cool from
+   pale yellow to orange to deep red, then drift off as faint smoke. Each fire gets its own pattern from where it stands. */
+function drawFlames(c,x,y,h,a){if(a<=0||h<=0)return;const sd=((x*.37+y*.11)|0)%97,ga=c.globalAlpha;c.save();
+  c.globalCompositeOperation='lighter';drawGlow(c,x,y-h*.25,h*.85,'255,110,40',.18*a);
+  const N=Math.round(clamp(18+h*.16,18,46));for(let i=0;i<N;i++){const sp=.32+hash(i,sd+1,71)*.22,t=(T*sp+hash(i,sd+2,71))%1,
+    dx=(hash(i,sd+3,71)-.5)*h*.34*(1-t*.55)+Math.sin(T*1.6+i*1.3)*h*.04*t,px=x+dx,py=y-t*h*1.05,r=h*.2*(1-t)**.7+2;
+    const col=t<.2?'255,214,140':t<.5?'250,130,60':'210,66,36';drawGlow(c,px,py,r,col,(1-t)*.24*a);}
+  c.globalCompositeOperation='source-over';for(let i=0;i<7;i++){const t=(T*.16+hash(i,sd+7,71))%1,px=x+(hash(i,sd+8,71)-.5)*h*.3+Math.sin(T*.6+i)*h*.14*t,py=y-h*(.85+t*1.1),r=h*.14+h*.3*t;drawGlow(c,px,py,r,'110,102,108',.22*(1-t)*Math.min(1,t*4)*a);}
+  c.restore();c.globalAlpha=ga;}
