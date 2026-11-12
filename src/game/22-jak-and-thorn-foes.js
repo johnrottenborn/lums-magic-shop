@@ -70,7 +70,8 @@ const THINT=[{x:JAKREST.x-6,y:JAKREST.y-100,reach:100,onInteract:()=>jakInteract
   // the maze's exit, once the Broodmother is gone: on to the clearing
   {x:TW_,y:TMZ.finish*TCH+TCH/2+10,reach:165,door:true,onInteract:()=>goScene(enterClearing)},
   // and back again, before Lum reaches Cosmic
-  {x:TW_+260+95,y:TMZ.finish*TCH+TCH/2+10,reach:80,door:true,onInteract:()=>{if(FKS.st)return;goScene(()=>{lum.x=TW_-120;lum.y=TMZ.finish*TCH+TCH/2+10;lum.face=-1;cam.x=lum.x;cam.y=lum.y-50;resetJakFollow();});}}];
+  // (in Chapter 2 the hellfire still burns across this entrance: no door, no way back into Stranglethorn)
+  {x:TW_+260+95,y:TMZ.finish*TCH+TCH/2+10,get reach(){return CH>=2?0:80},dynDoor:true,get door(){return CH<2},onInteract:()=>{if(FKS.st||CH>=2)return;goScene(()=>{lum.x=TW_-120;lum.y=TMZ.finish*TCH+TCH/2+10;lum.face=-1;cam.x=lum.x;cam.y=lum.y-50;resetJakFollow();});}}];
 
 // roaming creatures: spiders, Flora, red slimes and red foxes
 const THFOES=[];let thFoesBuilt=false;const THBOSS={kind:'bigspider',scene:'thorn',x:12*TCW+TCW/2,y:2*TCH+190,s:1,pack:1,calm:0,dead:0,ph:0,face:-1,boss:1};
@@ -116,6 +117,8 @@ function drawThorn(){const vw=W/zoom,vh=H/zoom,x0=cam.x-vw/2-60,y0=cam.y-vh/2-60
   drawForage(THORN.forage||[]);drawThornCritters(x0,y0,x1,y1);drawThornWebs(x0,y0,x1,y1);
   drawThornMotes();
   ctx.save();ctx.globalCompositeOperation='lighter';for(const m of THORN.mist){if(m.x<x0-m.r||m.x>x1+m.r||m.y<y0-m.r||m.y>y1+m.r)continue;drawGlow(ctx,m.x+Math.sin(T*.08+m.ph)*50,m.y,m.r,'150,90,110',.05+.025*Math.sin(T*.4+m.ph));}ctx.restore();
+  /* Chapter 2: flames from the hellfire block the way back into Stranglethorn */
+  if(CH>=2){for(let k=0;k<7;k++){const fy=CLR.cy-150+k*50,fx=CLR.x0+70+Math.sin(k*2.1)*22;ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,fx,fy-40,110,'255,120,40',.22+.06*Math.sin(T*3+k));ctx.restore();drawFlames(ctx,fx,fy,150+30*Math.sin(k*1.7),1);}}
   /* Chapter 1 never shows the clearing's east side (the outpost and mountain belong to Chapter 2's opening): it stays in darkness */
   if(CH===1){const g=ctx.createLinearGradient(CLR.x1+30,0,CLR.x1+190,0);g.addColorStop(0,'rgba(6,5,10,0)');g.addColorStop(1,'rgba(6,5,10,.98)');ctx.fillStyle=g;ctx.fillRect(CLR.x1+30,y0-200,160,y1-y0+600);ctx.fillStyle='rgba(6,5,10,.98)';ctx.fillRect(CLR.x1+189,y0-200,x1-CLR.x1+800,y1-y0+600);}
   ctx.setTransform(DPR,0,0,DPR,0,0);

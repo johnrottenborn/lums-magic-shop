@@ -365,6 +365,7 @@ const CASES = {
     await p.screenshot({ path: path.join(SHOTS, `ch2-clearing-${vp}.png`) });
     const ok = await p.evaluate(() => { const g = window.__g, P = g.CPATH; const tries = [[g.CLR.cx, g.CLR.cy], [g.CLR.x1 + 200, P.y], [P.xt, P.y - 200], [P.xt, P.ytop + 60]]; return tries.map(([x, y]) => g.thornFree(x, y)); });
     check(ok.every(Boolean), 'clearing/path not walkable: ' + JSON.stringify(ok));
+    check(await p.evaluate(() => { const g = window.__g; return !g.thornFree(g.CLR.x0 + 120, g.CLR.cy); }), 'the burning west entrance can still be walked through in Chapter 2');
     await p.evaluate(() => { const g = window.__g, P = g.CPATH; g.lum.x = P.xt; g.lum.y = P.y - 150; g.cam.x = g.lum.x; g.cam.y = g.lum.y; }); await wait(1500);
     await p.screenshot({ path: path.join(SHOTS, `ch2-gatehouse-path-${vp}.png`) });
     await p.evaluate(() => { const g = window.__g; g.lum.x = g.CLR.x1 + 150; g.lum.y = g.CPATH.y; }); await wait(1500);
