@@ -45,6 +45,17 @@ function drawClrScorch(x0,y0,x1,y1){ctx.save();ctx.beginPath();ctx.ellipse(CLR.c
   for(const [x,y,v] of clrScorchPts()){if(x<x0-60||x>x1+60||y<y0-60||y>y1+80)continue;ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,x,y,40,'255,110,40',.18);ctx.restore();drawFlames(ctx,x,y,34+v*26,.95);}}
 function drawStoneLum(){const sv={x:lum.x,y:lum.y,face:lum.face,state:lum.state,vx:lum.vx,vy:lum.vy,stepF:lum.stepF},st=LUMSTONE;
   lum.x=STONELUM.x;lum.y=STONELUM.y;lum.face=1;lum.state='idle';lum.vx=lum.vy=0;LUMSTONE=1;try{drawLum();}finally{Object.assign(lum,sv);LUMSTONE=st;}}
+/* the end of Chapter 1: hellfire spreading from Spar across the clearing and up the trees around it */
+function fkChaosPts(){if(fkChaosPts.c)return fkChaosPts.c;const o=FKS.fire||{x:FKS.cx-120,y:FKS.cy},out=[];
+  for(let i=0;i<46;i++){const a=hash(i,1,601)*TAU,r=Math.sqrt(hash(i,2,601))*.95,x=CLR.cx+Math.cos(a)*(CLR.rx-60)*r,y=CLR.cy+Math.sin(a)*(CLR.ry-50)*r;if(Math.hypot(x-(FKS.cx-240),(y-FKS.cy)*1.5)<90)continue;out.push([x,y,70+hash(i,3,601)*110,Math.hypot(x-o.x,y-o.y)/260]);}
+  for(let i=0;i<26;i++){const a=i/26*TAU+hash(i,4,603)*.2,x=CLR.cx+Math.cos(a)*(CLR.rx+30),y=CLR.cy+Math.sin(a)*(CLR.ry+40);out.push([x,y,170+hash(i,5,603)*120,1.4+hash(i,6,603)*2.2]);}
+  return fkChaosPts.c=out.sort((a,b)=>a[1]-b[1]);}
+function drawFkChaos(){const t=FKS.chaos,vw=W/zoom,vh=H/zoom,x0=cam.x-vw/2-200,x1=cam.x+vw/2+200,y0=cam.y-vh/2-200,y1=cam.y+vh/2+300;
+  ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,CLR.cx,CLR.cy-80,CLR.rx*1.3,'255,70,20',Math.min(.32,t*.08));ctx.restore();
+  for(const [x,y,h,d] of fkChaosPts()){const u=Math.min(1,(t-d)/1.2);if(u<=0||x<x0||x>x1||y<y0||y>y1)continue;ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,x,y-h*.3,h*.7,'255,90,30',.22*u);ctx.restore();drawFlames(ctx,x,y,h*u,u);}
+  // smoke rolling over everything, embers swirling up
+  for(let i=0;i<14;i++){const q=(T*.06+hash(i,1,607))%1,x=CLR.cx+(hash(i,2,607)-.5)*CLR.rx*2.2+Math.sin(T*.3+i)*60,y=CLR.cy+CLR.ry*.5-q*CLR.ry*2.4,r=160+q*240;ctx.save();ctx.globalAlpha=Math.min(1,t*.3)*(1-q)*Math.min(1,q*4)*.55;drawGlow(ctx,x,y,r,'50,40,44',1);ctx.restore();}
+  ctx.save();ctx.globalCompositeOperation='lighter';for(let i=0;i<60;i++){const q=(T*(.18+hash(i,3,609)*.25)+hash(i,4,609))%1,x=CLR.cx+(hash(i,5,609)-.5)*CLR.rx*2+Math.sin(T*1.3+i)*30*q,y=CLR.cy+CLR.ry*.6-q*CLR.ry*2.2;ctx.fillStyle=`rgba(255,${140+(hash(i,6,609)*90)|0},60,${Math.min(1,t*.4)*(1-q)})`;ctx.beginPath();ctx.arc(x,y,2.4*(1-q)+.8,0,TAU);ctx.fill();}ctx.restore();}
 function drawSparOW(F,alpha){if(!F)return;if(F===JAKF&&fkFacing()&&!FKS.jakIn){F.dir='side';F.face=F.x<FKS.cx?1:-1;F.moving=0;}const vert=F.dir==='up'||F.dir==='down',an=vert?F.dir:'side',fi=F.moving?Math.floor((F.ph||0)/16)%5:0;
   ctx.fillStyle='rgba(10,10,20,.25)';ctx.beginPath();ctx.ellipse(F.x,F.y+2,30,8,0,0,TAU);ctx.fill();c1Frame(ctx,'spar',an,fi,F.x,F.y+3,SPAR_H,!vert&&F.face<0,alpha??1,0);}
 function drawJakResting(){if(MATE==='spar'){drawSparResting();return;}drawJakResting_();}
@@ -144,7 +155,7 @@ function drawThorn(){const vw=W/zoom,vh=H/zoom,x0=cam.x-vw/2-60,y0=cam.y-vh/2-60
   ctx.save();ctx.globalCompositeOperation='lighter';for(const m of THORN.mist){if(m.x<x0-m.r||m.x>x1+m.r||m.y<y0-m.r||m.y>y1+m.r)continue;drawGlow(ctx,m.x+Math.sin(T*.08+m.ph)*50,m.y,m.r,'150,90,110',.05+.025*Math.sin(T*.4+m.ph));}ctx.restore();
   /* Chapter 2: flames from the hellfire block the way back into Stranglethorn */
   if(CH>=2){for(let k=0;k<7;k++){const fy=CLR.cy-150+k*50,fx=CLR.x0+70+Math.sin(k*2.1)*22;ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,fx,fy-40,110,'255,120,40',.22+.06*Math.sin(T*3+k));ctx.restore();drawFlames(ctx,fx,fy,150+30*Math.sin(k*1.7),1);}}
-  drawC2World();if(CH>=2&&NIGHT.rain)drawRain(1/60);
+  drawC2World();if(CH>=2&&NIGHT.rain)drawRain(1/60);if(CH===1&&FKS.chaos)drawFkChaos();
   /* Chapter 1 never shows the clearing's east side (the outpost and mountain belong to Chapter 2's opening): it stays in darkness */
   if(CH===1){const g=ctx.createLinearGradient(CLR.x1+30,0,CLR.x1+190,0);g.addColorStop(0,'rgba(6,5,10,0)');g.addColorStop(1,'rgba(6,5,10,.98)');ctx.fillStyle=g;ctx.fillRect(CLR.x1+30,y0-200,160,y1-y0+600);ctx.fillStyle='rgba(6,5,10,.98)';ctx.fillRect(CLR.x1+189,y0-200,x1-CLR.x1+800,y1-y0+600);}
   ctx.setTransform(DPR,0,0,DPR,0,0);
@@ -212,6 +223,9 @@ function updateClearing(dt){if(C1.fkDone)return;FKS.t+=dt;FKS.flash=Math.max(0,F
   if(FKS.jakIn&&JAKF){const J_=FKS.jakIn,dx=J_.tx-JAKF.x,step=300*dt;JAKF.y=J_.ty;JAKF.dir='side';JAKF.face=1;
     if(Math.abs(dx)<=step){JAKF.x=J_.tx;JAKF.moving=0;JAKF.mv=0;FKS.jakIn=null;talk([['Spar',"Lum!"]],false,fkStand);}else{JAKF.x+=Math.sign(dx)*step;JAKF.moving=1;JAKF.mv=1;JAKF.ph+=step;}}
   if(FKS.st===8){ZOOMK=1-.22*easeIO(Math.min(1,FKS.t/4));if(FKS.t>2.6&&!FKS.ended){FKS.ended=1;C1.fkDone=1;C1.chEnd=1;finishChapter('ch1');startCh1Results();}}
+  /* chaos: from "A stone witch watches…" (or his last line, if Lum came alone) fire spreads out across the clearing */
+  if(FKS.st>=5&&!FKS.chaos&&DLG.active){const ln=(DLG.lines[DLG.i]||[])[1]||'';if(/stone witch|true meaning of suffering/.test(ln)){FKS.chaos=.001;sfxRumble(2.5,.7);}}
+  if(FKS.chaos)FKS.chaos+=dt;
   if(FKS.st===6){FKS.fa=Math.max(0,FKS.fa-dt*.7);if(FKS.fa<=0){FKS.st=7;fkFarewell();}}}
 const fkJak=()=>jakInParty();
 /* ZOOMK: the slow pull-back at the end of the clearing (1 = normal view) */

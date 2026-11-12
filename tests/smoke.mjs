@@ -336,6 +336,8 @@ const CASES = {
     check(await until(() => window.__g.FKS.st === 5 && !window.__g.BATTLE.on, 15000), 'the lost battle did not return to the clearing');
     await wait(1600); await p.screenshot({ path: path.join(SHOTS, `fokalur-aftermath-${vp}.png`) });
     check(await p.evaluate(() => window.__g.LUMSTONE === 1 && !!window.__g.FKS.fire), 'no stone Lum and fire in the clearing after the battle');
+    check(await until(() => window.__g.FKS.chaos > 3, 40000), 'the fires did not spread after the battle');
+    await p.screenshot({ path: path.join(SHOTS, `fokalur-chaos-${vp}.png`) });
     check(await until(() => window.__g.FKS.st === 8, 40000), 'the scene did not pull back after Lum\'s last line');
     await wait(1800); await p.screenshot({ path: path.join(SHOTS, `fokalur-pullback-${vp}.png`) });
     check(await until(() => window.__g.C1X.fkDone === 1, 40000), 'the scene after the battle did not finish the chapter');
