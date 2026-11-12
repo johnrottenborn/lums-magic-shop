@@ -58,10 +58,12 @@ function buildThorn(){if(THORN.built)return;THORN.built=true;const P=THORN.props
    // the evergreens: the east rim, and both sides of the path (spruce and tall pine most often, saplings and twisted ones mixed in)
    const PN=[['pine_spruce',290],['pine_tall',250],['pine_spruce',300],['pine_twist_a',330],['pine_tall',240],['pine_sapling',270],['pine_twist_b',340]];
    const LOW=PN.filter(p=>p[0]!=='pine_tall');
-   const pine=(x,y,k,s0=1,low=false)=>{const L_=low?LOW:PN,[img,w]=L_[Math.floor(H_(k,9,233)*L_.length)];P.push({t:'tree',img,x:x+(H_(k,10,233)-.5)*40,y:y+(H_(k,11,233)-.5)*20,w:w*s0*(.9+H_(k,12,233)*.25),flip:H_(k,13,233)<.5,base:.95});};
-   let q=0;for(let d=-60;d<=60;d+=13){if(d>4&&d<32)continue;const th=d*Math.PI/180;pine(CLR.cx+(CLR.rx+60)*Math.cos(th),CLR.cy+(CLR.ry+60+40*Math.max(0,Math.sin(th)))*Math.sin(th),q++);}
+   // Chapter 2 (after the hellfire): the evergreens nearest the clearing stand burned, some still smouldering
+   const BURNT=[['burnt_charred_big',400],['burnt_smoulder_small',300],['burnt_charred_twist',290],['burnt_smoulder_big',390],['burnt_charred_small',300],['burnt_smoulder_twist',290]];
+   const pine=(x,y,k,s0=1,low=false,burn=0)=>{const L_=low?LOW:PN,[img,w]=L_[Math.floor(H_(k,9,233)*L_.length)],b=burn&&H_(k,17,233)<burn?BURNT[Math.floor(H_(k,18,233)*BURNT.length)]:null;P.push({t:'tree',img,img2:b&&b[0],w2:b&&b[1]*s0*(.9+H_(k,12,233)*.25),x:x+(H_(k,10,233)-.5)*40,y:y+(H_(k,11,233)-.5)*20,w:w*s0*(.9+H_(k,12,233)*.25),flip:H_(k,13,233)<.5,base:.95});};
+   let q=0;for(let d=-60;d<=60;d+=13){if(d>4&&d<32)continue;const th=d*Math.PI/180;pine(CLR.cx+(CLR.rx+60)*Math.cos(th),CLR.cy+(CLR.ry+60+40*Math.max(0,Math.sin(th)))*Math.sin(th),q++,1,false,.85);}
    // path sides: trunks kept clear of the dirt so the trees never hide Lum on the path
-   for(let x=CLR.x1+60;x<CPATH.xt+300;x+=210){pine(x,CPATH.y+CPATH.hw+430,q++,.95,true);if(x<CPATH.xt-260)pine(x,CPATH.y-CPATH.hw-20,q++,.95);}
+   for(let x=CLR.x1+60;x<CPATH.xt+300;x+=210){const bn=x<CLR.x1+420?.6:.12;pine(x,CPATH.y+CPATH.hw+430,q++,.95,true,bn);if(x<CPATH.xt-260)pine(x,CPATH.y-CPATH.hw-20,q++,.95,false,bn);}
    for(let y=CPATH.ytop+150;y<CPATH.y-CPATH.hw;y+=210){pine(CPATH.xt-CPATH.hw-200,y,q++,.95);pine(CPATH.xt+CPATH.hw+200,y+60,q++,.95);}
    // the Worldbind: cliff faces behind the gatehouse and along the path's east side; the gatehouse sits in the mountain face where the path ends
    P.push({t:'tree',img:'worldbind_cliff',x:CPATH.xt+200,y:CPATH.ytop-40,w:2300,flip:false,cliff:1});
@@ -105,8 +107,8 @@ function drawRedFlowers(x,y,s,seed){ctx.save();ctx.translate(x,y);ctx.scale(s,s)
     ctx.fillStyle='#e0363f';for(let p=0;p<5;p++){const a=p/5*TAU+.6;ctx.beginPath();ctx.ellipse(Math.cos(a)*r*.45,Math.sin(a)*r*.45,r*.42,r*.3,a,0,TAU);ctx.fill();}
     ctx.fillStyle='#2a0a0e';ctx.beginPath();ctx.arc(0,0,r*.28,0,TAU);ctx.fill();ctx.restore();}
   ctx.restore();}
-function drawThornProp(o,alpha){if(o.t==='shrub'){drawShrub(o);return;}const name=o.t==='hedge'?'bramble_hedge':o.t==='arch'?'bramble_arch':o.t==='oak'?'oak_big':o.t==='web'?'webtree':o.img;const im=IMG[name];if(!ready(im))return;
-  const w=o.w,h=w*im.naturalHeight/im.naturalWidth;ctx.save();ctx.globalAlpha=alpha;ctx.translate(o.x,o.y);if(o.flip)ctx.scale(-1,1);
+function drawThornProp(o,alpha){if(o.t==='shrub'){drawShrub(o);return;}const name=o.t==='hedge'?'bramble_hedge':o.t==='arch'?'bramble_arch':o.t==='oak'?'oak_big':o.t==='web'?'webtree':(CH>=2&&o.img2)||o.img;const im=IMG[name];if(!ready(im))return;
+  const w=(CH>=2&&o.img2?o.w2:o.w),h=w*im.naturalHeight/im.naturalWidth;ctx.save();ctx.globalAlpha=alpha;ctx.translate(o.x,o.y);if(o.flip)ctx.scale(-1,1);
   if(o.t==='rose'&&THORN.blooms){const tw=o.img==='rose_twin';THORN.blooms.push([o.x+(tw?w*.3*(o.flip?-1:1):0),o.y-h*(o.img==='rose_bud'?.9:tw?.86:.88)]);}
   const base=o.base||(o.t==='oak'?.99:o.t==='web'?.97:o.t==='tree'?.985:.94);ctx.drawImage(im,-w/2,-h*base,w,h);ctx.restore();
   if(o.t==='oak'){ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,o.x-w*.32,o.y-h*.2,60,'120,230,220',.35+.12*Math.sin(T*2));ctx.restore();}}
