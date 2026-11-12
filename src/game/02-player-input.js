@@ -34,7 +34,7 @@ function inputVec(){if(INTRO.on||FADE.dir||MENU.open||WEVENT.on||CHOICE.on||MIX.
   return [0,0,0];}
 const busy=()=>lum.state==='cast'||lum.state==='interact';
 /* A: water magic. Any droplet that lands on a foe starts a battle. */
-function backToTitle(){if(backToTitle.go)return;backToTitle.go=1;FADE.dir=1;FADE.cb=()=>location.reload();}
+function backToTitle(){ZOOMK=1;if(backToTitle.go)return;backToTitle.go=1;FADE.dir=1;FADE.cb=()=>location.reload();}
 function pressA(){if(CH>=2&&C2.on&&C2.narr>=0){c2NarrNext();return;}if(WEV.end>9.7){backToTitle();return;}if(DLG.active&&!CHOICE.on&&!MIX.on&&!FADE.dir&&!MENU.open&&!BATTLE.pending&&!WIPE.dir&&!INTRO.on&&!INTRO.waiting&&performance.now()>=(CHOICE.until||0)){dlgNext();return;}if(CHOICE.on||MIX.on||FADE.dir||MENU.open||WEVENT.on||BATTLE.pending||WIPE.dir)return;if(INTRO.waiting){titleKey();return;}if(INTRO.on){introSkip();return;}if(DLG.active){dlgNext();return;}if(busy())return;pressB();}
 /* B: interact with the nearest NPC or object in reach. */
 /* the sword emote: an enemy close enough to strike first. Bosses, sleeping/still foes and scripted fights keep their own openings. */

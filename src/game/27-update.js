@@ -93,7 +93,7 @@ function update(dt){
   for(const k in BTN){BTN[k].pulse=Math.max(0,BTN[k].pulse-dt*4);BTN[k].shake=Math.max(0,BTN[k].shake-dt);}
   shake=Math.max(0,shake-dt*30);
   if(SCENE==='thorn'){updateThorn(dt);}else
-  if(SCENE==='woods'){const k=Math.min(1,dt*4.5);cam.x+=(lum.x+60-cam.x)*k;cam.y+=(lum.y-(WEV.foka?250:50)-cam.y)*k;const vw=W/zoom,vh=H/zoom;cam.x=clamp(cam.x,vw/2,WOODS_W-vw/2);cam.y=clamp(cam.y,WTOP+vh/2,WOODS_H-vh/2);WTITLE.t+=dt;}else
+  if(SCENE==='woods'){const k=Math.min(1,dt*4.5);/* once Cosmic becomes the Demon God: centre him on screen and ease the view out a little */if(WEV.foka||ZOOMK<1)ZOOMK+=((WEV.foka?.84:1)-ZOOMK)*Math.min(1,dt*1.1);cam.x+=(lum.x+(WEV.foka?0:60)-cam.x)*k;cam.y+=(lum.y-(WEV.foka?262:50)-cam.y)*k;const vw=W/zoom,vh=H/zoom,fx=WEV.foka?500:0;cam.x=clamp(cam.x,vw/2-fx,WOODS_W-vw/2+fx);cam.y=clamp(cam.y,WTOP+vh/2,WOODS_H-vh/2);WTITLE.t+=dt;}else
   if(SCENE!=='garden'){const rz=roomView()[0],vw=W/rz;WCAM.x+=(lum.x-WCAM.x)*Math.min(1,dt*4);WCAM.x=SCENE==='shed'?(vw>=690?SHO+345:clamp(WCAM.x,SHO+vw/2,SHO+690-vw/2)):SCENE==='vhut'?(vw>=VHW?VHW/2:clamp(WCAM.x,vw/2,VHW-vw/2)):vw>=1375?687:clamp(WCAM.x,vw/2,1375-vw/2);WTITLE.t+=dt;if(SCENE==='shed')updateSlimeList(SHSLIMES,dt,shedFree);if(SCENE==='shop')updateShopLum(dt);if(SCENE==='pond'){updateSlimeList(PSLIMES,dt,pondFree);if(QUAKE.t<QUAKE.dur)QUAKE.t+=dt;}if(SCENE==='well')updateWellSlimes(dt);if(SCENE==='study')updateSlimeList(SSLIMES,dt,studyFree);updateRoomDoors();}else{
   const k=Math.min(1,dt*4.5);cam.x+=(lum.x-cam.x)*k;cam.y+=(lum.y-50-cam.y)*k;
   {const vw=W/zoom,vh=H/zoom;cam.x=clamp(cam.x,Math.max(BACK.x,-990)+vw/2,Math.min(BACK.x+BACK.w,1110)-vw/2);cam.y=clamp(cam.y,BACK.y+vh/2,1700-vh/2);}}
