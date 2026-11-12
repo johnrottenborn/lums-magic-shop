@@ -44,6 +44,13 @@ function buildThorn(){if(THORN.built)return;THORN.built=true;const P=THORN.props
       const k=KS[got.length%3],side=H_(r,c,99)<.5?-1:1,x=c*TCW+TCW/2+side*(45+H_(r,c,101)*25),y=r*TCH+TCH*.42+(H_(r,c,103)-.5)*40;
       P.push({t:'shrub',k,x,y,s:SHR[k].s*1.05,flip:side>0,ph:x*.01,w:180});THORN.forage.push({x,y,id:FORAGE_MAP[k],n:2,picked:0});}}
   for(let y=CLR.cy-CLR.hh-60,k=0;y<=CLR.cy+CLR.hh+60;y+=75,k++)P.push({t:'hedge',x:CLR.x0+(H_(k,3,211)-.5)*16,y,w:150+H_(k,5,211)*24,flip:H_(k,7,211)<.5});
+  // the clearing's north and south walls: the same brambles and red trees as the maze
+  {const xa=CLR.x0+60,xb=CLR.x1+260,yn=CLR.cy-CLR.hh-24,ys=CLR.cy+CLR.hh+46,SM=['bwood_small_a','bwood_small_b','bwood2_small_a','bwood2_small_b'];
+   for(let x=xa,k=0;x<=xb;x+=190,k++){P.push({t:'hedge',x:x+(H_(k,1,221)-.5)*24,y:yn+(H_(k,2,221)-.5)*10,w:225+H_(k,3,221)*30,flip:H_(k,4,221)<.5});
+     P.push({t:'hedge',x:x+(H_(k,5,221)-.5)*24,y:ys+(H_(k,6,221)-.5)*10,w:225+H_(k,7,221)*30,flip:H_(k,8,221)<.5});}
+   for(let x=xa+80,k=0;x<=xb;x+=300,k++){P.push({t:'tree',img:SM[Math.floor(H_(k,9,221)*4)],x:x+(H_(k,10,221)-.5)*80,y:yn-40,w:430+H_(k,11,221)*90,flip:H_(k,12,221)<.5});}
+   // the east wall: a small outpost (its gate is shut; Chapter 2 goes through it)
+   P.push({t:'tree',img:'outpost',x:CLR.x1+70,y:CLR.cy-70,w:430,flip:false});}
   THORN.mist=[];for(let i=0;i<40;i++)THORN.mist.push({x:hash(i,1,77)*TW_,y:hash(i,2,77)*TH_,r:160+hash(i,3,77)*220,ph:hash(i,4,77)*TAU});}
 /* glimpses of Cosmic at the edge of the lantern light along the red-rose path; each happens once */
 const COSSEE=[],COS_LINES=["Cosmic? I am coming for you!","Cosmic! Wait for me!","Was that… Cosmic? Don't run off!","I saw you, Cosmic! Hold on, I'm coming!","Cosmic! Don't go…"];
@@ -73,7 +80,7 @@ function enterThorn(){buildThorn();if(!THORN.fint){THORN.fint=1;for(const f of T
 function startThornPreview(){SAVEC.finished=0;audioInit();c1Reset();C1.introDone=1;C1.hedgeSeen=1;C1I.on=false;WEVENT.on=false;INTRO.lumShown=true;if(!BAG.includes('lantern'))BAG.push('lantern');FADE.a=1;FADE.dir=-1;enterThorn();}
 function updateThorn(dt){updateThornAtmos(dt);updateCosSightings(dt);updateThornCritters(dt);updateThornFoes(dt);updateJakFollow(dt);
   if(!C1.jak&&!C1.jakSpotted&&!DLG.active&&!FADE.dir&&Math.hypot(lum.x-JAKREST.x,lum.y-JAKREST.y)<300){C1.jakSpotted=1;talk([['Lum',"Someone's there… slumped against the roots of that old oak."]]);}
-  if(!C1.thornBoss&&lum.x<TW_&&lum.x>12*TCW+TCW*.8&&Math.floor(lum.y/TCH)===2){lum.x=12*TCW+TCW*.8;}const k=Math.min(1,dt*4.5),fkCam=typeof FKS!=='undefined'&&FKS.st>=1&&FKS.st<7&&!C1.fkDone&&lum.x>TW_;cam.x+=((fkCam?(lum.x+FKS.cx)/2:lum.x+40)-cam.x)*k*(fkCam?.5:1);cam.y+=((fkCam?FKS.cy-250:lum.y-50)-cam.y)*k*(fkCam?.5:1);const vw=W/zoom,vh=H/zoom;cam.x=clamp(cam.x,vw/2-80,(lum.x>TW_+40?CLR.x1+(fkCam?420:60):TW_+80)-vw/2);cam.y=clamp(cam.y,-200+vh/2,TH_+60-vh/2);THORN.t+=dt;
+  if(!C1.thornBoss&&lum.x<TW_&&lum.x>12*TCW+TCW*.8&&Math.floor(lum.y/TCH)===2){lum.x=12*TCW+TCW*.8;}const k=Math.min(1,dt*4.5),fkCam=typeof FKS!=='undefined'&&FKS.st>=1&&FKS.st<7&&!C1.fkDone&&lum.x>TW_;cam.x+=((fkCam?(lum.x+FKS.cx)/2:lum.x+40)-cam.x)*k*(fkCam?.5:1);cam.y+=((fkCam?FKS.cy-250:lum.y-50)-cam.y)*k*(fkCam?.5:1);const vw=W/zoom,vh=H/zoom;cam.x=clamp(cam.x,vw/2-80,(lum.x>TW_+40?CLR.x1+(fkCam?420:330):TW_+80)-vw/2);cam.y=clamp(cam.y,-200+vh/2,TH_+60-vh/2);THORN.t+=dt;
   updateClearing(dt);}
 function drawRedFlowers(x,y,s,seed){ctx.save();ctx.translate(x,y);ctx.scale(s,s);
   for(let i=0;i<4;i++){const a=hash(seed,i,61)*TAU,l=10+hash(seed,i,63)*8;ctx.fillStyle='#2f4a24';ctx.beginPath();ctx.ellipse(Math.cos(a)*l*.6,Math.sin(a)*l*.3+2,l*.55,3,a,0,TAU);ctx.fill();}
