@@ -168,7 +168,8 @@ function recordPrologue(stars,badges,keep){try{const p=readProg();p.prologue=p.p
 const PLAYTEST=true; // New Game always opens chapter select; Chapter 1 stays locked (greyed) until the Prologue is finished
 const CHSEL={on:false,sel:0,confirm:null,note:'',noteT:0,hits:[],t:0};
 const CHAPTERS=[{id:'prologue',title:'Prologue'},{id:'ch1',title:'Chapter 1',art:'ch1_card'},{id:'ch2',title:'Chapter 2',art:'ch2_card'}];
-const CH_NEEDS={ch1:['prologue','Prologue'],ch2:['ch1','Chapter 1']};
+/* Chapter 2 is open for the designer to walk the clearing while it is being built; lock it (add ch2:['ch1','Chapter 1']) before release */
+const CH_NEEDS={ch1:['prologue','Prologue']};
 const chLocked=c=>{const n=CH_NEEDS[c.id];if(!n)return false;const p=readProg();return !(p[n[0]]&&p[n[0]].done);};
 function openChapterSelect(){CHSEL.on=true;CHSEL.sel=0;CHSEL.confirm=null;CHSEL.t=0;sfxPage&&sfxPage(.8);}
 function chselPick(i){CHSEL.sel=i;if(chLocked(CHAPTERS[i])){CHSEL.note='Finish the '+CH_NEEDS[CHAPTERS[i].id][1]+' to unlock '+CHAPTERS[i].title;CHSEL.noteT=2.6;return;}CHSEL.confirm=i;sfxPage&&sfxPage(.6);}
