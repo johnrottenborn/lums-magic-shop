@@ -4,9 +4,9 @@
 /* soft, winding dirt paths: a Catmull-Rom spline with ragged edges, wheel ruts, stones and grass tufts */
 function splinePts(P,step=24){const out=[];for(let i=0;i<P.length-1;i++){const p0=P[Math.max(0,i-1)],p1=P[i],p2=P[i+1],p3=P[Math.min(P.length-1,i+2)];const n=Math.max(2,Math.round(Math.hypot(p2[0]-p1[0],p2[1]-p1[1])/step));
   for(let k=0;k<n;k++){const t=k/n,t2=t*t,t3=t2*t;out.push([0,1].map(j=>.5*((2*p1[j])+(-p0[j]+p2[j])*t+(2*p0[j]-5*p1[j]+4*p2[j]-p3[j])*t2+(-p0[j]+3*p1[j]-3*p2[j]+p3[j])*t3)));}}out.push(P[P.length-1].slice());return out;}
-function buildPath(P,w0,seed){const pts=splinePts(P,18),L=[],R=[],ruts=[[],[]],cen=[];let s=0;
+function buildPath(P,w0,seed,taper){const pts=splinePts(P,18),L=[],R=[],ruts=[[],[]],cen=[];let s=0;
   for(let i=0;i<pts.length;i++){const a=pts[Math.max(0,i-1)],b=pts[Math.min(pts.length-1,i+1)],[x,y]=pts[i];let nx=-(b[1]-a[1]),ny=b[0]-a[0];const d=Math.hypot(nx,ny)||1;nx/=d;ny/=d;if(i)s+=Math.hypot(x-pts[i-1][0],y-pts[i-1][1]);
-    const w=w0*(1+.16*Math.sin(s*.011+seed)+.08*Math.sin(s*.037+seed*2));const jl=(hash(i,1,seed)-.5)*w*.16,jr=(hash(i,2,seed)-.5)*w*.16;
+    const w=w0*(1+.16*Math.sin(s*.011+seed)+.08*Math.sin(s*.037+seed*2))*(taper?Math.min(1,.12+.88*(s/taper)**.7):1);const jl=(hash(i,1,seed)-.5)*w*.16,jr=(hash(i,2,seed)-.5)*w*.16;
     L.push([x+nx*(w/2+jl),y+ny*(w/2+jl)*.85]);R.push([x-nx*(w/2+jr),y-ny*(w/2+jr)*.85]);cen.push([x,y,nx,ny,w]);
     const wob=Math.sin(s*.02+seed)*4;ruts[0].push([x+nx*(w*.2+wob),y+ny*(w*.2+wob)*.85]);ruts[1].push([x-nx*(w*.2-wob),y-ny*(w*.2-wob)*.85]);}
   const stones=[],tufts=[];for(let i=0;i<cen.length;i+=1){const [x,y,nx,ny,w]=cen[i];

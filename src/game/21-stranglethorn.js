@@ -6,7 +6,11 @@ const TCW=360,TCH=300,TW_=TMZ.C*TCW,TH_=TMZ.R*TCH;/* the clearing past the maze'
 const CLR={x0:TW_+260,cx:TW_+260+760,cy:TMZ.finish*TCH+TCH/2+10,rx:760,ry:440,x1:TW_+260+1520,hh:440};
 const CPATH={y:CLR.cy+130,xt:CLR.x1+430,ytop:CLR.cy-430,hw:72};
 const clrIn=(x,y)=>((x-CLR.cx)/(CLR.rx-70))**2+((y-CLR.cy)/(CLR.ry-60))**2<1;
-const clrOnPath=(x,y)=>CH>=2&&((x>CLR.cx&&x<CPATH.xt+CPATH.hw&&Math.abs(y-CPATH.y)<CPATH.hw)||(Math.abs(x-CPATH.xt)<CPATH.hw&&y>CPATH.ytop+30&&y<CPATH.y+CPATH.hw));
+/* the path is a gentle curve drawn with the woods' road painter (buildPath/drawPath in 17): east out of the clearing, bending up north to the gatehouse arch */
+const CPATH_CTRL=[[CLR.cx+CLR.rx-470,CPATH.y+20],[CLR.cx+CLR.rx-300,CPATH.y+6],[CLR.x1+40,CPATH.y-4],[CPATH.xt-260,CPATH.y+14],[CPATH.xt-90,CPATH.y-60],[CPATH.xt-20,CPATH.y-250],[CPATH.xt+6,CPATH.ytop+120],[CPATH.xt,CPATH.ytop+20]];
+const CPATH_PTS=splinePts(CPATH_CTRL,20);let CPATHP=null;
+function cpathDist(x,y){let best=1e9;for(let i=0;i<CPATH_PTS.length-1;i++){const [ax,ay]=CPATH_PTS[i],[bx,by]=CPATH_PTS[i+1],dx=bx-ax,dy=by-ay,t=clamp(((x-ax)*dx+(y-ay)*dy)/(dx*dx+dy*dy),0,1),d=Math.hypot(x-ax-dx*t,y-ay-dy*t);if(d<best)best=d;}return best;}
+const clrOnPath=(x,y)=>CH>=2&&cpathDist(x,y)<CPATH.hw;
 function clrFree(x,y){if(x<CLR.x0+70||!(clrIn(x,y)||clrOnPath(x,y)))return false;if(!C1.fkDone&&Math.hypot((x-(CLR.x0+640))/70,(y-CLR.cy)/26)<1)return false;return true;}
 const THORN={built:false,props:[],flowers:[],path:[],pockets:[],t:0,lightK:1};
 // wall lines: hW(line,c) = horizontal wall on the top edge of row `line` at column c; vW(r,line) = vertical wall on the left edge of column `line` at row r
@@ -60,8 +64,8 @@ function buildThorn(){if(THORN.built)return;THORN.built=true;const P=THORN.props
    const LOW=PN.filter(p=>p[0]!=='pine_tall');
    // Chapter 2 (after the hellfire): the evergreens nearest the clearing stand burned, some still smouldering
    const BURNT=[['burnt_charred_big',400],['burnt_smoulder_small',300],['burnt_charred_twist',290],['burnt_smoulder_big',390],['burnt_charred_small',300],['burnt_smoulder_twist',290]];
-   const pine=(x,y,k,s0=1,low=false,burn=0)=>{const L_=low?LOW:PN,[img,w]=L_[Math.floor(H_(k,9,233)*L_.length)],b=burn&&H_(k,17,233)<burn?BURNT[Math.floor(H_(k,18,233)*BURNT.length)]:null;P.push({t:'tree',img,img2:b&&b[0],w2:b&&b[1]*s0*(.9+H_(k,12,233)*.25),x:x+(H_(k,10,233)-.5)*40,y:y+(H_(k,11,233)-.5)*20,w:w*s0*(.9+H_(k,12,233)*.25),flip:H_(k,13,233)<.5,base:.95});};
-   let q=0;for(let d=-60;d<=60;d+=13){if(d>4&&d<32)continue;const th=d*Math.PI/180;pine(CLR.cx+(CLR.rx+60)*Math.cos(th),CLR.cy+(CLR.ry+60+40*Math.max(0,Math.sin(th)))*Math.sin(th),q++,1,false,.85);}
+   const pine=(x,y,k,s0=1,low=false,burn=0)=>{if(cpathDist(x,y)<CPATH.hw+90)return;const L_=low?LOW:PN,[img,w]=L_[Math.floor(H_(k,9,233)*L_.length)],b=burn&&H_(k,17,233)<burn?BURNT[Math.floor(H_(k,18,233)*BURNT.length)]:null;P.push({t:'tree',img,img2:b&&b[0],w2:b&&b[1]*s0*(.9+H_(k,12,233)*.25),x:x+(H_(k,10,233)-.5)*40,y:y+(H_(k,11,233)-.5)*20,w:w*s0*(.9+H_(k,12,233)*.25),flip:H_(k,13,233)<.5,base:.95});};
+   let q=0;for(let d=-60;d<=60;d+=13){if(d>-4&&d<46)continue;const th=d*Math.PI/180;pine(CLR.cx+(CLR.rx+60)*Math.cos(th),CLR.cy+(CLR.ry+60+40*Math.max(0,Math.sin(th)))*Math.sin(th),q++,1,false,.85);}
    // path sides: trunks kept clear of the dirt so the trees never hide Lum on the path
    for(let x=CLR.x1+60;x<CPATH.xt+300;x+=210){const bn=x<CLR.x1+420?.6:.12;pine(x,CPATH.y+CPATH.hw+430,q++,.95,true,bn);if(x<CPATH.xt-260)pine(x,CPATH.y-CPATH.hw-20,q++,.95,false,bn);}
    for(let y=CPATH.ytop+150;y<CPATH.y-CPATH.hw;y+=210){pine(CPATH.xt-CPATH.hw-200,y,q++,.95);pine(CPATH.xt+CPATH.hw+200,y+60,q++,.95);}
