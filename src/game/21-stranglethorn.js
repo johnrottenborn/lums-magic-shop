@@ -69,6 +69,9 @@ function buildThorn(){if(THORN.built)return;THORN.built=true;const P=THORN.props
    // path sides: trunks kept clear of the dirt so the trees never hide Lum on the path
    for(let x=CLR.x1+60;x<CPATH.xt+300;x+=210){const bn=x<CLR.x1+420?.6:.12;pine(x,CPATH.y+CPATH.hw+430,q++,.95,true,bn);if(x<CPATH.xt-260)pine(x,CPATH.y-CPATH.hw-20,q++,.95,false,bn);}
    for(let y=CPATH.ytop+150;y<CPATH.y-CPATH.hw;y+=210){pine(CPATH.xt-CPATH.hw-200,y,q++,.95);pine(CPATH.xt+CPATH.hw+200,y+60,q++,.95);}
+   // the woods carry on south of the clearing: Stranglethorn trees to the south-west, evergreens to the south-east (kept well back so they never hide the clearing)
+   for(let r=0;r<3;r++)for(let x=CLR.x0-260+(r%2)*130,k=0;x<CLR.x1+160;x+=260,k++){const y=CLR.cy+CLR.ry+500+r*230+(H_(k,r,241)-.5)*60;if(x>CLR.cx+260)pine(x,y,q++,1.05,false,.35);else P.push({t:'tree',img:SM[Math.floor(H_(k,r+3,241)*4)],x:x+(H_(k,r+5,241)-.5)*80,y,w:440+H_(k,r+7,241)*90,flip:H_(k,r+9,241)<.5});}
+   for(let r=0;r<2;r++)for(let x=CLR.x1+160+(r%2)*110;x<CPATH.xt+700;x+=220)pine(x,CPATH.y+CPATH.hw+700+r*220,q++,1,false,.15);
    // the Worldbind: cliff faces behind the gatehouse and along the path's east side; the gatehouse sits in the mountain face where the path ends
    P.push({t:'tree',img:'worldbind_cliff',x:CPATH.xt+200,y:CPATH.ytop-40,w:2300,flip:false,cliff:1});
    P.push({t:'tree',img:'worldbind_cliff',x:CPATH.xt+1350,y:CPATH.y+420,w:2300,flip:true,cliff:1});
@@ -115,7 +118,15 @@ function drawThornProp(o,alpha){if(o.t==='shrub'){drawShrub(o);return;}const nam
   const w=(CH>=2&&o.img2?o.w2:o.w),h=w*im.naturalHeight/im.naturalWidth;ctx.save();ctx.globalAlpha=alpha;ctx.translate(o.x,o.y);if(o.flip)ctx.scale(-1,1);
   if(o.t==='rose'&&THORN.blooms){const tw=o.img==='rose_twin';THORN.blooms.push([o.x+(tw?w*.3*(o.flip?-1:1):0),o.y-h*(o.img==='rose_bud'?.9:tw?.86:.88)]);}
   const base=o.base||(o.t==='oak'?.99:o.t==='web'?.97:o.t==='tree'?.985:.94);ctx.drawImage(im,-w/2,-h*base,w,h);ctx.restore();
-  if(o.t==='oak'){ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,o.x-w*.32,o.y-h*.2,60,'120,230,220',.35+.12*Math.sin(T*2));ctx.restore();}}
+  if(o.t==='oak'){ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,o.x-w*.32,o.y-h*.2,60,'120,230,220',.35+.12*Math.sin(T*2));ctx.restore();}
+  if(CH>=2&&o.img2)drawBurnFx(o,w,h);}
+/* Chapter 2: the hellfire's leftovers on each burned tree: a few small flames at the roots, embers, and smoke curling up through the branches */
+function drawBurnFx(o,w,h){const sd=(o.x*.013+o.y*.007)%1,sm=o.img2.includes('smoulder');
+  ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,o.x,o.y-8,w*.45,'255,110,40',(sm?.16:.1)+.04*Math.sin(T*3+sd*9));ctx.restore();
+  const nf=sm?3:2;for(let i=0;i<nf;i++){const fx=o.x+(hash(i,1,o.x|0)-.5)*w*.5,fy=o.y+4+(hash(i,2,o.x|0)-.5)*14;drawFlames(ctx,fx,fy,(sm?38:26)+hash(i,3,o.x|0)*22,.95);}
+  for(let i=0;i<6;i++){const t=(T*(.09+hash(i,4,o.x|0)*.05)+hash(i,5,o.x|0))%1,px=o.x+(hash(i,6,o.x|0)-.5)*w*.4+Math.sin(T*.7+i*1.3)*18*t,py=o.y-h*(.15+t*.95),r=(28+60*t)*(w/380);
+    ctx.save();ctx.globalAlpha=(1-t)*Math.min(1,t*5)*.7;drawGlow(ctx,px,py,r,'120,112,118',.9);ctx.restore();}
+  ctx.save();ctx.globalCompositeOperation='lighter';for(let i=0;i<4;i++){const t=(T*(.25+hash(i,7,o.x|0)*.2)+hash(i,8,o.x|0))%1;ctx.fillStyle=`rgba(255,${150+(hash(i,9,o.x|0)*80)|0},60,${(1-t)*.9})`;ctx.beginPath();ctx.arc(o.x+(hash(i,10,o.x|0)-.5)*w*.5+Math.sin(T*2+i)*8,o.y-10-t*h*.7,2.2*(1-t)+.8,0,TAU);ctx.fill();}ctx.restore();}
 
 /* ---------- Stranglethorn atmosphere: drifting fog, motes, petals, cold grade, haunted sound ---------- */
 let THFOG=null;
@@ -132,8 +143,9 @@ function fogLayer(tex,scale,ox,oy,alpha,tint){const S=256*scale;const sx=((ox%S)
 function drawThornFog(pass){if(!THFOG){THFOG=makeFogTex();THFOG.tint=document.createElement('canvas');THFOG.tint.width=THFOG.tint.height=256;const g=THFOG.tint.getContext('2d');g.drawImage(THFOG,0,0);g.globalCompositeOperation='source-in';g.fillStyle='rgb(188,182,204)';g.fillRect(0,0,256,256);
     THFOG.red=document.createElement('canvas');THFOG.red.width=THFOG.red.height=256;const g2=THFOG.red.getContext('2d');g2.drawImage(THFOG,0,0);g2.globalCompositeOperation='source-in';g2.fillStyle='rgb(150,96,112)';g2.fillRect(0,0,256,256);}
   const z=zoom,cx=cam.x*z,cy=cam.y*z;
-  if(pass===0){fogLayer(THFOG.tint,3.6,cx*.9+T*14,cy*.9+T*3,.21,0);fogLayer(THFOG.red,2.4,cx*1.05-T*9,cy*1.05+T*2,.16,0);}
-  else{fogLayer(THFOG.tint,4.6,cx*.6+T*22,cy*.6-T*4,.12,0);
+  const fk=CH>=2?.5:1;   // Chapter 2's clearing: thinner haze (smoke rather than Stranglethorn fog)
+  if(pass===0){fogLayer(THFOG.tint,3.6,cx*.9+T*14,cy*.9+T*3,.21*fk,0);fogLayer(THFOG.red,2.4,cx*1.05-T*9,cy*1.05+T*2,.16*fk,0);}
+  else{fogLayer(THFOG.tint,4.6,cx*.6+T*22,cy*.6-T*4,.12*fk,0);
     // low ground haze hugging the bottom of the view
     const g=ctx.createLinearGradient(0,H*.55,0,H);g.addColorStop(0,'rgba(170,165,190,0)');g.addColorStop(1,'rgba(150,145,175,.16)');ctx.fillStyle=g;ctx.fillRect(0,H*.55,W,H*.45);}}
 function updateThornAtmos(dt){const A=THORN.motes||(THORN.motes=[]);const vw=W/zoom,vh=H/zoom;
