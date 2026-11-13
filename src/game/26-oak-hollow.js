@@ -61,15 +61,15 @@ function setupDun(){DUNINT.length=0;const r=DUN.room,D=(x,y,reach,fn)=>DUNINT.pu
     DUNINT.push({x:1130,y:605,reach:80,door:true,onInteract:()=>{dunGo(14,200,560,1);}});L(470,610,70,["A worn stone marker. The carving has crumbled away."]);}
   if(r===14){D(150,520,80,()=>BO.lock?talk([['Lum',"I need to leave this place."]]):dunGo(13,1110,610,-1));D(1250,520,80,()=>dunGo(15,425,230,1));
     L(730,545,110,["More of the old stonework. Whoever built this passage built it to last.","The same cold, damp stones. The passage is longer than it looks."]);}
-  if(r===15){D(425,205,70,()=>dunGo(14,1215,540,-1));L(818,560,95,["A bronze lion's head, set into the rock. A cold green flame burns above it.","The green flame gives off no heat at all."]);
+  if(r===15){D(425,205,70,()=>dunGo(14,1215,540,-1));DUNINT.push({x:818,y:560,reach:95,onInteract:()=>touchWBTorch('lion',["A bronze lion's head, set into the rock. Its green flame burns brighter now."])});
     D(1195,535,80,()=>dunGo(16,200,560,1));}
   if(r===16){D(150,520,80,()=>dunGo(15,1165,560,-1));D(1250,520,80,()=>dunGo(17,422,230,1));
     L(730,545,110,["Another stretch of the old wall. The passage keeps going down and down.","Moss has crept between the stones here."]);}
-  if(r===17){D(422,205,70,()=>dunGo(16,1215,540,-1));L(825,575,95,["A carved raven's head, its beak open. A cold green flame burns above it.","Small stone faces watch from the walls all along the stairs."]);
+  if(r===17){D(422,205,70,()=>dunGo(16,1215,540,-1));DUNINT.push({x:825,y:575,reach:95,onInteract:()=>touchWBTorch('raven',["A carved raven's head, its beak open. Its green flame burns brighter now."])});
     L(330,700,95,["An empty stone pedestal. Whatever stood here is long gone."]);D(1165,545,80,()=>dunGo(18,200,560,1));}
   if(r===18){D(150,520,80,()=>dunGo(17,1150,560,-1));D(1250,520,80,()=>dunGo(19,422,230,1));
     L(730,545,110,["The old wall again. The air is getting colder the deeper we go.","Water drips somewhere behind the stones."]);}
-  if(r===19){D(422,205,70,()=>dunGo(18,1215,540,-1));L(840,580,95,["A great stone serpent, coiled and ready to strike. A cold green flame burns above its head.","Its stone eyes seem to follow us."]);
+  if(r===19){D(422,205,70,()=>dunGo(18,1215,540,-1));DUNINT.push({x:840,y:580,reach:95,onInteract:()=>touchWBTorch('serpent',["A great stone serpent, coiled and ready to strike. Its green flame burns brighter now."])});
     L(330,700,95,["Another empty pedestal."]);D(1165,545,80,()=>dunGo(20,862,425,1));}
   if(r===20){D(862,405,60,()=>dunGo(19,1150,560,-1));
     DUNINT.push({x:900,y:745,reach:95,door:true,onInteract:()=>goScene(enterHome)});   /* out into the open: Amroth's home */
@@ -122,7 +122,7 @@ function enterDun(room,x,y,face){const prevRoom=SCENE==='dun'?DUN.room:0;buildDF
   if(room===5)DUN.eyes=EYES5.map(()=>({b:rnd(0,6),t:0}));}
 function drawDun(){const R=DROOMS[DUN.room],im=IMG['dun'+DUN.room];if(!ready(im))return;const [rz]=roomView();
   ctx.setTransform(DPR,0,0,DPR,0,0);ctx.fillStyle='#07080c';ctx.fillRect(0,0,W,H);
-  ctx.setTransform(DPR*rz,0,0,DPR*rz,DPR*(W/2-WCAM.x*rz),0);ctx.drawImage(im,0,0,1375,768);
+  const qk=DUN.room===15?WB5.q:[0,0];ctx.setTransform(DPR*rz,0,0,DPR*rz,DPR*(W/2-WCAM.x*rz+qk[0]),DPR*qk[1]);ctx.drawImage(im,0,0,1375,768);   /* room 5 trembles */
   if(DUN.room===14&&!BO.R&&BO.a<1){const g=ctx.createLinearGradient(780,0,1180,0);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,'rgba(0,0,0,.94)');ctx.fillStyle=g;ctx.fillRect(780,-500,2600,1800);}
   if(DUN.room===14&&BO.a>0){ctx.fillStyle=`rgba(0,0,0,${BO.a})`;ctx.fillRect(-2000,-500,5375,1800);}
   if(DUN.room===12&&!C2.torchLit&&IMG.dun12_torch_out&&IMG.dun12_torch_out.complete){ctx.drawImage(IMG.dun12_torch_out,70,270);ctx.save();for(let i=0;i<4;i++){const q=(T*.25+i/4)%1;ctx.globalAlpha=.35*(1-q);drawGlow(ctx,110+Math.sin(T+i)*6*q,368-q*90,10+q*22,'150,160,170',.8);}ctx.restore();}
@@ -140,9 +140,11 @@ function drawDun(){const R=DROOMS[DUN.room],im=IMG['dun'+DUN.room];if(!ready(im)
     if(CH>=2&&C2.joined){const ka=dunH(AMR.y)/151;L.push([AMR.y-1,()=>{ctx.save();ctx.translate(AMR.x,AMR.y);ctx.scale(ka,ka);ctx.translate(-AMR.x,-AMR.y);drawAmrOW(AMR,1);ctx.restore();}]);}
     if(DUN.room===7)L.push([614,()=>{const t=IMG.dun7_table;if(!ready(t))return;const hid=lum.y<614&&Math.abs(lum.x-945)<240;ctx.save();ctx.globalAlpha=hid?.62:1;ctx.drawImage(t,730,425);ctx.restore();}]);
     if(DUN.room===14){for(const d of BO.ow)L.push([d.y,()=>drawDemonOW(d.x,d.y,d.face,d.a,d.mv)]);const g=BO.chaser;if(g)L.push([g.y,()=>drawDemonOW(g.x,g.y,g.face,g.a,g.mv)]);}
+    if(DUN.room===15)for(const g of [WB5.chaser,WB5.brown])if(g)L.push([g.y,()=>drawDemonOW(g.x,g.y,g.face,g.a,g.mv,g.big)]);
     L.sort((a,b)=>a[0]-b[0]);for(const [,f] of L)f();}
   if(DUN.room===14&&BO.a>0){ctx.fillStyle=`rgba(0,0,0,${BO.a*.55})`;ctx.fillRect(-2000,-500,5375,1800);}
   for(const p of PARTS)if(p.type==='fiz'||p.type==='puff'||p.type==='dust'){const k2=dunH(p.y)/151;ctx.save();ctx.translate(p.x,p.y);ctx.scale(k2,k2);ctx.translate(-p.x,-p.y);drawPartWell(p);ctx.restore();}
+  if(DUN.room===15)drawWB5Fall();
   if(DUN.room>=11&&!(DUN.room===14&&BO.a>.3))drawWorldbindAir(R);
   // darkness: only the little lantern's circle (and any daylight from above) cuts through
   ctx.setTransform(DPR,0,0,DPR,0,0);const lit=BAG.includes('lantern');const [sx,sy]=wellToScreen(lum.x,lum.y-70*k);const zr=rz*(lit?1:.45);
@@ -153,9 +155,9 @@ function drawDun(){const R=DROOMS[DUN.room],im=IMG['dun'+DUN.room];if(!ready(im)
   /* the torches: a warm pool of light on the walls and floor, a hot core at the flame, flickering */
   if(DUN.room===12||DUN.room===14||DUN.room===16||DUN.room===18)for(const [tx,ty] of [[115,340],[1278,335]]){if(DUN.room===12&&tx<600&&!C2.torchLit)continue;if(DUN.room===14&&!(tx<600?BO.L:BO.R))continue;const lk=DUN.room===12&&tx<600&&C2.lightT!=null?Math.min(1,C2.lightT):DUN.room===14&&tx<600?BO.lt:1;const [px,py]=wellToScreen(tx,ty),[fx,fy]=wellToScreen(tx+(tx<600?60:-60),ty+260),f=1+.06*Math.sin(T*9+tx)+.04*Math.sin(T*23+tx*2);
     drawGlow(ctx,px,py,320*rz*f,'255,140,60',.26*lk);drawGlow(ctx,fx,fy,260*rz*f,'255,150,80',.14*lk);drawGlow(ctx,px,py,90*rz*f,'255,200,120',.45*lk);drawGlow(ctx,px,py-14*rz,34*rz*f,'255,235,180',.6*lk);if(lk<1)drawGlow(ctx,px,py,140*rz,'255,240,200',(1-lk)*.8);}
-  if(DUN.room===19){const [px,py]=wellToScreen(805,200);drawGlow(ctx,px,py,(160+10*Math.sin(T*5))*rz,'90,255,190',.26);}
-  if(DUN.room===17){const [px,py]=wellToScreen(818,280);drawGlow(ctx,px,py,(160+10*Math.sin(T*5))*rz,'90,255,190',.26);}
-  if(DUN.room===15){const [px,py]=wellToScreen(818,290);drawGlow(ctx,px,py,(170+10*Math.sin(T*5))*rz,'90,255,190',.26);}
+  if(DUN.room===19){const [px,py]=wellToScreen(805,200);drawGlow(ctx,px,py,(160+10*Math.sin(T*5))*rz,'90,255,190',.26);;wbTorchGlow(19,px,py,rz);}
+  if(DUN.room===17){const [px,py]=wellToScreen(818,280);drawGlow(ctx,px,py,(160+10*Math.sin(T*5))*rz,'90,255,190',.26);;wbTorchGlow(17,px,py,rz);}
+  if(DUN.room===15){const [px,py]=wellToScreen(818,290);drawGlow(ctx,px,py,(170+10*Math.sin(T*5))*rz,'90,255,190',.26);;wbTorchGlow(15,px,py,rz);}
   if(R.light){const [lx,ly,lr]=R.light,[px,py]=wellToScreen(lx,ly);drawGlow(ctx,px,py,lr*rz,'180,210,255',.22);}
   ctx.restore();
   if(WTITLE.t<4.5&&!CAPTURE.on){const a=Math.min(1,WTITLE.t*1.5,(4.5-WTITLE.t)*1.2);ctx.save();ctx.globalAlpha=a;ctx.textAlign='center';ctx.fillStyle='rgba(10,8,14,.5)';ctx.fillRect(0,H*.3-40,W,80);

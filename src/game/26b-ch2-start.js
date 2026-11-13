@@ -112,7 +112,7 @@ const followSnap={};
 /* Worldbind room 2, first visit: the first torch is out. Amroth walks over, explains, and relights it */
 function c2TorchScene(){if(C2.torchLit||C2.torchScene||DUN.room!==12)return;C2.torchScene=1;WEVENT.on=true;
   setTimeout(()=>talk([['Amroth',"Hm. The first torch has gone out."],['Amroth',"Keeping these torches lit is my job, too."]],false,()=>{C2.torchWalk=1;}),900);}
-function updateC2Torch(dt){updateBlackout(dt);
+function updateC2Torch(dt){updateBlackout(dt);updateWorldbind5(dt);
   /* Worldbind room 3, first visit: Amroth reassures Lum about the bats */
   /* rooms 1 and 3: Amroth speaks once Lum is about a third of the way along the walk from the entrance to the exit
      (down the stairs, then across): room 1's walk is ~1000 long, room 3's ~770 */
@@ -164,7 +164,7 @@ function updateBlackout(dt){if(SCENE!=='dun'||DUN.room!==14){if(BO.st&&BO.st<9){
         if(d<62&&lum.bumpT<=0)startEncounter(g,'ambush');}
       else g.mv=0;}}}
 /* the two demons flanking Lum in the overworld (designer's art faces left; the one on her left is flipped to face her) */
-function drawDemonOW(x,y,face,a,mv){const im=IMG.demon_imp;if(!ready(im)||CAPTURE.on)return;   /* kept out of the battle backdrop */
-  const k=dunH(y)/151,h=175*k,w=h*im.width/im.height,br=1+.02*Math.sin(T*2.6+x),hop=mv?Math.abs(Math.sin(T*9))*6*k:0,tilt=mv?Math.sin(T*9)*.05:0;
+function drawDemonOW(x,y,face,a,mv,big){const im=demonArt(big);if(!ready(im)||CAPTURE.on)return;   /* kept out of the battle backdrop; big = the brown demons, half again as large */
+  const k=dunH(y)/151,h=175*k*(big?1.5:1),w=h*im.width/im.height,br=1+.02*Math.sin(T*2.6+x),hop=mv?Math.abs(Math.sin(T*9))*6*k:0,tilt=mv?Math.sin(T*9)*.05:0;
   ctx.save();ctx.globalAlpha=a*.35;ctx.fillStyle='#000';ctx.beginPath();ctx.ellipse(x,y,40*k,10*k,0,0,TAU);ctx.fill();ctx.restore();
   ctx.save();ctx.globalAlpha=a;ctx.translate(x,y-hop);ctx.rotate(tilt);ctx.scale(face>0?-1:1,br);ctx.drawImage(im,-w/2,-h,w,h);ctx.restore();}

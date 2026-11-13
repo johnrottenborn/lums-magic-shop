@@ -510,10 +510,35 @@ const CASES = {
     await g_(() => { const g = window.__g; g.lum.x = 1220; g.lum.y = 540; }); await wait(600);
     await g_(() => window.__g.NEAR.onInteract()); await wait(2200);
     check(await g_(() => window.__g.SCENE === 'dun' && window.__g.DUNX.room === 15 && window.__g.lum.y < 300), 'room 4 did not lead to the top of room 5');
-    await p.keyboard.down('ArrowDown'); await p.keyboard.down('ArrowRight'); await wait(2600); await p.keyboard.up('ArrowDown'); await p.keyboard.up('ArrowRight'); await wait(400);
-    check(await g_(() => window.__g.lum.y > 400), 'Lum could not walk down room 5\'s stairs');
+    // room 5 shakes and sheds dust and pebbles; a third of the way down Amroth warns them, and demons start coming from the top of the stairs
+    await wait(1200); check(await g_(() => window.__g.WB5.fall.length > 0), 'nothing is falling from room 5\'s ceiling');
+    await p.keyboard.down('ArrowDown'); await p.keyboard.down('ArrowRight');
+    for (let i = 0; i < 30 && !(await g_(() => window.__g.DLG.active)); i++) await wait(150);
+    await p.keyboard.up('ArrowDown'); await p.keyboard.up('ArrowRight');
+    { const l = await g_(() => window.__g.DLG.active && window.__g.DLG.lines[0]); check(l && l[0] === 'Amroth' && /cannot face them all/.test(l[1]), 'Amroth did not warn a third of the way into room 5: ' + JSON.stringify(l)); }
     await p.screenshot({ path: path.join(SHOTS, `worldbind-room5-${vp}.png`) });
-    await g_(() => { const g = window.__g; g.lum.x = 1180; g.lum.y = 545; }); await wait(600);
+    await p.keyboard.press('Enter'); await wait(400);
+    await p.keyboard.down('ArrowDown'); await p.keyboard.down('ArrowRight'); await wait(1500); await p.keyboard.up('ArrowDown'); await p.keyboard.up('ArrowRight');
+    check(await g_(() => window.__g.lum.y > 400 && !!window.__g.WB5.chaser), 'Lum could not get down room 5\'s stairs, or no demon followed');
+    await p.screenshot({ path: path.join(SHOTS, `worldbind-room5-chase-${vp}.png`) });
+    // touching the lion torch lights it, and a big brown demon comes from the right
+    await g_(() => { const g = window.__g; g.WB5.chaser.calm = 99; g.lum.x = 818; g.lum.y = 610; }); await wait(500);
+    await g_(() => window.__g.NEAR.onInteract()); await wait(1600);
+    check(await g_(() => window.__g.WBT.lion === 1 && !!window.__g.WB5.brown), 'touching the lion torch did not light it and bring the brown demon');
+    await wait(1200); await p.screenshot({ path: path.join(SHOTS, `worldbind-room5-brown-${vp}.png`) });
+    const pots = await g_(() => window.__g.BAG.filter(x => x === 'potion').length);
+    await g_(() => { const g = window.__g; g.WB5.brown.x = g.lum.x + 60; g.WB5.brown.y = g.lum.y; }); 
+    for (let i = 0; i < 30 && !(await g_(() => window.__g.BATTLE.on)); i++) await wait(150);
+    check(await g_(() => window.__g.BATTLE.on && window.__g.BATTLE.foes.length === 1 && window.__g.BATTLE.foes[0].type === 'bdemon'), 'the brown demon battle did not start');
+    for (let i = 0; i < 80 && (await g_(() => window.__g.BATTLE.phase)) !== 'foeLeap'; i++) await wait(100);
+    await wait(150); await p.screenshot({ path: path.join(SHOTS, `worldbind-brown-fire-${vp}.png`) });
+    await wait(1200); await g_(() => { const B = window.__g.BATTLE; B.phase = 'win'; B.t = 1; B.rewarded = 0; });
+    for (let i = 0; i < 40 && (await g_(() => window.__g.BATTLE.on)); i++) { await p.keyboard.press('Space'); await wait(300); }
+    check(await g_(() => window.__g.BAG.filter(x => x === 'potion').length) === pots + 1, 'the brown demon did not drop a healing potion');
+    for (let i = 0; i < 20 && !(await g_(() => window.__g.DLG.active)); i++) await wait(150);
+    { const l = await g_(() => window.__g.DLG.active && window.__g.DLG.lines[0]); check(l && l[0] === 'Amroth' && /Keep running/.test(l[1]), 'Amroth did not say to keep running: ' + JSON.stringify(l)); }
+    await p.keyboard.press('Enter'); await wait(300);
+    await g_(() => { const g = window.__g; if (g.WB5.chaser) g.WB5.chaser.calm = 99; g.lum.x = 1180; g.lum.y = 545; }); await wait(600);
     await g_(() => window.__g.NEAR.onInteract()); await wait(2200);
     check(await g_(() => window.__g.SCENE === 'dun' && window.__g.DUNX.room === 16), 'room 5 did not lead to room 6');
     await p.screenshot({ path: path.join(SHOTS, `worldbind-room6-${vp}.png`) });
