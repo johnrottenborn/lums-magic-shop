@@ -413,7 +413,9 @@ const CASES = {
     await g_(() => window.__g.NEAR.onInteract()); await wait(2200);
     check(await g_(() => window.__g.SCENE === 'dun' && window.__g.DUNX.room === 11), 'the gatehouse door did not open the Worldbind Passage');
     check(await g_(() => window.__g.BAG.includes('baby') && /mountain to Amroth/.test(window.__g.GOAL ? window.__g.GOAL.text : '')), 'the baby is not in the satchel or the task is wrong after the Chapter 2 opening');
-    await wait(800); { const l = await g_(() => window.__g.DLG.active && window.__g.DLG.lines[0]); check(l && l[0] === 'Amroth' && /my home, little one/.test(l[1]), 'Amroth did not speak on first entering the passage: ' + JSON.stringify(l)); }
+    await wait(800); check(await g_(() => !window.__g.DLG.active), 'Amroth should wait until Lum is a third of the way into room 1');
+    await p.keyboard.down('ArrowDown'); await p.keyboard.down('ArrowRight'); for (let i = 0; i < 30 && !(await g_(() => window.__g.DLG.active)); i++) await wait(200); await p.keyboard.up('ArrowDown'); await p.keyboard.up('ArrowRight'); await wait(300);
+    { const l = await g_(() => window.__g.DLG.active && window.__g.DLG.lines[0]); check(l && l[0] === 'Amroth' && /my home, little one/.test(l[1]), 'Amroth did not speak a third of the way into the passage: ' + JSON.stringify(l)); }
     await p.screenshot({ path: path.join(SHOTS, `worldbind-amroth-speaks-${vp}.png`) });
     for (let i = 0; i < 6 && await g_(() => window.__g.DLG.active); i++) { await p.keyboard.press('Enter'); await wait(400); }
     await p.screenshot({ path: path.join(SHOTS, `worldbind-top-${vp}.png`) });
@@ -441,7 +443,9 @@ const CASES = {
     await g_(() => { const g = window.__g; g.lum.x = 1220; g.lum.y = 540; }); await wait(600);
     await g_(() => window.__g.NEAR.onInteract()); await wait(2200);
     check(await g_(() => window.__g.SCENE === 'dun' && window.__g.DUNX.room === 13 && window.__g.lum.y < 300), 'room 2 did not lead to the top of room 3');
-    await wait(1000); { const l = await g_(() => window.__g.DLG.active && window.__g.DLG.lines[0]); check(l && l[0] === 'Amroth' && /small bats/.test(l[1]), 'Amroth did not mention the bats in room 3: ' + JSON.stringify(l)); }
+    await wait(1000); check(await g_(() => !window.__g.DLG.active), 'Amroth should wait until Lum is a third of the way into room 3');
+    await p.keyboard.down('ArrowDown'); for (let i = 0; i < 30 && !(await g_(() => window.__g.DLG.active)); i++) await wait(200); await p.keyboard.up('ArrowDown'); await wait(300);
+    { const l = await g_(() => window.__g.DLG.active && window.__g.DLG.lines[0]); check(l && l[0] === 'Amroth' && /small bats/.test(l[1]), 'Amroth did not mention the bats a third of the way into room 3: ' + JSON.stringify(l)); }
     await p.screenshot({ path: path.join(SHOTS, `worldbind-room3-bats-${vp}.png`) });
     for (let i = 0; i < 3 && await g_(() => window.__g.DLG.active); i++) { await p.keyboard.press('Enter'); await wait(400); }
     await wait(300);
@@ -453,7 +457,20 @@ const CASES = {
     await p.screenshot({ path: path.join(SHOTS, `worldbind-room3-exit-${vp}.png`) });
     await g_(() => window.__g.NEAR.onInteract()); await wait(2200);
     check(await g_(() => window.__g.SCENE === 'dun' && window.__g.DUNX.room === 14), 'room 3 did not lead to room 4');
-    await p.keyboard.down('ArrowRight'); await wait(1200); await p.keyboard.up('ArrowRight'); await wait(400);
+    // halfway across room 4 the torches go out; Amroth relights the left one and two demons are flanking Lum
+    await p.keyboard.down('ArrowRight'); await wait(4000); await p.keyboard.up('ArrowRight');
+    check(await g_(() => window.__g.BO.st >= 1 && window.__g.lum.x < 800), 'the torches did not go out halfway across room 4');
+    await wait(1600); { const l = await g_(() => window.__g.DLG.active && window.__g.DLG.lines.map(x => x[1]).join(' ')); check(l && /Stand still/.test(l) && /back of my hand/.test(l), 'Amroth did not speak in the dark: ' + JSON.stringify(l)); }
+    await p.screenshot({ path: path.join(SHOTS, `worldbind-room4-dark-${vp}.png`) });
+    for (let i = 0; i < 3 && await g_(() => window.__g.DLG.active); i++) { await p.keyboard.press('Enter'); await wait(400); }
+    await wait(1600); { const l = await g_(() => window.__g.DLG.active && window.__g.DLG.lines[0]); check(l && l[0] === 'Lum' && /hear something/.test(l[1]), 'Lum did not ask what she hears: ' + JSON.stringify(l)); }
+    await p.screenshot({ path: path.join(SHOTS, `worldbind-room4-hear-${vp}.png`) });
+    await p.keyboard.press('Enter');
+    for (let i = 0; i < 70 && !(await g_(() => window.__g.BO.dem > 0 && window.__g.BO.lt >= 1)); i++) await wait(200);
+    check(await g_(() => window.__g.BO.L && window.__g.BO.dem > 0), 'the left torch was not relit with the demons revealed');
+    await p.screenshot({ path: path.join(SHOTS, `worldbind-room4-demons-${vp}.png`) });
+    for (let i = 0; i < 40 && await g_(() => window.__g.WEVENT.on); i++) await wait(200);
+    check(await g_(() => !window.__g.WEVENT.on), 'room 4 did not hand control back');
     await p.screenshot({ path: path.join(SHOTS, `worldbind-room4-${vp}.png`) });
     await g_(() => { const g = window.__g; g.lum.x = 1220; g.lum.y = 540; }); await wait(600);
     await g_(() => window.__g.NEAR.onInteract()); await wait(2200);

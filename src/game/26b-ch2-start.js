@@ -67,7 +67,7 @@ function c2Finish(){if(!BAG.includes('baby'))BAG.push('baby');if(!PARTY_ORDER.in
 /* once he has joined, Amroth walks behind Lum along the exact path she took (breadcrumbs, like Spar), so he never cuts through walls */
 const AMRCRUMB=[];
 function resetAmrFollow(){AMR.x=lum.x;AMR.y=lum.y;AMR.moving=0;AMR.face=lum.face;AMRCRUMB.length=0;}
-function updateAmrFollow(dt){updateC2Torch(dt);if(!C2.joined||CH<2||(SCENE!=='thorn'&&SCENE!=='dun')||C2.torchWalk||(C2.torchScene&&!C2.torchLit)||(WEVENT.on&&C2.torchScene&&DLG.active))return;const lc=AMRCRUMB[AMRCRUMB.length-1];
+function updateAmrFollow(dt){updateC2Torch(dt);if(!C2.joined||CH<2||(SCENE!=='thorn'&&SCENE!=='dun')||C2.torchWalk||(C2.torchScene&&!C2.torchLit)||(BO.st>=1&&BO.st<10)||(WEVENT.on&&C2.torchScene&&DLG.active))return;const lc=AMRCRUMB[AMRCRUMB.length-1];
   if(!lc||Math.hypot(lc[0]-lum.x,lc[1]-lum.y)>6){AMRCRUMB.push([lum.x,lum.y]);if(AMRCRUMB.length>80)AMRCRUMB.shift();}
   let acc=0,tx=AMR.x,ty=AMR.y,px=lum.x,py=lum.y,found=false;for(let i=AMRCRUMB.length-1;i>=0;i--){const [cx,cy]=AMRCRUMB[i];acc+=Math.hypot(cx-px,cy-py);px=cx;py=cy;if(acc>=64){tx=cx;ty=cy;found=true;break;}}
   if(!found){AMR.moving=0;if(!DLG.active){AMR.dir='side';AMR.face=lum.face;}return;}
@@ -105,17 +105,41 @@ function drawAmrOW(F,alpha){if(!F||alpha<=0)return;drawnAmr.n++;const an=F.dir==
 function enterWorldbind(){enterDun(11,238,250,1);
   /* first time in: the baby cries, and Amroth talks as they start down the stairs */
   if(!C2.wbSeen){C2.wbSeen=1;setTimeout(()=>{try{sfxBabyCry(.8);}catch(e){}},700);
-    setTimeout(()=>talk([['Amroth',"We will take you to my home, little one."],['Amroth',"It’s much easier walking down these stairs than climbing up them. I climb them every day."],
-      ['Amroth',"My job is to make sure no one tries to use this passage anymore…"]]),2000);}AMR.x=lum.x+30;AMR.y=lum.y-30;AMR.dir='down';}
+C2.wbLine=0;}AMR.x=lum.x+30;AMR.y=lum.y-30;AMR.dir='down';}
 /* party followers snap onto Lum's spot whenever she changes place (see 27-update) */
 const followSnap={};
 /* Worldbind room 2, first visit: the first torch is out. Amroth walks over, explains, and relights it */
 function c2TorchScene(){if(C2.torchLit||C2.torchScene||DUN.room!==12)return;C2.torchScene=1;WEVENT.on=true;
   setTimeout(()=>talk([['Amroth',"Hm. The first torch has gone out."],['Amroth',"Keeping these torches lit is my job, too."]],false,()=>{C2.torchWalk=1;}),900);}
-function updateC2Torch(dt){
+function updateC2Torch(dt){updateBlackout(dt);
   /* Worldbind room 3, first visit: Amroth reassures Lum about the bats */
-  if(SCENE==='dun'&&DUN.room===13&&C2.joined&&!C2.batLine&&!FADE.dir&&!DLG.active){C2.batLine=1;WEVENT.on=true;setTimeout(()=>talk([['Amroth',"We may see a few small bats, but the passage is safe."]],false,()=>{WEVENT.on=false;}),900);}
+  /* rooms 1 and 3: Amroth speaks once Lum is about a third of the way along the walk from the entrance to the exit
+     (down the stairs, then across): room 1's walk is ~1000 long, room 3's ~770 */
+  const third=(x0,y0,d)=>Math.hypot(lum.x-x0,lum.y-y0)>=d;
+  const wbSay=(lines,flag)=>{C2[flag]=1;WEVENT.on=true;lum.state='idle';lum.vx=lum.vy=0;talk(lines,false,()=>{WEVENT.on=false;});};
+  if(SCENE==='dun'&&C2.joined&&!FADE.dir&&!DLG.active){
+    if(DUN.room===11&&C2.wbSeen&&!C2.wbLine&&third(238,250,330))wbSay([['Amroth',"We will take you to my home, little one."],['Amroth',"It’s much easier walking down these stairs than climbing up them. I climb them every day."],['Amroth',"My job is to make sure no one tries to use this passage anymore…"]],'wbLine');
+    if(DUN.room===13&&!C2.batLine&&third(540,240,255))wbSay([['Amroth',"We may see a few small bats, but the passage is safe."]],'batLine');}
   if(SCENE!=='dun'||DUN.room!==12)return;if(!C2.torchLit&&!C2.torchScene&&C2.joined&&!FADE.dir)c2TorchScene();
   if(C2.torchWalk){if(amrWalk(150,500,90,dt)){C2.torchWalk=0;AMR.dir='side';AMR.face=-1;AMR.moving=0;setTimeout(()=>{C2.torchLit=1;C2.lightT=0;try{sfxIgnite();}catch(e){}
       setTimeout(()=>talk([['Amroth',"There. That's better."]],false,()=>{WEVENT.on=false;resetAmrFollow();AMR.x=150;AMR.y=500;}),900);},500);}}
   if(C2.lightT!=null&&C2.lightT<1)C2.lightT+=dt*1.5;}
+/* Worldbind room 4, first visit: halfway across, both torches go out and everything goes black. Amroth goes to relight
+   the left torch; when it catches, two demons are flanking Lum. (Demons are stand-ins until their art arrives.) */
+const BO={st:0,t:0,a:0,L:1,R:1,lt:1,dem:0,done:0};
+function updateBlackout(dt){if(SCENE!=='dun'||DUN.room!==14){if(BO.st&&BO.st<9){BO.st=0;BO.a=0;BO.L=BO.R=1;BO.lt=1;BO.dem=0;WEVENT.on=false;}return;}
+  const go=n=>{BO.st=n;BO.t=0;};BO.t+=dt;
+  if(!BO.st){if(!BO.done&&C2.joined&&lum.x>687&&!FADE.dir&&!DLG.active){go(1);WEVENT.on=true;lum.state='idle';lum.vx=lum.vy=0;BO.L=BO.R=0;try{sfxSnuff();}catch(e){}}return;}
+  if(BO.st===1){BO.a=Math.min(1,BO.t/.35);if(BO.t>1.4&&!DLG.active){go(2);talk([['Amroth',"Stand still while I relight the torches."],['Amroth',"I know this passage like the back of my hand!"]],false,()=>go(3));}}
+  else if(BO.st===3){const there=amrWalk(150,520,130,dt);if(!there){AMR.dir='side';AMR.face=-1;}
+    if(BO.t>1.3&&!BO.said){BO.said=1;talk([['Lum',"Amroth? Do you hear something?"]],false,()=>{});}
+    if(there&&BO.said&&!DLG.active){AMR.moving=0;go(4);}}
+  else if(BO.st===4){if(BO.t>.6&&!BO.L){BO.L=1;BO.lt=0;BO.dem=1;try{sfxIgnite();}catch(e){}}if(BO.L){BO.lt=Math.min(1,BO.lt+dt*1.5);BO.a=Math.max(0,1-BO.lt);}
+    if(BO.t>2.4){go(9);BO.done=1;}}   /* what happens next waits on the demons' art and the designer's next beat */
+  else if(BO.st===9){if(BO.t>1.6){BO.dem=Math.max(0,BO.dem-dt);if(!BO.dem&&!BO.R){BO.R=1;BO.st=10;WEVENT.on=false;resetAmrFollow();}}}
+  if(BO.st>=3&&BO.st<9)lum.face=AMR.x<lum.x?-1:1;}
+/* stand-in demon: a dark horned shape with red eyes, until the real art comes */
+function drawDemonStandIn(x,y,face,a){const k=dunH(y)/151;ctx.save();ctx.globalAlpha=a;ctx.translate(x,y);ctx.scale(k*face,k);
+  ctx.fillStyle='rgba(0,0,0,.35)';ctx.beginPath();ctx.ellipse(0,0,34,9,0,0,TAU);ctx.fill();
+  ctx.fillStyle='#16101c';ctx.beginPath();ctx.moveTo(-30,0);ctx.quadraticCurveTo(-36,-80,-14,-118);ctx.lineTo(-22,-150);ctx.lineTo(-6,-126);ctx.quadraticCurveTo(0,-130,6,-126);ctx.lineTo(22,-150);ctx.lineTo(14,-118);ctx.quadraticCurveTo(36,-80,30,0);ctx.closePath();ctx.fill();
+  ctx.globalCompositeOperation='lighter';drawGlow(ctx,-9,-108,7,'255,60,40',.9*a);drawGlow(ctx,-25,-108,7,'255,60,40',.9*a);ctx.restore();}
