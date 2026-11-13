@@ -64,8 +64,14 @@ function updateC2(dt){if(!C2.on)return;C2.t+=dt;
   if(st!==15&&!LUMSTONE){lum.state='idle';lum.fi=0;}}
 function c2Finish(){if(!PARTY_ORDER.includes('amroth'))PARTY_ORDER.push('amroth');HEROES.amroth.hp=HEROES.amroth.maxHp;C1.comboA=0;C2.on=false;C2.st=99;C2.cam=null;C2.joined=1;WEVENT.on=false;C2.title=.001;C2.mound=0;lum.state='idle';
   AMR.moving=0;AMR.a=1;GOAL.tag='TASK';GOAL.text='Follow Amroth to the passage';}
-/* once he has joined, Amroth walks behind Lum */
-function updateAmrFollow(dt){if(!C2.joined||CH<2||(SCENE!=='thorn'&&SCENE!=='dun'))return;const tx=lum.x-56*lum.face,ty=lum.y+6,d=Math.hypot(tx-AMR.x,ty-AMR.y);if(d>18)amrWalk(tx,ty,Math.min(220,60+d*1.6),dt);else{AMR.moving=0;if(!DLG.active){AMR.dir='side';AMR.face=lum.face;}}}
+/* once he has joined, Amroth walks behind Lum along the exact path she took (breadcrumbs, like Spar), so he never cuts through walls */
+const AMRCRUMB=[];
+function resetAmrFollow(){AMR.x=lum.x;AMR.y=lum.y;AMR.moving=0;AMR.face=lum.face;AMRCRUMB.length=0;}
+function updateAmrFollow(dt){if(!C2.joined||CH<2||(SCENE!=='thorn'&&SCENE!=='dun'))return;const lc=AMRCRUMB[AMRCRUMB.length-1];
+  if(!lc||Math.hypot(lc[0]-lum.x,lc[1]-lum.y)>6){AMRCRUMB.push([lum.x,lum.y]);if(AMRCRUMB.length>80)AMRCRUMB.shift();}
+  let acc=0,tx=AMR.x,ty=AMR.y,px=lum.x,py=lum.y,found=false;for(let i=AMRCRUMB.length-1;i>=0;i--){const [cx,cy]=AMRCRUMB[i];acc+=Math.hypot(cx-px,cy-py);px=cx;py=cy;if(acc>=64){tx=cx;ty=cy;found=true;break;}}
+  if(!found){AMR.moving=0;if(!DLG.active){AMR.dir='side';AMR.face=lum.face;}return;}
+  const d=Math.hypot(tx-AMR.x,ty-AMR.y);if(d>2)amrWalk(tx,ty,Math.min(260,70+d*3),dt);else{AMR.moving=0;}}
 /* the cutscene's overlays: narration on black, the fade from black into the rain, the title card */
 function drawC2UI(){if(CH<2)return;ctx.save();ctx.setTransform(DPR,0,0,DPR,0,0);
   if(C2.on&&C2.narr>=0){ctx.fillStyle='#000';ctx.fillRect(0,0,W,H);const L=C2NARR[C2.narr],dur=2.6+L.length*.045,a=Math.min(1,C2.na*1.5,Math.max(0,(dur-C2.na)*1.6));
@@ -97,3 +103,5 @@ function drawAmrOW(F,alpha){if(!F||alpha<=0)return;drawnAmr.n++;const an=F.dir==
   c1Frame(ctx,'amroth',an,an==='side'||an==='up'?fi:0,F.x,F.y+bob,AMR_H,an==='side'&&F.face>0,alpha,0);}
 /* through the gatehouse arch: the first room of the Worldbind Passage (room 11 of the root-room engine in 26), arriving at the top of the stairs */
 function enterWorldbind(){enterDun(11,238,250,1);AMR.x=lum.x+30;AMR.y=lum.y-30;AMR.dir='down';}
+/* party followers snap onto Lum's spot whenever she changes place (see 27-update) */
+const followSnap={};

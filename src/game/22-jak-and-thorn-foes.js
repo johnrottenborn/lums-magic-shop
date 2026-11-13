@@ -3,7 +3,7 @@ const JAKDX=(.5-.4)*560/300;const JAKREST={x:1*TCW+TCW*.56,y:6*TCH+TCH*.7};
 let JAKF=null;const JAKCRUMB=[];
 const MATE='spar'; // Stranglethorn's companion (was Jak; Jak moves to Chapter 2). JAKF / jakInParty etc. now mean "the companion"
 const jakInParty=()=>PARTY_ORDER.includes(MATE);
-function resetJakFollow(){JAKF={x:lum.x-60*lum.face,y:lum.y+4,face:lum.face,moving:0,ph:0};JAKCRUMB.length=0;}
+function resetJakFollow(){JAKF={x:lum.x,y:lum.y,face:lum.face,moving:0,ph:0};JAKCRUMB.length=0;}
 function updateJakFollow(dt){if(!jakInParty())return;if(!JAKF)resetJakFollow();const lc=JAKCRUMB[JAKCRUMB.length-1];
   if(!lc||Math.hypot(lc[0]-lum.x,lc[1]-lum.y)>6){JAKCRUMB.push([lum.x,lum.y]);if(JAKCRUMB.length>80)JAKCRUMB.shift();}
   let acc=0,tx=JAKF.x,ty=JAKF.y,px=lum.x,py=lum.y;for(let i=JAKCRUMB.length-1;i>=0;i--){const [cx,cy]=JAKCRUMB[i];acc+=Math.hypot(cx-px,cy-py);px=cx;py=cy;if(acc>=72){tx=cx;ty=cy;break;}}
