@@ -76,9 +76,9 @@ function buildThorn(){if(THORN.built)return;THORN.built=true;const P=THORN.props
    for(let r=0;r<3;r++)for(let x=CLR.x0-260+(r%2)*130,k=0;x<CLR.x1+160;x+=260,k++){const y=CLR.cy+CLR.ry+500+r*230+(H_(k,r,241)-.5)*60;if(x>CLR.cx+260)pine(x,y,q++,1.05,false,.35);else P.push({t:'tree',img:SM[Math.floor(H_(k,r+3,241)*4)],x:x+(H_(k,r+5,241)-.5)*80,y,w:440+H_(k,r+7,241)*90,flip:H_(k,r+9,241)<.5});}
    for(let r=0;r<2;r++)for(let x=CLR.x1+160+(r%2)*110;x<CPATH.xt+700;x+=220)pine(x,CPATH.y+CPATH.hw+700+r*220,q++,1,false,.15);
    // the Worldbind: cliff faces behind the gatehouse and along the path's east side; the gatehouse sits in the mountain face where the path ends
-   P.push({t:'tree',img:'worldbind_cliff',x:CPATH.xt+200,y:CPATH.ytop-40,w:2300,flip:false,cliff:1});
-   P.push({t:'tree',img:'worldbind_cliff',x:CPATH.xt+1350,y:CPATH.y+420,w:2300,flip:true,cliff:1});
-   P.push({t:'tree',img:'outpost',x:CPATH.xt+52,y:CPATH.ytop+18,w:430,flip:false});}
+   P.push({t:'tree',img:'worldbind_cliff',x:CPATH.xt+200,y:CPATH.ytop-40,w:2300,flip:false,cliff:1,solid:1});
+   P.push({t:'tree',img:'worldbind_cliff',x:CPATH.xt+1350,y:CPATH.y+420,w:2300,flip:true,cliff:1,solid:1});
+   P.push({t:'tree',img:'outpost',x:CPATH.xt+52,y:CPATH.ytop+18,sy:CPATH.ytop-30,w:430,flip:false,solid:1});   /* solid: never fades; sorted behind anyone standing in its archway */}
   THORN.mist=[];for(let i=0;i<40;i++)THORN.mist.push({x:hash(i,1,77)*TW_,y:hash(i,2,77)*TH_,r:160+hash(i,3,77)*220,ph:hash(i,4,77)*TAU});}
 /* glimpses of Cosmic at the edge of the lantern light along the red-rose path; each happens once */
 const COSSEE=[],COS_LINES=["Cosmic? I am coming for you!","Cosmic! Wait for me!","Was that… Cosmic? Don't run off!","I saw you, Cosmic! Hold on, I'm coming!","Cosmic! Don't go…"];
