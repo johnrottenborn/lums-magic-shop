@@ -27,6 +27,8 @@ const DROOMS={
      light:[420,130,200]},   /* arrive at the top of the stairs (back to room 14); a lion-head brazier with a green flame; stairs on the right lead further down */
   17:{name:'Worldbind Passage',dark:.42,floor:[[375,195],[470,195],[490,280],[545,400],[640,500],[760,580],[880,600],[1080,590],[1150,530],[1200,540],[1170,650],[1100,768],[480,768],[420,680],[300,560],[200,440],[180,330],[300,240]],
      block:[{x:322,y:640,rx:78,ry:24},{x:238,y:432,rx:48,ry:16},{x:460,y:330,rx:32,ry:11},{x:258,y:302,rx:24,ry:9},{x:790,y:540,rx:62,ry:19}],light:[420,130,200]},   /* arrive at the top of the stairs (back to room 16); stone pedestals; a raven-head brazier; the tunnel stairs on the right lead on */
+  19:{name:'Worldbind Passage',dark:.42,floor:[[375,195],[470,195],[490,280],[545,400],[640,500],[760,580],[880,600],[1080,590],[1150,530],[1200,540],[1170,650],[1100,768],[480,768],[420,680],[300,560],[200,440],[180,330],[300,240]],
+     block:[{x:322,y:640,rx:78,ry:24},{x:238,y:432,rx:48,ry:16},{x:460,y:330,rx:32,ry:11},{x:258,y:302,rx:24,ry:9},{x:790,y:540,rx:62,ry:19},{x:860,y:525,rx:55,ry:16}],light:[420,130,200]},   /* arrive at the top of the stairs (back to room 18); stone pedestals; a coiled serpent statue with a green flame; the tunnel stairs on the right lead on */
   5:{name:'Deeproot',sub:'turn back',dark:.86,floor:[[420,768],[480,640],[560,580],[620,540],[700,540],[800,580],[950,620],[1050,700],[1080,768]]}};
 const EYES5=[[200,144],[290,106],[275,181],[331,319],[500,140],[652,129],[625,238],[731,190],[512,422],[612,444],[212,481],[212,512],[440,275],[420,412],[610,282]];
 function dunFree(x,y){const R=DROOMS[DUN.room];if(!inPoly(x,y,R.floor))return false;for(const b of (R.block||[]))if(((x-b.x)/b.rx)**2+((y-b.y)/b.ry)**2<1)return false;return true;}
@@ -63,8 +65,10 @@ function setupDun(){DUNINT.length=0;const r=DUN.room,D=(x,y,reach,fn)=>DUNINT.pu
     L(730,545,110,["Another stretch of the old wall. The passage keeps going down and down.","Moss has crept between the stones here."]);}
   if(r===17){D(422,205,70,()=>dunGo(16,1215,540,-1));L(825,575,95,["A carved raven's head, its beak open. A cold green flame burns above it.","Small stone faces watch from the walls all along the stairs."]);
     L(330,700,95,["An empty stone pedestal. Whatever stood here is long gone."]);D(1165,545,80,()=>dunGo(18,200,560,1));}
-  if(r===18){D(150,520,80,()=>dunGo(17,1150,560,-1));L(1250,520,80,["The tunnel runs on into the dark, deeper under the mountains.","A cold draught breathes out of the tunnel."]);
+  if(r===18){D(150,520,80,()=>dunGo(17,1150,560,-1));D(1250,520,80,()=>dunGo(19,422,230,1));
     L(730,545,110,["The old wall again. The air is getting colder the deeper we go.","Water drips somewhere behind the stones."]);}
+  if(r===19){D(422,205,70,()=>dunGo(18,1215,540,-1));L(840,580,95,["A great stone serpent, coiled and ready to strike. A cold green flame burns above its head.","Its stone eyes seem to follow us."]);
+    L(330,700,95,["Another empty pedestal."]);L(1165,545,80,["The tunnel slopes away into the dark."]);}
   if(r===12){L(730,545,110,["Old stonework, set into the rock. Someone built this passage long ago.","The stones are cold and damp. Roots have pushed through the mortar."]);}
   if(r===2){D(175,590,64,()=>dunGo(1,1240,600,-1));D(1270,590,64,()=>dunGo(3,290,540,1));L(700,655,80,["The roots here are so thick they look woven together.","Purple fungus on the ceiling. Glowmold. Lovely in a powder, if only I could reach it."]);}
   if(r===3){D(270,525,60,()=>dunGo(2,1240,600,-1));
@@ -136,6 +140,7 @@ function drawDun(){const R=DROOMS[DUN.room],im=IMG['dun'+DUN.room];if(!ready(im)
   ctx.fillStyle=g;if(!CAPTURE.on)ctx.fillRect(0,0,W,H);
   ctx.save();ctx.globalCompositeOperation='lighter';if(lit)drawGlow(ctx,sx,sy,r0*1.3,'255,200,120',.12);for(const g of here){if(g.kind!=='bat'&&g.kind!=='spider')continue;const sp_=g.kind==='spider',kk=dunH(g.y)/151,[ex,ey]=wellToScreen(g.x+(g.face>0?1:-1)*(sp_?22:18)*kk,sp_?g.y-30*kk:g.y-150*kk-Math.sin(g.ph*3)*8);const tw=.55+.45*Math.sin(T*5+g.ph);drawGlow(ctx,ex-3,ey,5,'255,90,90',.8*tw);drawGlow(ctx,ex+3,ey,5,'255,90,90',.8*tw);}
   if(DUN.room===12||DUN.room===14||DUN.room===16||DUN.room===18)for(const [tx,ty] of [[115,340],[1278,335]]){const [px,py]=wellToScreen(tx,ty);drawGlow(ctx,px,py,(150+8*Math.sin(T*7+tx))*rz,'255,150,70',.28);}
+  if(DUN.room===19){const [px,py]=wellToScreen(805,200);drawGlow(ctx,px,py,(160+10*Math.sin(T*5))*rz,'90,255,190',.26);}
   if(DUN.room===17){const [px,py]=wellToScreen(818,280);drawGlow(ctx,px,py,(160+10*Math.sin(T*5))*rz,'90,255,190',.26);}
   if(DUN.room===15){const [px,py]=wellToScreen(818,290);drawGlow(ctx,px,py,(170+10*Math.sin(T*5))*rz,'90,255,190',.26);}
   if(R.light){const [lx,ly,lr]=R.light,[px,py]=wellToScreen(lx,ly);drawGlow(ctx,px,py,lr*rz,'180,210,255',.22);}
