@@ -158,11 +158,11 @@ function drawDun(){const R=DROOMS[DUN.room],im=IMG['dun'+DUN.room];if(!ready(im)
 
 /* ---------- the Worldbind Passage's air: a spiritual mist flowing low over the floor and stairs, and very tiny bats ---------- */
 function wbMist(R){const k='mist'+DUN.room;if(DUN[k])return DUN[k];const pts=[],F=R.floor;let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9;for(const [x,y] of F){x0=Math.min(x0,x);x1=Math.max(x1,x);y0=Math.min(y0,y);y1=Math.max(y1,y);}
-  for(let i=0;i<400&&pts.length<34;i++){const x=x0+hash(i,1,DUN.room*7)*(x1-x0),y=y0+hash(i,2,DUN.room*7)*(y1-y0);if(inPoly(x,y,F))pts.push({x,y,r:60+hash(i,3,DUN.room)*90,ph:hash(i,4,DUN.room)*TAU,sp:6+hash(i,5,DUN.room)*10});}
+  for(let i=0;i<400&&pts.length<56;i++){const x=x0+hash(i,1,DUN.room*7)*(x1-x0),y=y0+hash(i,2,DUN.room*7)*(y1-y0);if(inPoly(x,y,F))pts.push({x,y,r:80+hash(i,3,DUN.room)*120,ph:hash(i,4,DUN.room)*TAU,sp:6+hash(i,5,DUN.room)*10});}
   return DUN[k]={pts,x0,x1};}
 function drawWorldbindAir(R){const M=wbMist(R),span=M.x1-M.x0+300;ctx.save();ctx.globalCompositeOperation='lighter';
-  for(const m of M.pts){const x=M.x0-150+(((m.x-M.x0+150)+T*m.sp)%span+span)%span,y=m.y+Math.sin(T*.4+m.ph)*8,a=.11+.05*Math.sin(T*.6+m.ph);
-    ctx.save();ctx.translate(x,y);ctx.scale(1,.32);drawGlow(ctx,0,0,m.r,'150,225,235',a);ctx.restore();}
+  for(const m of M.pts){const x=M.x0-150+(((m.x-M.x0+150)+T*m.sp)%span+span)%span,y=m.y+Math.sin(T*.4+m.ph)*8,a=.24+.08*Math.sin(T*.6+m.ph);
+    ctx.save();ctx.translate(x,y);ctx.scale(1,.3);drawGlow(ctx,0,0,m.r,'160,232,240',a);drawGlow(ctx,m.r*.25*Math.sin(T*.3+m.ph),-m.r*.15,m.r*.45,'215,250,255',a*.6);ctx.restore();}
   ctx.restore();
   // very tiny bats, flitting high in the dark
   ctx.save();ctx.fillStyle='rgba(12,14,22,.9)';for(let i=0;i<5;i++){const s=T*(.18+hash(i,1,DUN.room+40)*.12)+hash(i,2,DUN.room+40)*9,x=687+Math.sin(s)*(420+hash(i,3,DUN.room)*200)+Math.sin(s*3.1)*40,y=110+hash(i,4,DUN.room)*170+Math.sin(s*2.3)*30+Math.sin(s*7)*6,
