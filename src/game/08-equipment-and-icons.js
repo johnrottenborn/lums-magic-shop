@@ -22,6 +22,8 @@ const ITEMS={
   lumpouch:{name:"Lum's Powder Pouch",slot:'main',stats:{atk:1},desc:"A sealed leather pouch packed with Lum's handmade powders. Sparkdust for striking, and a few rarer blends for tricky foes."},
   lumrobe:{name:"Starry Shop Cape",slot:'chest',stats:{def:1},desc:"Lum's favorite cape, dusted with embroidered moons and stars. She claims it's just for keeping warm."},
   foxboots:{name:'Vixenstep Boots',slot:'boots',stats:{def:1,spd:2},desc:"Light as a fox's step, dropped by the Elder Vixen in the watching dark. +1 DEF, +2 SPD."},
+  amrothsword:{name:"Gatekeeper's Sword",slot:'main',stats:{atk:1},desc:"A long, well-kept blade with a cross hilt. Amroth has carried it on every patrol of the pass. +1 ATK."},
+  amrothshield:{name:"Lion Shield",slot:'off',stats:{def:1},desc:"A steel kite shield worked with a rampant lion in violet enamel. +1 DEF."},
   sparsword:{name:"Spar's Sword",slot:'main',stats:{atk:1},desc:"A bright steel sword with a silver crossguard. Spar never lets it out of reach. +1 ATK."},
   foxtails:{name:'Fox Tail Charm',slot:'charm',stats:{spd:1},desc:"Three soft tails bound with leather, earned by finishing Chapter 1 with 3 stars. They twitch a little when danger is near. +1 SPD."},
   foxpendant:{name:'Fox Pendant',slot:'charm',stats:{spd:1,mag:1},desc:"A pale fox face on a braided cord, earned by finishing Chapter 1 with 4 stars. It hums faintly when Lum mixes. +1 SPD, +1 MAG."},
@@ -42,7 +44,7 @@ const ITEMS={
   duskflower:{name:'Pressed Duskberry Blossom',slot:'charm',stats:{def:1},desc:"A tiny duskberry blossom set in a heart-shaped charm. +1 DEF."},
   spark:{name:'Spark Powder',kind:'use',dmg:3,short:'Throw for 3 damage',desc:"A pinch of crackling stardust. Thrown in battle, it bursts for 3 damage (more with Magic)."}};
 const STAT_NAME={atk:'Attack',def:'Defense',mag:'Magic',spd:'Speed'};
-const PARTY={spar:{main:'sparsword',off:null,head:null,chest:null,boots:null,charm:null},jak:{main:'jakaxe',off:'jakstick',head:null,chest:'jakcoat',boots:null,charm:null},cosmic:{main:'staff',off:null,head:null,chest:'cloak',boots:'boots',charm:null},
+const PARTY={amroth:{main:'amrothsword',off:'amrothshield',head:null,chest:null,boots:null,charm:null},spar:{main:'sparsword',off:null,head:null,chest:null,boots:null,charm:null},jak:{main:'jakaxe',off:'jakstick',head:null,chest:'jakcoat',boots:null,charm:null},cosmic:{main:'staff',off:null,head:null,chest:'cloak',boots:'boots',charm:null},
              lum:{main:'lumpouch',off:null,head:null,chest:'lumrobe',boots:null,charm:null}};
 const BAG=[];let bucketTaken=false,gotEquip=false;
 const MENU={open:false,a:0,sel:null,hits:[],S:1,ox:0,oy:0,note:'',noteT:0,newItems:0};
@@ -94,7 +96,7 @@ function drawBucketHat(c,fr){const im=IMG.bucket_worn;if(!ready(im))return;const
   c.drawImage(im,-w/2,-h+3,w,h);
   c.restore();}
 /* little painted icons for the book */
-const IMGICON={jakcoat:'icon_cloak_grey',jakaxe:'icon_axe_bearded',jakstick:'icon_stick',foxboots:'icon4_boots_fur',vanecharm:'icon2_cross_wood',shedkey:'icon2_key_gold',crystalpouch:'icon5_pouch_foxfur',foxring:'icon5_ring_fox',foxhood:'icon5_hood_fox',foxsuit:'icon5_suit_fox',sparsword:'icon_spar_sword',foxtails:'icon5_tails_fox',foxpendant:'icon5_pendant_fox',foxtotem:'icon5_totem_fox',lantern:'tool_lantern',duskberry:'ing_duskberry',dewberry:'ing_dewberry',emberberry:'ing_emberberry',moonleaf:'ing_leavesB5',slimeparts:'ing_slime',boneparts:'ing_bones',thornsprig:'ing_twig',potion:'icon_potion',lumpouch:'icon_pouch_seal',lumrobe:'icon_cape_stars',mooncharm:'acc_moon_necklace',moonmint:'acc_moonstone_ring',duskflower:'acc_heart_ring'};
+const IMGICON={jakcoat:'icon_cloak_grey',jakaxe:'icon_axe_bearded',jakstick:'icon_stick',foxboots:'icon4_boots_fur',vanecharm:'icon2_cross_wood',shedkey:'icon2_key_gold',crystalpouch:'icon5_pouch_foxfur',foxring:'icon5_ring_fox',foxhood:'icon5_hood_fox',foxsuit:'icon5_suit_fox',sparsword:'icon_spar_sword',amrothsword:'icon_amroth_sword',amrothshield:'icon_amroth_shield',foxtails:'icon5_tails_fox',foxpendant:'icon5_pendant_fox',foxtotem:'icon5_totem_fox',lantern:'tool_lantern',duskberry:'ing_duskberry',dewberry:'ing_dewberry',emberberry:'ing_emberberry',moonleaf:'ing_leavesB5',slimeparts:'ing_slime',boneparts:'ing_bones',thornsprig:'ing_twig',potion:'icon_potion',lumpouch:'icon_pouch_seal',lumrobe:'icon_cape_stars',mooncharm:'acc_moon_necklace',moonmint:'acc_moonstone_ring',duskflower:'acc_heart_ring'};
 function drawIcon(c,id,x,y,s,ghost){c.save();c.translate(x,y);const G=ghost?'rgba(110,84,52,.22)':null;c.lineJoin='round';c.lineCap='round';
   if(!G&&IMGICON[id]&&ready(IMG[IMGICON[id]])){const im=IMG[IMGICON[id]],h=s*1.15,w=h*im.naturalWidth/im.naturalHeight,sc=Math.min(1,s*1.15/w);c.drawImage(im,-w*sc/2,-h*sc/2,w*sc,h*sc);c.restore();return;}
   if(id==='lantern'){c.strokeStyle='#3a2a18';c.lineWidth=s*.05;c.fillStyle=G||'#5a4428';c.beginPath();c.arc(0,-s*.38,s*.09,Math.PI,0);c.stroke();c.fillRect(-s*.2,-s*.32,s*.4,s*.08);c.fillRect(-s*.18,s*.3,s*.36,s*.08);

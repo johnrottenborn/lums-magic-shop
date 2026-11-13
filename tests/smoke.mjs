@@ -375,8 +375,28 @@ const CASES = {
       if (await g_(() => window.__g.DLG.active)) { await wait(250); await p.keyboard.press('Enter'); } else await wait(250);
     }
     const r = await g_(() => ({ on: window.__g.C2.on, joined: window.__g.C2.joined, stone: window.__g.LUMSTONEX, party: window.__g.PARTY_ORDER.join(',') }));
-    check(!r.on && r.joined && !r.stone && r.party === 'lum', 'opening did not end with Lum free and Amroth along (not in battle party): ' + JSON.stringify(r));
+    check(!r.on && r.joined && !r.stone && r.party === 'lum,amroth', 'opening did not end with Lum free and Amroth in the party: ' + JSON.stringify(r));
     await wait(1500); await p.screenshot({ path: path.join(SHOTS, `ch2-after-${vp}.png`) });
+  },
+  async 'amroth-battle'(p) {
+    // Amroth fights beside Lum: guard stance, sword attack, and Lion's Fury (tap as each ring meets the star, up to 15 hits)
+    const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop', g_ = f => p.evaluate(f);
+    await g_(() => { window.__g.startChapter2(); window.__g.c2Skip(); }); await wait(1500);
+    await g_(() => window.__g.startEncounter({ kind: 'spider', scene: 'thorn', x: 0, y: 0, s: 1, pack: 1, calm: 0, over: { hp: 60 } }, 'normal'));
+    for (let i = 0; i < 60; i++) { await wait(150); if (await g_(() => window.__g.BATTLE.phase) === 'heroMenu') break; }
+    check(await g_(() => window.__g.BATTLE.heroes.map(h => h.id).join(',')) === 'lum,amroth', 'Amroth is not in the battle');
+    await g_(() => { const B = window.__g.BATTLE; B.cur = 1; window.__g.C1X.comboA = 5; }); await wait(900);
+    await p.screenshot({ path: path.join(SHOTS, `amroth-in-battle-${vp}.png`) });
+    check(await g_(() => window.__g.battleMenuOpts().some(o => o[0] === 'burst' && o[1] === "Lion's Fury")), "no Lion's Fury at 5 stars");
+    await g_(() => { const B = window.__g.BATTLE; B.phase = 'aflurry'; B.t = 0; B.af = { i: 0, bt: 0, hits: 0, hit: -1, pressed: 0, swing: 0 };
+      const tick = () => { const a = B.af; if (!a || a.done || B.phase !== 'aflurry') return; if (!a.pressed && a.bt / 0.52 > 0.76) window.__g.battleAction(); requestAnimationFrame(tick); }; requestAnimationFrame(tick); });
+    await wait(2600); await p.screenshot({ path: path.join(SHOTS, `amroth-lions-fury-${vp}.png`) });
+    for (let i = 0; i < 60 && !(await g_(() => window.__g.BATTLE.af && window.__g.BATTLE.af.done)); i++) await wait(200);
+    const hits = await g_(() => window.__g.BATTLE.af.hits);
+    check(hits >= 13, "Lion's Fury landed too few hits with good timing: " + hits);
+    await g_(() => { window.__g.BATTLE.on = false; });
+    await g_(() => { const g = window.__g; g.openMenu(); g.MENU.page = 'char'; g.MENU.who = 'amroth'; }); await wait(600);
+    await p.screenshot({ path: path.join(SHOTS, `amroth-spellbook-${vp}.png`) });
   },
   async 'ch2-clearing'(p) {
     // Chapter 2 opens in the big round clearing; the path east then north reaches the gatehouse

@@ -2,10 +2,10 @@
    Party portraits along the top, then either a two-page spread (wide screens)
    or a single page that flips between Character and Satchel (phones).
    Everything is drawn in "book space" and scaled to fit the screen. */
-const HCOL={lum:'#7a4f9a',jak:'#7a5a32',cosmic:'#4a6fb5',spar:'#9a2f2f'};
-const HSUB={lum:"Keeper of the magic shop  ·  powder-maker",jak:"Lost traveller  ·  axeman",spar:"Young swordsman  ·  fire blade",cosmic:"Lum's apprentice  ·  aspiring wizard"};
-const HCOMBO={lum:'Starfall',jak:'Staff Bolt',spar:'Blazing Edge'};
-const FACEIMG={lum:'face_lum',jak:'face_jak',cosmic:'face_cosmic',spar:'face_spar'};
+const HCOL={lum:'#7a4f9a',jak:'#7a5a32',cosmic:'#4a6fb5',spar:'#9a2f2f',amroth:'#4d5d8f'};
+const HSUB={lum:"Keeper of the magic shop  ·  powder-maker",jak:"Lost traveller  ·  axeman",spar:"Young swordsman  ·  fire blade",amroth:"Gatekeeper of the Worldbind  ·  sword and shield",cosmic:"Lum's apprentice  ·  aspiring wizard"};
+const HCOMBO={lum:'Starfall',jak:'Staff Bolt',spar:'Blazing Edge',amroth:'Lion\'s Fury'};
+const FACEIMG={lum:'face_lum',jak:'face_jak',cosmic:'face_cosmic',spar:'face_spar',amroth:'face_amroth'};
 const STATIMG={atk:'stat_atk',def:'stat_def',mag:'stat_mag',spd:'stat_spd'};
 const BK={spread:false,W:380,H:590,top:108,bot:104,r:30};
 function menuLayout(){const sp=W>H*1.15&&W>=640;BK.spread=sp;if(sp)Object.assign(BK,{W:780,H:500,top:118,bot:46,r:35});else Object.assign(BK,{W:380,H:590,top:108,bot:104,r:30});BK.task=GOAL&&GOAL.text?52:0;BK.top+=BK.task;}
@@ -45,6 +45,7 @@ function drawDoll(c,MH,fx,fy,k){c.save();c.translate(fx,fy);c.scale(k,k);
   if(MH==='lum'&&ready(atlas)){const sp=.64,dw=FW*sp,dh=FH*sp;c.drawImage(atlas,37*FW,0,FW,FH,-dw/2,-dh*(274/280),dw,dh);}
   else if(MH==='jak'){c1Frame(c,'jak','idle',0,JAKDX*196,0,196,false,1,0);}
   else if(MH==='spar'){c1Frame(c,'spar','bidle',0,0,0,200,false,1,0);}
+  else if(MH==='amroth'){c1Frame(c,'amroth','down',0,0,0,196,false,1,0);}
   else if(ready(catlas)){const sp=.74,dw=CFW*sp,dh=CFH*sp,fr=bladeFr(16);c.translate(-dw/2,-dh*(264/270));c.drawImage(cosSheet(),fr*CFW,0,CFW,CFH,0,0,dw,dh);c.scale(sp,sp);if(PARTY[MH].head==='bucket')drawBucketHat(c,fr);}
   c.restore();}
 function drawSlot(c,MH,k,label,x,y,s){const id=PARTY[MH][k],sel=MENU.sel&&MENU.sel.kind==='slot'&&MENU.sel.slot===k;

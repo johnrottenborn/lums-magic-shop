@@ -1,7 +1,7 @@
 /* ---------- Chapter 2: The Ashes of Awakening ----------
    Opens in the clearing where Chapter 1 ended (CLR in 21-stranglethorn). Scene 1: narration on black. Scene 2: light rain; Amroth the gatekeeper
    comes out of his gatehouse, walks down to the clearing, frees Lum from the stone, finds a baby in Spar's ashes, and joins Lum.
-   Amroth (his own sprite, face always hidden in his helmet) follows Lum but has no battle role yet (not in PARTY_ORDER).
+   Amroth (his own sprite, face always hidden in his helmet) joins the party at the end of the opening and follows Lum on the map.
    No saving yet. */
 const C2={on:false,st:0,t:0,w:0,narr:-1,na:0,cam:null,title:0,heal:0,mound:1,shake:0,joined:0};
 const AMR={x:0,y:0,face:1,dir:'side',moving:0,ph:0,a:1};
@@ -62,7 +62,7 @@ function updateC2(dt){if(!C2.on)return;C2.t+=dt;
   else if(st===15){amrWalk(S.x+420,S.y+40,80,dt);if(C2.t>.7)c1Walk(S.x+300,S.y+30,75,dt);if(C2.t>2.6&&!FADE.dir)goScene(c2Finish);}
   // Lum is still while the cutscene runs (she only walks at the very end)
   if(st!==15&&!LUMSTONE){lum.state='idle';lum.fi=0;}}
-function c2Finish(){C2.on=false;C2.st=99;C2.cam=null;C2.joined=1;WEVENT.on=false;C2.title=.001;C2.mound=0;lum.state='idle';
+function c2Finish(){if(!PARTY_ORDER.includes('amroth'))PARTY_ORDER.push('amroth');HEROES.amroth.hp=HEROES.amroth.maxHp;C1.comboA=0;C2.on=false;C2.st=99;C2.cam=null;C2.joined=1;WEVENT.on=false;C2.title=.001;C2.mound=0;lum.state='idle';
   AMR.x=lum.x-60;AMR.y=lum.y+4;AMR.moving=0;GOAL.tag='TASK';GOAL.text='Follow Amroth to the passage';}
 /* once he has joined, Amroth walks behind Lum */
 function updateAmrFollow(dt){if(!C2.joined||CH<2||SCENE!=='thorn')return;const tx=lum.x-56*lum.face,ty=lum.y+6,d=Math.hypot(tx-AMR.x,ty-AMR.y);if(d>18)amrWalk(tx,ty,Math.min(220,60+d*1.6),dt);else{AMR.moving=0;if(!DLG.active){AMR.dir='side';AMR.face=lum.face;}}}
