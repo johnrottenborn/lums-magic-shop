@@ -424,6 +424,16 @@ const CASES = {
     await g_(() => window.__g.NEAR.onInteract()); await wait(2200);
     check(await g_(() => window.__g.SCENE === 'dun' && window.__g.DUNX.room === 12), 'the tunnel did not lead to the second passage room');
     check(await g_(() => Math.hypot(window.__g.AMR.x - window.__g.lum.x, window.__g.AMR.y - window.__g.lum.y) < 6), 'Amroth did not arrive on Lum\'s spot in the new room');
+    // first visit: the first torch is out; Amroth notices, walks over and relights it
+    check(await g_(() => !window.__g.C2.torchLit), 'the first torch in room 2 should start out unlit');
+    await wait(1400); { const l = await g_(() => window.__g.DLG.active && window.__g.DLG.lines.map(x => x[1]).join(' ')); check(l && /torch/.test(l) && /my job/.test(l), 'Amroth did not notice the unlit torch: ' + JSON.stringify(l)); }
+    await p.screenshot({ path: path.join(SHOTS, `worldbind-torch-out-${vp}.png`) });
+    for (let i = 0; i < 4 && await g_(() => window.__g.DLG.active); i++) { await p.keyboard.press('Enter'); await wait(400); }
+    await wait(4000); check(await g_(() => window.__g.C2.torchLit), 'Amroth did not relight the torch');
+    await p.screenshot({ path: path.join(SHOTS, `worldbind-torch-lit-${vp}.png`) });
+    for (let i = 0; i < 4 && await g_(() => window.__g.DLG.active); i++) { await p.keyboard.press('Enter'); await wait(400); }
+    await wait(500); check(await g_(() => !window.__g.WEVENT.on), 'the torch scene did not hand control back');
+    await g_(() => { const g = window.__g; g.lum.x = 238; g.lum.y = 520; }); await wait(300);
     await p.keyboard.down('ArrowRight'); await wait(1500); await p.keyboard.up('ArrowRight'); await wait(400);
     { const d = await g_(() => [Math.round(window.__g.lum.x - window.__g.AMR.x), Math.round(Math.hypot(window.__g.AMR.x - window.__g.lum.x, window.__g.AMR.y - window.__g.lum.y))]); check(d[0] > 20 && d[1] < 110, 'Amroth is not following behind Lum: ' + JSON.stringify(d)); }
     await p.screenshot({ path: path.join(SHOTS, `worldbind-room2-${vp}.png`) });

@@ -67,7 +67,7 @@ function c2Finish(){if(!PARTY_ORDER.includes('amroth'))PARTY_ORDER.push('amroth'
 /* once he has joined, Amroth walks behind Lum along the exact path she took (breadcrumbs, like Spar), so he never cuts through walls */
 const AMRCRUMB=[];
 function resetAmrFollow(){AMR.x=lum.x;AMR.y=lum.y;AMR.moving=0;AMR.face=lum.face;AMRCRUMB.length=0;}
-function updateAmrFollow(dt){if(!C2.joined||CH<2||(SCENE!=='thorn'&&SCENE!=='dun'))return;const lc=AMRCRUMB[AMRCRUMB.length-1];
+function updateAmrFollow(dt){updateC2Torch(dt);if(!C2.joined||CH<2||(SCENE!=='thorn'&&SCENE!=='dun')||C2.torchWalk||(C2.torchScene&&!C2.torchLit)||(WEVENT.on&&C2.torchScene&&DLG.active))return;const lc=AMRCRUMB[AMRCRUMB.length-1];
   if(!lc||Math.hypot(lc[0]-lum.x,lc[1]-lum.y)>6){AMRCRUMB.push([lum.x,lum.y]);if(AMRCRUMB.length>80)AMRCRUMB.shift();}
   let acc=0,tx=AMR.x,ty=AMR.y,px=lum.x,py=lum.y,found=false;for(let i=AMRCRUMB.length-1;i>=0;i--){const [cx,cy]=AMRCRUMB[i];acc+=Math.hypot(cx-px,cy-py);px=cx;py=cy;if(acc>=64){tx=cx;ty=cy;found=true;break;}}
   if(!found){AMR.moving=0;if(!DLG.active){AMR.dir='side';AMR.face=lum.face;}return;}
@@ -109,3 +109,10 @@ function enterWorldbind(){enterDun(11,238,250,1);
       ['Amroth',"My job is to make sure no one tries to use this passage anymore…"]]),2000);}AMR.x=lum.x+30;AMR.y=lum.y-30;AMR.dir='down';}
 /* party followers snap onto Lum's spot whenever she changes place (see 27-update) */
 const followSnap={};
+/* Worldbind room 2, first visit: the first torch is out. Amroth walks over, explains, and relights it */
+function c2TorchScene(){if(C2.torchLit||C2.torchScene||DUN.room!==12)return;C2.torchScene=1;WEVENT.on=true;
+  setTimeout(()=>talk([['Amroth',"Hm. The first torch has gone out."],['Amroth',"Keeping these torches lit is my job, too."]],false,()=>{C2.torchWalk=1;}),900);}
+function updateC2Torch(dt){if(SCENE!=='dun'||DUN.room!==12)return;if(!C2.torchLit&&!C2.torchScene&&C2.joined&&!FADE.dir)c2TorchScene();
+  if(C2.torchWalk){if(amrWalk(150,500,90,dt)){C2.torchWalk=0;AMR.dir='side';AMR.face=-1;AMR.moving=0;setTimeout(()=>{C2.torchLit=1;C2.lightT=0;try{sfxIgnite();}catch(e){}
+      setTimeout(()=>talk([['Amroth',"There. That's better."]],false,()=>{WEVENT.on=false;resetAmrFollow();AMR.x=150;AMR.y=500;}),900);},500);}}
+  if(C2.lightT!=null&&C2.lightT<1)C2.lightT+=dt*1.5;}

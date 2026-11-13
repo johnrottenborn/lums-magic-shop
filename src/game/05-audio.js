@@ -87,6 +87,8 @@ function sfxSplash(){if(!SND.ready)return;const t=SND.ctx.currentTime;noiseHit(t
 function sfxWell(){if(!SND.ready)return;const t=SND.ctx.currentTime;[86,90,93,98,100,105].forEach((n,i)=>bell(t+i*.12,NOTE(n),.07,2.6,SND.sfx,(i-2.5)*.15));noiseHit(t,1.2,'highpass',6000,.5,.02,SND.sfxVerb);}
 function sfxFizzle(near){if(!SND.ready||!near)return;const t=SND.ctx.currentTime;[100,97,93,88].forEach((n,i)=>bell(t+i*.06,NOTE(n),.03,.5,SND.sfx,.2));noiseHit(t+.25,.3,'bandpass',900,1,.05,SND.sfx);}
 /* a baby's single cry from under the ashes (Chapter 2 opening): a wavering wail that rises and falls, through a vocal-ish filter */
+/* torch catching: soft whoosh then a crackle */
+function sfxIgnite(){if(!SND.ready)return;const t=SND.ctx.currentTime;noiseHit(t,.5,'bandpass',300,.8,.12,SND.sfx,1800);for(let i=0;i<6;i++)noiseHit(t+.3+i*.09+Math.random()*.05,.04,'highpass',2500,1,.04,SND.sfx);}
 function sfxBabyCry(v=1){if(!SND.ready)return;const c=SND.ctx,t=c.currentTime,o=c.createOscillator(),f=c.createBiquadFilter(),f2=c.createBiquadFilter(),g=c.createGain(),vib=c.createOscillator(),vg=c.createGain();
   o.type='sawtooth';o.frequency.setValueAtTime(430,t);o.frequency.linearRampToValueAtTime(560,t+.25);o.frequency.linearRampToValueAtTime(520,t+.75);o.frequency.exponentialRampToValueAtTime(330,t+1.15);
   vib.frequency.value=6.5;vg.gain.value=14;vib.connect(vg);vg.connect(o.frequency);f.type='bandpass';f.frequency.value=1150;f.Q.value=3;f2.type='bandpass';f2.frequency.value=2600;f2.Q.value=4;
