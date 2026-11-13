@@ -412,6 +412,9 @@ const CASES = {
     await g_(() => { const g = window.__g, P = g.CPATH; g.lum.x = P.xt; g.lum.y = P.ytop + 80; }); await wait(700);
     await g_(() => window.__g.NEAR.onInteract()); await wait(2200);
     check(await g_(() => window.__g.SCENE === 'dun' && window.__g.DUNX.room === 11), 'the gatehouse door did not open the Worldbind Passage');
+    await wait(800); { const l = await g_(() => window.__g.DLG.active && window.__g.DLG.lines[0]); check(l && l[0] === 'Amroth' && /my home, little one/.test(l[1]), 'Amroth did not speak on first entering the passage: ' + JSON.stringify(l)); }
+    await p.screenshot({ path: path.join(SHOTS, `worldbind-amroth-speaks-${vp}.png`) });
+    for (let i = 0; i < 6 && await g_(() => window.__g.DLG.active); i++) { await p.keyboard.press('Enter'); await wait(400); }
     await p.screenshot({ path: path.join(SHOTS, `worldbind-top-${vp}.png`) });
     await p.keyboard.down('ArrowDown'); await p.keyboard.down('ArrowRight'); await wait(2500); await p.keyboard.up('ArrowDown'); await p.keyboard.up('ArrowRight'); await wait(800);
     const y = await g_(() => window.__g.lum.y); check(y > 330, 'Lum could not walk down the stairs: y=' + y);

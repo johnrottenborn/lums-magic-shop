@@ -102,6 +102,10 @@ function drawAmrOW(F,alpha){if(!F||alpha<=0)return;drawnAmr.n++;const an=F.dir==
   ctx.save();ctx.globalAlpha*=alpha;ctx.fillStyle='rgba(10,10,20,.28)';ctx.beginPath();ctx.ellipse(F.x,F.y,26,8,0,0,TAU);ctx.fill();ctx.restore();
   c1Frame(ctx,'amroth',an,an==='side'||an==='up'?fi:0,F.x,F.y+bob,AMR_H,an==='side'&&F.face>0,alpha,0);}
 /* through the gatehouse arch: the first room of the Worldbind Passage (room 11 of the root-room engine in 26), arriving at the top of the stairs */
-function enterWorldbind(){enterDun(11,238,250,1);AMR.x=lum.x+30;AMR.y=lum.y-30;AMR.dir='down';}
+function enterWorldbind(){enterDun(11,238,250,1);
+  /* first time in: the baby cries, and Amroth talks as they start down the stairs */
+  if(!C2.wbSeen){C2.wbSeen=1;setTimeout(()=>{try{sfxBabyCry(.8);}catch(e){}},700);
+    setTimeout(()=>talk([['Amroth',"We will take you to my home, little one."],['Amroth',"It’s much easier walking down these stairs than climbing up them. I climb them every day."],
+      ['Amroth',"My job is to make sure no one tries to use this passage anymore…"]]),2000);}AMR.x=lum.x+30;AMR.y=lum.y-30;AMR.dir='down';}
 /* party followers snap onto Lum's spot whenever she changes place (see 27-update) */
 const followSnap={};
