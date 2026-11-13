@@ -97,6 +97,16 @@ function sfxBabyCry(v=1){if(!SND.ready)return;const c=SND.ctx,t=c.currentTime,o=
   g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.13*v,t+.08);g.gain.setValueAtTime(.13*v,t+.8);g.gain.exponentialRampToValueAtTime(.001,t+1.2);
   o.connect(f);o.connect(f2);f.connect(g);f2.connect(g);g.connect(SND.sfx);g.connect(SND.sfxVerb);o.start(t);vib.start(t);o.stop(t+1.25);vib.stop(t+1.25);}
 /* possessed Cosmic (Chapter 1 on): a child's note that sags and splits into a low demonic growl, with a breathy whisper under it */
+/* a demon's roar: a throaty growl that swells and drops in pitch, with a rasp of breath; the brown demons are deeper and longer */
+function sfxDemonRoar(big){if(!SND.ready)return;const c=SND.ctx,t=c.currentTime,out=SND.sfx,k=big?.72:1,d=big?1.5:1.1,p0=rnd(.94,1.06);
+  const g=c.createGain();g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.24,t+.12);g.gain.setValueAtTime(.24,t+d*.55);g.gain.exponentialRampToValueAtTime(.001,t+d);
+  const f=c.createBiquadFilter();f.type='bandpass';f.Q.value=2.2;f.frequency.setValueAtTime(700*k,t);f.frequency.linearRampToValueAtTime(1100*k,t+d*.3);f.frequency.exponentialRampToValueAtTime(380*k,t+d);
+  const lp=c.createBiquadFilter();lp.type='lowpass';lp.frequency.value=2400;f.connect(lp);lp.connect(g);g.connect(out);
+  for(const [type,m,v] of [['sawtooth',1,1],['sawtooth',1.012,.8],['square',.5,.5]]){const o=c.createOscillator(),og=c.createGain();o.type=type;og.gain.value=v*.5;
+    o.frequency.setValueAtTime(150*k*m*p0,t);o.frequency.linearRampToValueAtTime(190*k*m*p0,t+d*.3);o.frequency.exponentialRampToValueAtTime(70*k*m*p0,t+d);
+    const lfo=c.createOscillator(),lg=c.createGain();lfo.frequency.value=31;lg.gain.value=14*k;lfo.connect(lg);lg.connect(o.frequency);   /* the rattle in its throat */
+    o.connect(og);og.connect(f);o.start(t);o.stop(t+d+.05);lfo.start(t);lfo.stop(t+d+.05);}
+  noiseHit(t,d*.9,'bandpass',900*k,1.2,.16,out,320*k);}
 function sfxPossessed(){if(!SND.ready)return;const c=SND.ctx,t=c.currentTime,out=SND.sfx;
   const v=c.createOscillator(),vg=c.createGain();v.type='triangle';v.frequency.setValueAtTime(NOTE(81),t);v.frequency.exponentialRampToValueAtTime(NOTE(57),t+.55);
   vg.gain.setValueAtTime(0,t);vg.gain.linearRampToValueAtTime(.05,t+.02);vg.gain.exponentialRampToValueAtTime(.001,t+.6);v.connect(vg);vg.connect(out);v.start(t);v.stop(t+.65);

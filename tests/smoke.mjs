@@ -468,6 +468,7 @@ const CASES = {
     await p.keyboard.press('Enter');
     for (let i = 0; i < 70 && !(await g_(() => window.__g.BO.ow.length === 2 && window.__g.BO.lt >= 1)); i++) await wait(200);
     check(await g_(() => window.__g.BO.L && window.__g.BO.ow.length === 2), 'the left torch was not relit with the demons revealed');
+    check(await g_(() => window.__g.roars() >= 2), 'the demons did not roar when they appeared');
     await p.screenshot({ path: path.join(SHOTS, `worldbind-room4-demons-${vp}.png`) });
     // a battle starts: Lum and Amroth against two demons that hurl fire
     for (let i = 0; i < 30 && !(await g_(() => window.__g.BATTLE.on)); i++) await wait(200);
@@ -525,6 +526,8 @@ const CASES = {
     await g_(() => { const g = window.__g; g.WB5.chaser.calm = 99; g.lum.x = 818; g.lum.y = 610; }); await wait(500);
     await g_(() => window.__g.NEAR.onInteract()); await wait(1600);
     check(await g_(() => window.__g.WBT.lion === 1 && !!window.__g.WB5.brown), 'touching the lion torch did not light it and bring the brown demon');
+    for (let i = 0; i < 40 && !(await g_(() => window.__g.WB5.brown.roared)); i++) await wait(150);
+    check(await g_(() => window.__g.WB5.brown.roared === 1), 'the brown demon did not roar when it came into view');
     await wait(1200); await p.screenshot({ path: path.join(SHOTS, `worldbind-room5-brown-${vp}.png`) });
     const pots = await g_(() => window.__g.BAG.filter(x => x === 'potion').length);
     await g_(() => { const g = window.__g; g.WB5.brown.x = g.lum.x + 60; g.WB5.brown.y = g.lum.y; }); 
