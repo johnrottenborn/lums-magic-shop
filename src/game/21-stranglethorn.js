@@ -78,6 +78,7 @@ function buildThorn(){if(THORN.built)return;THORN.built=true;const P=THORN.props
    // the Worldbind: cliff faces behind the gatehouse and along the path's east side; the gatehouse sits in the mountain face where the path ends
    P.push({t:'tree',img:'worldbind_cliff',x:CPATH.xt+200,y:CPATH.ytop-40,w:2300,flip:false,cliff:1,solid:1});
    P.push({t:'tree',img:'worldbind_cliff',x:CPATH.xt+1350,y:CPATH.y+420,w:2300,flip:true,cliff:1,solid:1});
+   homeProps(P,PN);
    P.push({t:'tree',img:'outpost',x:CPATH.xt+52,y:CPATH.ytop+18,sy:CPATH.ytop-30,w:430,flip:false,solid:1});   /* solid: never fades; sorted behind anyone standing in its archway */}
   THORN.mist=[];for(let i=0;i<40;i++)THORN.mist.push({x:hash(i,1,77)*TW_,y:hash(i,2,77)*TH_,r:160+hash(i,3,77)*220,ph:hash(i,4,77)*TAU});}
 /* glimpses of Cosmic at the edge of the lantern light along the red-rose path; each happens once */
@@ -92,7 +93,7 @@ function drawCosGhost(s){if(!ready(catlas)||s.a<=0)return;const A=s.st===2?COS_B
   ctx.save();ctx.globalAlpha=s.a;ctx.fillStyle='rgba(0,0,0,.25)';ctx.beginPath();ctx.ellipse(s.x,s.y+2,26,7,0,0,TAU);ctx.fill();
   ctx.translate(s.x,s.y+3);if(s.face!==A.native)ctx.scale(-1,1);const dw=CFW*CSPR,dh=CFH*CSPR;ctx.save();ctx.globalCompositeOperation='lighter';const bg=s.st===2?[18,-32,44]:[34,-66,44];drawGlow(ctx,bg[0],bg[1],bg[2],'255,40,50',.7+.12*Math.sin(T*5));ctx.restore();ctx.drawImage(catlas,fr*CFW,0,CFW,CFH,-dw/2,-dh*(264/270),dw,dh);ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,bg[0],bg[1],bg[2]*.5,'255,70,60',.45);ctx.restore();ctx.restore();
   ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,s.x,s.y-70,60,'140,170,255',.22*s.a);ctx.restore();}
-function thornFree(x,y){if(x>TW_+40)return clrFree(x,y);if(x<18||y<14||y>TH_-14)return false;if(x>TW_-12&&Math.floor(y/TCH)!==TMZ.finish)return false;if(x>TW_+30)return false;
+function thornFree(x,y){if(x>HOMEX-300)return homeFree(x,y);if(x>TW_+40)return clrFree(x,y);if(x<18||y<14||y>TH_-14)return false;if(x>TW_-12&&Math.floor(y/TCH)!==TMZ.finish)return false;if(x>TW_+30)return false;
   const c=clamp(Math.floor(x/TCW),0,TMZ.C-1),r=clamp(Math.floor(y/TCH),0,TMZ.R-1),lx=x-c*TCW,ly=y-r*TCH,T_=34,B_=24,SX=42;
   if(ly<B_&&hW(r,c))return false;if(ly>TCH-T_&&hW(r+1,c))return false;if(lx<SX&&vW(r,c))return false;if(lx>TCW-SX&&vW(r,c+1))return false;
   const nearL=lx<SX,nearR=lx>TCW-SX,nearT=ly<B_,nearB=ly>TCH-T_;
@@ -108,7 +109,7 @@ function enterThorn(){buildThorn();if(!THORN.fint){THORN.fint=1;for(const f of T
 function startThornPreview(){SAVEC.finished=0;audioInit();c1Reset();C1.introDone=1;C1.hedgeSeen=1;C1I.on=false;WEVENT.on=false;INTRO.lumShown=true;if(!BAG.includes('lantern'))BAG.push('lantern');FADE.a=1;FADE.dir=-1;enterThorn();}
 function updateThorn(dt){updateThornAtmos(dt);updateCosSightings(dt);updateThornCritters(dt);updateThornFoes(dt);updateJakFollow(dt);
   if(!C1.jak&&!C1.jakSpotted&&!DLG.active&&!FADE.dir&&Math.hypot(lum.x-JAKREST.x,lum.y-JAKREST.y)<300){C1.jakSpotted=1;talk([['Lum',"Someone's there… slumped against the roots of that old oak."]]);}
-  if(!C1.thornBoss&&lum.x<TW_&&lum.x>12*TCW+TCW*.8&&Math.floor(lum.y/TCH)===2){lum.x=12*TCW+TCW*.8;}const k=Math.min(1,dt*4.5),fkCam=typeof FKS!=='undefined'&&FKS.st>=1&&FKS.st<7&&!C1.fkDone&&lum.x>TW_;const c2c=CH>=2&&typeof C2!=='undefined'&&C2.on&&C2.cam;cam.x+=((c2c?C2.cam.x:fkCam?(lum.x+FKS.cx)/2:lum.x+40)-cam.x)*k*(fkCam||c2c?.5:1);cam.y+=((c2c?C2.cam.y:fkCam?FKS.cy-250:lum.y-50)-cam.y)*k*(fkCam||c2c?.5:1);const vw=W/zoom,vh=H/zoom;cam.x=clamp(cam.x,vw/2-80,(lum.x>TW_+40?(CH>=2?CPATH.xt+900:CLR.x1+(fkCam?420:60)):TW_+80)-vw/2);cam.y=clamp(cam.y,-200+vh/2,TH_+60-vh/2);THORN.t+=dt;
+  if(!C1.thornBoss&&lum.x<TW_&&lum.x>12*TCW+TCW*.8&&Math.floor(lum.y/TCH)===2){lum.x=12*TCW+TCW*.8;}const k=Math.min(1,dt*4.5),fkCam=typeof FKS!=='undefined'&&FKS.st>=1&&FKS.st<7&&!C1.fkDone&&lum.x>TW_;const c2c=CH>=2&&typeof C2!=='undefined'&&C2.on&&C2.cam;cam.x+=((c2c?C2.cam.x:fkCam?(lum.x+FKS.cx)/2:lum.x+40)-cam.x)*k*(fkCam||c2c?.5:1);cam.y+=((c2c?C2.cam.y:fkCam?FKS.cy-250:lum.y-50)-cam.y)*k*(fkCam||c2c?.5:1);const vw=W/zoom,vh=H/zoom;cam.x=clamp(cam.x,vw/2-80,(lum.x>TW_+40?(inHome()?1e9:CH>=2?CPATH.xt+900:CLR.x1+(fkCam?420:60)):TW_+80)-vw/2);cam.y=clamp(cam.y,-200+vh/2,TH_+60-vh/2);if(inHome()){cam.x=vw>=HW?HOMEX+HW/2:clamp(cam.x,HOMEX+vw/2,HOMEX+HW-vw/2);cam.y=vh>=HH?HOMEY+HH/2:clamp(cam.y,HOMEY+vh/2,HOMEY+HH-vh/2);}THORN.t+=dt;
   updateClearing(dt);}
 function drawRedFlowers(x,y,s,seed){ctx.save();ctx.translate(x,y);ctx.scale(s,s);
   for(let i=0;i<4;i++){const a=hash(seed,i,61)*TAU,l=10+hash(seed,i,63)*8;ctx.fillStyle='#2f4a24';ctx.beginPath();ctx.ellipse(Math.cos(a)*l*.6,Math.sin(a)*l*.3+2,l*.55,3,a,0,TAU);ctx.fill();}

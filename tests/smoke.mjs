@@ -469,6 +469,15 @@ const CASES = {
     await p.keyboard.down('ArrowDown'); await wait(3000); await p.keyboard.up('ArrowDown'); await wait(500);
     check(await g_(() => window.__g.lum.y > 640 && !!(window.__g.NEAR && window.__g.NEAR.door)), 'Lum could not walk through the arch to the way on in the foreground');
     await p.screenshot({ path: path.join(SHOTS, `worldbind-room10-${vp}.png`) });
+    // out into the open: Amroth's home. The path winds down to the cottage and the pond
+    await g_(() => window.__g.NEAR.onInteract()); await wait(2400);
+    check(await g_(() => window.__g.SCENE === 'thorn' && window.__g.lum.x > window.__g.HOMEX), 'room 10 did not lead out to Amroth\'s home');
+    await p.screenshot({ path: path.join(SHOTS, `amroth-home-arrive-${vp}.png`) });
+    const ok = await g_(() => { const g = window.__g, X = g.HOMEX, Y = g.HOMEY; return [[523, 620], [470, 800], [560, 1150], [1080, 1195], [1385, 980], [1250, 1140]].map(([x, y]) => g.thornFree(x + X, y + Y)); });
+    check(ok.every(Boolean), 'the path to Amroth\'s cottage is not walkable: ' + JSON.stringify(ok));
+    check(await g_(() => !window.__g.thornFree(window.__g.HOMEX + 1520, window.__g.HOMEY + 1290)), 'Lum can walk on the pond');
+    await g_(() => { const g = window.__g; g.lum.x = g.HOMEX + 1300; g.lum.y = g.HOMEY + 1080; }); await wait(1500);
+    await p.screenshot({ path: path.join(SHOTS, `amroth-home-cottage-${vp}.png`) });
   },
   async 'ch2-clearing'(p) {
     // Chapter 2 opens in the big round clearing; the path east then north reaches the gatehouse

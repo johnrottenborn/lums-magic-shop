@@ -72,7 +72,7 @@ function setupDun(){DUNINT.length=0;const r=DUN.room,D=(x,y,reach,fn)=>DUNINT.pu
   if(r===19){D(422,205,70,()=>dunGo(18,1215,540,-1));L(840,580,95,["A great stone serpent, coiled and ready to strike. A cold green flame burns above its head.","Its stone eyes seem to follow us."]);
     L(330,700,95,["Another empty pedestal."]);D(1165,545,80,()=>dunGo(20,862,425,1));}
   if(r===20){D(862,405,60,()=>dunGo(19,1150,560,-1));
-    DUNINT.push({x:900,y:745,reach:95,door:true,onInteract:()=>say("The passage opens out ahead…")});   /* the way on (next area still to come) */
+    DUNINT.push({x:900,y:745,reach:95,door:true,onInteract:()=>goScene(enterHome)});   /* out into the open: Amroth's home */
     L(300,600,110,["A carving of a many-headed serpent.","Three empty pedestals stand in a row beneath it."]);L(862,600,70,["Runes are carved above the arch. I can't read them."]);}
   if(r===12){L(730,545,110,["Old stonework, set into the rock. Someone built this passage long ago.","The stones are cold and damp. Roots have pushed through the mortar."]);}
   if(r===2){D(175,590,64,()=>dunGo(1,1240,600,-1));D(1270,590,64,()=>dunGo(3,290,540,1));L(700,655,80,["The roots here are so thick they look woven together.","Purple fungus on the ceiling. Glowmold. Lovely in a powder, if only I could reach it."]);}

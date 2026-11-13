@@ -38,6 +38,7 @@ Live at https://lums-magic-shop.vercel.app. Story and lore: `docs/story.md`. Mak
 | 26-oak-hollow | the five-room root dungeon under the old oak |
 | 26b-ch2-start | Chapter 2 "The Ashes of Awakening": opening cutscene (`C2`: narration on black, Amroth from the gatehouse, Stonebreak Elixir frees Lum, baby in Spar's ashes), Amroth follower (`AMR`); no saving yet |
 | (rooms) | The Worldbind Passage's rooms reuse the root-room engine in 26 (`DROOMS`, image `dun<n>`): room 11 is the first, through the gatehouse door (`enterWorldbind`) |
+| 26c-amroth-home | Amroth's home (`HOME`, `HOMEX/HOMEY`): outdoor area past Worldbind room 20, built as a far-east region of the Stranglethorn world; gatehouse in a stone mountain, a winding path through firs, the cottage and its pond. Stand-in art (hut, outpost, worldbind_cliff), no pier yet |
 | 27-update / 28-render / 29-loop | the main update, the main draw, and the frame loop plus `window.__g` (test hooks) |
 
 To find something, grep `src/game` for the function or constant name. Don't read whole files.

@@ -146,7 +146,7 @@ function drawThorn(){const vw=W/zoom,vh=H/zoom,x0=cam.x-vw/2-60,y0=cam.y-vh/2-60
   // fallen petals and a darker rim outside the maze
   ctx.fillStyle='rgba(10,8,12,.55)';if(x0<0)ctx.fillRect(x0,y0,-x0,y1-y0);if(x1>TW_&&CH<2)ctx.fillRect(TW_,y0,x1-TW_,y1-y0);if(y0<0)ctx.fillRect(x0,y0,x1-x0,-y0);
   for(const d of THORN.decals||[]){const im=IMG[d.n];if(!ready(im))continue;const h=d.w*im.naturalHeight/im.naturalWidth;if(d.x+d.w/2<x0||d.x-d.w/2>x1||d.y+h/2<y0||d.y-h/2>y1)continue;ctx.save();ctx.translate(d.x,d.y);if(d.flip)ctx.scale(-1,1);ctx.drawImage(im,-d.w/2,-h/2,d.w,h);ctx.restore();}
-  drawClrPath(x0,x1);if(CH===1&&FKS.chaos)drawFkChaos(false);if(CH>=2){drawClrScorch(x0,y0,x1,y1);drawAshMound();}
+  drawClrPath(x0,x1);drawHomeGround(x0,y0,x1,y1);if(CH===1&&FKS.chaos)drawFkChaos(false);if(CH>=2){drawClrScorch(x0,y0,x1,y1);drawAshMound();}
   drawCellarMouth();
   for(const f of THORN.flowers)if(f.x>x0-30&&f.x<x1+30&&f.y>y0-30&&f.y<y1)drawRedFlowers(f.x,f.y,f.s,f.seed);
   const L=[];for(const o of THORN.props)if(o.x>x0-o.w/2-40&&o.x<x1+o.w/2+40&&o.y>y0-20&&o.y<y1+o.w*1.4)L.push([o.sy??o.y,o]);L.push([lum.y,null]);L.sort((a,b)=>a[0]-b[0]);
