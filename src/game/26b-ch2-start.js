@@ -59,11 +59,11 @@ function updateC2(dt){if(!C2.on)return;C2.t+=dt;
       ['Amroth',"Whatever happened here, we need to get moving. I’ll escort you down the mountain."]],13);}
   else if(st===13){C2.mound=Math.max(0,1-C2.t/1.6);if(C2.t>.4&&!C2.cried2){C2.cried2=1;try{sfxBabyCry(.6);}catch(e){}}if(C2.t>2)c2Talk([['Lum',"Where did this little one come from?"],['Amroth',"That’s a question for another time."]],14);}
   else if(st===14){if(C2.t>1.4)c2Talk([['Amroth',"Come on. We need to reach the passage before nightfall."]],15);}
-  else if(st===15){amrWalk(S.x+420,S.y+40,80,dt);if(C2.t>.7)c1Walk(S.x+300,S.y+30,75,dt);if(C2.t>2.6&&!FADE.dir)goScene(c2Finish);}
+  else if(st===15){if(C2.t<1.2)amrWalk(S.x+420,S.y+40,60,dt);else AMR.moving=0;lum.face=1;if(C2.t>1.4&&!FADE.dir)goScene(c2Finish);}   /* Amroth turns for the path; Lum stays put, so the player takes over exactly where the scene ends */
   // Lum is still while the cutscene runs (she only walks at the very end)
   if(st!==15&&!LUMSTONE){lum.state='idle';lum.fi=0;}}
 function c2Finish(){if(!PARTY_ORDER.includes('amroth'))PARTY_ORDER.push('amroth');HEROES.amroth.hp=HEROES.amroth.maxHp;C1.comboA=0;C2.on=false;C2.st=99;C2.cam=null;C2.joined=1;WEVENT.on=false;C2.title=.001;C2.mound=0;lum.state='idle';
-  AMR.x=lum.x-60;AMR.y=lum.y+4;AMR.moving=0;AMR.a=1;GOAL.tag='TASK';GOAL.text='Follow Amroth to the passage';}
+  AMR.moving=0;AMR.a=1;GOAL.tag='TASK';GOAL.text='Follow Amroth to the passage';}
 /* once he has joined, Amroth walks behind Lum */
 function updateAmrFollow(dt){if(!C2.joined||CH<2||(SCENE!=='thorn'&&SCENE!=='dun'))return;const tx=lum.x-56*lum.face,ty=lum.y+6,d=Math.hypot(tx-AMR.x,ty-AMR.y);if(d>18)amrWalk(tx,ty,Math.min(220,60+d*1.6),dt);else{AMR.moving=0;if(!DLG.active){AMR.dir='side';AMR.face=lum.face;}}}
 /* the cutscene's overlays: narration on black, the fade from black into the rain, the title card */
@@ -89,7 +89,7 @@ function drawAshMound(){if(CH<2||C2.mound<=0)return;const m=C2.mound,sh=C2.shake
   ctx.fillStyle='rgba(120,112,108,.45)';for(let i=0;i<16;i++){const a=hash(i,1,503)*Math.PI,r=hash(i,2,503);ctx.beginPath();ctx.ellipse(x-Math.cos(a)*40*r*m,y-6*m-Math.sin(a)*18*r*m,2.5,1.5,0,0,TAU);ctx.fill();}
   if(C2.shake)for(let i=0;i<5;i++){const t=(T*1.4+i/5)%1;ctx.fillStyle=`rgba(70,66,64,${.6*(1-t)})`;ctx.beginPath();ctx.arc(x+(hash(i,7,505)-.5)*60,y-10-t*30,2.4,0,TAU);ctx.fill();}ctx.restore();}
 /* tests: jump past the opening straight to walking with Amroth */
-function c2Skip(){if(!C2.on)return;DLG.active=false;C2.narr=-1;LUMSTONE=0;NIGHT.rain=true;c2Finish();C2.title=0;}
+function c2Skip(){if(!C2.on)return;DLG.active=false;C2.narr=-1;LUMSTONE=0;NIGHT.rain=true;c2Finish();C2.title=0;AMR.x=lum.x+60;AMR.y=lum.y+4;}
 /* Amroth on the map: walking side frames face LEFT in his atlas (flipped for right); facing down is a single pose that bobs as he walks */
 function drawnAmr(){}drawnAmr.n=0;
 function drawAmrOW(F,alpha){if(!F||alpha<=0)return;drawnAmr.n++;const an=F.dir==='up'?'up':F.dir==='down'?'down':'side',n=C1ATL.amroth.rows[an][1],fi=F.moving?Math.floor((F.ph||0)/18)%n:0,bob=F.moving&&an==='down'?Math.abs(Math.sin((F.ph||0)*.09))*-4:0;

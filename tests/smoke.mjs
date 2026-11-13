@@ -376,11 +376,13 @@ const CASES = {
     const shots = { 5: 'alma', 7: 'stonebreak', 11: 'ashes', 15: 'leaving' }, seen = {};
     for (let i = 0; i < 400 && await g_(() => window.__g.C2.on); i++) {
       const st = await g_(() => window.__g.C2.st);
+      if (st === 15 && !seen.pos) seen.pos = await g_(() => [Math.round(window.__g.lum.x), Math.round(window.__g.lum.y)]);
       if (shots[st] && !seen[st]) { seen[st] = 1; await wait(st === 7 ? 1800 : 300); await p.screenshot({ path: path.join(SHOTS, `ch2-${shots[st]}-${vp}.png`) }); }
       if (await g_(() => window.__g.DLG.active)) { await wait(250); await p.keyboard.press('Enter'); } else await wait(250);
     }
     const r = await g_(() => ({ on: window.__g.C2.on, joined: window.__g.C2.joined, stone: window.__g.LUMSTONEX, party: window.__g.PARTY_ORDER.join(',') }));
     check(!r.on && r.joined && !r.stone && r.party === 'lum,amroth', 'opening did not end with Lum free and Amroth in the party: ' + JSON.stringify(r));
+    { const now = await g_(() => [Math.round(window.__g.lum.x), Math.round(window.__g.lum.y)]); check(seen.pos && Math.hypot(now[0] - seen.pos[0], now[1] - seen.pos[1]) < 4, 'Lum moved between the end of the cutscene and taking control: ' + JSON.stringify([seen.pos, now])); }
     await wait(1500); await p.screenshot({ path: path.join(SHOTS, `ch2-after-${vp}.png`) });
   },
   async 'amroth-battle'(p) {
