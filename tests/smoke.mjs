@@ -373,11 +373,11 @@ const CASES = {
     // he stays visible while he talks, and faces the way he walks
     { const n0 = await g_(() => window.__g.amrDraws()); await wait(400); const r = await g_(() => ({ talk: window.__g.DLG.active, n: window.__g.amrDraws() }));
       check(r.talk && r.n > n0, 'Amroth vanished while speaking at the gatehouse'); }
-    const shots = { 5: 'alma', 7: 'stonebreak', 11: 'ashes', 15: 'leaving' }, seen = {};
+    const shots = { 5: 'alma', 7: 'stonebreak', 11: 'ashes', 13: 'baby', 15: 'leaving' }, seen = {};
     for (let i = 0; i < 400 && await g_(() => window.__g.C2.on); i++) {
       const st = await g_(() => window.__g.C2.st);
       if (st === 15 && !seen.pos) seen.pos = await g_(() => [Math.round(window.__g.lum.x), Math.round(window.__g.lum.y)]);
-      if (shots[st] && !seen[st]) { seen[st] = 1; await wait(st === 7 ? 1800 : 300); await p.screenshot({ path: path.join(SHOTS, `ch2-${shots[st]}-${vp}.png`) }); }
+      if (shots[st] && !seen[st]) { seen[st] = 1; await wait(st === 7 ? 1800 : st === 13 ? 1500 : 300); await p.screenshot({ path: path.join(SHOTS, `ch2-${shots[st]}-${vp}.png`) }); }
       if (await g_(() => window.__g.DLG.active)) { await wait(250); await p.keyboard.press('Enter'); } else await wait(250);
     }
     const r = await g_(() => ({ on: window.__g.C2.on, joined: window.__g.C2.joined, stone: window.__g.LUMSTONEX, party: window.__g.PARTY_ORDER.join(',') }));
@@ -412,6 +412,7 @@ const CASES = {
     await g_(() => { const g = window.__g, P = g.CPATH; g.lum.x = P.xt; g.lum.y = P.ytop + 80; }); await wait(700);
     await g_(() => window.__g.NEAR.onInteract()); await wait(2200);
     check(await g_(() => window.__g.SCENE === 'dun' && window.__g.DUNX.room === 11), 'the gatehouse door did not open the Worldbind Passage');
+    check(await g_(() => window.__g.BAG.includes('baby') && /mountain to Amroth/.test(window.__g.GOAL ? window.__g.GOAL.text : '')), 'the baby is not in the satchel or the task is wrong after the Chapter 2 opening');
     await wait(800); { const l = await g_(() => window.__g.DLG.active && window.__g.DLG.lines[0]); check(l && l[0] === 'Amroth' && /my home, little one/.test(l[1]), 'Amroth did not speak on first entering the passage: ' + JSON.stringify(l)); }
     await p.screenshot({ path: path.join(SHOTS, `worldbind-amroth-speaks-${vp}.png`) });
     for (let i = 0; i < 6 && await g_(() => window.__g.DLG.active); i++) { await p.keyboard.press('Enter'); await wait(400); }

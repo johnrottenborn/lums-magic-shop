@@ -57,13 +57,13 @@ function updateC2(dt){if(!C2.on)return;C2.t+=dt;
   else if(st===12){C2.shake=0;if(C2.t>1.4&&!C2.cried){C2.cried=1;try{sfxBabyCry();}catch(e){}}if(C2.t>2.8)c2Talk([['Lum',"A baby…? How could a child possibly have survived this?"],['Amroth',"I don’t know. And I wish we had more time to find out."],
       ['Amroth',"I patrol the passage through the Worldbind Mountains. It’s not safe to linger here, especially after sunset."],['Lum',"What lies beyond the passage?"],['Amroth',"Darkness. And things best left undisturbed."],
       ['Amroth',"Whatever happened here, we need to get moving. I’ll escort you down the mountain."]],13);}
-  else if(st===13){C2.mound=Math.max(0,1-C2.t/1.6);if(C2.t>.4&&!C2.cried2){C2.cried2=1;try{sfxBabyCry(.6);}catch(e){}}if(C2.t>2)c2Talk([['Lum',"Where did this little one come from?"],['Amroth',"That’s a question for another time."]],14);}
+  else if(st===13){C2.mound=Math.max(0,1-C2.t/1.6);if(C2.t>.4&&!C2.cried2){C2.cried2=1;try{sfxBabyCry(.6);}catch(e){}}if(C2.t>1.2&&!BAG.includes('baby'))giveItem('baby');if(C2.t>2)c2Talk([['Lum',"Where did this little one come from?"],['Amroth',"That’s a question for another time."]],14);}
   else if(st===14){if(C2.t>1.4)c2Talk([['Amroth',"Come on. We need to reach the passage before nightfall."]],15);}
   else if(st===15){if(C2.t<1.2)amrWalk(S.x+420,S.y+40,60,dt);else AMR.moving=0;lum.face=1;if(C2.t>1.4&&!FADE.dir)goScene(c2Finish);}   /* Amroth turns for the path; Lum stays put, so the player takes over exactly where the scene ends */
   // Lum is still while the cutscene runs (she only walks at the very end)
   if(st!==15&&!LUMSTONE){lum.state='idle';lum.fi=0;}}
-function c2Finish(){if(!PARTY_ORDER.includes('amroth'))PARTY_ORDER.push('amroth');HEROES.amroth.hp=HEROES.amroth.maxHp;C1.comboA=0;C2.on=false;C2.st=99;C2.cam=null;C2.joined=1;WEVENT.on=false;C2.title=.001;C2.mound=0;lum.state='idle';
-  AMR.moving=0;AMR.a=1;GOAL.tag='TASK';GOAL.text='Follow Amroth to the passage';}
+function c2Finish(){if(!BAG.includes('baby'))BAG.push('baby');if(!PARTY_ORDER.includes('amroth'))PARTY_ORDER.push('amroth');HEROES.amroth.hp=HEROES.amroth.maxHp;C1.comboA=0;C2.on=false;C2.st=99;C2.cam=null;C2.joined=1;WEVENT.on=false;C2.title=.001;C2.mound=0;lum.state='idle';
+  AMR.moving=0;AMR.a=1;GOAL.tag='NEW TASK';GOAL.text='Pass through the mountain to Amroth’s home';HINT.goalT=0;}
 /* once he has joined, Amroth walks behind Lum along the exact path she took (breadcrumbs, like Spar), so he never cuts through walls */
 const AMRCRUMB=[];
 function resetAmrFollow(){AMR.x=lum.x;AMR.y=lum.y;AMR.moving=0;AMR.face=lum.face;AMRCRUMB.length=0;}
