@@ -337,6 +337,7 @@ const CASES = {
     await wait(1600); await p.screenshot({ path: path.join(SHOTS, `fokalur-aftermath-${vp}.png`) });
     check(await p.evaluate(() => window.__g.LUMSTONE === 1 && !!window.__g.FKS.fire), 'no stone Lum and fire in the clearing after the battle');
     check(await until(() => window.__g.FKS.chaos > 3, 40000), 'the fires did not spread after the battle');
+    check(await until(() => window.__g.FKS.st >= 7, 40000) && await p.evaluate(() => window.__g.lum.talkSide && window.__g.lum.face === 1), 'petrified Lum did not stay facing right after Fokalur left');
     await p.screenshot({ path: path.join(SHOTS, `fokalur-chaos-${vp}.png`) });
     check(await until(() => window.__g.FKS.st === 8, 40000), 'the scene did not pull back after Lum\'s last line');
     await wait(1800); await p.screenshot({ path: path.join(SHOTS, `fokalur-pullback-${vp}.png`) });
@@ -365,6 +366,7 @@ const CASES = {
     await g_(() => window.__g.startChapter2()); await wait(1500);
     await p.screenshot({ path: path.join(SHOTS, `ch2-narration-${vp}.png`) });
     check(await g_(() => window.__g.C2.narr === 0 && window.__g.LUMSTONEX === 1), 'Chapter 2 did not open on narration with Lum in stone');
+    check(await g_(() => window.__g.lum.talkSide && window.__g.lum.face === 1), 'petrified Lum is not facing right at the start of Chapter 2');
     for (let i = 0; i < 12 && await g_(() => window.__g.C2.narr >= 0); i++) { await wait(700); await p.keyboard.press('Enter'); }
     check(await g_(() => window.__g.C2.narr < 0), 'narration did not finish');
     await wait(2600); await p.screenshot({ path: path.join(SHOTS, `ch2-gatehouse-${vp}.png`) });

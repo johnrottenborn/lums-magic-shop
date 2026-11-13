@@ -48,7 +48,7 @@ function drawLumGhost(){if(!OCC||!ready(atlas))return;const a=ANIM[lum.state];le
   gctx.globalCompositeOperation='source-over';gctx.clearRect(0,0,300,280);gctx.drawImage(atlas,fr*FW,0,FW,FH,0,0,FW,FH);gctx.globalCompositeOperation='source-atop';gctx.fillStyle='rgba(225,236,255,.28)';gctx.fillRect(0,0,300,280);
   const flip=lum.face!==a.native,dw=FW*SPR,dh=FH*SPR;ctx.save();ctx.globalAlpha=.78;ctx.translate(lum.x,lum.y+3);if(PC!=='cosmic')ctx.scale(LUMK,LUMK);if(flip)ctx.scale(-1,1);ctx.drawImage(ghostCv,-dw/2,-dh*(274/280),dw,dh);ctx.restore();}
 let LUMSTONE=0;
-function drawLum(){if(LUMSTONE&&!drawLum.raw){const t0=T;withStone('lumow',lum.x-110,lum.y-250,220,270,()=>{drawLum.raw=1;T=0;try{drawLum();}finally{T=t0;drawLum.raw=0;}});return;}
+function drawLum(){if(LUMSTONE&&!drawLum.raw){const t0=T;withStone('lumow'+(lum.talkSide?'s':'')+lum.face+lum.state,lum.x-110,lum.y-250,220,270,()=>{drawLum.raw=1;T=0;try{drawLum();}finally{T=t0;drawLum.raw=0;}});return;}
   if(!INTRO.lumShown||CAPTURE.on)return;
   if(PC==='spar'){const st=lum.state,F={x:lum.x,y:lum.y,face:lum.face,dir:st==='walkUp'?'up':st==='walkDown'?'down':'side',moving:st==='walk'||st==='walkUp'||st==='walkDown',ph:(lum.ft||0)*16};drawSparOW(F,lum.alpha);return;}
   const a=ANIM[lum.state]||ANIM.idle;let fr=a.frames[lum.state==='idle'?lum.fi%a.frames.length:lum.fi];if(fr===undefined)fr=a.frames[0];
