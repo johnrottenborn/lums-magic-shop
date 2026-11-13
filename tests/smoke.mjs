@@ -370,6 +370,9 @@ const CASES = {
     for (let i = 0; i < 12 && await g_(() => window.__g.C2.narr >= 0); i++) { await wait(700); await p.keyboard.press('Enter'); }
     check(await g_(() => window.__g.C2.narr < 0), 'narration did not finish');
     await wait(2600); await p.screenshot({ path: path.join(SHOTS, `ch2-gatehouse-${vp}.png`) });
+    // he stays visible while he talks, and faces the way he walks
+    { const n0 = await g_(() => window.__g.amrDraws()); await wait(400); const r = await g_(() => ({ talk: window.__g.DLG.active, n: window.__g.amrDraws() }));
+      check(r.talk && r.n > n0, 'Amroth vanished while speaking at the gatehouse'); }
     const shots = { 5: 'alma', 7: 'stonebreak', 11: 'ashes', 15: 'leaving' }, seen = {};
     for (let i = 0; i < 400 && await g_(() => window.__g.C2.on); i++) {
       const st = await g_(() => window.__g.C2.st);

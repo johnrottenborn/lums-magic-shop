@@ -63,7 +63,7 @@ function updateC2(dt){if(!C2.on)return;C2.t+=dt;
   // Lum is still while the cutscene runs (she only walks at the very end)
   if(st!==15&&!LUMSTONE){lum.state='idle';lum.fi=0;}}
 function c2Finish(){if(!PARTY_ORDER.includes('amroth'))PARTY_ORDER.push('amroth');HEROES.amroth.hp=HEROES.amroth.maxHp;C1.comboA=0;C2.on=false;C2.st=99;C2.cam=null;C2.joined=1;WEVENT.on=false;C2.title=.001;C2.mound=0;lum.state='idle';
-  AMR.x=lum.x-60;AMR.y=lum.y+4;AMR.moving=0;GOAL.tag='TASK';GOAL.text='Follow Amroth to the passage';}
+  AMR.x=lum.x-60;AMR.y=lum.y+4;AMR.moving=0;AMR.a=1;GOAL.tag='TASK';GOAL.text='Follow Amroth to the passage';}
 /* once he has joined, Amroth walks behind Lum */
 function updateAmrFollow(dt){if(!C2.joined||CH<2||SCENE!=='thorn')return;const tx=lum.x-56*lum.face,ty=lum.y+6,d=Math.hypot(tx-AMR.x,ty-AMR.y);if(d>18)amrWalk(tx,ty,Math.min(220,60+d*1.6),dt);else{AMR.moving=0;if(!DLG.active){AMR.dir='side';AMR.face=lum.face;}}}
 /* the cutscene's overlays: narration on black, the fade from black into the rain, the title card */
@@ -90,7 +90,8 @@ function drawAshMound(){if(CH<2||C2.mound<=0)return;const m=C2.mound,sh=C2.shake
   if(C2.shake)for(let i=0;i<5;i++){const t=(T*1.4+i/5)%1;ctx.fillStyle=`rgba(70,66,64,${.6*(1-t)})`;ctx.beginPath();ctx.arc(x+(hash(i,7,505)-.5)*60,y-10-t*30,2.4,0,TAU);ctx.fill();}ctx.restore();}
 /* tests: jump past the opening straight to walking with Amroth */
 function c2Skip(){if(!C2.on)return;DLG.active=false;C2.narr=-1;LUMSTONE=0;NIGHT.rain=true;c2Finish();C2.title=0;}
-/* Amroth on the map: walking side frames face right (flipped for left); facing down is a single pose that bobs as he walks */
-function drawAmrOW(F,alpha){if(!F||alpha<=0)return;const an=F.dir==='up'?'up':F.dir==='down'?'down':'side',n=C1ATL.amroth.rows[an][1],fi=F.moving?Math.floor((F.ph||0)/18)%n:0,bob=F.moving&&an==='down'?Math.abs(Math.sin((F.ph||0)*.09))*-4:0;
+/* Amroth on the map: walking side frames face LEFT in his atlas (flipped for right); facing down is a single pose that bobs as he walks */
+function drawnAmr(){}drawnAmr.n=0;
+function drawAmrOW(F,alpha){if(!F||alpha<=0)return;drawnAmr.n++;const an=F.dir==='up'?'up':F.dir==='down'?'down':'side',n=C1ATL.amroth.rows[an][1],fi=F.moving?Math.floor((F.ph||0)/18)%n:0,bob=F.moving&&an==='down'?Math.abs(Math.sin((F.ph||0)*.09))*-4:0;
   ctx.save();ctx.globalAlpha*=alpha;ctx.fillStyle='rgba(10,10,20,.28)';ctx.beginPath();ctx.ellipse(F.x,F.y,26,8,0,0,TAU);ctx.fill();ctx.restore();
-  c1Frame(ctx,'amroth',an,an==='side'||an==='up'?fi:0,F.x,F.y+bob,AMR_H,an==='side'&&F.face<0,alpha,0);}
+  c1Frame(ctx,'amroth',an,an==='side'||an==='up'?fi:0,F.x,F.y+bob,AMR_H,an==='side'&&F.face>0,alpha,0);}

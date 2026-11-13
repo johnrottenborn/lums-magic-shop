@@ -255,7 +255,7 @@ function drawAflurry(){const B=BATTLE,a=B.af;if(B.phase!=='aflurry'||!a||a.done)
   ctx.restore();ctx.save();ctx.fillStyle='#fdf6e4';ctx.strokeStyle='rgba(20,10,30,.7)';ctx.lineWidth=4;ctx.font='700 '+Math.round(20*S)+'px "Alegreya SC", Georgia, serif';ctx.textAlign='center';
   const txt=a.hits+' / '+AF_N;ctx.strokeText(txt,x,c_.top-26*S);ctx.fillText(txt,x,c_.top-26*S);ctx.restore();}
 function drawBattleAmroth(h){const S=bS(),B=BATTLE,x=h.x+h.ox+Math.max(0,62*S-h.x-h.ox+20*S)*(h.ox<=0?1:0),y=h.y+h.oy,me=B.heroes[B.cur]===h,ph=B.phase,t=B.t,H_=AMR_BH*S;let an='bidle',fi=0,flip=false,rot=0,guard=true;
-  if(me&&(ph==='bonkRun'||ph==='bonkBack'||ph==='run'||ph==='fled')){guard=false;an='run';fi=Math.floor(t*12)%6;flip=ph!=='bonkRun';}
+  if(me&&(ph==='bonkRun'||ph==='bonkBack'||ph==='run'||ph==='fled')){guard=false;an='run';fi=Math.floor(t*12)%6;flip=ph==='bonkRun';}   /* his run row faces left */
   else if(me&&ph==='bonkWind'){guard=false;an='bidle';fi=1;rot=-.1*Math.min(1,t/B.windD);}
   else if(me&&ph==='bonkHit'){guard=false;an='bslash';fi=t<.08?0:t<.2?1:2;}
   else if(me&&ph==='aflurry'){guard=false;const a=B.af||{};an='bslash';fi=a.swing>.16?1:a.swing>0?2:0;}
