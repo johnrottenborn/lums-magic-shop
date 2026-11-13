@@ -100,7 +100,8 @@ function c2Skip(){if(!C2.on)return;DLG.active=false;C2.narr=-1;LUMSTONE=0;NIGHT.
 function drawnAmr(){}drawnAmr.n=0;
 function drawAmrOW(F,alpha){if(!F||alpha<=0)return;drawnAmr.n++;const an=F.dir==='up'?'up':F.dir==='down'?'down':'side',n=C1ATL.amroth.rows[an][1],fi=F.moving?Math.floor((F.ph||0)/18)%n:0,bob=F.moving&&an==='down'?Math.abs(Math.sin((F.ph||0)*.09))*-4:0;
   ctx.save();ctx.globalAlpha*=alpha;ctx.fillStyle='rgba(10,10,20,.28)';ctx.beginPath();ctx.ellipse(F.x,F.y,26,8,0,0,TAU);ctx.fill();ctx.restore();
-  c1Frame(ctx,'amroth',an,an==='side'||an==='up'?fi:0,F.x,F.y+bob,AMR_H,an==='side'&&F.face>0,alpha,0);}
+  ctx.save();ctx.translate(F.x,0);ctx.scale(.88,1);ctx.translate(-F.x,0);   /* same slim build as in battle */
+  c1Frame(ctx,'amroth',an,an==='side'||an==='up'?fi:0,F.x,F.y+bob,AMR_H,an==='side'&&F.face>0,alpha,0);ctx.restore();}
 /* through the gatehouse arch: the first room of the Worldbind Passage (room 11 of the root-room engine in 26), arriving at the top of the stairs */
 function enterWorldbind(){enterDun(11,238,250,1);
   /* first time in: the baby cries, and Amroth talks as they start down the stairs */
