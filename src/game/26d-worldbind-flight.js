@@ -50,3 +50,33 @@ function drawWB5Fall(){ctx.save();for(const p of WB5.fall){const fade=p.land?Mat
   if(p.rock){ctx.globalAlpha=fade;ctx.fillStyle='#3b3f47';ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.rot);ctx.beginPath();ctx.moveTo(-p.s,-p.s*.6);ctx.lineTo(p.s*.8,-p.s);ctx.lineTo(p.s,p.s*.5);ctx.lineTo(-p.s*.4,p.s);ctx.closePath();ctx.fill();ctx.restore();
     if(p.land&&p.land<.4){ctx.globalAlpha=(.4-p.land)*1.2;ctx.fillStyle='rgba(170,175,185,.6)';ctx.beginPath();ctx.ellipse(p.x,p.y,8+p.land*40,3+p.land*10,0,0,TAU);ctx.fill();}}
   else{ctx.globalAlpha=.35*fade;ctx.fillStyle='rgba(185,190,200,1)';ctx.fillRect(p.x-1,p.y-24,2,24);ctx.globalAlpha=.2*fade;ctx.beginPath();ctx.arc(p.x,p.y,p.s,0,TAU);ctx.fill();}}ctx.restore();}
+/* ---------- Worldbind room 10 (room 20 in code): at the bottom of the stairs the archway caves in behind Lum ----------
+   The rubble is cut from the mountain-face art (worldbind_cliff), clipped to the arch and darkened; the way back up is closed for good. */
+const WB10={st:0,t:0,fill:0,q:[0,0],rocks:[]};
+const ARCH={cx:857,cy:305,r:93,x0:764,x1:950,y1:600};
+function archPath(c,pad=0){c.beginPath();c.moveTo(ARCH.x0-pad,ARCH.y1+pad);c.lineTo(ARCH.x0-pad,ARCH.cy);c.arc(ARCH.cx,ARCH.cy,ARCH.r+pad,Math.PI,0);c.lineTo(ARCH.x1+pad,ARCH.y1+pad);c.closePath();}
+function updateWorldbind10(dt){if(SCENE!=='dun'||DUN.room!==20){WB10.q=[0,0];return;}
+  if(!WB10.st&&C2.joined&&lum.y>=598&&!FADE.dir&&!DLG.active){WB10.st=1;WB10.t=0;WEVENT.on=true;lum.state='idle';lum.vx=lum.vy=0;lum.face=1;if(lum.y<618)lum.y=618;resetAmrFollow();setupDun();try{sfxRumble(2.6,1);}catch(e){}}
+  if(WB10.st===1){WB10.t+=dt;const t=WB10.t,amp=t<1.8?9*(1-t/2):0;WB10.q=[rnd(-amp,amp),rnd(-amp,amp)*.7];
+    if(t<1.4&&Math.random()<dt*40)WB10.rocks.push({x:rnd(ARCH.x0+10,ARCH.x1-10),y:rnd(200,260),vy:rnd(0,80),ground:rnd(560,620),s:rnd(5,13),rot:rnd(0,TAU),land:0});
+    if(t>.35)WB10.fill=Math.min(1,WB10.fill+dt*.9);
+    if(t>2.4){WB10.st=2;WB10.q=[0,0];WEVENT.on=false;}}
+  for(const p of WB10.rocks){if(p.land){p.land+=dt;continue;}p.vy+=900*dt;p.y+=p.vy*dt;p.rot+=dt*5;if(p.y>=p.ground){p.y=p.ground;p.land=.001;}}
+  for(let i=WB10.rocks.length-1;i>=0;i--)if(WB10.rocks[i].land>(WB10.fill>=1?.3:1.2))WB10.rocks.splice(i,1);}
+/* the blocked archway, drawn over the room image (under the characters) */
+function drawWB10Rubble(){if(WB10.fill<=0)return;const im=IMG.worldbind_cliff;ctx.save();ctx.globalAlpha=WB10.fill;
+  /* the passage beyond goes dark */
+  archPath(ctx);ctx.fillStyle='#04070c';ctx.fill();
+  /* rubble rises from the floor as it piles up */
+  const top=ARCH.y1-(ARCH.y1-ARCH.cy+ARCH.r+10)*Math.min(1,WB10.fill*1.15);
+  ctx.save();archPath(ctx,4);ctx.clip();ctx.beginPath();ctx.moveTo(ARCH.x0-10,ARCH.y1+30);
+  for(let x=ARCH.x0-10;x<=ARCH.x1+10;x+=12)ctx.lineTo(x,top+Math.sin(x*.37)*9+Math.sin(x*.11)*14);ctx.lineTo(ARCH.x1+10,ARCH.y1+30);ctx.closePath();ctx.clip();
+  if(ready(im))ctx.drawImage(im,330,40,300,330,ARCH.x0-12,ARCH.cy-ARCH.r-14,ARCH.x1-ARCH.x0+24,ARCH.y1-ARCH.cy+ARCH.r+44);
+  ctx.fillStyle='rgba(10,30,48,.32)';ctx.fillRect(ARCH.x0-20,ARCH.cy-ARCH.r-20,ARCH.x1-ARCH.x0+40,ARCH.y1-ARCH.cy+ARCH.r+60);
+  const g=ctx.createLinearGradient(0,ARCH.cy-ARCH.r,0,ARCH.y1);g.addColorStop(0,'rgba(0,0,0,.6)');g.addColorStop(.6,'rgba(0,0,0,.2)');g.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=g;ctx.fillRect(ARCH.x0-20,ARCH.cy-ARCH.r-20,ARCH.x1-ARCH.x0+40,ARCH.y1-ARCH.cy+ARCH.r+60);ctx.restore();
+  /* a few boulders spilling onto the floor at the foot of the arch */
+  if(ready(im))for(const [bx,by,br] of [[785,606,26],[838,614,20],[893,610,30],[934,603,18]]){ctx.save();ctx.beginPath();ctx.ellipse(bx,by,br,br*.62,0,0,TAU);ctx.clip();ctx.drawImage(im,420+bx%60,160,br*3,br*2.2,bx-br,by-br*.7,br*2,br*1.4);ctx.fillStyle='rgba(10,30,48,.25)';ctx.fillRect(bx-br,by-br,br*2,br*2);ctx.restore();}
+  ctx.restore();
+  /* falling stones and dust while it comes down */
+  ctx.save();for(const p of WB10.rocks){const a=p.land?Math.max(0,1-p.land/1.2):1;ctx.globalAlpha=a;ctx.fillStyle='#6b7783';ctx.strokeStyle='#26303a';ctx.lineWidth=1.5;ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.rot);ctx.beginPath();ctx.moveTo(-p.s,-p.s*.5);ctx.lineTo(p.s*.7,-p.s);ctx.lineTo(p.s,p.s*.6);ctx.lineTo(-p.s*.5,p.s);ctx.closePath();ctx.fill();ctx.stroke();ctx.restore();}
+  ctx.restore();if(WB10.st===1){const a=Math.max(0,.55-WB10.t*.2);for(let i=0;i<5;i++)drawGlow(ctx,ARCH.cx+(i-2)*55,ARCH.y1-30-i%2*40,(90+WB10.t*50)*(1+i%3*.2),'175,185,195',a);}}   /* a soft dust cloud */

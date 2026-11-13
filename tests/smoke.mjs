@@ -564,7 +564,14 @@ const CASES = {
     await g_(() => window.__g.NEAR.onInteract()); await wait(2200);
     check(await g_(() => window.__g.SCENE === 'dun' && window.__g.DUNX.room === 20 && window.__g.lum.y < 450), 'room 9 did not lead into room 10\'s lit stairwell');
     await p.screenshot({ path: path.join(SHOTS, `worldbind-room10-start-${vp}.png`) });
-    await p.keyboard.down('ArrowDown'); await wait(3000); await p.keyboard.up('ArrowDown'); await wait(500);
+    // at the bottom of the stairs the archway caves in behind them
+    await p.keyboard.down('ArrowDown'); for (let i = 0; i < 30 && !(await g_(() => window.__g.WB10.st)); i++) await wait(150); await p.keyboard.up('ArrowDown');
+    check(await g_(() => window.__g.WB10.st === 1 && window.__g.WEVENT.on), 'the archway did not cave in at the bottom of room 10\'s stairs');
+    await wait(700); await p.screenshot({ path: path.join(SHOTS, `worldbind-room10-collapse-${vp}.png`) });
+    for (let i = 0; i < 30 && await g_(() => window.__g.WEVENT.on); i++) await wait(150);
+    check(await g_(() => window.__g.WB10.st === 2 && !window.__g.dunFree(857, 500) && !window.__g.DUNINTS().some(d => d.door && d.y < 450)), 'the way back up is not blocked after the cave-in');
+    await p.screenshot({ path: path.join(SHOTS, `worldbind-room10-blocked-${vp}.png`) });
+    await p.keyboard.down('ArrowDown'); await wait(1500); await p.keyboard.up('ArrowDown'); await wait(500);
     check(await g_(() => window.__g.lum.y > 640 && !!(window.__g.NEAR && window.__g.NEAR.door)), 'Lum could not walk through the arch to the way on in the foreground');
     await p.screenshot({ path: path.join(SHOTS, `worldbind-room10-${vp}.png`) });
     // out into the open: Amroth's home. The path winds down to the cottage and the pond

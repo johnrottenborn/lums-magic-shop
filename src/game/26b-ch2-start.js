@@ -112,7 +112,7 @@ const followSnap={};
 /* Worldbind room 2, first visit: the first torch is out. Amroth walks over, explains, and relights it */
 function c2TorchScene(){if(C2.torchLit||C2.torchScene||DUN.room!==12)return;C2.torchScene=1;WEVENT.on=true;
   setTimeout(()=>talk([['Amroth',"Hm. The first torch has gone out."],['Amroth',"Keeping these torches lit is my job, too."]],false,()=>{C2.torchWalk=1;}),900);}
-function updateC2Torch(dt){updateBlackout(dt);updateWorldbind5(dt);
+function updateC2Torch(dt){updateBlackout(dt);updateWorldbind5(dt);updateWorldbind10(dt);
   /* Worldbind room 3, first visit: Amroth reassures Lum about the bats */
   /* rooms 1 and 3: Amroth speaks once Lum is about a third of the way along the walk from the entrance to the exit
      (down the stairs, then across): room 1's walk is ~1000 long, room 3's ~770 */
