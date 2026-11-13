@@ -462,6 +462,13 @@ const CASES = {
     await p.keyboard.down('ArrowDown'); await p.keyboard.down('ArrowRight'); await wait(2600); await p.keyboard.up('ArrowDown'); await p.keyboard.up('ArrowRight'); await wait(400);
     check(await g_(() => window.__g.lum.y > 400), 'Lum could not walk down room 9\'s stairs');
     await p.screenshot({ path: path.join(SHOTS, `worldbind-room9-${vp}.png`) });
+    await g_(() => { const g = window.__g; g.lum.x = 1160; g.lum.y = 550; }); await wait(600);
+    await g_(() => window.__g.NEAR.onInteract()); await wait(2200);
+    check(await g_(() => window.__g.SCENE === 'dun' && window.__g.DUNX.room === 20 && window.__g.lum.y < 450), 'room 9 did not lead into room 10\'s lit stairwell');
+    await p.screenshot({ path: path.join(SHOTS, `worldbind-room10-start-${vp}.png`) });
+    await p.keyboard.down('ArrowDown'); await wait(3000); await p.keyboard.up('ArrowDown'); await wait(500);
+    check(await g_(() => window.__g.lum.y > 640 && !!(window.__g.NEAR && window.__g.NEAR.door)), 'Lum could not walk through the arch to the way on in the foreground');
+    await p.screenshot({ path: path.join(SHOTS, `worldbind-room10-${vp}.png`) });
   },
   async 'ch2-clearing'(p) {
     // Chapter 2 opens in the big round clearing; the path east then north reaches the gatehouse

@@ -29,6 +29,8 @@ const DROOMS={
      block:[{x:322,y:640,rx:78,ry:24},{x:238,y:432,rx:48,ry:16},{x:460,y:330,rx:32,ry:11},{x:258,y:302,rx:24,ry:9},{x:790,y:540,rx:62,ry:19}],light:[420,130,200]},   /* arrive at the top of the stairs (back to room 16); stone pedestals; a raven-head brazier; the tunnel stairs on the right lead on */
   19:{name:'Worldbind Passage',dark:.42,floor:[[375,195],[470,195],[490,280],[545,400],[640,500],[760,580],[880,600],[1080,590],[1150,530],[1200,540],[1170,650],[1100,768],[480,768],[420,680],[300,560],[200,440],[180,330],[300,240]],
      block:[{x:322,y:640,rx:78,ry:24},{x:238,y:432,rx:48,ry:16},{x:460,y:330,rx:32,ry:11},{x:258,y:302,rx:24,ry:9},{x:790,y:540,rx:62,ry:19},{x:860,y:525,rx:55,ry:16}],light:[420,130,200]},   /* arrive at the top of the stairs (back to room 18); stone pedestals; a coiled serpent statue with a green flame; the tunnel stairs on the right lead on */
+  20:{name:'Worldbind Passage',dark:.38,floor:[[792,395],[935,395],[948,595],[1060,605],[1180,640],[1235,768],[565,768],[585,700],[605,625],[765,598]],
+     light:[862,250,230]},   /* the serpent gate: arrive in the lit stairwell behind the carved archway (back to room 19), walk down through it; the way on is in the foreground */
   5:{name:'Deeproot',sub:'turn back',dark:.86,floor:[[420,768],[480,640],[560,580],[620,540],[700,540],[800,580],[950,620],[1050,700],[1080,768]]}};
 const EYES5=[[200,144],[290,106],[275,181],[331,319],[500,140],[652,129],[625,238],[731,190],[512,422],[612,444],[212,481],[212,512],[440,275],[420,412],[610,282]];
 function dunFree(x,y){const R=DROOMS[DUN.room];if(!inPoly(x,y,R.floor))return false;for(const b of (R.block||[]))if(((x-b.x)/b.rx)**2+((y-b.y)/b.ry)**2<1)return false;return true;}
@@ -68,7 +70,10 @@ function setupDun(){DUNINT.length=0;const r=DUN.room,D=(x,y,reach,fn)=>DUNINT.pu
   if(r===18){D(150,520,80,()=>dunGo(17,1150,560,-1));D(1250,520,80,()=>dunGo(19,422,230,1));
     L(730,545,110,["The old wall again. The air is getting colder the deeper we go.","Water drips somewhere behind the stones."]);}
   if(r===19){D(422,205,70,()=>dunGo(18,1215,540,-1));L(840,580,95,["A great stone serpent, coiled and ready to strike. A cold green flame burns above its head.","Its stone eyes seem to follow us."]);
-    L(330,700,95,["Another empty pedestal."]);L(1165,545,80,["The tunnel slopes away into the dark."]);}
+    L(330,700,95,["Another empty pedestal."]);D(1165,545,80,()=>dunGo(20,862,425,1));}
+  if(r===20){D(862,405,60,()=>dunGo(19,1150,560,-1));
+    DUNINT.push({x:900,y:745,reach:95,door:true,onInteract:()=>say("The passage opens out ahead…")});   /* the way on (next area still to come) */
+    L(300,600,110,["A carving of a many-headed serpent.","Three empty pedestals stand in a row beneath it."]);L(862,600,70,["Runes are carved above the arch. I can't read them."]);}
   if(r===12){L(730,545,110,["Old stonework, set into the rock. Someone built this passage long ago.","The stones are cold and damp. Roots have pushed through the mortar."]);}
   if(r===2){D(175,590,64,()=>dunGo(1,1240,600,-1));D(1270,590,64,()=>dunGo(3,290,540,1));L(700,655,80,["The roots here are so thick they look woven together.","Purple fungus on the ceiling. Glowmold. Lovely in a powder, if only I could reach it."]);}
   if(r===3){D(270,525,60,()=>dunGo(2,1240,600,-1));
@@ -128,8 +133,8 @@ function drawDun(){const R=DROOMS[DUN.room],im=IMG['dun'+DUN.room];if(!ready(im)
   // characters, depth-sorted; the cellar's table is drawn over anyone standing behind it
   const k=dunH(lum.y)/151,here=DFOES.filter(g=>g.room===DUN.room);{const L=here.map(g=>[g.y,()=>drawDFoe(g)]);
     L.push([lum.y,()=>{ctx.save();ctx.translate(lum.x,lum.y);ctx.scale(k,k);ctx.translate(-lum.x,-lum.y);drawLum();ctx.restore();}]);
-    if(CH===1&&jakInParty()&&JAKF){const kj=dunH(JAKF.y)/151;L.push([JAKF.y,()=>{ctx.save();ctx.translate(JAKF.x,JAKF.y);ctx.scale(kj,kj);ctx.translate(-JAKF.x,-JAKF.y);drawJakOW();ctx.restore();}]);}   /* Spar comes down into the rooms with Lum */
-    if(CH>=2&&C2.joined){const ka=dunH(AMR.y)/151;L.push([AMR.y,()=>{ctx.save();ctx.translate(AMR.x,AMR.y);ctx.scale(ka,ka);ctx.translate(-AMR.x,-AMR.y);drawAmrOW(AMR,1);ctx.restore();}]);}
+    if(CH===1&&jakInParty()&&JAKF){const kj=dunH(JAKF.y)/151;L.push([JAKF.y-1,()=>{ctx.save();ctx.translate(JAKF.x,JAKF.y);ctx.scale(kj,kj);ctx.translate(-JAKF.x,-JAKF.y);drawJakOW();ctx.restore();}]);}   /* Spar comes down into the rooms with Lum */
+    if(CH>=2&&C2.joined){const ka=dunH(AMR.y)/151;L.push([AMR.y-1,()=>{ctx.save();ctx.translate(AMR.x,AMR.y);ctx.scale(ka,ka);ctx.translate(-AMR.x,-AMR.y);drawAmrOW(AMR,1);ctx.restore();}]);}
     if(DUN.room===7)L.push([614,()=>{const t=IMG.dun7_table;if(!ready(t))return;const hid=lum.y<614&&Math.abs(lum.x-945)<240;ctx.save();ctx.globalAlpha=hid?.62:1;ctx.drawImage(t,730,425);ctx.restore();}]);
     L.sort((a,b)=>a[0]-b[0]);for(const [,f] of L)f();}
   for(const p of PARTS)if(p.type==='fiz'||p.type==='puff'||p.type==='dust'){const k2=dunH(p.y)/151;ctx.save();ctx.translate(p.x,p.y);ctx.scale(k2,k2);ctx.translate(-p.x,-p.y);drawPartWell(p);ctx.restore();}
