@@ -25,15 +25,15 @@ const DROOMS={
      light:[540,120,200]},   /* arrive at the top entrance (back to room 2); stairs down to a landing */
   15:{name:'Worldbind Passage',dark:.42,floor:[[372,195],[470,195],[495,280],[550,400],[640,510],[760,575],[860,590],[1080,565],[1190,505],[1228,525],[1185,640],[1100,768],[560,768],[420,650],[300,520],[210,420],[190,320],[300,240]],
      light:[420,130,200]},   /* arrive at the top of the stairs (back to room 14); a lion-head brazier with a green flame; stairs on the right lead further down */
-  17:{name:'Worldbind Passage',dark:.42,floor:[[375,195],[470,195],[490,280],[545,400],[640,500],[760,580],[880,600],[1080,590],[1150,530],[1200,540],[1170,650],[1100,768],[480,768],[420,680],[300,560],[200,440],[180,330],[300,240]],
-     block:[{x:322,y:640,rx:78,ry:24},{x:238,y:432,rx:48,ry:16},{x:460,y:330,rx:32,ry:11},{x:258,y:302,rx:24,ry:9},{x:790,y:540,rx:62,ry:19}],light:[420,130,200]},   /* arrive at the top of the stairs (back to room 16); stone pedestals; a raven-head brazier; the tunnel stairs on the right lead on */
-  19:{name:'Worldbind Passage',dark:.42,floor:[[375,195],[470,195],[490,280],[545,400],[640,500],[760,580],[880,600],[1080,590],[1150,530],[1200,540],[1170,650],[1100,768],[480,768],[420,680],[300,560],[200,440],[180,330],[300,240]],
-     block:[{x:322,y:640,rx:78,ry:24},{x:238,y:432,rx:48,ry:16},{x:460,y:330,rx:32,ry:11},{x:258,y:302,rx:24,ry:9},{x:790,y:540,rx:62,ry:19},{x:860,y:525,rx:55,ry:16}],light:[420,130,200]},   /* arrive at the top of the stairs (back to room 18); stone pedestals; a coiled serpent statue with a green flame; the tunnel stairs on the right lead on */
+  17:{name:'Worldbind Passage',dark:.42,floor:[[375,195],[475,195],[530,275],[590,360],[650,450],[730,520],[790,580],[880,600],[1080,590],[1150,530],[1200,540],[1170,650],[1100,768],[480,768],[420,680],[300,560],[200,440],[180,330],[300,240]],
+     block:[{x0:232,y0:498,x1:415,y1:690},{x0:180,y0:345,x1:300,y1:452},{x0:415,y0:296,x1:505,y1:372},{x0:225,y0:268,x1:295,y1:332},{x0:720,y0:462,x1:862,y1:575}],light:[420,130,200]},   /* arrive at the top of the stairs (back to room 16); stone pedestals; a raven-head brazier; the tunnel stairs on the right lead on */
+  19:{name:'Worldbind Passage',dark:.42,floor:[[375,195],[475,195],[530,275],[590,360],[650,450],[730,520],[790,580],[880,600],[1080,590],[1150,530],[1200,540],[1170,650],[1100,768],[480,768],[420,680],[300,560],[200,440],[180,330],[300,240]],
+     block:[{x0:232,y0:498,x1:415,y1:690},{x0:180,y0:345,x1:300,y1:452},{x0:415,y0:296,x1:505,y1:372},{x0:225,y0:268,x1:295,y1:332},{x0:720,y0:462,x1:862,y1:575},{x:860,y:525,rx:55,ry:16}],light:[420,130,200]},   /* arrive at the top of the stairs (back to room 18); stone pedestals; a coiled serpent statue with a green flame; the tunnel stairs on the right lead on */
   20:{name:'Worldbind Passage',dark:.38,floor:[[792,395],[935,395],[948,595],[1060,605],[1180,640],[1235,768],[565,768],[585,700],[605,625],[765,598]],
      light:[862,250,230]},   /* the serpent gate: arrive in the lit stairwell behind the carved archway (back to room 19), walk down through it; the way on is in the foreground */
   5:{name:'Deeproot',sub:'turn back',dark:.86,floor:[[420,768],[480,640],[560,580],[620,540],[700,540],[800,580],[950,620],[1050,700],[1080,768]]}};
 const EYES5=[[200,144],[290,106],[275,181],[331,319],[500,140],[652,129],[625,238],[731,190],[512,422],[612,444],[212,481],[212,512],[440,275],[420,412],[610,282]];
-function dunFree(x,y){const R=DROOMS[DUN.room];if(!inPoly(x,y,R.floor))return false;for(const b of (R.block||[]))if(((x-b.x)/b.rx)**2+((y-b.y)/b.ry)**2<1)return false;return true;}
+function dunFree(x,y){const R=DROOMS[DUN.room];if(!inPoly(x,y,R.floor))return false;for(const b of (R.block||[]))if(b.x0!==undefined?(x>b.x0&&x<b.x1&&y>b.y0&&y<b.y1):((x-b.x)/b.rx)**2+((y-b.y)/b.ry)**2<1)return false;return true;}
 function solveDun(px,py,nx,ny){if(dunFree(nx,ny))return [nx,ny];if(dunFree(nx,py))return [nx,py];if(dunFree(px,ny))return [px,ny];return [px,py];}
 const dunH=y=>150+(clamp(y,380,768)-620)*.28;
 const DUNINT=[];
@@ -138,13 +138,16 @@ function drawDun(){const R=DROOMS[DUN.room],im=IMG['dun'+DUN.room];if(!ready(im)
     if(DUN.room===7)L.push([614,()=>{const t=IMG.dun7_table;if(!ready(t))return;const hid=lum.y<614&&Math.abs(lum.x-945)<240;ctx.save();ctx.globalAlpha=hid?.62:1;ctx.drawImage(t,730,425);ctx.restore();}]);
     L.sort((a,b)=>a[0]-b[0]);for(const [,f] of L)f();}
   for(const p of PARTS)if(p.type==='fiz'||p.type==='puff'||p.type==='dust'){const k2=dunH(p.y)/151;ctx.save();ctx.translate(p.x,p.y);ctx.scale(k2,k2);ctx.translate(-p.x,-p.y);drawPartWell(p);ctx.restore();}
+  if(DUN.room>=11)drawWorldbindAir(R);
   // darkness: only the little lantern's circle (and any daylight from above) cuts through
   ctx.setTransform(DPR,0,0,DPR,0,0);const lit=BAG.includes('lantern');const [sx,sy]=wellToScreen(lum.x,lum.y-70*k);const zr=rz*(lit?1:.45);
   const r0=(BAG.includes('lantern')?120:70)*zr,r1=(BAG.includes('lantern')?260:170)*zr,R_=Math.hypot(W,H)*1.2,fl=1+.03*Math.sin(T*9);
   const g=ctx.createRadialGradient(sx,sy,0,sx,sy,R_);g.addColorStop(0,'rgba(4,5,10,0)');g.addColorStop(Math.min(.99,r0*fl/R_),'rgba(4,5,10,0)');g.addColorStop(Math.min(.995,r1*fl/R_),`rgba(4,5,10,${R.dark})`);g.addColorStop(1,`rgba(4,5,10,${R.dark})`);
   ctx.fillStyle=g;if(!CAPTURE.on)ctx.fillRect(0,0,W,H);
   ctx.save();ctx.globalCompositeOperation='lighter';if(lit)drawGlow(ctx,sx,sy,r0*1.3,'255,200,120',.12);for(const g of here){if(g.kind!=='bat'&&g.kind!=='spider')continue;const sp_=g.kind==='spider',kk=dunH(g.y)/151,[ex,ey]=wellToScreen(g.x+(g.face>0?1:-1)*(sp_?22:18)*kk,sp_?g.y-30*kk:g.y-150*kk-Math.sin(g.ph*3)*8);const tw=.55+.45*Math.sin(T*5+g.ph);drawGlow(ctx,ex-3,ey,5,'255,90,90',.8*tw);drawGlow(ctx,ex+3,ey,5,'255,90,90',.8*tw);}
-  if(DUN.room===12||DUN.room===14||DUN.room===16||DUN.room===18)for(const [tx,ty] of [[115,340],[1278,335]]){const [px,py]=wellToScreen(tx,ty);drawGlow(ctx,px,py,(150+8*Math.sin(T*7+tx))*rz,'255,150,70',.28);}
+  /* the torches: a warm pool of light on the walls and floor, a hot core at the flame, flickering */
+  if(DUN.room===12||DUN.room===14||DUN.room===16||DUN.room===18)for(const [tx,ty] of [[115,340],[1278,335]]){const [px,py]=wellToScreen(tx,ty),[fx,fy]=wellToScreen(tx+(tx<600?60:-60),ty+260),f=1+.06*Math.sin(T*9+tx)+.04*Math.sin(T*23+tx*2);
+    drawGlow(ctx,px,py,320*rz*f,'255,140,60',.26);drawGlow(ctx,fx,fy,260*rz*f,'255,150,80',.14);drawGlow(ctx,px,py,90*rz*f,'255,200,120',.45);drawGlow(ctx,px,py-14*rz,34*rz*f,'255,235,180',.6);}
   if(DUN.room===19){const [px,py]=wellToScreen(805,200);drawGlow(ctx,px,py,(160+10*Math.sin(T*5))*rz,'90,255,190',.26);}
   if(DUN.room===17){const [px,py]=wellToScreen(818,280);drawGlow(ctx,px,py,(160+10*Math.sin(T*5))*rz,'90,255,190',.26);}
   if(DUN.room===15){const [px,py]=wellToScreen(818,290);drawGlow(ctx,px,py,(170+10*Math.sin(T*5))*rz,'90,255,190',.26);}
@@ -153,3 +156,15 @@ function drawDun(){const R=DROOMS[DUN.room],im=IMG['dun'+DUN.room];if(!ready(im)
   if(WTITLE.t<4.5&&!CAPTURE.on){const a=Math.min(1,WTITLE.t*1.5,(4.5-WTITLE.t)*1.2);ctx.save();ctx.globalAlpha=a;ctx.textAlign='center';ctx.fillStyle='rgba(10,8,14,.5)';ctx.fillRect(0,H*.3-40,W,80);
     ctx.fillStyle='#e8eef6';ctx.font='700 26px "Alegreya SC", Georgia, serif';ctx.fillText(R.name,W/2,H*.3+10);ctx.restore();}}
 
+/* ---------- the Worldbind Passage's air: a spiritual mist flowing low over the floor and stairs, and very tiny bats ---------- */
+function wbMist(R){const k='mist'+DUN.room;if(DUN[k])return DUN[k];const pts=[],F=R.floor;let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9;for(const [x,y] of F){x0=Math.min(x0,x);x1=Math.max(x1,x);y0=Math.min(y0,y);y1=Math.max(y1,y);}
+  for(let i=0;i<400&&pts.length<34;i++){const x=x0+hash(i,1,DUN.room*7)*(x1-x0),y=y0+hash(i,2,DUN.room*7)*(y1-y0);if(inPoly(x,y,F))pts.push({x,y,r:60+hash(i,3,DUN.room)*90,ph:hash(i,4,DUN.room)*TAU,sp:6+hash(i,5,DUN.room)*10});}
+  return DUN[k]={pts,x0,x1};}
+function drawWorldbindAir(R){const M=wbMist(R),span=M.x1-M.x0+300;ctx.save();ctx.globalCompositeOperation='lighter';
+  for(const m of M.pts){const x=M.x0-150+(((m.x-M.x0+150)+T*m.sp)%span+span)%span,y=m.y+Math.sin(T*.4+m.ph)*8,a=.11+.05*Math.sin(T*.6+m.ph);
+    ctx.save();ctx.translate(x,y);ctx.scale(1,.32);drawGlow(ctx,0,0,m.r,'150,225,235',a);ctx.restore();}
+  ctx.restore();
+  // very tiny bats, flitting high in the dark
+  ctx.save();ctx.fillStyle='rgba(12,14,22,.9)';for(let i=0;i<5;i++){const s=T*(.18+hash(i,1,DUN.room+40)*.12)+hash(i,2,DUN.room+40)*9,x=687+Math.sin(s)*(420+hash(i,3,DUN.room)*200)+Math.sin(s*3.1)*40,y=110+hash(i,4,DUN.room)*170+Math.sin(s*2.3)*30+Math.sin(s*7)*6,
+    fl=Math.sin(T*28+i*2),w=6,dir=Math.cos(s)>0?1:-1;ctx.beginPath();ctx.moveTo(x,y);ctx.quadraticCurveTo(x-w*.6*dir,y-3*fl-1,x-w,y-2*fl);ctx.quadraticCurveTo(x-w*.5,y+.8,x,y+1.2);ctx.quadraticCurveTo(x+w*.5,y+.8,x+w,y-2*fl);ctx.quadraticCurveTo(x+w*.6*dir,y-3*fl-1,x,y);ctx.fill();}
+  ctx.restore();}
