@@ -225,7 +225,7 @@ function updateClearing(dt){if(C1.fkDone)return;FKS.t+=dt;FKS.flash=Math.max(0,F
   if(FKS.st===0&&!DLG.active&&!FADE.dir&&!BATTLE.on&&lum.x>CLR.x0&&Math.hypot(lum.x-FKS.cx,(lum.y-FKS.cy)*1.2)<215){FKS.st=1;fkMeet();}
   if(FKS.st===2){if(FKS.t>.6&&!FKS.flashed){FKS.flashed=1;FKS.flash=1;sfxRumble(2,1);}FKS.ca=Math.max(0,1-FKS.t/.8);FKS.fa=clamp((FKS.t-.6)/.8,0,1);if(FKS.t>2.4){FKS.st=3;fkReveal();}}
   if(FKS.jakIn&&JAKF){const J_=FKS.jakIn,dx=J_.tx-JAKF.x,step=300*dt;JAKF.y=J_.ty;JAKF.dir='side';JAKF.face=1;
-    if(Math.abs(dx)<=step){JAKF.x=J_.tx;JAKF.moving=0;JAKF.mv=0;FKS.jakIn=null;talk([['Spar',"Lum!"]],false,fkStand);}else{JAKF.x+=Math.sign(dx)*step;JAKF.moving=1;JAKF.mv=1;JAKF.ph+=step;}}
+    if(Math.abs(dx)<=step){JAKF.x=J_.tx;JAKF.moving=0;JAKF.mv=0;FKS.jakIn=null;talk([['Spar',"Fokalur!"]],false,fkStand);}else{JAKF.x+=Math.sign(dx)*step;JAKF.moving=1;JAKF.mv=1;JAKF.ph+=step;}}
   if(FKS.st===8){ZOOMK=1-.22*easeIO(Math.min(1,FKS.t/4));if(FKS.t>2.6&&!FKS.ended){FKS.ended=1;C1.fkDone=1;C1.chEnd=1;finishChapter('ch1');startCh1Results();}}
   /* chaos: from "A stone witch watches…" (or his last line, if Lum came alone) fire spreads out across the clearing */
   if(FKS.st>=5&&!FKS.chaos&&DLG.active){const ln=(DLG.lines[DLG.i]||[])[1]||'';if(/stone witch|true meaning of suffering/.test(ln)){FKS.chaos=.001;sfxRumble(2.5,.7);}}
@@ -248,7 +248,7 @@ function fkReveal(){const L=[['Fokalur',"One thousand years… trapped in darkne
 /* Lum came alone: Jak runs into the clearing to stand with her */
 function fkJakArrives(){if(!jakInParty()){PARTY_ORDER.length=1;PARTY_ORDER.push(MATE);}C1.jak=1;HEROES[MATE].hp=HEROES[MATE].maxHp;
   JAKF={x:lum.x-390,y:lum.y+4,face:1,moving:1,ph:0,dir:'side',mv:1};JAKCRUMB.length=0;FKS.jakIn={tx:lum.x-70,ty:lum.y+4};}
-function fkStand(){const L=[['Spar',"I do not fear death."],['Fokalur',"A shop owner and a broken warrior… prepare to die!"]];
+function fkStand(){const L=[['Spar',"I am Spar! And I do not fear death."],['Fokalur',"A shop owner and a broken warrior… prepare to die!"]];
   talk(L,false,()=>{FKS.st=4;WEVENT.on=false;lum.bumpT=0;startEncounter({kind:'fokalur',scene:'thorn',x:FKS.cx,y:FKS.cy,s:1,pack:1,calm:0,dead:0,scripted:true,boss:1,onLose:fkAfterLoss},'normal');});}
 function fkAfterLoss(){for(const id of PARTY_ORDER)HEROES[id].hp=Math.max(1,Math.round(HEROES[id].maxHp*.25));
   SCENE='thorn';lum.x=FKS.cx-240;lum.y=FKS.cy;lum.face=1;lum.vx=lum.vy=0;lum.state='idle';cam.x=lum.x+120;cam.y=lum.y-50;resetJakFollow();LUMSTONE=1;FKS.fire={x:lum.x+120,y:lum.y+6};FKS.st=5;FKS.fa=1;FKS.ca=0;WEVENT.on=true;
