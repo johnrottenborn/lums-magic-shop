@@ -255,12 +255,13 @@ function drawAflurry(){const B=BATTLE,a=B.af;if(B.phase!=='aflurry'||!a||a.done)
   if(a.hit===1){ctx.globalCompositeOperation='lighter';drawGlow(ctx,x,y,R*2.4,'255,240,180',.7*(1-u));}
   ctx.restore();ctx.save();ctx.fillStyle='#fdf6e4';ctx.strokeStyle='rgba(20,10,30,.7)';ctx.lineWidth=4;ctx.font='700 '+Math.round(20*S)+'px "Alegreya SC", Georgia, serif';ctx.textAlign='center';
   const txt=a.hits+' / '+AF_N;ctx.strokeText(txt,x,c_.top-26*S);ctx.fillText(txt,x,c_.top-26*S);ctx.restore();}
-function drawBattleAmroth(h){const S=bS(),B=BATTLE,x=h.x+h.ox+Math.max(0,62*S-h.x-h.ox+20*S)*(h.ox<=0?1:0),y=h.y+h.oy,me=B.heroes[B.cur]===h,ph=B.phase,t=B.t,H_=AMR_BH*S;let an='bidle',fi=0,flip=false,rot=0,guard=true;
+function drawBattleAmroth(h){const S=bS(),B=BATTLE,x=h.x+h.ox+Math.max(0,62*S-h.x-h.ox+20*S)*(h.ox<=0?1:0),y=h.y+h.oy,me=B.heroes[B.cur]===h,ph=B.phase,t=B.t,H_=AMR_BH*S;let an='bidle',fi=0,flip=true,rot=0,guard=true;   /* his guard row faces left: flip it to face the foes (the slash row already faces right) */
   if(me&&(ph==='bonkRun'||ph==='bonkBack'||ph==='run'||ph==='fled')){guard=false;an='run';fi=Math.floor(t*12)%6;flip=ph==='bonkRun';}   /* his run row faces left */
   else if(me&&ph==='bonkWind'){guard=false;an='bidle';fi=1;rot=-.1*Math.min(1,t/B.windD);}
-  else if(me&&ph==='bonkHit'){guard=false;an='bslash';fi=t<.08?0:t<.2?1:2;}
-  else if(me&&ph==='aflurry'){guard=false;const a=B.af||{};an='bslash';fi=a.swing>.16?1:a.swing>0?2:0;}
-  bshadow(x,y+2,40*S,11*S,.35);ctx.save();ctx.translate(x,y+3);if(h.hurt>0)ctx.translate(Math.sin(h.hurt*60)*4,0);ctx.rotate(rot);if(guard){const b=Math.sin(T*1.5);ctx.scale(1-.004*b,1+.01*b);}
+  else if(me&&ph==='bonkHit'){guard=false;an='bslash';fi=t<.08?0:t<.2?1:2;flip=false;}
+  else if(me&&ph==='aflurry'){guard=false;const a=B.af||{};an='bslash';fi=a.swing>.16?1:a.swing>0?2:0;flip=false;}
+  bshadow(x,y+2,40*S,11*S,.35);ctx.save();ctx.translate(x,y+3);if(h.hurt>0)ctx.translate(Math.sin(h.hurt*60)*4,0);ctx.rotate(flip?-rot:rot);ctx.scale(.88,1);   /* a little slimmer */
+  if(guard){const b=Math.sin(T*1.5);ctx.scale(1-.004*b,1+.01*b);}
   c1Frame(ctx,'amroth',an,fi,0,0,H_,flip,1,h.hurt>.3?1:0);ctx.restore();}
 function drawBattleSpar(h){const S=bS(),B=BATTLE,x=h.x+h.ox,y=h.y+h.oy,me=B.heroes[B.cur]===h,ph=B.phase,t=B.t,H_=SPAR_BH*S;let an='brun',fi=1,flip=false,rot=0,guard=true;
   /* at rest he stands on guard: knees bent, sword gripped two-handed across his body (run row frame 1), breathing; the run row faces right, toward the foes */
