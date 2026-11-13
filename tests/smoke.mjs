@@ -403,6 +403,18 @@ const CASES = {
     await g_(() => { const g = window.__g; g.openMenu(); g.MENU.page = 'char'; g.MENU.who = 'amroth'; }); await wait(600);
     await p.screenshot({ path: path.join(SHOTS, `amroth-spellbook-${vp}.png`) });
   },
+  async 'worldbind-passage'(p) {
+    // the gatehouse door leads to the first room of the Worldbind Passage: arrive at the top of the stairs, walk down, and the door back works
+    const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop', g_ = f => p.evaluate(f);
+    await g_(() => { window.__g.startChapter2(); window.__g.c2Skip(); }); await wait(1500);
+    await g_(() => { const g = window.__g, P = g.CPATH; g.lum.x = P.xt; g.lum.y = P.ytop + 80; }); await wait(700);
+    await g_(() => window.__g.NEAR.onInteract()); await wait(2200);
+    check(await g_(() => window.__g.SCENE === 'dun' && window.__g.DUNX.room === 11), 'the gatehouse door did not open the Worldbind Passage');
+    await p.screenshot({ path: path.join(SHOTS, `worldbind-top-${vp}.png`) });
+    await p.keyboard.down('ArrowDown'); await p.keyboard.down('ArrowRight'); await wait(2500); await p.keyboard.up('ArrowDown'); await p.keyboard.up('ArrowRight'); await wait(800);
+    const y = await g_(() => window.__g.lum.y); check(y > 330, 'Lum could not walk down the stairs: y=' + y);
+    await p.screenshot({ path: path.join(SHOTS, `worldbind-stairs-${vp}.png`) });
+  },
   async 'ch2-clearing'(p) {
     // Chapter 2 opens in the big round clearing; the path east then north reaches the gatehouse
     const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop';

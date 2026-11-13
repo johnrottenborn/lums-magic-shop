@@ -65,7 +65,7 @@ function updateC2(dt){if(!C2.on)return;C2.t+=dt;
 function c2Finish(){if(!PARTY_ORDER.includes('amroth'))PARTY_ORDER.push('amroth');HEROES.amroth.hp=HEROES.amroth.maxHp;C1.comboA=0;C2.on=false;C2.st=99;C2.cam=null;C2.joined=1;WEVENT.on=false;C2.title=.001;C2.mound=0;lum.state='idle';
   AMR.x=lum.x-60;AMR.y=lum.y+4;AMR.moving=0;AMR.a=1;GOAL.tag='TASK';GOAL.text='Follow Amroth to the passage';}
 /* once he has joined, Amroth walks behind Lum */
-function updateAmrFollow(dt){if(!C2.joined||CH<2||SCENE!=='thorn')return;const tx=lum.x-56*lum.face,ty=lum.y+6,d=Math.hypot(tx-AMR.x,ty-AMR.y);if(d>18)amrWalk(tx,ty,Math.min(220,60+d*1.6),dt);else{AMR.moving=0;if(!DLG.active){AMR.dir='side';AMR.face=lum.face;}}}
+function updateAmrFollow(dt){if(!C2.joined||CH<2||(SCENE!=='thorn'&&SCENE!=='dun'))return;const tx=lum.x-56*lum.face,ty=lum.y+6,d=Math.hypot(tx-AMR.x,ty-AMR.y);if(d>18)amrWalk(tx,ty,Math.min(220,60+d*1.6),dt);else{AMR.moving=0;if(!DLG.active){AMR.dir='side';AMR.face=lum.face;}}}
 /* the cutscene's overlays: narration on black, the fade from black into the rain, the title card */
 function drawC2UI(){if(CH<2)return;ctx.save();ctx.setTransform(DPR,0,0,DPR,0,0);
   if(C2.on&&C2.narr>=0){ctx.fillStyle='#000';ctx.fillRect(0,0,W,H);const L=C2NARR[C2.narr],dur=2.6+L.length*.045,a=Math.min(1,C2.na*1.5,Math.max(0,(dur-C2.na)*1.6));
@@ -95,3 +95,5 @@ function drawnAmr(){}drawnAmr.n=0;
 function drawAmrOW(F,alpha){if(!F||alpha<=0)return;drawnAmr.n++;const an=F.dir==='up'?'up':F.dir==='down'?'down':'side',n=C1ATL.amroth.rows[an][1],fi=F.moving?Math.floor((F.ph||0)/18)%n:0,bob=F.moving&&an==='down'?Math.abs(Math.sin((F.ph||0)*.09))*-4:0;
   ctx.save();ctx.globalAlpha*=alpha;ctx.fillStyle='rgba(10,10,20,.28)';ctx.beginPath();ctx.ellipse(F.x,F.y,26,8,0,0,TAU);ctx.fill();ctx.restore();
   c1Frame(ctx,'amroth',an,an==='side'||an==='up'?fi:0,F.x,F.y+bob,AMR_H,an==='side'&&F.face>0,alpha,0);}
+/* through the gatehouse arch: the first room of the Worldbind Passage (room 11 of the root-room engine in 26), arriving at the top of the stairs */
+function enterWorldbind(){enterDun(11,238,250,1);AMR.x=lum.x+30;AMR.y=lum.y-30;AMR.dir='down';}
