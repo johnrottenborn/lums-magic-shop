@@ -426,6 +426,9 @@ const CASES = {
     await p.keyboard.down('ArrowDown'); await wait(2500); await p.keyboard.up('ArrowDown'); await wait(400);
     check(await g_(() => window.__g.lum.y > 380), 'Lum could not walk down room 3\'s stairs');
     await p.screenshot({ path: path.join(SHOTS, `worldbind-room3-${vp}.png`) });
+    await g_(() => { const g = window.__g; g.lum.x = 1110; g.lum.y = 610; }); await wait(600);
+    check(await g_(() => { const n = window.__g.NEAR; return !!(n && n.door); }), 'no door emote at room 3\'s right-hand opening');
+    await p.screenshot({ path: path.join(SHOTS, `worldbind-room3-exit-${vp}.png`) });
   },
   async 'ch2-clearing'(p) {
     // Chapter 2 opens in the big round clearing; the path east then north reaches the gatehouse

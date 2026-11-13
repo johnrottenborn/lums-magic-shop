@@ -45,7 +45,9 @@ function setupDun(){DUNINT.length=0;const r=DUN.room,D=(x,y,reach,fn)=>DUNINT.pu
   if(r===11){D(238,215,70,()=>goScene(()=>{SCENE='thorn';lum.x=CPATH.xt;lum.y=CPATH.ytop+95;lum.face=1;lum.state='idle';lum.vx=lum.vy=0;cam.x=lum.x;cam.y=lum.y-50;THORN.t=99;AMR.x=lum.x-50;AMR.y=lum.y+20;}));
     D(1150,560,90,()=>dunGo(12,200,560,1));}
   if(r===12){D(150,520,80,()=>dunGo(11,1110,575,-1));D(1250,520,80,()=>dunGo(13,540,240,1));}
-  if(r===13){D(540,210,70,()=>dunGo(12,1215,540,-1));L(470,610,70,["A worn stone marker. The carving has crumbled away."]);}
+  if(r===13){D(540,210,70,()=>dunGo(12,1215,540,-1));
+    /* the dark opening on the right leads to room 4 (art still to come): a door emote that, for now, only speaks */
+    DUNINT.push({x:1130,y:605,reach:80,door:true,onInteract:()=>{if(DROOMS[14]&&ready(IMG.dun14))dunGo(14);else say("The passage winds on into the dark…");}});L(470,610,70,["A worn stone marker. The carving has crumbled away."]);}
   if(r===12){L(730,545,110,["Old stonework, set into the rock. Someone built this passage long ago.","The stones are cold and damp. Roots have pushed through the mortar."]);}
   if(r===2){D(175,590,64,()=>dunGo(1,1240,600,-1));D(1270,590,64,()=>dunGo(3,290,540,1));L(700,655,80,["The roots here are so thick they look woven together.","Purple fungus on the ceiling. Glowmold. Lovely in a powder, if only I could reach it."]);}
   if(r===3){D(270,525,60,()=>dunGo(2,1240,600,-1));
