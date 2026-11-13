@@ -466,8 +466,8 @@ const CASES = {
     await wait(1600); { const l = await g_(() => window.__g.DLG.active && window.__g.DLG.lines[0]); check(l && l[0] === 'Lum' && /hear something/.test(l[1]), 'Lum did not ask what she hears: ' + JSON.stringify(l)); }
     await p.screenshot({ path: path.join(SHOTS, `worldbind-room4-hear-${vp}.png`) });
     await p.keyboard.press('Enter');
-    for (let i = 0; i < 70 && !(await g_(() => window.__g.BO.dem > 0 && window.__g.BO.lt >= 1)); i++) await wait(200);
-    check(await g_(() => window.__g.BO.L && window.__g.BO.dem > 0), 'the left torch was not relit with the demons revealed');
+    for (let i = 0; i < 70 && !(await g_(() => window.__g.BO.ow.length === 2 && window.__g.BO.lt >= 1)); i++) await wait(200);
+    check(await g_(() => window.__g.BO.L && window.__g.BO.ow.length === 2), 'the left torch was not relit with the demons revealed');
     await p.screenshot({ path: path.join(SHOTS, `worldbind-room4-demons-${vp}.png`) });
     // a battle starts: Lum and Amroth against two demons that hurl fire
     for (let i = 0; i < 30 && !(await g_(() => window.__g.BATTLE.on)); i++) await wait(200);
@@ -477,8 +477,34 @@ const CASES = {
     await wait(150); await p.screenshot({ path: path.join(SHOTS, `worldbind-demon-fire-${vp}.png`) });
     await wait(1500); await p.screenshot({ path: path.join(SHOTS, `worldbind-demon-battle-${vp}.png`) });
     await g_(() => { const B = window.__g.BATTLE; B.phase = 'win'; B.t = 1; B.rewarded = 0; });
-    for (let i = 0; i < 40 && (await g_(() => window.__g.BATTLE.on || window.__g.WEVENT.on)); i++) { await p.keyboard.press('Space'); await wait(300); }
-    check(await g_(() => !window.__g.BATTLE.on && window.__g.BO.done && window.__g.SCENE === 'dun'), 'winning the demon battle did not return to room 4');
+    for (let i = 0; i < 40 && (await g_(() => window.__g.BATTLE.on)); i++) { await p.keyboard.press('Space'); await wait(300); }
+    // Amroth's warning, then two more demons close in from either side and a second battle starts
+    for (let i = 0; i < 20 && !(await g_(() => window.__g.DLG.active)); i++) await wait(150);
+    { const l = await g_(() => window.__g.DLG.active && window.__g.DLG.lines[0]); check(l && l[0] === 'Amroth' && /should not be here/.test(l[1]), 'Amroth did not warn after the first fight: ' + JSON.stringify(l)); }
+    await p.keyboard.press('Enter'); await wait(1200);
+    await p.screenshot({ path: path.join(SHOTS, `worldbind-demons-close-in-${vp}.png`) });
+    for (let i = 0; i < 40 && !(await g_(() => window.__g.BATTLE.on)); i++) await wait(200);
+    check(await g_(() => window.__g.BATTLE.on && window.__g.BATTLE.foes.length === 2 && window.__g.BATTLE.foes.every(f => f.type === 'demon')), 'the second demon battle did not start');
+    await wait(1500); await g_(() => { const B = window.__g.BATTLE; B.phase = 'win'; B.t = 1; B.rewarded = 0; });
+    for (let i = 0; i < 40 && (await g_(() => window.__g.BATTLE.on)); i++) { await p.keyboard.press('Space'); await wait(300); }
+    for (let i = 0; i < 20 && !(await g_(() => window.__g.DLG.active)); i++) await wait(150);
+    { const l = await g_(() => window.__g.DLG.active && window.__g.DLG.lines[0]); check(l && l[0] === 'Amroth' && /move quickly/.test(l[1]), 'Amroth did not urge them on after the second fight: ' + JSON.stringify(l)); }
+    await p.keyboard.press('Enter'); await wait(1500);
+    check(await g_(() => { const c = window.__g.BO.chaser; return !window.__g.WEVENT.on && c && c.x < window.__g.lum.x; }), 'no demon came from the left after the second fight');
+    await p.screenshot({ path: path.join(SHOTS, `worldbind-demon-chase-${vp}.png`) });
+    // the way back to room 3 is closed
+    await g_(() => { const g = window.__g; g.BO.chaser.calm = 99; g.lum.x = 170; g.lum.y = 530; }); await wait(500);
+    await g_(() => window.__g.NEAR.onInteract()); await wait(400);
+    { const l = await g_(() => window.__g.DLG.active && window.__g.DUNX.room === 14 && window.__g.DLG.lines[0]); check(l && /need to leave this place/.test(l[1]), 'the way back to room 3 was not closed: ' + JSON.stringify(l)); }
+    for (let i = 0; i < 3 && await g_(() => window.__g.DLG.active); i++) { await p.keyboard.press('Enter'); await wait(300); }
+    // beating the left demon brings another
+    await g_(() => { const g = window.__g; g.lum.x = 700; g.lum.y = 575; g.BO.chaser.calm = 0; g.BO.chaser.x = 640; g.BO.chaser.y = 575; }); await wait(800);
+    check(await g_(() => window.__g.BATTLE.on || window.__g.BATTLE.pending), 'touching the demon did not start a fight');
+    for (let i = 0; i < 30 && !(await g_(() => window.__g.BATTLE.on)); i++) await wait(150);
+    await wait(1200); await g_(() => { const B = window.__g.BATTLE; B.phase = 'win'; B.t = 1; B.rewarded = 0; });
+    for (let i = 0; i < 40 && (await g_(() => window.__g.BATTLE.on)); i++) { await p.keyboard.press('Space'); await wait(300); }
+    await wait(2000); check(await g_(() => !!window.__g.BO.chaser && window.__g.BO.chaser.x < 400), 'a new demon did not come from the left');
+    await g_(() => { window.__g.BO.chaser.calm = 99; });
     check(await g_(() => !window.__g.WEVENT.on), 'room 4 did not hand control back');
     await p.screenshot({ path: path.join(SHOTS, `worldbind-room4-${vp}.png`) });
     await g_(() => { const g = window.__g; g.lum.x = 1220; g.lum.y = 540; }); await wait(600);

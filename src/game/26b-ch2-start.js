@@ -127,21 +127,44 @@ function updateC2Torch(dt){updateBlackout(dt);
   if(C2.lightT!=null&&C2.lightT<1)C2.lightT+=dt*1.5;}
 /* Worldbind room 4, first visit: halfway across, both torches go out and everything goes black. Amroth goes to relight
    the left torch; when it catches, two demons are flanking Lum. (Demons are stand-ins until their art arrives.) */
-const BO={st:0,t:0,a:0,L:1,R:1,lt:1,dem:0,done:0};
-function updateBlackout(dt){if(SCENE!=='dun'||DUN.room!==14){if(BO.st&&BO.st<9){BO.st=0;BO.a=0;BO.L=BO.R=1;BO.lt=1;BO.dem=0;WEVENT.on=false;}return;}
+const BO={st:0,t:0,a:0,L:1,R:1,lt:1,ow:[],done:0,lock:0,chaser:null};
+function boHeal(){for(const id of PARTY_ORDER)HEROES[id].hp=HEROES[id].maxHp;}
+/* after the two fights a demon keeps coming from the left (room 3's side): running right gets away, beating it brings another */
+function spawnChaser(){BO.chaser={kind:'demon',scene:'dun',x:40,y:575,face:1,s:1,pack:1,calm:0,ph:0,a:0,
+  onWin:()=>{BO.chaser=null;BO.respawn=1.2;},onLose:()=>{boHeal();BO.chaser=null;BO.respawn=2;lum.x=900;lum.y=575;lum.face=1;resetAmrFollow();}};}
+function demonPair(){const y=lum.y+4;return [{x:lum.x-125,y,face:1,a:.001},{x:lum.x+125,y,face:-1,a:.001}];}
+function updateBlackout(dt){if(SCENE!=='dun'||DUN.room!==14){if(BO.st&&BO.st<9){BO.st=0;BO.a=0;BO.L=BO.R=1;BO.lt=1;BO.ow=[];WEVENT.on=false;}BO.chaser=null;return;}
   const go=n=>{BO.st=n;BO.t=0;};BO.t+=dt;
-  if(!BO.st){if(!BO.done&&C2.joined&&lum.x>687&&!FADE.dir&&!DLG.active){go(1);WEVENT.on=true;lum.state='idle';lum.vx=lum.vy=0;BO.L=BO.R=0;try{sfxSnuff();}catch(e){}}return;}
-  if(BO.st===1){BO.a=Math.min(1,BO.t/.35);if(BO.t>1.4&&!DLG.active){go(2);talk([['Amroth',"Stand still while I relight the torches."],['Amroth',"I know this passage like the back of my hand!"]],false,()=>go(3));}}
+  for(const d of BO.ow)if(d.a>0&&d.a<1)d.a=Math.min(1,d.a+dt*2);
+  if(!BO.st){if(!BO.done&&C2.joined&&lum.x>687&&!FADE.dir&&!DLG.active){go(1);WEVENT.on=true;lum.state='idle';lum.vx=lum.vy=0;BO.L=BO.R=0;try{sfxSnuff();}catch(e){}}}
+  else if(BO.st===1){BO.a=Math.min(1,BO.t/.35);if(BO.t>1.4&&!DLG.active){go(2);talk([['Amroth',"Stand still while I relight the torches."],['Amroth',"I know this passage like the back of my hand!"]],false,()=>go(3));}}
   else if(BO.st===3){const there=amrWalk(150,520,130,dt);if(!there){AMR.dir='side';AMR.face=-1;}
     if(BO.t>1.3&&!BO.said){BO.said=1;talk([['Lum',"Amroth? Do you hear something?"]],false,()=>{});}
     if(there&&BO.said&&!DLG.active){AMR.moving=0;go(4);}}
-  else if(BO.st===4){if(BO.t>.6&&!BO.L){BO.L=1;BO.lt=0;BO.dem=1;try{sfxIgnite();}catch(e){}}if(BO.L){BO.lt=Math.min(1,BO.lt+dt*1.5);BO.a=Math.max(0,1-BO.lt);}
+  else if(BO.st===4){if(BO.t>.6&&!BO.L){BO.L=1;BO.lt=0;BO.ow=demonPair();try{sfxIgnite();}catch(e){}}if(BO.L){BO.lt=Math.min(1,BO.lt+dt*1.5);BO.a=Math.max(0,1-BO.lt);}
     if(BO.t>2.2){go(5);WEVENT.on=false;startEncounter({kind:'demon',scene:'dun',x:lum.x+125,y:lum.y,s:1,pack:2,calm:0,noFlee:1,
-      onWin:()=>{BO.dem=0;BO.R=1;BO.done=1;go(10);resetAmrFollow();},
-      onLose:()=>{for(const id of PARTY_ORDER)HEROES[id].hp=HEROES[id].maxHp;BO.st=0;BO.a=0;BO.L=BO.R=1;BO.lt=1;BO.dem=0;BO.said=0;BO.done=0;enterDun(14,200,560,1);resetAmrFollow();}},'ambush');}}
-  if(BO.st>=3&&BO.st<9)lum.face=AMR.x<lum.x?-1:1;}
+      onWin:()=>{BO.ow=[];BO.R=1;go(11);WEVENT.on=true;resetAmrFollow();},
+      onLose:()=>{boHeal();BO.st=0;BO.a=0;BO.L=BO.R=1;BO.lt=1;BO.ow=[];BO.said=0;BO.done=0;enterDun(14,200,560,1);resetAmrFollow();}},'ambush');}}
+  /* first fight won: Amroth's warning, then two more demons close in from either side */
+  else if(BO.st===11){if(BO.t>.8&&!DLG.active&&!BO.warned){BO.warned=1;talk([['Amroth',"Demons should not be here!"]],false,()=>{go(12);const y=lum.y+4;BO.ow=[{x:lum.x-560,y,face:1,a:1,tx:lum.x-125},{x:lum.x+560,y,face:-1,a:1,tx:lum.x+125}];});}}
+  else if(BO.st===12){let all=1;for(const d of BO.ow){const dx=d.tx-d.x;if(Math.abs(dx)>2){d.x+=Math.sign(dx)*Math.min(Math.abs(dx),150*dt);d.mv=1;all=0;}else d.mv=0;}lum.face=BO.t%2.4<1.2?-1:1;
+    if(all&&BO.t>.6)go(13);}
+  else if(BO.st===13){if(BO.t>.7){go(14);WEVENT.on=false;startEncounter({kind:'demon',scene:'dun',x:lum.x+125,y:lum.y,s:1,pack:2,calm:0,noFlee:1,
+      onWin:()=>{BO.ow=[];go(15);WEVENT.on=true;resetAmrFollow();},
+      onLose:()=>{boHeal();go(13);WEVENT.on=true;resetAmrFollow();}},'normal');}}
+  /* second fight won: Amroth urges them on, and from now on the demons keep coming from the left */
+  else if(BO.st===15){if(BO.t>.8&&!DLG.active&&!BO.urged){BO.urged=1;talk([['Amroth',"Let’s move quickly!"]],false,()=>{go(20);WEVENT.on=false;BO.done=1;BO.lock=1;spawnChaser();});}}
+  if(BO.st>=3&&BO.st<9)lum.face=AMR.x<lum.x?-1:1;
+  /* the chaser walks in from the left edge and stalks Lum; touching her starts a fight */
+  if(BO.lock&&!BATTLE.on&&!BATTLE.pending&&!WIPE.dir&&!FADE.dir){
+    if(!BO.chaser){BO.respawn=(BO.respawn||0)-dt;if(BO.respawn<=0&&!WEVENT.on)spawnChaser();}
+    else{const g=BO.chaser;g.a=Math.min(1,g.a+dt*2);if(g.calm>0){g.calm-=dt;g.mv=0;}
+      else if(!WEVENT.on&&!DLG.active){const dx=lum.x-g.x,dy=lum.y-g.y,d=Math.hypot(dx,dy);
+        if(d>4){const m=Math.min(d,118*dt),nx=g.x+dx/d*m,ny=g.y+dy/d*m;if(dunFree(nx,ny)||nx<130){g.x=nx;g.y=ny;}else if(dunFree(nx,g.y))g.x=nx;g.mv=1;g.face=dx>0?1:-1;}
+        if(d<62&&lum.bumpT<=0)startEncounter(g,'ambush');}
+      else g.mv=0;}}}
 /* the two demons flanking Lum in the overworld (designer's art faces left; the one on her left is flipped to face her) */
-function drawDemonOW(x,y,face,a){const im=IMG.demon_imp;if(!ready(im)||CAPTURE.on)return;   /* kept out of the battle backdrop */
-  const k=dunH(y)/151,h=175*k,w=h*im.width/im.height,br=1+.02*Math.sin(T*2.6+x);
+function drawDemonOW(x,y,face,a,mv){const im=IMG.demon_imp;if(!ready(im)||CAPTURE.on)return;   /* kept out of the battle backdrop */
+  const k=dunH(y)/151,h=175*k,w=h*im.width/im.height,br=1+.02*Math.sin(T*2.6+x),hop=mv?Math.abs(Math.sin(T*9))*6*k:0,tilt=mv?Math.sin(T*9)*.05:0;
   ctx.save();ctx.globalAlpha=a*.35;ctx.fillStyle='#000';ctx.beginPath();ctx.ellipse(x,y,40*k,10*k,0,0,TAU);ctx.fill();ctx.restore();
-  ctx.save();ctx.globalAlpha=a;ctx.translate(x,y);ctx.scale(face>0?-1:1,br);ctx.drawImage(im,-w/2,-h,w,h);ctx.restore();}
+  ctx.save();ctx.globalAlpha=a;ctx.translate(x,y-hop);ctx.rotate(tilt);ctx.scale(face>0?-1:1,br);ctx.drawImage(im,-w/2,-h,w,h);ctx.restore();}

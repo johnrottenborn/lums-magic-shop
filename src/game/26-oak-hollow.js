@@ -59,7 +59,7 @@ function setupDun(){DUNINT.length=0;const r=DUN.room,D=(x,y,reach,fn)=>DUNINT.pu
   if(r===13){D(540,210,70,()=>dunGo(12,1215,540,-1));
     /* the dark opening on the right leads to room 4 (art still to come): a door emote that, for now, only speaks */
     DUNINT.push({x:1130,y:605,reach:80,door:true,onInteract:()=>{dunGo(14,200,560,1);}});L(470,610,70,["A worn stone marker. The carving has crumbled away."]);}
-  if(r===14){D(150,520,80,()=>dunGo(13,1110,610,-1));D(1250,520,80,()=>dunGo(15,425,230,1));
+  if(r===14){D(150,520,80,()=>BO.lock?talk([['Lum',"I need to leave this place."]]):dunGo(13,1110,610,-1));D(1250,520,80,()=>dunGo(15,425,230,1));
     L(730,545,110,["More of the old stonework. Whoever built this passage built it to last.","The same cold, damp stones. The passage is longer than it looks."]);}
   if(r===15){D(425,205,70,()=>dunGo(14,1215,540,-1));L(818,560,95,["A bronze lion's head, set into the rock. A cold green flame burns above it.","The green flame gives off no heat at all."]);
     D(1195,535,80,()=>dunGo(16,200,560,1));}
@@ -139,7 +139,7 @@ function drawDun(){const R=DROOMS[DUN.room],im=IMG['dun'+DUN.room];if(!ready(im)
     if(CH===1&&jakInParty()&&JAKF){const kj=dunH(JAKF.y)/151;L.push([JAKF.y-1,()=>{ctx.save();ctx.translate(JAKF.x,JAKF.y);ctx.scale(kj,kj);ctx.translate(-JAKF.x,-JAKF.y);drawJakOW();ctx.restore();}]);}   /* Spar comes down into the rooms with Lum */
     if(CH>=2&&C2.joined){const ka=dunH(AMR.y)/151;L.push([AMR.y-1,()=>{ctx.save();ctx.translate(AMR.x,AMR.y);ctx.scale(ka,ka);ctx.translate(-AMR.x,-AMR.y);drawAmrOW(AMR,1);ctx.restore();}]);}
     if(DUN.room===7)L.push([614,()=>{const t=IMG.dun7_table;if(!ready(t))return;const hid=lum.y<614&&Math.abs(lum.x-945)<240;ctx.save();ctx.globalAlpha=hid?.62:1;ctx.drawImage(t,730,425);ctx.restore();}]);
-    if(DUN.room===14&&BO.dem>0)for(const s of [-1,1]){const dx=lum.x+s*125,dy=lum.y+4;L.push([dy,()=>drawDemonOW(dx,dy,-s,Math.min(1,BO.dem))]);}
+    if(DUN.room===14){for(const d of BO.ow)L.push([d.y,()=>drawDemonOW(d.x,d.y,d.face,d.a,d.mv)]);const g=BO.chaser;if(g)L.push([g.y,()=>drawDemonOW(g.x,g.y,g.face,g.a,g.mv)]);}
     L.sort((a,b)=>a[0]-b[0]);for(const [,f] of L)f();}
   if(DUN.room===14&&BO.a>0){ctx.fillStyle=`rgba(0,0,0,${BO.a*.55})`;ctx.fillRect(-2000,-500,5375,1800);}
   for(const p of PARTS)if(p.type==='fiz'||p.type==='puff'||p.type==='dust'){const k2=dunH(p.y)/151;ctx.save();ctx.translate(p.x,p.y);ctx.scale(k2,k2);ctx.translate(-p.x,-p.y);drawPartWell(p);ctx.restore();}
