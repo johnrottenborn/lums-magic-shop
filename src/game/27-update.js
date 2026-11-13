@@ -106,7 +106,7 @@ function update(dt){
   if(LUMSTONE){lum.talkSide=true;lum.face=1;lum.state='idle';lum.vx=lum.vy=0;}
   {const k_=SCENE+'|'+(SCENE==='dun'?DUN.room:''),jump=followSnap.x!==undefined&&Math.hypot(lum.x-followSnap.x,lum.y-followSnap.y)>160;
    if(k_!==followSnap.k||jump){if(followSnap.k!==undefined&&!(C2.on&&!C2.joined)){if(C2.joined)resetAmrFollow();if(jakInParty())resetJakFollow();}followSnap.k=k_;}followSnap.x=lum.x;followSnap.y=lum.y;}
-  if(C1I.on)updateC1Intro(dt);if(C2.on)updateC2(dt);updateAmrFollow(dt);
+  if(C1I.on)updateC1Intro(dt);if(C2.on)updateC2(dt);updateAmrFollow(dt);if(SCENE==='dun'&&CH===1)updateJakFollow(dt);
 }
 let c1LastScene='';
 

@@ -528,6 +528,15 @@ const CASES = {
     const f = await p.evaluate(() => { const g = window.__g; return { inParty: g.PARTY_ORDER.join(','), moved: !!g.JAKFX && Math.round(Math.hypot(g.JAKFX.x - g.JAKRESTX.x, g.JAKFX.y - g.JAKRESTX.y)), near: !!g.JAKFX && Math.round(Math.hypot(g.lum.x - g.JAKFX.x, g.lum.y - g.JAKFX.y)) }; });
     check(f.inParty === 'lum,spar' && f.moved > 30 && f.near < 220, 'Spar did not join and follow Lum: ' + JSON.stringify(f));
     await p.screenshot({ path: path.join(SHOTS, `spar-follow-${vp}.png`) });
+    // he goes with Lum through every room change: down into a room under Stranglethorn and back out
+    await p.evaluate(() => window.__g.enterDun(7, 700, 650, 1)); await wait(700);
+    const r7 = await p.evaluate(() => { const g = window.__g; return { scene: g.SCENE, d: Math.round(Math.hypot(g.JAKFX.x - g.lum.x, g.JAKFX.y - g.lum.y)) }; });
+    check(r7.scene === 'dun' && r7.d < 6, 'Spar did not arrive with Lum in the room: ' + JSON.stringify(r7));
+    await p.keyboard.down('ArrowRight'); await wait(1200); await p.keyboard.up('ArrowRight'); await wait(400);
+    await p.screenshot({ path: path.join(SHOTS, `spar-in-room-${vp}.png`) });
+    check(await p.evaluate(() => { const g = window.__g; return g.lum.x - g.JAKFX.x > 20; }), 'Spar did not follow Lum in the room');
+    await p.evaluate(() => { const g = window.__g; g.enterClearing(); g.lum.x = g.CLR.x0 + 300; g.lum.y = g.CLR.cy; }); await wait(600);
+    check(await p.evaluate(() => { const g = window.__g; return Math.hypot(g.JAKFX.x - g.lum.x, g.JAKFX.y - g.lum.y) < 6; }), 'Spar did not arrive with Lum back in Stranglethorn');
     // Spar can lead, alone
     await p.evaluate(() => { const g = window.__g; g.becomeSpar(g.lum.x, g.lum.y, 1, false); }); await wait(300);
     for (const k of ['ArrowRight', 'ArrowDown']) { await p.keyboard.down(k); await wait(500); await p.keyboard.up(k); } await wait(300);

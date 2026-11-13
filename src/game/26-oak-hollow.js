@@ -107,6 +107,7 @@ function drawDun(){const R=DROOMS[DUN.room],im=IMG['dun'+DUN.room];if(!ready(im)
   // characters, depth-sorted; the cellar's table is drawn over anyone standing behind it
   const k=dunH(lum.y)/151,here=DFOES.filter(g=>g.room===DUN.room);{const L=here.map(g=>[g.y,()=>drawDFoe(g)]);
     L.push([lum.y,()=>{ctx.save();ctx.translate(lum.x,lum.y);ctx.scale(k,k);ctx.translate(-lum.x,-lum.y);drawLum();ctx.restore();}]);
+    if(CH===1&&jakInParty()&&JAKF){const kj=dunH(JAKF.y)/151;L.push([JAKF.y,()=>{ctx.save();ctx.translate(JAKF.x,JAKF.y);ctx.scale(kj,kj);ctx.translate(-JAKF.x,-JAKF.y);drawJakOW();ctx.restore();}]);}   /* Spar comes down into the rooms with Lum */
     if(CH>=2&&C2.joined){const ka=dunH(AMR.y)/151;L.push([AMR.y,()=>{ctx.save();ctx.translate(AMR.x,AMR.y);ctx.scale(ka,ka);ctx.translate(-AMR.x,-AMR.y);drawAmrOW(AMR,1);ctx.restore();}]);}
     if(DUN.room===7)L.push([614,()=>{const t=IMG.dun7_table;if(!ready(t))return;const hid=lum.y<614&&Math.abs(lum.x-945)<240;ctx.save();ctx.globalAlpha=hid?.62:1;ctx.drawImage(t,730,425);ctx.restore();}]);
     L.sort((a,b)=>a[0]-b[0]);for(const [,f] of L)f();}
