@@ -58,10 +58,10 @@ function archPath(c,pad=0){c.beginPath();c.moveTo(ARCH.x0-pad,ARCH.y1+pad);c.lin
 function updateWorldbind10(dt){if(SCENE!=='dun'||DUN.room!==20){WB10.q=[0,0];return;}
   if(!WB10.st&&C2.joined&&lum.y>=598&&!FADE.dir&&!DLG.active){WB10.st=1;WB10.t=0;WEVENT.on=true;lum.state='idle';lum.vx=lum.vy=0;lum.face=1;if(lum.y<618)lum.y=618;resetAmrFollow();setupDun();try{sfxRumble(2.6,1);}catch(e){}}
   if(WB10.st===1){WB10.t+=dt;const t=WB10.t,amp=t<1.8?9*(1-t/2):0;WB10.q=[rnd(-amp,amp),rnd(-amp,amp)*.7];
-    if(t<1.4&&Math.random()<dt*40)WB10.rocks.push({x:rnd(ARCH.x0+10,ARCH.x1-10),y:rnd(200,260),vy:rnd(0,80),ground:rnd(560,620),s:rnd(5,13),rot:rnd(0,TAU),land:0});
+    if(t<1.4&&Math.random()<dt*40)WB10.rocks.push({x:rnd(ARCH.x0+10,ARCH.x1-10),y:rnd(200,260),vy:rnd(0,80),ground:rnd(560,620),s:rnd(9,22),rot:rnd(0,TAU),spin:rnd(-5,5),cell:Math.floor(rnd(0,7)),land:0});
     if(t>.35)WB10.fill=Math.min(1,WB10.fill+dt*.9);
     if(t>2.4){WB10.st=2;WB10.q=[0,0];WEVENT.on=false;}}
-  for(const p of WB10.rocks){if(p.land){p.land+=dt;continue;}p.vy+=900*dt;p.y+=p.vy*dt;p.rot+=dt*5;if(p.y>=p.ground){p.y=p.ground;p.land=.001;}}
+  for(const p of WB10.rocks){if(p.land){p.land+=dt;continue;}p.vy+=900*dt;p.y+=p.vy*dt;p.rot+=dt*p.spin;if(p.y>=p.ground){p.y=p.ground;p.land=.001;}}
   for(let i=WB10.rocks.length-1;i>=0;i--)if(WB10.rocks[i].land>(WB10.fill>=1?.3:1.2))WB10.rocks.splice(i,1);}
 /* the blocked archway, drawn over the room image (under the characters) */
 function drawWB10Rubble(){if(WB10.fill<=0)return;const im=IMG.worldbind_cliff;ctx.save();ctx.globalAlpha=WB10.fill;
@@ -75,8 +75,13 @@ function drawWB10Rubble(){if(WB10.fill<=0)return;const im=IMG.worldbind_cliff;ct
   ctx.fillStyle='rgba(10,30,48,.32)';ctx.fillRect(ARCH.x0-20,ARCH.cy-ARCH.r-20,ARCH.x1-ARCH.x0+40,ARCH.y1-ARCH.cy+ARCH.r+60);
   const g=ctx.createLinearGradient(0,ARCH.cy-ARCH.r,0,ARCH.y1);g.addColorStop(0,'rgba(0,0,0,.6)');g.addColorStop(.6,'rgba(0,0,0,.2)');g.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=g;ctx.fillRect(ARCH.x0-20,ARCH.cy-ARCH.r-20,ARCH.x1-ARCH.x0+40,ARCH.y1-ARCH.cy+ARCH.r+60);ctx.restore();
   /* a few boulders spilling onto the floor at the foot of the arch */
-  if(ready(im))for(const [bx,by,br] of [[785,606,26],[838,614,20],[893,610,30],[934,603,18]]){ctx.save();ctx.beginPath();ctx.ellipse(bx,by,br,br*.62,0,0,TAU);ctx.clip();ctx.drawImage(im,420+bx%60,160,br*3,br*2.2,bx-br,by-br*.7,br*2,br*1.4);ctx.fillStyle='rgba(10,30,48,.25)';ctx.fillRect(bx-br,by-br,br*2,br*2);ctx.restore();}
+  for(const [bx,by,br,cl,fl] of [[788,606,30,1,0],[842,616,24,2,1],[896,610,36,7,0],[936,602,20,4,1]]){ctx.save();ctx.translate(bx,by-br*.25);if(fl)ctx.scale(-1,1);drawStone(cl,br*2.6);ctx.restore();}
   ctx.restore();
-  /* falling stones and dust while it comes down */
-  ctx.save();for(const p of WB10.rocks){const a=p.land?Math.max(0,1-p.land/1.2):1;ctx.globalAlpha=a;ctx.fillStyle='#6b7783';ctx.strokeStyle='#26303a';ctx.lineWidth=1.5;ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.rot);ctx.beginPath();ctx.moveTo(-p.s,-p.s*.5);ctx.lineTo(p.s*.7,-p.s);ctx.lineTo(p.s,p.s*.6);ctx.lineTo(-p.s*.5,p.s);ctx.closePath();ctx.fill();ctx.stroke();ctx.restore();}
-  ctx.restore();if(WB10.st===1){const a=Math.max(0,.55-WB10.t*.2);for(let i=0;i<5;i++)drawGlow(ctx,ARCH.cx+(i-2)*55,ARCH.y1-30-i%2*40,(90+WB10.t*50)*(1+i%3*.2),'175,185,195',a);}}   /* a soft dust cloud */
+  /* falling stones (cut from the designer's rock tile, cooled to the passage's blue light) and dust while it comes down */
+  ctx.save();for(const p of WB10.rocks){const a=p.land?Math.max(0,1-p.land/1.2):1;ctx.globalAlpha=a;ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.rot);drawStone(p.cell,p.s*2.4);ctx.restore();}
+ctx.restore();if(WB10.st===1){const a=Math.max(0,.55-WB10.t*.2);for(let i=0;i<5;i++)drawGlow(ctx,ARCH.cx+(i-2)*55,ARCH.y1-30-i%2*40,(90+WB10.t*50)*(1+i%3*.2),'175,185,195',a);}}   /* a soft dust cloud */
+/* one stone from the rubble sheet (128px cells), tinted once to match the cool, dim passage */
+let STONES_COOL=null;
+function drawStone(i,size){const im=IMG.rubble_stones;if(!ready(im))return;if(!STONES_COOL){const c=document.createElement('canvas');c.width=im.width;c.height=im.height;const x=c.getContext('2d');x.drawImage(im,0,0);
+    x.globalCompositeOperation='multiply';x.fillStyle='#6f8796';x.fillRect(0,0,c.width,c.height);x.globalCompositeOperation='destination-in';x.drawImage(im,0,0);STONES_COOL=c;}
+  ctx.drawImage(STONES_COOL,i*128,0,128,128,-size/2,-size/2,size,size);}
