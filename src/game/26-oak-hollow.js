@@ -18,6 +18,8 @@ const DROOMS={
   11:{name:'Worldbind Passage',dark:.42,floor:[[175,205],[300,205],[330,280],[420,330],[560,420],[680,500],[790,590],[900,610],[1040,590],[1100,520],[1200,500],[1230,600],[1170,690],[1000,740],[860,768],[470,768],[400,660],[300,520],[220,400],[165,290]],
      light:[240,170,190]},   /* Chapter 2: beyond the gatehouse arch. Stairs down from the archway (top left); a tunnel leads on (right) */
   12:{name:'Worldbind Passage',dark:.4,floor:[[120,500],[260,505],[420,540],[600,545],[800,545],[980,540],[1130,505],[1290,500],[1300,560],[1270,640],[1180,720],[1000,768],[350,768],[180,700],[110,610]]},   /* tunnels left (back to the stairs) and right (on into the mountain); torches either side */
+  13:{name:'Worldbind Passage',dark:.42,floor:[[468,200],[615,200],[605,300],[645,400],[705,500],[825,580],[1000,600],[1150,600],[1185,680],[1110,768],[560,768],[430,650],[330,565],[240,455],[238,345],[300,300],[440,245]],
+     light:[540,120,200]},   /* arrive at the top entrance (back to room 2); stairs down to a landing */
   5:{name:'Deeproot',sub:'turn back',dark:.86,floor:[[420,768],[480,640],[560,580],[620,540],[700,540],[800,580],[950,620],[1050,700],[1080,768]]}};
 const EYES5=[[200,144],[290,106],[275,181],[331,319],[500,140],[652,129],[625,238],[731,190],[512,422],[612,444],[212,481],[212,512],[440,275],[420,412],[610,282]];
 function dunFree(x,y){const R=DROOMS[DUN.room];if(!inPoly(x,y,R.floor))return false;for(const b of (R.block||[]))if(((x-b.x)/b.rx)**2+((y-b.y)/b.ry)**2<1)return false;return true;}
@@ -42,8 +44,9 @@ function setupDun(){DUNINT.length=0;const r=DUN.room,D=(x,y,reach,fn)=>DUNINT.pu
 }
   if(r===11){D(238,215,70,()=>goScene(()=>{SCENE='thorn';lum.x=CPATH.xt;lum.y=CPATH.ytop+95;lum.face=1;lum.state='idle';lum.vx=lum.vy=0;cam.x=lum.x;cam.y=lum.y-50;THORN.t=99;AMR.x=lum.x-50;AMR.y=lum.y+20;}));
     D(1150,560,90,()=>dunGo(12,200,560,1));}
-  if(r===12){D(150,520,80,()=>dunGo(11,1110,575,-1));L(1250,520,80,["The tunnel runs on into the dark, deeper under the mountains.","A cold draught breathes out of the tunnel."]);
-    L(730,545,110,["Old stonework, set into the rock. Someone built this passage long ago.","The stones are cold and damp. Roots have pushed through the mortar."]);}
+  if(r===12){D(150,520,80,()=>dunGo(11,1110,575,-1));D(1250,520,80,()=>dunGo(13,540,240,1));}
+  if(r===13){D(540,210,70,()=>dunGo(12,1215,540,-1));L(470,610,70,["A worn stone marker. The carving has crumbled away."]);}
+  if(r===12){L(730,545,110,["Old stonework, set into the rock. Someone built this passage long ago.","The stones are cold and damp. Roots have pushed through the mortar."]);}
   if(r===2){D(175,590,64,()=>dunGo(1,1240,600,-1));D(1270,590,64,()=>dunGo(3,290,540,1));L(700,655,80,["The roots here are so thick they look woven together.","Purple fungus on the ceiling. Glowmold. Lovely in a powder, if only I could reach it."]);}
   if(r===3){D(270,525,60,()=>dunGo(2,1240,600,-1));
     DUNINT.push({x:700,y:540,reach:66,dynDoor:1,get door(){return !!C1.webCut},onInteract:webInteract});
