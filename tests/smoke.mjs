@@ -443,6 +443,10 @@ const CASES = {
     await p.keyboard.down('ArrowDown'); await p.keyboard.down('ArrowRight'); await wait(2600); await p.keyboard.up('ArrowDown'); await p.keyboard.up('ArrowRight'); await wait(400);
     check(await g_(() => window.__g.lum.y > 400), 'Lum could not walk down room 5\'s stairs');
     await p.screenshot({ path: path.join(SHOTS, `worldbind-room5-${vp}.png`) });
+    await g_(() => { const g = window.__g; g.lum.x = 1180; g.lum.y = 545; }); await wait(600);
+    await g_(() => window.__g.NEAR.onInteract()); await wait(2200);
+    check(await g_(() => window.__g.SCENE === 'dun' && window.__g.DUNX.room === 16), 'room 5 did not lead to room 6');
+    await p.screenshot({ path: path.join(SHOTS, `worldbind-room6-${vp}.png`) });
   },
   async 'ch2-clearing'(p) {
     // Chapter 2 opens in the big round clearing; the path east then north reaches the gatehouse
