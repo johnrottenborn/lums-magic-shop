@@ -112,7 +112,10 @@ const followSnap={};
 /* Worldbind room 2, first visit: the first torch is out. Amroth walks over, explains, and relights it */
 function c2TorchScene(){if(C2.torchLit||C2.torchScene||DUN.room!==12)return;C2.torchScene=1;WEVENT.on=true;
   setTimeout(()=>talk([['Amroth',"Hm. The first torch has gone out."],['Amroth',"Keeping these torches lit is my job, too."]],false,()=>{C2.torchWalk=1;}),900);}
-function updateC2Torch(dt){if(SCENE!=='dun'||DUN.room!==12)return;if(!C2.torchLit&&!C2.torchScene&&C2.joined&&!FADE.dir)c2TorchScene();
+function updateC2Torch(dt){
+  /* Worldbind room 3, first visit: Amroth reassures Lum about the bats */
+  if(SCENE==='dun'&&DUN.room===13&&C2.joined&&!C2.batLine&&!FADE.dir&&!DLG.active){C2.batLine=1;WEVENT.on=true;setTimeout(()=>talk([['Amroth',"We may see a few small bats, but the passage is safe."]],false,()=>{WEVENT.on=false;}),900);}
+  if(SCENE!=='dun'||DUN.room!==12)return;if(!C2.torchLit&&!C2.torchScene&&C2.joined&&!FADE.dir)c2TorchScene();
   if(C2.torchWalk){if(amrWalk(150,500,90,dt)){C2.torchWalk=0;AMR.dir='side';AMR.face=-1;AMR.moving=0;setTimeout(()=>{C2.torchLit=1;C2.lightT=0;try{sfxIgnite();}catch(e){}
       setTimeout(()=>talk([['Amroth',"There. That's better."]],false,()=>{WEVENT.on=false;resetAmrFollow();AMR.x=150;AMR.y=500;}),900);},500);}}
   if(C2.lightT!=null&&C2.lightT<1)C2.lightT+=dt*1.5;}

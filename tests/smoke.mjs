@@ -441,6 +441,10 @@ const CASES = {
     await g_(() => { const g = window.__g; g.lum.x = 1220; g.lum.y = 540; }); await wait(600);
     await g_(() => window.__g.NEAR.onInteract()); await wait(2200);
     check(await g_(() => window.__g.SCENE === 'dun' && window.__g.DUNX.room === 13 && window.__g.lum.y < 300), 'room 2 did not lead to the top of room 3');
+    await wait(1000); { const l = await g_(() => window.__g.DLG.active && window.__g.DLG.lines[0]); check(l && l[0] === 'Amroth' && /small bats/.test(l[1]), 'Amroth did not mention the bats in room 3: ' + JSON.stringify(l)); }
+    await p.screenshot({ path: path.join(SHOTS, `worldbind-room3-bats-${vp}.png`) });
+    for (let i = 0; i < 3 && await g_(() => window.__g.DLG.active); i++) { await p.keyboard.press('Enter'); await wait(400); }
+    await wait(300);
     await p.keyboard.down('ArrowDown'); await wait(2500); await p.keyboard.up('ArrowDown'); await wait(400);
     check(await g_(() => window.__g.lum.y > 380), 'Lum could not walk down room 3\'s stairs');
     await p.screenshot({ path: path.join(SHOTS, `worldbind-room3-${vp}.png`) });
