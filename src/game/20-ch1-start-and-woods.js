@@ -6,6 +6,8 @@ const C1ATL={"jak": {"cw": 560, "ch": 300, "rows": {"idle": [0, 5], "walk": [1, 
 const C1={hedgeSeen:0,tracksSeen:0,cemSeen:0,reaper:0,vane:0,endSeen:0,woodsSeen:0};
 const WFOES=[];let REAPER=null,VANE=null;
 C1ATL.fox_red=C1ATL.fox;C1ATL.spider_dark=C1ATL.spider;
+C1ATL.amroth={"cw":230,"ch":256,"rows":{"down":[0,1],"up":[1,2],"side":[2,6],"run":[3,6],"bidle":[4,2],"bslash":[5,3]}}; // Amroth: visor always closed. down (1 frame), up, side walk + run (face right), battle guard, sword slash (faces right)
+const AMR_H=150;
 C1ATL.spar={"cw": 261, "ch": 306, "rows": {"down": [0, 5], "up": [1, 5], "side": [2, 5], "bidle": [3, 4], "brun": [4, 5]}}; // Spar: down/up/side walks (side faces right), battle idle + run with his sword (run faces left)
 const SPAR_H=139,SPAR_BH=164; // overworld / battle draw heights (a head taller than Lum)
 function c1Frame(c,sh,anim,i,x,y,h,flip,alpha,flash){const im=IMG[sh],A=C1ATL[sh];if(!ready(im)||!A.rows[anim])return;const [r,n]=A.rows[anim];i=clamp(i|0,0,n-1);const k=h/A.ch;

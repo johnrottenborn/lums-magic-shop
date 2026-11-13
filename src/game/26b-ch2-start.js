@@ -1,7 +1,7 @@
 /* ---------- Chapter 2: The Ashes of Awakening ----------
    Opens in the clearing where Chapter 1 ended (CLR in 21-stranglethorn). Scene 1: narration on black. Scene 2: light rain; Amroth the gatekeeper
    comes out of his gatehouse, walks down to the clearing, frees Lum from the stone, finds a baby in Spar's ashes, and joins Lum.
-   Amroth is drawn with Spar's sprite as a stand-in until his art arrives. He follows Lum but has no battle role (not in PARTY_ORDER).
+   Amroth (his own sprite, face always hidden in his helmet) follows Lum but has no battle role yet (not in PARTY_ORDER).
    No saving yet. */
 const C2={on:false,st:0,t:0,w:0,narr:-1,na:0,cam:null,title:0,heal:0,mound:1,shake:0,joined:0};
 const AMR={x:0,y:0,face:1,dir:'side',moving:0,ph:0,a:1};
@@ -90,3 +90,7 @@ function drawAshMound(){if(CH<2||C2.mound<=0)return;const m=C2.mound,sh=C2.shake
   if(C2.shake)for(let i=0;i<5;i++){const t=(T*1.4+i/5)%1;ctx.fillStyle=`rgba(70,66,64,${.6*(1-t)})`;ctx.beginPath();ctx.arc(x+(hash(i,7,505)-.5)*60,y-10-t*30,2.4,0,TAU);ctx.fill();}ctx.restore();}
 /* tests: jump past the opening straight to walking with Amroth */
 function c2Skip(){if(!C2.on)return;DLG.active=false;C2.narr=-1;LUMSTONE=0;NIGHT.rain=true;c2Finish();C2.title=0;}
+/* Amroth on the map: walking side frames face right (flipped for left); facing down is a single pose that bobs as he walks */
+function drawAmrOW(F,alpha){if(!F||alpha<=0)return;const an=F.dir==='up'?'up':F.dir==='down'?'down':'side',n=C1ATL.amroth.rows[an][1],fi=F.moving?Math.floor((F.ph||0)/18)%n:0,bob=F.moving&&an==='down'?Math.abs(Math.sin((F.ph||0)*.09))*-4:0;
+  ctx.save();ctx.globalAlpha*=alpha;ctx.fillStyle='rgba(10,10,20,.28)';ctx.beginPath();ctx.ellipse(F.x,F.y,26,8,0,0,TAU);ctx.fill();ctx.restore();
+  c1Frame(ctx,'amroth',an,an==='side'||an==='up'?fi:0,F.x,F.y+bob,AMR_H,an==='side'&&F.face<0,alpha,0);}
