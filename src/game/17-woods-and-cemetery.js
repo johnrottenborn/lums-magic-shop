@@ -14,7 +14,22 @@ function buildPath(P,w0,seed,taper){const pts=splinePts(P,18),L=[],R=[],ruts=[[]
     for(const sd of [-1,1])if(hash(i,7+sd,seed)<.6){const o=sd*(w/2+(hash(i,9+sd,seed)-.6)*14);tufts.push([x+nx*o,y+ny*o*.85,6+hash(i,11+sd,seed)*8,hash(i,13+sd,seed)]);}}
   return {pts,L,R,ruts,stones,tufts};}
 function polyPath(c,A,B){c.beginPath();A.forEach(([x,y],i)=>i?c.lineTo(x,y):c.moveTo(x,y));for(let i=B.length-1;i>=0;i--)c.lineTo(B[i][0],B[i][1]);c.closePath();}
+/* dirt paths are painted from the designer's dirt art (dirt_patches: feathered pieces cut from it), baked once per path into an image:
+   a soft worn edge, a feathered dirt base, then overlapping dirt pieces only where the base is (so the edges stay soft). Grass tufts are drawn live on top. */
+function bakePath(P){const im=IMG.dirt_patches;if(!ready(im))return null;const SC=1.4,pad=60;let bx0=1e9,by0=1e9,bx1=-1e9,by1=-1e9;for(const [x,y] of P.L.concat(P.R)){bx0=Math.min(bx0,x);by0=Math.min(by0,y);bx1=Math.max(bx1,x);by1=Math.max(by1,y);}
+  bx0-=pad;by0-=pad;bx1+=pad;by1+=pad;const cv_=document.createElement('canvas');cv_.width=Math.ceil((bx1-bx0)*SC);cv_.height=Math.ceil((by1-by0)*SC);const c=cv_.getContext('2d');c.setTransform(SC,0,0,SC,-bx0*SC,-by0*SC);
+  c.save();c.filter='blur(12px)';polyPath(c,P.L,P.R);c.fillStyle='rgba(70,52,30,.32)';c.fill();c.restore();
+  c.save();c.filter='blur(4px)';polyPath(c,P.L,P.R);c.fillStyle='#8a6a48';c.fill();c.restore();
+  c.save();c.globalCompositeOperation='source-atop';const n=im.naturalWidth/im.naturalHeight|0,ps=im.naturalHeight,use=5;let acc=99,k=0;
+  for(let i=1;i<P.pts.length;i++){acc+=Math.hypot(P.pts[i][0]-P.pts[i-1][0],P.pts[i][1]-P.pts[i-1][1]);if(acc<46)continue;acc=0;const [x,y]=P.pts[i],a=P.pts[Math.max(0,i-1)],b=P.pts[Math.min(P.pts.length-1,i+1)];
+    let nx=-(b[1]-a[1]),ny=b[0]-a[0];const d=Math.hypot(nx,ny)||1;nx/=d;ny/=d;const w=Math.hypot(P.L[i][0]-P.R[i][0],P.L[i][1]-P.R[i][1]);
+    for(const o of [-.28,0,.28]){k++;const j=Math.floor(hash(k,1,77)*use)%Math.max(1,Math.min(use,n)),sz=w*(.7+hash(k,2,77)*.35),px=x+nx*o*w+(hash(k,3,77)-.5)*14,py=y+ny*o*w*.85+(hash(k,4,77)-.5)*10;
+      c.save();c.translate(px,py);c.rotate((hash(k,5,77)-.5)*.9);if(hash(k,6,77)<.5)c.scale(-1,1);c.drawImage(im,j*ps,0,ps,ps,-sz/2,-sz/2,sz,sz);c.restore();}}
+  c.restore();return {c:cv_,x:bx0,y:by0,w:bx1-bx0,h:by1-by0};}
 function drawPath(P,x0,x1){const c=ctx;
+  if(P.bake===undefined||P.bake===null)P.bake=bakePath(P);
+  if(P.bake){const B=P.bake;c.drawImage(B.c,B.x,B.y,B.w,B.h);
+    c.save();c.strokeStyle='rgba(70,110,50,.9)';c.lineWidth=1.6;c.lineCap='round';for(const [x,y,h,v] of P.tufts){if(x<x0-20||x>x1+20)continue;const sw=Math.sin(T*1.5+x*.02)*1.5;c.beginPath();for(let k=-2;k<=2;k++){c.moveTo(x+k*2.2,y);c.quadraticCurveTo(x+k*3+sw,y-h*.6,x+k*4.5+sw*1.5,y-h*(1-Math.abs(k)*.15));}c.stroke();}c.restore();return;}
   // worn grass halo, then the dirt itself in two washes
   c.save();c.lineJoin='round';c.lineCap='round';
   polyPath(c,P.L,P.R);c.strokeStyle='rgba(78,64,40,.32)';c.lineWidth=26;c.stroke();c.fillStyle='#86684a';c.fill();
