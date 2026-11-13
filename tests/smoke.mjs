@@ -469,7 +469,16 @@ const CASES = {
     for (let i = 0; i < 70 && !(await g_(() => window.__g.BO.dem > 0 && window.__g.BO.lt >= 1)); i++) await wait(200);
     check(await g_(() => window.__g.BO.L && window.__g.BO.dem > 0), 'the left torch was not relit with the demons revealed');
     await p.screenshot({ path: path.join(SHOTS, `worldbind-room4-demons-${vp}.png`) });
-    for (let i = 0; i < 40 && await g_(() => window.__g.WEVENT.on); i++) await wait(200);
+    // a battle starts: Lum and Amroth against two demons that hurl fire
+    for (let i = 0; i < 30 && !(await g_(() => window.__g.BATTLE.on)); i++) await wait(200);
+    { const b = await g_(() => { const B = window.__g.BATTLE; return B.on && { foes: B.foes.map(f => f.type).join(','), heroes: B.heroes.map(h => h.id).join(',') }; });
+      check(b && b.foes === 'demon,demon' && b.heroes === 'lum,amroth', 'the demon battle did not start: ' + JSON.stringify(b)); }
+    for (let i = 0; i < 60 && (await g_(() => window.__g.BATTLE.phase)) !== 'foeLeap'; i++) await wait(100);
+    await wait(150); await p.screenshot({ path: path.join(SHOTS, `worldbind-demon-fire-${vp}.png`) });
+    await wait(1500); await p.screenshot({ path: path.join(SHOTS, `worldbind-demon-battle-${vp}.png`) });
+    await g_(() => { const B = window.__g.BATTLE; B.phase = 'win'; B.t = 1; B.rewarded = 0; });
+    for (let i = 0; i < 40 && (await g_(() => window.__g.BATTLE.on || window.__g.WEVENT.on)); i++) { await p.keyboard.press('Space'); await wait(300); }
+    check(await g_(() => !window.__g.BATTLE.on && window.__g.BO.done && window.__g.SCENE === 'dun'), 'winning the demon battle did not return to room 4');
     check(await g_(() => !window.__g.WEVENT.on), 'room 4 did not hand control back');
     await p.screenshot({ path: path.join(SHOTS, `worldbind-room4-${vp}.png`) });
     await g_(() => { const g = window.__g; g.lum.x = 1220; g.lum.y = 540; }); await wait(600);

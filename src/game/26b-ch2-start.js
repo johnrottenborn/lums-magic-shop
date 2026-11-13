@@ -135,11 +135,12 @@ function updateBlackout(dt){if(SCENE!=='dun'||DUN.room!==14){if(BO.st&&BO.st<9){
     if(BO.t>1.3&&!BO.said){BO.said=1;talk([['Lum',"Amroth? Do you hear something?"]],false,()=>{});}
     if(there&&BO.said&&!DLG.active){AMR.moving=0;go(4);}}
   else if(BO.st===4){if(BO.t>.6&&!BO.L){BO.L=1;BO.lt=0;BO.dem=1;try{sfxIgnite();}catch(e){}}if(BO.L){BO.lt=Math.min(1,BO.lt+dt*1.5);BO.a=Math.max(0,1-BO.lt);}
-    if(BO.t>2.4){go(9);BO.done=1;}}   /* what happens next waits on the demons' art and the designer's next beat */
-  else if(BO.st===9){if(BO.t>1.6){BO.dem=Math.max(0,BO.dem-dt);if(!BO.dem&&!BO.R){BO.R=1;BO.st=10;WEVENT.on=false;resetAmrFollow();}}}
+    if(BO.t>2.2){go(5);WEVENT.on=false;startEncounter({kind:'demon',scene:'dun',x:lum.x+125,y:lum.y,s:1,pack:2,calm:0,noFlee:1,
+      onWin:()=>{BO.dem=0;BO.R=1;BO.done=1;go(10);resetAmrFollow();},
+      onLose:()=>{for(const id of PARTY_ORDER)HEROES[id].hp=HEROES[id].maxHp;BO.st=0;BO.a=0;BO.L=BO.R=1;BO.lt=1;BO.dem=0;BO.said=0;BO.done=0;enterDun(14,200,560,1);resetAmrFollow();}},'ambush');}}
   if(BO.st>=3&&BO.st<9)lum.face=AMR.x<lum.x?-1:1;}
-/* stand-in demon: a dark horned shape with red eyes, until the real art comes */
-function drawDemonStandIn(x,y,face,a){const k=dunH(y)/151;ctx.save();ctx.globalAlpha=a;ctx.translate(x,y);ctx.scale(k*face,k);
-  ctx.fillStyle='rgba(0,0,0,.35)';ctx.beginPath();ctx.ellipse(0,0,34,9,0,0,TAU);ctx.fill();
-  ctx.fillStyle='#16101c';ctx.beginPath();ctx.moveTo(-30,0);ctx.quadraticCurveTo(-36,-80,-14,-118);ctx.lineTo(-22,-150);ctx.lineTo(-6,-126);ctx.quadraticCurveTo(0,-130,6,-126);ctx.lineTo(22,-150);ctx.lineTo(14,-118);ctx.quadraticCurveTo(36,-80,30,0);ctx.closePath();ctx.fill();
-  ctx.globalCompositeOperation='lighter';drawGlow(ctx,-9,-108,7,'255,60,40',.9*a);drawGlow(ctx,-25,-108,7,'255,60,40',.9*a);ctx.restore();}
+/* the two demons flanking Lum in the overworld (designer's art faces left; the one on her left is flipped to face her) */
+function drawDemonOW(x,y,face,a){const im=IMG.demon_imp;if(!ready(im)||CAPTURE.on)return;   /* kept out of the battle backdrop */
+  const k=dunH(y)/151,h=175*k,w=h*im.width/im.height,br=1+.02*Math.sin(T*2.6+x);
+  ctx.save();ctx.globalAlpha=a*.35;ctx.fillStyle='#000';ctx.beginPath();ctx.ellipse(x,y,40*k,10*k,0,0,TAU);ctx.fill();ctx.restore();
+  ctx.save();ctx.globalAlpha=a;ctx.translate(x,y);ctx.scale(face>0?-1:1,br);ctx.drawImage(im,-w/2,-h,w,h);ctx.restore();}

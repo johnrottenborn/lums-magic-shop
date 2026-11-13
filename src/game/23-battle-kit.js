@@ -4,7 +4,7 @@ const POWDER_LIST=[['spark','Sparkdust','Damage · unlimited',null],['frost','Fr
 const POWICON={spark:'icon4_sun_bottle',frost:'icon3_frost_bowl',thorn:'icon_pouch_rose',moon:'icon3_pastel_powders'};
 function drawPowderIcon(c,id,x,y,z){const im=IMG[POWICON[id]];if(ready(im)){c.drawImage(im,x-z/2,y-z/2,z,z);return true;}return false;}
 const PCOL={spark:'255,230,140',frost:'170,225,255',thorn:'170,220,120',moon:'200,170,255'};
-const WEAKTO={rslime:'frost',rvixen:'thorn',bigspider:'thorn',slime:'frost',jelly:'frost',fslime:'frost',slug:'frost',slugking:'frost',wisp:'frost',flora:'frost',spider:'thorn',vixen:'thorn',bigvixen:'thorn',bat:'spark',mimic:'spark',rskel:'moon',reaper:'moon',skel:'moon'};
+const WEAKTO={demon:'frost',rslime:'frost',rvixen:'thorn',bigspider:'thorn',slime:'frost',jelly:'frost',fslime:'frost',slug:'frost',slugking:'frost',wisp:'frost',flora:'frost',spider:'thorn',vixen:'thorn',bigvixen:'thorn',bat:'spark',mimic:'spark',rskel:'moon',reaper:'moon',skel:'moon'};
 const weakKnown=(t,p)=>WEAKTO[t]===p&&C1.weak&&C1.weak[t];
 function lumPowderHit(h,f,c){const B=BATTLE,S=bS(),st=heroStats(h.id),p=B.powder||'spark';let dmg=Math.max(1,st.atk+(c.nice?1:0)-f.def);const tp=foeCenter(f).top;const weak=WEAKTO[f.type]===p;
   if(h.chill){dmg=Math.max(1,dmg-1);h.chill=0;}
@@ -161,3 +161,17 @@ function drawBattleC1Foe(f){const S=bS(),B=BATTLE,x=f.x+f.ox,y=f.y+f.oy,sh=f.typ
     ctx.fillStyle='#fff';ctx.font='700 10px "Alegreya SC", Georgia, serif';ctx.textAlign='center';ctx.fillText(`${f.hp}/${f.max}`,bx+bw/2,by+20);ctx.restore();}
   if(B.phase==='target'&&B.foes[B.target]===f)tutArrow(ctx,f.x,f.y-H_*.95,1);}
 
+
+/* Worldbind demons: the designer's art (faces left), breathing, rearing back to wind up, then hurling a ball of fire at a hero */
+function drawBattleDemon(f){const S=bS(),B=BATTLE,im=IMG.demon_imp;if(!ready(im))return;const x=f.x+f.ox,y=f.y+f.oy,h=Math.min(235*S,W*.4)*(f.s||1),w=h*im.width/im.height,me=B.foes[B.foeI]===f;
+  let al=1;if(f.dead){al=Math.max(0,1-f.dead/.7);if(al<=0)return;}
+  const wind=me&&B.phase==='foeWind'?(f.wind||0):0,br=1+.015*Math.sin(T*2.4+f.ph);
+  bshadow(x,y,h*.22,h*.05,.35*al);
+  ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,x,y-h*.5,h*.55,'200,40,30',(.12+.05*Math.sin(T*3+f.ph))*al);ctx.restore();
+  ctx.save();ctx.globalAlpha=al;ctx.translate(x+(f.hit>0?Math.sin(f.hit*50)*5:0)+wind*10*S,y);ctx.rotate(wind*.08);ctx.scale(1,br);ctx.drawImage(im,-w/2,-h,w,h);ctx.restore();
+  /* fire gathers in the jaws as it winds up */
+  const mx=x-w*.2+wind*10*S,my=y-h*.8;if(wind>0){ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,mx,my,(16+40*wind)*S,'255,140,50',.5+.3*wind);drawGlow(ctx,mx,my,(6+14*wind)*S,'255,230,160',.8);ctx.restore();}
+  if(me&&B.phase==='foeLeap'&&B.t>=0&&f.tgt){const u=Math.min(1,B.t/B.leapD),tx=f.tgt.x+f.tgt.ox,ty=f.tgt.y-85*S,px=mx+(tx-mx)*u,py=my+(ty-my)*u-Math.sin(Math.PI*u)*40*S;
+    ctx.save();ctx.globalCompositeOperation='lighter';for(let k=0;k<8;k++){const v=u-k*.045;if(v<0)continue;drawGlow(ctx,mx+(tx-mx)*v,my+(ty-my)*v-Math.sin(Math.PI*v)*40*S,(26-k*2.8)*S,k<3?'255,170,70':'230,80,30',.75-k*.08);}
+    drawGlow(ctx,px,py,30*S,'255,235,170',.95);ctx.restore();drawFlames(ctx,px,py+16*S,70*S,.9);}
+  if(f.showHp>0&&!f.dead){const bw=60*S,bx=x-bw/2,by=y+16*S;ctx.save();ctx.globalAlpha=Math.min(1,f.showHp*3);ctx.fillStyle='rgba(20,20,30,.55)';rr(bx-2,by-2,bw+4,10,5);ctx.fill();ctx.fillStyle='#7ee08a';rr(bx,by,bw*f.hp/f.max,6,3);ctx.fill();ctx.restore();}}
