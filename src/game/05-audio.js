@@ -49,7 +49,7 @@ const NOTE=n=>440*Math.pow(2,(n-69)/12);
 const PROG=[[50,[62,66,69,73]],[47,[59,62,66,69]],[43,[55,59,62,66]],[45,[57,61,64,69]],[50,[62,66,69,74]],[54,[57,61,66,69]],[43,[55,59,64,67]],[45,[57,61,64,67]]];
 const MEL=[[78,-1,81,-1,78,76,-1,74],[76,-1,-1,74,73,-1,71,-1],[74,-1,79,-1,78,-1,74,-1],[76,-1,73,-1,69,-1,-1,-1],[78,-1,81,83,81,-1,78,-1],[76,-1,78,-1,73,-1,-1,-1],[74,76,79,-1,78,76,74,-1],[73,-1,76,-1,74,-1,-1,-1]];
 const ARP=[0,1,2,3,2,1,2,1],EIGHTH=60/64/2;
-function scheduleMusic(){if(BMUS.on){scheduleBattleMusic();return;}if(NIGHT.on){SND.nextNote=SND.ctx.currentTime+.1;return;}if(CH>0&&(SCENE==='woods'||SCENE==='dun'||SCENE==='thorn'||SCENE==='thgate')){scheduleWoodsMusic();return;}SND.wStep=0;const c=SND.ctx;while(SND.nextNote<c.currentTime+.25){const t=SND.nextNote,s=SND.step,bar=Math.floor(s/8)%PROG.length,e=s%8,[root,ch]=PROG[bar],section=Math.floor(s/64)%4;
+function scheduleMusic(){if(BMUS.on){scheduleBattleMusic();return;}if(NIGHT.on){SND.nextNote=SND.ctx.currentTime+.1;return;}if(SCENE==='dun'&&DUN.room>=11){scheduleWorldbindMusic();return;}if(CH>0&&(SCENE==='woods'||SCENE==='dun'||SCENE==='thorn'||SCENE==='thgate')){scheduleWoodsMusic();return;}SND.wStep=0;const c=SND.ctx;while(SND.nextNote<c.currentTime+.25){const t=SND.nextNote,s=SND.step,bar=Math.floor(s/8)%PROG.length,e=s%8,[root,ch]=PROG[bar],section=Math.floor(s/64)%4;
     if(e===0){pluck(t,NOTE(root-12),.22,2.6,SND.music,0,.5);pad(t,ch.slice(0,3).map(NOTE),EIGHTH*8+.4,.012);}
     if(e===4)pluck(t,NOTE(root),.12,1.8,SND.music,0,.5);
     pluck(t+(Math.random()-.5)*.012,NOTE(ch[ARP[e]]),.07+(e===0?.03:0),1.6,SND.music,(ARP[e]-1.5)*.25,.7);
@@ -117,3 +117,26 @@ function drawSoundBtn(){const x=W-28,y=28,r=17;ctx.save();ctx.globalAlpha=.75;ct
   if(SND.on){ctx.beginPath();ctx.arc(x+2,y,5,-.9,.9);ctx.stroke();ctx.beginPath();ctx.arc(x+2,y,9,-.9,.9);ctx.stroke();}
   else{ctx.beginPath();ctx.moveTo(x+4,y-4);ctx.lineTo(x+11,y+4);ctx.moveTo(x+11,y-4);ctx.lineTo(x+4,y+4);ctx.stroke();}ctx.restore();}
 
+/* ---------- the Worldbind Passage: grumbling, low, slow and haunting. Nothing upbeat ----------
+   Each 'bar' is ~7.5 s. A growling low drone (detuned saws through a slowly breathing low-pass, with a slow rumble wobble),
+   a minor chord that swells in and out like breath, a semitone that rubs against it now and then, a distant low bell,
+   and a far-off moan that slides down. */
+const WBPROG=[[33,[45,48,52]],[33,[44,48,51]],[31,[43,46,50]],[32,[44,47,51]]];
+function scheduleWorldbindMusic(){const c=SND.ctx,BAR=7.5;if(!SND.wbNext||SND.wbNext<c.currentTime-1)SND.wbNext=c.currentTime+.2;
+  while(SND.wbNext<c.currentTime+.5){const t=SND.wbNext,b=SND.wbBar||0,[root,ch]=WBPROG[b%WBPROG.length];SND.wbBar=b+1;SND.wbNext=t+BAR;
+    // the growl
+    const lp=c.createBiquadFilter();lp.type='lowpass';lp.Q.value=7;lp.frequency.setValueAtTime(90,t);lp.frequency.linearRampToValueAtTime(240,t+BAR*.45);lp.frequency.linearRampToValueAtTime(100,t+BAR+.6);
+    const g=c.createGain();g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.11,t+2);g.gain.setValueAtTime(.11,t+BAR-1.5);g.gain.linearRampToValueAtTime(0,t+BAR+.8);lp.connect(g);g.connect(SND.music);
+    const wob=c.createOscillator(),wg=c.createGain();wob.frequency.value=5.5+Math.random()*2;wg.gain.value=.04;wob.connect(wg);wg.connect(g.gain);wob.start(t);wob.stop(t+BAR+1);
+    for(const [n,d] of [[root-12,0],[root-12,-14],[root,9]]){const o=c.createOscillator();o.type='sawtooth';o.frequency.value=NOTE(n);o.detune.value=d;o.connect(lp);o.start(t);o.stop(t+BAR+1);}
+    // the breathing chord
+    pad(t+.6,ch.map(NOTE),BAR+1.2,.016);
+    // a semitone that rubs against it, every other bar
+    if(b%2===1){const o=c.createOscillator(),og=c.createGain();o.type='triangle';o.frequency.value=NOTE(ch[1]+1);og.gain.setValueAtTime(0,t+3);og.gain.linearRampToValueAtTime(.022,t+4.5);og.gain.linearRampToValueAtTime(0,t+7);o.connect(og);og.connect(SND.music);o.start(t+3);o.stop(t+7.2);}
+    // a distant low bell
+    if(b%2===0)bell(t+1.2,NOTE(root+12),.05,6,SND.music,-.3);
+    // a far-off moan sliding down
+    if(b%4===3){const o=c.createOscillator(),og=c.createGain(),f=c.createBiquadFilter();o.type='sine';o.frequency.setValueAtTime(NOTE(ch[2]+12),t+2);o.frequency.exponentialRampToValueAtTime(NOTE(ch[2]+5),t+6);
+      const v=c.createOscillator(),vg=c.createGain();v.frequency.value=4.5;vg.gain.value=6;v.connect(vg);vg.connect(o.frequency);f.type='bandpass';f.frequency.value=700;f.Q.value=1.5;
+      og.gain.setValueAtTime(0,t+2);og.gain.linearRampToValueAtTime(.03,t+3.4);og.gain.linearRampToValueAtTime(0,t+6.2);o.connect(f);f.connect(og);og.connect(SND.music);o.start(t+2);v.start(t+2);o.stop(t+6.4);v.stop(t+6.4);}}
+  SND.nextNote=c.currentTime+.1;}
