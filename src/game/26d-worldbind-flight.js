@@ -11,11 +11,12 @@ function demonArt(brown){const im=IMG.demon_imp;if(!brown||!ready(im))return im;
   const c=document.createElement('canvas');c.width=im.width;c.height=im.height;const x=c.getContext('2d');x.drawImage(im,0,0);
   x.globalCompositeOperation='multiply';x.fillStyle='#a8865a';x.fillRect(0,0,c.width,c.height);x.globalCompositeOperation='destination-in';x.drawImage(im,0,0);
   return DEMON_BROWN=c;}
-function wb5Chaser(){const [sx,sy]=DUN.room===16||DUN.room===18?nearestFree(150,560):DUN.room===17?nearestFree(422,236):nearestFree(425,236);   /* from the room's entrance */
-  WB5.chaser={kind:'demon',scene:'dun',x:sx,y:sy,face:1,s:1,pack:1,calm:0,a:0,ti:0,
+function wb5Chaser(){const r9=DUN.room===19,[sx,sy]=DUN.room===16||DUN.room===18?nearestFree(150,560):DUN.room===17||r9?nearestFree(422,236):nearestFree(425,236);   /* room 9: a pack of three, slower */   /* from the room's entrance */
+  WB5.chaser={kind:'demon',pack:r9?3:1,trio:r9,hist:[],scene:'dun',x:sx,y:sy,face:1,s:1,calm:0,a:0,ti:0,
   onWin:()=>{WB5.chaser=null;WB5.respawn=1.2;runLine();},onLose:()=>{boHeal();WB5.chaser=null;WB5.respawn=2.5;[lum.x,lum.y]=nearestFree(1000,620);lum.face=1;resetAmrFollow();}};}
 /* a brown demon from the room's right-hand entrance: room 5's (lion torch) drops a potion, room 7's (raven torch) two */
-function wb5Brown(){const [bx,by]=nearestFree(DUN.room===17?1190:1215,540),r7=DUN.room===17;WB5.brown={kind:'bdemon',scene:'dun',x:bx,y:by,face:-1,s:1,pack:1,calm:0,a:0,big:1,over:r7?{loot:['potion','potion']}:undefined,
+function wb5Brown(){const [bx,by]=nearestFree(DUN.room===15?1215:1190,540),r7=DUN.room===17||DUN.room===19;   /* rooms 7 and 9 drop two potions */
+  WB5.brown={kind:'bdemon',scene:'dun',x:bx,y:by,face:-1,s:1,pack:1,calm:0,a:0,big:1,over:r7?{loot:['potion','potion']}:undefined,
   onWin:()=>{WB5.brown=null;WB5.brownLeft=0;setTimeout(()=>talk([['Amroth',"Keep running!"]]),900);},
   onLose:()=>{boHeal();WB5.brown.calm=3;[WB5.brown.x,WB5.brown.y]=nearestFree(1215,540);[lum.x,lum.y]=nearestFree(640,620);lum.face=1;resetAmrFollow();}};WB5.brownLeft=DUN.room;}
 /* demons walk only where Lum can walk: a 20px grid of the room's walkable floor (dunFree), searched breadth-first toward their target */
@@ -42,7 +43,7 @@ function demonStep(g,tx,ty,sp,dt){const d0=Math.hypot(tx-g.x,ty-g.y);if(d0<3){g.
 const wbQuaking=()=>SCENE==='dun'&&DUN.room>=15&&DUN.room<=20&&!(DUN.room===20&&WB10.st);
 function updateWorldbind5(dt){
   if(!wbQuaking()){WB5.fall.length=0;WB5.q=[0,0];}else{if(WB5.qRoom!==DUN.room){WB5.qRoom=DUN.room;WB5.fall.length=0;}wbQuake(dt);}
-  if(SCENE!=='dun'||DUN.room<15||DUN.room>18){WB5.chaser=null;WB5.trail.length=0;if(WB5.brown){WB5.brown=null;}WB5.room=0;return;}
+  if(SCENE!=='dun'||DUN.room<15||DUN.room>19){WB5.chaser=null;WB5.trail.length=0;if(WB5.brown){WB5.brown=null;}WB5.room=0;return;}
   if(WB5.room!==DUN.room){WB5.room=DUN.room;WB5.chaser=null;WB5.brown=null;WB5.respawn=.8;}   /* (a brown demon left alive comes back from the right when you return) */   /* a new room: its demons come from its own entrance */
   updateWB5Room(dt);}
 /* the line after beating one of the endless demons (rooms 4, 5, 6): Lum and Amroth take turns */
@@ -60,10 +61,11 @@ function updateWB5Room(dt){
   /* Lum's path through the room, for the demons to follow down the stairs */
   const tr=WB5.trail,lt=tr[tr.length-1];if(!lt||Math.hypot(lum.x-lt[0],lum.y-lt[1])>14)tr.push([lum.x,lum.y]);
   /* a third of the way in (down the stairs, ~880 long in all): Amroth's warning, then the demons start coming */
-  const r6=DUN.room===16,r7=DUN.room===17,r8=DUN.room===18,key='said'+DUN.room,on=WB5[key];
+  const r6=DUN.room===16,r7=DUN.room===17,r8=DUN.room===18,r9=DUN.room===19,key='said'+DUN.room,on=WB5[key];
   if(r8)updateWB8(dt);
-  if(!on&&C2.joined&&!FADE.dir&&!DLG.active&&(r6||r8?lum.x>687:Math.hypot(lum.x-(r7?422:425),lum.y-230)>=290)){WEVENT.on=true;lum.state='idle';lum.vx=lum.vy=0;WB5[key]=1;
-    if(r8)talk([['Amroth',"I feel the presence of evil."],['Lum',"Something wretched is coming…"]],false,()=>{WEVENT.on=false;WB5.respawn=.6;});   /* room 8, halfway */
+  if(!on&&C2.joined&&!FADE.dir&&!DLG.active&&(r6||r8?lum.x>687:Math.hypot(lum.x-(r7||r9?422:425),lum.y-230)>=(r9?440:290))){WEVENT.on=true;lum.state='idle';lum.vx=lum.vy=0;WB5[key]=1;
+    if(r9)talk([['Amroth',"The exit is just ahead…"]],false,()=>{WEVENT.on=false;WB5.respawn=.6;});   /* room 9, halfway */
+    else if(r8)talk([['Amroth',"I feel the presence of evil."],['Lum',"Something wretched is coming…"]],false,()=>{WEVENT.on=false;WB5.respawn=.6;});   /* room 8, halfway */
     else if(r7)talk([['Lum',"This place is going to collapse!"],['Amroth',"We’re not far from the exit."]],false,()=>{WEVENT.on=false;WB5.respawn=.6;});   /* room 7, a third of the way in */
     else if(r6){try{sfxBabyCry(.8);}catch(e){}   /* room 6, halfway across: the baby cries */
       setTimeout(()=>talk([['Amroth',"Are the demons coming after this baby?"]],false,()=>{WEVENT.on=false;WB5.respawn=.6;}),1100);}
@@ -73,12 +75,12 @@ function updateWB5Room(dt){
   if(WB5.brownLeft===DUN.room&&!WB5.brown)wb5Brown();
   for(const g of [WB5.chaser,WB5.brown]){if(!g||g.boss)continue;g.a=Math.min(1,g.a+dt*2);if(g.calm>0){g.calm-=dt;g.mv=0;continue;}if(WEVENT.on||DLG.active){g.mv=0;continue;}
     const d=Math.hypot(lum.x-g.x,lum.y-g.y);
-    if(g===WB5.chaser)demonStep(g,lum.x,lum.y,118,dt);
+    if(g===WB5.chaser){demonStep(g,lum.x,lum.y,g.trio?70:118,dt);if(g.trio){const h=g.hist,l=h[h.length-1];if(!l||Math.hypot(g.x-l[0],g.y-l[1])>6){h.push([g.x,g.y]);if(h.length>40)h.shift();}}}
     else demonStep(g,lum.x,lum.y,100,dt);
     if(d<(g.big?80:62)&&lum.bumpT<=0){startEncounter(g,'ambush');break;}}}
 /* the green-flame torches: touch to light them brighter (the lion's also wakes the brown demon) */
 function touchWBTorch(k,lines){if(WBT[k]){say(lines[0]);return;}WBT[k]=1;WBT.flare[k]=1;try{sfxIgnite();}catch(e){}
-  if(k==='lion'||k==='raven')setTimeout(()=>{if(SCENE==='dun'&&DUN.room===(k==='lion'?15:17))wb5Brown();},900);}
+  setTimeout(()=>{if(SCENE==='dun'&&DUN.room===({lion:15,raven:17,serpent:19})[k])wb5Brown();},900);}
 function wbTorchGlow(room,px,py,rz){const k=room===15?'lion':room===17?'raven':'serpent';if(!WBT[k])return;const f=WBT.flare[k]||0;if(f>0)WBT.flare[k]=Math.max(0,f-1/60);
   drawGlow(ctx,px,py,(230+12*Math.sin(T*6))*rz,'110,255,200',.3);drawGlow(ctx,px,py,70*rz,'210,255,235',.45);if(f>0)drawGlow(ctx,px,py,300*rz,'200,255,230',f*.8);}
 /* dust streams and pebbles falling in room 5, drawn in room coordinates */
@@ -137,3 +139,5 @@ function updateWB8(dt){
       onLose:()=>{boHeal();const b=WB8.boss;[b.x,b.y]=nearestFree(1285,525);b.a=1;[lum.x,lum.y]=nearestFree(900,600);lum.face=1;resetAmrFollow();WEVENT.on=true;}};}
   const b=WB8.boss;if(b&&!BATTLE.on&&!BATTLE.pending&&!WIPE.dir&&!FADE.dir){b.a=Math.min(1,b.a+dt*1.2);
     if(b.a>.6&&!DLG.active){const d=Math.hypot(lum.x-b.x,lum.y-b.y);if(d>95)demonStep(b,lum.x,lum.y,70,dt);else{b.mv=0;WEVENT.on=false;startEncounter(b,'normal');}}}}
+/* the two demons trailing room 9's pack leader, spaced along its path */
+function trioPos(g){const h=g.hist,out=[];for(const back of [8,16]){const p=h[Math.max(0,h.length-1-back)]||[g.x,g.y];out.push(p);}return out;}

@@ -163,7 +163,7 @@ function drawBattleC1Foe(f){const S=bS(),B=BATTLE,x=f.x+f.ox,y=f.y+f.oy,sh=f.typ
 
 
 /* Worldbind demons: the designer's art (faces left), breathing, rearing back to wind up, then hurling a ball of fire at a hero */
-function drawBattleDemon(f){const S=bS(),B=BATTLE,bg=f.type==='bdemon',im=demonArt(bg);if(!ready(im))return;const x=f.x+f.ox,y=f.y+f.oy,h=Math.min(235*S*(bg?1.5:1),W*(bg?.58:.4))*(f.s||1),w=h*im.width/im.height,me=B.foes[B.foeI]===f;
+function drawBattleDemon(f){const S=bS(),B=BATTLE,bg=f.type==='bdemon',im=demonArt(bg);if(!ready(im))return;const x=f.x+f.ox,y=f.y+f.oy,h=Math.min(235*S*(bg?1.5:1),W*(bg?.58:.4))*(f.s||1)*(B.foes.length>=3?.8:1),   /* a pack of three is drawn a little smaller so it fits */w=h*im.width/im.height,me=B.foes[B.foeI]===f;
   let al=1;if(f.dead){al=Math.max(0,1-f.dead/.7);if(al<=0)return;}
   const wind=me&&B.phase==='foeWind'?(f.wind||0):0,br=1+.015*Math.sin(T*2.4+f.ph);
   bshadow(x,y,h*.22,h*.05,.35*al);
