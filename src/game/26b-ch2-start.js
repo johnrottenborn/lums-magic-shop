@@ -130,10 +130,10 @@ function updateC2Torch(dt){updateBlackout(dt);updateWorldbind5(dt);updateWorldbi
 const BO={st:0,t:0,a:0,L:1,R:1,lt:1,ow:[],done:0,lock:0,chaser:null};
 function boHeal(){for(const id of PARTY_ORDER)HEROES[id].hp=HEROES[id].maxHp;}
 /* after the two fights a demon keeps coming from the left (room 3's side): running right gets away, beating it brings another */
-function spawnChaser(){BO.chaser={kind:'demon',scene:'dun',x:40,y:575,face:1,s:1,pack:1,calm:0,ph:0,a:0,
-  onWin:()=>{BO.chaser=null;BO.respawn=1.2;BO.wins=(BO.wins||0)+1;   /* after every fight with the left-side demons, a nudge to keep going (taking turns) */
-    setTimeout(()=>talk([BO.wins%2?['Lum',"There’s too many! We need to run…"]:['Amroth',"Let’s move quickly!"]]),700);},onLose:()=>{boHeal();BO.chaser=null;BO.respawn=2;lum.x=900;lum.y=575;lum.face=1;resetAmrFollow();}};}
-function demonPair(){const y=lum.y+4;return [{x:lum.x-125,y,face:1,a:.001},{x:lum.x+125,y,face:-1,a:.001}];}
+function spawnChaser(){const [sx,sy]=nearestFree(150,540);BO.chaser={kind:'demon',scene:'dun',x:sx,y:sy,face:1,s:1,pack:1,calm:0,ph:0,a:0,
+  onWin:()=>{BO.chaser=null;BO.respawn=1.2;runLine();},   /* after every fight with the left-side demons, a nudge to keep going */onLose:()=>{boHeal();BO.chaser=null;BO.respawn=2;lum.x=900;lum.y=575;lum.face=1;resetAmrFollow();}};}
+const onFloor=(x,y)=>dunFree(x,y)?[x,y]:nearestFree(x,y);
+function demonPair(){return [-1,1].map(s=>{const [x,y]=onFloor(lum.x+s*125,lum.y+4);return {x,y,face:-s,a:.001};});}
 function updateBlackout(dt){if(SCENE!=='dun'||DUN.room!==14){if(BO.st&&BO.st<9){BO.st=0;BO.a=0;BO.L=BO.R=1;BO.lt=1;BO.ow=[];WEVENT.on=false;}BO.chaser=null;return;}
   const go=n=>{BO.st=n;BO.t=0;};BO.t+=dt;
   for(const d of BO.ow)if(d.a>0&&d.a<1)d.a=Math.min(1,d.a+dt*2);
@@ -147,7 +147,7 @@ function updateBlackout(dt){if(SCENE!=='dun'||DUN.room!==14){if(BO.st&&BO.st<9){
       onWin:()=>{BO.ow=[];BO.R=1;go(11);WEVENT.on=true;resetAmrFollow();},
       onLose:()=>{boHeal();BO.st=0;BO.a=0;BO.L=BO.R=1;BO.lt=1;BO.ow=[];BO.said=0;BO.done=0;enterDun(14,200,560,1);resetAmrFollow();}},'ambush');}}
   /* first fight won: Amroth's warning, then two more demons close in from either side */
-  else if(BO.st===11){if(BO.t>.8&&!DLG.active&&!BO.warned){BO.warned=1;talk([['Amroth',"Demons should not be here!"]],false,()=>{go(12);const y=lum.y+4;BO.ow=[{x:lum.x-560,y,face:1,a:1,tx:lum.x-125},{x:lum.x+560,y,face:-1,a:1,tx:lum.x+125}];});}}
+  else if(BO.st===11){if(BO.t>.8&&!DLG.active&&!BO.warned){BO.warned=1;talk([['Amroth',"Demons should not be here!"]],false,()=>{go(12);const y=lum.y+4;const far=s=>{let x=lum.x+s*125;for(let k=0;k<44&&dunFree(x+s*10,y);k++)x+=s*10;return x;};BO.ow=[-1,1].map(s=>{const [tx]=onFloor(lum.x+s*125,y);return {x:far(s),y,face:-s,a:1,tx};});});}}
   else if(BO.st===12){let all=1;for(const d of BO.ow){const dx=d.tx-d.x;if(Math.abs(dx)>2){d.x+=Math.sign(dx)*Math.min(Math.abs(dx),150*dt);d.mv=1;all=0;}else d.mv=0;}lum.face=BO.t%2.4<1.2?-1:1;
     if(all&&BO.t>.6)go(13);}
   else if(BO.st===13){if(BO.t>.7){go(14);WEVENT.on=false;startEncounter({kind:'demon',scene:'dun',x:lum.x+125,y:lum.y,s:1,pack:2,calm:0,noFlee:1,
@@ -161,7 +161,7 @@ function updateBlackout(dt){if(SCENE!=='dun'||DUN.room!==14){if(BO.st&&BO.st<9){
     if(!BO.chaser){BO.respawn=(BO.respawn||0)-dt;if(BO.respawn<=0&&!WEVENT.on)spawnChaser();}
     else{const g=BO.chaser;g.a=Math.min(1,g.a+dt*2);if(g.calm>0){g.calm-=dt;g.mv=0;}
       else if(!WEVENT.on&&!DLG.active){const dx=lum.x-g.x,dy=lum.y-g.y,d=Math.hypot(dx,dy);
-        if(d>4){const m=Math.min(d,118*dt),nx=g.x+dx/d*m,ny=g.y+dy/d*m;if(dunFree(nx,ny)||nx<130){g.x=nx;g.y=ny;}else if(dunFree(nx,g.y))g.x=nx;g.mv=1;g.face=dx>0?1:-1;}
+        if(d>4)demonStep(g,lum.x,lum.y,118,dt);
         if(d<62&&lum.bumpT<=0)startEncounter(g,'ambush');}
       else g.mv=0;}}}
 /* the two demons flanking Lum in the overworld (designer's art faces left; the one on her left is flipped to face her) */

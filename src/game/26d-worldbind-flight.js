@@ -11,20 +11,42 @@ function demonArt(brown){const im=IMG.demon_imp;if(!brown||!ready(im))return im;
   const c=document.createElement('canvas');c.width=im.width;c.height=im.height;const x=c.getContext('2d');x.drawImage(im,0,0);
   x.globalCompositeOperation='multiply';x.fillStyle='#a8865a';x.fillRect(0,0,c.width,c.height);x.globalCompositeOperation='destination-in';x.drawImage(im,0,0);
   return DEMON_BROWN=c;}
-function wb5Chaser(){WB5.chaser={kind:'demon',scene:'dun',x:425,y:236,face:1,s:1,pack:1,calm:0,a:0,ti:0,
-  onWin:()=>{WB5.chaser=null;WB5.respawn=1.2;},onLose:()=>{boHeal();WB5.chaser=null;WB5.respawn=2.5;lum.x=1000;lum.y=600;lum.face=1;resetAmrFollow();}};}
-function wb5Brown(){WB5.brown={kind:'bdemon',scene:'dun',x:1215,y:540,face:-1,s:1,pack:1,calm:0,a:0,big:1,
+function wb5Chaser(){const [sx,sy]=DUN.room===16?nearestFree(150,560):nearestFree(425,236);   /* from the room's entrance */
+  WB5.chaser={kind:'demon',scene:'dun',x:sx,y:sy,face:1,s:1,pack:1,calm:0,a:0,ti:0,
+  onWin:()=>{WB5.chaser=null;WB5.respawn=1.2;runLine();},onLose:()=>{boHeal();WB5.chaser=null;WB5.respawn=2.5;[lum.x,lum.y]=nearestFree(1000,620);lum.face=1;resetAmrFollow();}};}
+function wb5Brown(){const [bx,by]=nearestFree(1215,540);WB5.brown={kind:'bdemon',scene:'dun',x:bx,y:by,face:-1,s:1,pack:1,calm:0,a:0,big:1,
   onWin:()=>{WB5.brown=null;WB5.brownLeft=0;setTimeout(()=>talk([['Amroth',"Keep running!"]]),900);},
-  onLose:()=>{boHeal();WB5.brown.calm=3;WB5.brown.x=1215;WB5.brown.y=540;lum.x=640;lum.y=620;lum.face=1;resetAmrFollow();}};WB5.brownLeft=1;}
-/* step a roaming demon toward a point, sliding along walls; returns the distance left */
-function demonStep(g,tx,ty,sp,dt,ghost){const dx=tx-g.x,dy=ty-g.y,d=Math.hypot(dx,dy);if(d<2){g.mv=0;return d;}const m=Math.min(d,sp*dt),nx=g.x+dx/d*m,ny=g.y+dy/d*m;
-  if(ghost||dunFree(nx,ny)){g.x=nx;g.y=ny;}else if(dunFree(nx,g.y))g.x=nx;else if(dunFree(g.x,ny))g.y=ny;else{g.x=nx;g.y=ny;}g.mv=1;if(Math.abs(dx)>3)g.face=dx>0?1:-1;return d-m;}
+  onLose:()=>{boHeal();WB5.brown.calm=3;[WB5.brown.x,WB5.brown.y]=nearestFree(1215,540);lum.x=640;lum.y=620;lum.face=1;resetAmrFollow();}};WB5.brownLeft=1;}
+/* demons walk only where Lum can walk: a 20px grid of the room's walkable floor (dunFree), searched breadth-first toward their target */
+const DGRID={room:-1,c:20,cols:0,rows:0,free:null};
+function dgrid(){if(DGRID.room!==DUN.room){const c=DGRID.c;DGRID.cols=Math.ceil(1375/c);DGRID.rows=Math.ceil(768/c);DGRID.free=new Uint8Array(DGRID.cols*DGRID.rows);
+    for(let r=0;r<DGRID.rows;r++)for(let q=0;q<DGRID.cols;q++)DGRID.free[r*DGRID.cols+q]=dunFree(q*c+c/2,r*c+c/2)?1:0;DGRID.room=DUN.room;}return DGRID;}
+/* the walkable cell nearest a point (for spawn points and targets) */
+function nearestFree(x,y){const G=dgrid(),c=G.c;let best=null,bd=1e9;for(let r=0;r<G.rows;r++)for(let q=0;q<G.cols;q++)if(G.free[r*G.cols+q]){const px=q*c+c/2,py=r*c+c/2,d=(px-x)**2+(py-y)**2;if(d<bd){bd=d;best=[px,py];}}return best||[x,y];}
+function dcell(x,y){const G=dgrid();return [clamp(Math.floor(x/G.c),0,G.cols-1),clamp(Math.floor(y/G.c),0,G.rows-1)];}
+function lineFree(x0,y0,x1,y1){const n=Math.ceil(Math.hypot(x1-x0,y1-y0)/8);for(let i=1;i<=n;i++){const t=i/n;if(!dunFree(x0+(x1-x0)*t,y0+(y1-y0)*t))return false;}return true;}
+function dpath(g,tx,ty){const G=dgrid(),W_=G.cols,[sq,sr]=dcell(g.x,g.y);let [eq,er]=dcell(tx,ty);if(!G.free[er*W_+eq]){const n=nearestFree(tx,ty);[eq,er]=dcell(n[0],n[1]);}
+  const prev=new Int32Array(W_*G.rows).fill(-1),start=sr*W_+sq,goal=er*W_+eq,Q=[start];prev[start]=start;
+  for(let h=0;h<Q.length;h++){const u=Q[h];if(u===goal)break;const uq=u%W_,ur=(u/W_)|0;for(const [dq,dr] of [[1,0],[-1,0],[0,1],[0,-1],[1,1],[-1,1],[1,-1],[-1,-1]]){const q=uq+dq,r=ur+dr;if(q<0||r<0||q>=W_||r>=G.rows)continue;const v=r*W_+q;if(prev[v]>=0||!G.free[v])continue;if(dq&&dr&&(!G.free[ur*W_+q]||!G.free[r*W_+uq]))continue;prev[v]=u;Q.push(v);}}
+  if(prev[goal]<0)return null;const pts=[];for(let v=goal;v!==start;v=prev[v])pts.push([(v%W_)*G.c+G.c/2,((v/W_)|0)*G.c+G.c/2]);return pts.reverse();}
+/* step a demon toward (tx,ty) along walkable floor; returns the distance left */
+function demonStep(g,tx,ty,sp,dt){const d0=Math.hypot(tx-g.x,ty-g.y);if(d0<3){g.mv=0;return d0;}
+  if(!dunFree(g.x,g.y)){const n=nearestFree(g.x,g.y);g.x=n[0];g.y=n[1];}   /* never left standing in a wall */
+  let wx=tx,wy=ty;if(!lineFree(g.x,g.y,tx,ty)){g.repath=(g.repath||0)-dt;if(g.repath<=0||!g.path||!g.path.length){g.path=dpath(g,tx,ty);g.repath=.35;}
+    const P_=g.path;if(P_&&P_.length){while(P_.length>1&&lineFree(g.x,g.y,P_[1][0],P_[1][1]))P_.shift();if(Math.hypot(P_[0][0]-g.x,P_[0][1]-g.y)<6&&P_.length>1)P_.shift();[wx,wy]=P_[0];}else{g.mv=0;return d0;}}
+  const dx=wx-g.x,dy=wy-g.y,d=Math.hypot(dx,dy)||1,m=Math.min(d,sp*dt),nx=g.x+dx/d*m,ny=g.y+dy/d*m;
+  if(dunFree(nx,ny)){g.x=nx;g.y=ny;}else if(dunFree(nx,g.y))g.x=nx;else if(dunFree(g.x,ny))g.y=ny;
+  g.mv=1;if(Math.abs(tx-g.x)>3)g.face=tx>g.x?1:-1;return d0-m;}
 /* rooms 5 to 10 (15-20 in code) all shake, until the archway in room 10 caves in */
 const wbQuaking=()=>SCENE==='dun'&&DUN.room>=15&&DUN.room<=20&&!(DUN.room===20&&WB10.st);
 function updateWorldbind5(dt){
   if(!wbQuaking()){WB5.fall.length=0;WB5.q=[0,0];}else{if(WB5.qRoom!==DUN.room){WB5.qRoom=DUN.room;WB5.fall.length=0;}wbQuake(dt);}
-  if(SCENE!=='dun'||DUN.room!==15){WB5.chaser=null;WB5.trail.length=0;if(WB5.brown){WB5.brown=null;}return;}
+  if(SCENE!=='dun'||(DUN.room!==15&&DUN.room!==16)){WB5.chaser=null;WB5.trail.length=0;if(WB5.brown){WB5.brown=null;}WB5.room=0;return;}
+  if(WB5.room!==DUN.room){WB5.room=DUN.room;WB5.chaser=null;WB5.brown=null;WB5.respawn=.8;}   /* a new room: its demons come from its own entrance */
   updateWB5Room(dt);}
+/* the line after beating one of the endless demons (rooms 4, 5, 6): Lum and Amroth take turns */
+let RUNLINE=0;
+function runLine(){RUNLINE++;setTimeout(()=>talk([RUNLINE%2?['Lum',"There’s too many! We need to run…"]:['Amroth',"Let’s move quickly!"]]),700);}
 function wbQuake(dt){
   /* the mountain shakes: a constant tremor with heavier jolts, a low rumble, dust and pebbles from the ceiling */
   WB5.rumT-=dt;if(WB5.rumT<=0){WB5.rumT=rnd(3.5,5.5);WB5.jolt=.6;try{sfxRumble(1.8,.45);}catch(e){}}WB5.jolt=Math.max(0,(WB5.jolt||0)-dt);
@@ -36,14 +58,17 @@ function updateWB5Room(dt){
   /* Lum's path through the room, for the demons to follow down the stairs */
   const tr=WB5.trail,lt=tr[tr.length-1];if(!lt||Math.hypot(lum.x-lt[0],lum.y-lt[1])>14)tr.push([lum.x,lum.y]);
   /* a third of the way in (down the stairs, ~880 long in all): Amroth's warning, then the demons start coming */
-  if(!WB5.said&&C2.joined&&!FADE.dir&&!DLG.active&&Math.hypot(lum.x-425,lum.y-230)>=290){WB5.said=1;WEVENT.on=true;lum.state='idle';lum.vx=lum.vy=0;
-    talk([['Amroth',"More demons… we cannot face them all."]],false,()=>{WEVENT.on=false;WB5.respawn=.6;});}
+  const r6=DUN.room===16,on=r6?WB5.said6:WB5.said;
+  if(!on&&C2.joined&&!FADE.dir&&!DLG.active&&(r6?lum.x>687:Math.hypot(lum.x-425,lum.y-230)>=290)){WEVENT.on=true;lum.state='idle';lum.vx=lum.vy=0;
+    if(r6){WB5.said6=1;try{sfxBabyCry(.8);}catch(e){}   /* room 6, halfway across: the baby cries */
+      setTimeout(()=>talk([['Amroth',"Are the demons coming after this baby?"]],false,()=>{WEVENT.on=false;WB5.respawn=.6;}),1100);}
+    else{WB5.said=1;talk([['Amroth',"More demons… we cannot face them all."]],false,()=>{WEVENT.on=false;WB5.respawn=.6;});}}
   if(BATTLE.on||BATTLE.pending||WIPE.dir||FADE.dir)return;
-  if(WB5.said&&!WB5.chaser){WB5.respawn-=dt;if(WB5.respawn<=0&&!WEVENT.on)wb5Chaser();}
-  if(WB5.brownLeft&&!WB5.brown)wb5Brown();
+  if((r6?WB5.said6:WB5.said)&&!WB5.chaser){WB5.respawn-=dt;if(WB5.respawn<=0&&!WEVENT.on)wb5Chaser();}
+  if(!r6&&WB5.brownLeft&&!WB5.brown)wb5Brown();
   for(const g of [WB5.chaser,WB5.brown]){if(!g)continue;g.a=Math.min(1,g.a+dt*2);if(g.calm>0){g.calm-=dt;g.mv=0;continue;}if(WEVENT.on||DLG.active){g.mv=0;continue;}
     const d=Math.hypot(lum.x-g.x,lum.y-g.y);
-    if(g===WB5.chaser){/* walk Lum's trail; cut straight to her once close */if(d<160)demonStep(g,lum.x,lum.y,118,dt);else{while(g.ti<tr.length-1&&Math.hypot(tr[g.ti][0]-g.x,tr[g.ti][1]-g.y)<10)g.ti++;const p=tr[Math.min(g.ti,tr.length-1)];demonStep(g,p[0],p[1],118,dt,true);}}
+    if(g===WB5.chaser)demonStep(g,lum.x,lum.y,118,dt);
     else demonStep(g,lum.x,lum.y,100,dt);
     if(d<(g.big?80:62)&&lum.bumpT<=0){startEncounter(g,'ambush');break;}}}
 /* the green-flame torches: touch to light them brighter (the lion's also wakes the brown demon) */

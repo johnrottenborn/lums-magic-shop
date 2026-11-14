@@ -493,6 +493,7 @@ const CASES = {
     await p.keyboard.press('Enter'); await wait(1500);
     check(await g_(() => { const c = window.__g.BO.chaser; return !window.__g.WEVENT.on && c && c.x < window.__g.lum.x; }), 'no demon came from the left after the second fight');
     await p.screenshot({ path: path.join(SHOTS, `worldbind-demon-chase-${vp}.png`) });
+    { let ok = true; for (let i = 0; i < 12; i++) { ok = ok && await g_(() => { const c = window.__g.BO.chaser; return !c || window.__g.dunFree(c.x, c.y); }); await wait(150); } check(ok, 'a room 4 demon walked off the floor'); }
     // the way back to room 3 is closed
     await g_(() => { const g = window.__g; g.BO.chaser.calm = 99; g.lum.x = 170; g.lum.y = 530; }); await wait(500);
     await g_(() => window.__g.NEAR.onInteract()); await wait(400);
@@ -525,6 +526,7 @@ const CASES = {
     await p.keyboard.down('ArrowDown'); await p.keyboard.down('ArrowRight'); await wait(1500); await p.keyboard.up('ArrowDown'); await p.keyboard.up('ArrowRight');
     check(await g_(() => window.__g.lum.y > 400 && !!window.__g.WB5.chaser), 'Lum could not get down room 5\'s stairs, or no demon followed');
     await p.screenshot({ path: path.join(SHOTS, `worldbind-room5-chase-${vp}.png`) });
+    { let ok = true; for (let i = 0; i < 12; i++) { ok = ok && await g_(() => { const c = window.__g.WB5.chaser; return !c || window.__g.dunFree(c.x, c.y); }); await wait(150); } check(ok, 'a room 5 demon walked off the floor'); }
     // touching the lion torch lights it, and a big brown demon comes from the right
     await g_(() => { const g = window.__g; g.WB5.chaser.calm = 99; g.lum.x = 818; g.lum.y = 610; }); await wait(500);
     await g_(() => window.__g.NEAR.onInteract()); await wait(1600);
@@ -548,7 +550,21 @@ const CASES = {
     await g_(() => window.__g.NEAR.onInteract()); await wait(2200);
     check(await g_(() => window.__g.SCENE === 'dun' && window.__g.DUNX.room === 16), 'room 5 did not lead to room 6');
     await p.screenshot({ path: path.join(SHOTS, `worldbind-room6-${vp}.png`) });
-    await g_(() => { const g = window.__g; g.lum.x = 1220; g.lum.y = 540; }); await wait(600);
+    // halfway across room 6 the baby cries and Amroth wonders aloud; demons then keep coming from the left tunnel
+    check(await g_(() => !window.__g.WB5.chaser), 'no demon should come into room 6 before the halfway point');
+    await p.keyboard.down('ArrowRight'); for (let i = 0; i < 40 && !(await g_(() => window.__g.DLG.active)); i++) await wait(150); await p.keyboard.up('ArrowRight');
+    { const l = await g_(() => window.__g.DLG.active && window.__g.DLG.lines[0]); check(l && l[0] === 'Amroth' && /coming after this baby/.test(l[1]), 'Amroth did not speak halfway across room 6: ' + JSON.stringify(l)); }
+    await p.keyboard.press('Enter'); await wait(1500);
+    check(await g_(() => { const c = window.__g.WB5.chaser; return c && c.x < 400 && window.__g.dunFree(c.x, c.y); }), 'no demon came from room 6\'s left tunnel');
+    await p.screenshot({ path: path.join(SHOTS, `worldbind-room6-chase-${vp}.png`) });
+    await g_(() => { const g = window.__g, c = g.WB5.chaser; c.x = g.lum.x - 40; c.y = g.lum.y; });
+    for (let i = 0; i < 30 && !(await g_(() => window.__g.BATTLE.on)); i++) await wait(150);
+    await wait(1200); await g_(() => { const B = window.__g.BATTLE; B.phase = 'win'; B.t = 1; B.rewarded = 0; });
+    for (let i = 0; i < 40 && (await g_(() => window.__g.BATTLE.on)); i++) { await p.keyboard.press('Space'); await wait(300); }
+    for (let i = 0; i < 20 && !(await g_(() => window.__g.DLG.active)); i++) await wait(150);
+    { const l = await g_(() => window.__g.DLG.active && window.__g.DLG.lines[0]); check(l && (/too many/.test(l[1]) || /move quickly/.test(l[1])), 'no running line after a room 6 demon: ' + JSON.stringify(l)); }
+    await p.keyboard.press('Enter'); await wait(300);
+    await g_(() => { const g = window.__g; if (g.WB5.chaser) g.WB5.chaser.calm = 99; g.lum.x = 1220; g.lum.y = 540; }); await wait(600);
     await g_(() => window.__g.NEAR.onInteract()); await wait(2200);
     check(await g_(() => window.__g.SCENE === 'dun' && window.__g.DUNX.room === 17 && window.__g.lum.y < 300), 'room 6 did not lead to the top of room 7');
     await wait(1200); check(await g_(() => window.__g.WB5.fall.length > 0), 'room 7 is not shaking');
