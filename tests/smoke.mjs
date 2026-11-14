@@ -599,6 +599,27 @@ const CASES = {
     await g_(() => { const g = window.__g; g.lum.x = 1160; g.lum.y = 550; }); await wait(600);
     await g_(() => window.__g.NEAR.onInteract()); await wait(2200);
     check(await g_(() => window.__g.SCENE === 'dun' && window.__g.DUNX.room === 18), 'room 7 did not lead to room 8');
+    // room 8: the left torch dies as Lum passes it; halfway the evil is felt; at the right torch the mini boss comes
+    await p.keyboard.down('ArrowRight'); for (let i = 0; i < 30 && (await g_(() => window.__g.WB8.L)); i++) await wait(150);
+    check(await g_(() => window.__g.WB8.L === 0 && window.__g.WB8.R === 1), 'room 8\'s left torch did not go out as Lum passed');
+    for (let i = 0; i < 40 && !(await g_(() => window.__g.DLG.active)); i++) await wait(150); await p.keyboard.up('ArrowRight');
+    { const l = await g_(() => window.__g.DLG.active && window.__g.DLG.lines.map(x => x[0] + ':' + x[1]).join(' | ')); check(l && /Amroth:I feel the presence of evil/.test(l) && /Lum:Something wretched is coming/.test(l), 'room 8\'s halfway lines did not play: ' + JSON.stringify(l)); }
+    await p.screenshot({ path: path.join(SHOTS, `worldbind-room8-dim-${vp}.png`) });
+    for (let i = 0; i < 3 && await g_(() => window.__g.DLG.active); i++) { await p.keyboard.press('Enter'); await wait(350); }
+    await wait(1200); await g_(() => { const c = window.__g.WB5.chaser; if (c) c.calm = 99; });
+    await g_(() => { const g = window.__g; g.lum.x = 1040; g.lum.y = 580; }); await p.keyboard.down('ArrowRight'); await wait(500); await p.keyboard.up('ArrowRight');
+    check(await g_(() => window.__g.WB8.R === 0 && !!window.__g.WB8.boss), 'the right torch did not go out and bring the mini boss');
+    await wait(1500); await p.screenshot({ path: path.join(SHOTS, `worldbind-room8-boss-${vp}.png`) });
+    for (let i = 0; i < 60 && !(await g_(() => window.__g.BATTLE.on)); i++) await wait(150);
+    check(await g_(() => window.__g.BATTLE.on && window.__g.BATTLE.foes[0].name === 'Demon Brute'), 'the mini boss battle did not start');
+    await wait(1500); await p.screenshot({ path: path.join(SHOTS, `worldbind-room8-boss-battle-${vp}.png`) });
+    await g_(() => { const B = window.__g.BATTLE; B.phase = 'win'; B.t = 1; B.rewarded = 0; });
+    for (let i = 0; i < 40 && (await g_(() => window.__g.BATTLE.on)); i++) { await p.keyboard.press('Space'); await wait(300); }
+    check(await g_(() => window.__g.BAG.includes('wbboots') && window.__g.WB8.intense === 1), 'the mini boss did not drop the boots, or the collapse did not worsen');
+    for (let i = 0; i < 20 && !(await g_(() => window.__g.DLG.active)); i++) await wait(150);
+    { const l = await g_(() => window.__g.DLG.active && window.__g.DLG.lines[0]); check(l && l[0] === 'Amroth' && /still chasing from behind/.test(l[1]), 'Amroth did not warn after the mini boss: ' + JSON.stringify(l)); }
+    for (let i = 0; i < 3 && await g_(() => window.__g.DLG.active); i++) { await p.keyboard.press('Enter'); await wait(350); }
+    await g_(() => { const c = window.__g.WB5.chaser; if (c) c.calm = 99; });
     await g_(() => { const g = window.__g; g.lum.x = 1220; g.lum.y = 540; }); await wait(600);
     await g_(() => window.__g.NEAR.onInteract()); await wait(2200);
     check(await g_(() => window.__g.SCENE === 'dun' && window.__g.DUNX.room === 19 && window.__g.lum.y < 300), 'room 8 did not lead to the top of room 9');

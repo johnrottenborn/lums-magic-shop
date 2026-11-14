@@ -11,7 +11,7 @@ function demonArt(brown){const im=IMG.demon_imp;if(!brown||!ready(im))return im;
   const c=document.createElement('canvas');c.width=im.width;c.height=im.height;const x=c.getContext('2d');x.drawImage(im,0,0);
   x.globalCompositeOperation='multiply';x.fillStyle='#a8865a';x.fillRect(0,0,c.width,c.height);x.globalCompositeOperation='destination-in';x.drawImage(im,0,0);
   return DEMON_BROWN=c;}
-function wb5Chaser(){const [sx,sy]=DUN.room===16?nearestFree(150,560):DUN.room===17?nearestFree(422,236):nearestFree(425,236);   /* from the room's entrance */
+function wb5Chaser(){const [sx,sy]=DUN.room===16||DUN.room===18?nearestFree(150,560):DUN.room===17?nearestFree(422,236):nearestFree(425,236);   /* from the room's entrance */
   WB5.chaser={kind:'demon',scene:'dun',x:sx,y:sy,face:1,s:1,pack:1,calm:0,a:0,ti:0,
   onWin:()=>{WB5.chaser=null;WB5.respawn=1.2;runLine();},onLose:()=>{boHeal();WB5.chaser=null;WB5.respawn=2.5;[lum.x,lum.y]=nearestFree(1000,620);lum.face=1;resetAmrFollow();}};}
 /* a brown demon from the room's right-hand entrance: room 5's (lion torch) drops a potion, room 7's (raven torch) two */
@@ -42,7 +42,7 @@ function demonStep(g,tx,ty,sp,dt){const d0=Math.hypot(tx-g.x,ty-g.y);if(d0<3){g.
 const wbQuaking=()=>SCENE==='dun'&&DUN.room>=15&&DUN.room<=20&&!(DUN.room===20&&WB10.st);
 function updateWorldbind5(dt){
   if(!wbQuaking()){WB5.fall.length=0;WB5.q=[0,0];}else{if(WB5.qRoom!==DUN.room){WB5.qRoom=DUN.room;WB5.fall.length=0;}wbQuake(dt);}
-  if(SCENE!=='dun'||DUN.room<15||DUN.room>17){WB5.chaser=null;WB5.trail.length=0;if(WB5.brown){WB5.brown=null;}WB5.room=0;return;}
+  if(SCENE!=='dun'||DUN.room<15||DUN.room>18){WB5.chaser=null;WB5.trail.length=0;if(WB5.brown){WB5.brown=null;}WB5.room=0;return;}
   if(WB5.room!==DUN.room){WB5.room=DUN.room;WB5.chaser=null;WB5.brown=null;WB5.respawn=.8;}   /* (a brown demon left alive comes back from the right when you return) */   /* a new room: its demons come from its own entrance */
   updateWB5Room(dt);}
 /* the line after beating one of the endless demons (rooms 4, 5, 6): Lum and Amroth take turns */
@@ -50,25 +50,28 @@ let RUNLINE=0;
 function runLine(){RUNLINE++;setTimeout(()=>talk([RUNLINE%2?['Lum',"There’s too many! We need to run…"]:['Amroth',"Let’s move quickly!"]]),700);}
 function wbQuake(dt){
   /* the mountain shakes: a constant tremor with heavier jolts, a low rumble, dust and pebbles from the ceiling */
-  WB5.rumT-=dt;if(WB5.rumT<=0){WB5.rumT=rnd(3.5,5.5);WB5.jolt=.6;try{sfxRumble(1.8,.45);}catch(e){}}WB5.jolt=Math.max(0,(WB5.jolt||0)-dt);
-  const amp=1.2+WB5.jolt*7;WB5.q=[rnd(-amp,amp),rnd(-amp,amp)*.7];
-  if(Math.random()<dt*(WB5.jolt>0?28:9))WB5.fall.push({x:rnd(180,1250),y:rnd(-20,140),vy:rnd(40,90),g:rnd(500,700),ground:rnd(430,760),rock:Math.random()<.35,s:rnd(2,5),t:0,land:0,rot:rnd(0,TAU)});
+  const hard=WB8.intense&&(DUN.room===18||DUN.room===19);   /* after room 8's mini boss the collapse worsens in rooms 8 and 9 */
+  WB5.rumT-=dt;if(WB5.rumT<=0){WB5.rumT=hard?rnd(1.6,2.8):rnd(3.5,5.5);WB5.jolt=hard?.9:.6;try{sfxRumble(hard?2.2:1.8,hard?.7:.45);}catch(e){}}WB5.jolt=Math.max(0,(WB5.jolt||0)-dt);
+  const amp=(hard?2.6:1.2)+WB5.jolt*(hard?11:7);WB5.q=[rnd(-amp,amp),rnd(-amp,amp)*.7];
+  if(Math.random()<dt*(WB5.jolt>0?28:9)*(hard?2.2:1))WB5.fall.push({x:rnd(180,1250),y:rnd(-20,140),vy:rnd(40,90),g:rnd(500,700),ground:rnd(430,760),rock:Math.random()<.35,s:rnd(2,5),t:0,land:0,rot:rnd(0,TAU)});
   for(const p of WB5.fall){if(p.land){p.land+=dt;continue;}p.vy+=p.g*dt*(p.rock?1:.25);p.y+=p.vy*dt;p.rot+=dt*4;if(p.y>=p.ground){p.y=p.ground;p.land=.001;}}
   for(let i=WB5.fall.length-1;i>=0;i--)if(WB5.fall[i].land>(WB5.fall[i].rock?1.6:.5))WB5.fall.splice(i,1);}
 function updateWB5Room(dt){
   /* Lum's path through the room, for the demons to follow down the stairs */
   const tr=WB5.trail,lt=tr[tr.length-1];if(!lt||Math.hypot(lum.x-lt[0],lum.y-lt[1])>14)tr.push([lum.x,lum.y]);
   /* a third of the way in (down the stairs, ~880 long in all): Amroth's warning, then the demons start coming */
-  const r6=DUN.room===16,r7=DUN.room===17,key='said'+DUN.room,on=WB5[key];
-  if(!on&&C2.joined&&!FADE.dir&&!DLG.active&&(r6?lum.x>687:Math.hypot(lum.x-(r7?422:425),lum.y-230)>=290)){WEVENT.on=true;lum.state='idle';lum.vx=lum.vy=0;WB5[key]=1;
-    if(r7)talk([['Lum',"This place is going to collapse!"],['Amroth',"We’re not far from the exit."]],false,()=>{WEVENT.on=false;WB5.respawn=.6;});   /* room 7, a third of the way in */
+  const r6=DUN.room===16,r7=DUN.room===17,r8=DUN.room===18,key='said'+DUN.room,on=WB5[key];
+  if(r8)updateWB8(dt);
+  if(!on&&C2.joined&&!FADE.dir&&!DLG.active&&(r6||r8?lum.x>687:Math.hypot(lum.x-(r7?422:425),lum.y-230)>=290)){WEVENT.on=true;lum.state='idle';lum.vx=lum.vy=0;WB5[key]=1;
+    if(r8)talk([['Amroth',"I feel the presence of evil."],['Lum',"Something wretched is coming…"]],false,()=>{WEVENT.on=false;WB5.respawn=.6;});   /* room 8, halfway */
+    else if(r7)talk([['Lum',"This place is going to collapse!"],['Amroth',"We’re not far from the exit."]],false,()=>{WEVENT.on=false;WB5.respawn=.6;});   /* room 7, a third of the way in */
     else if(r6){try{sfxBabyCry(.8);}catch(e){}   /* room 6, halfway across: the baby cries */
       setTimeout(()=>talk([['Amroth',"Are the demons coming after this baby?"]],false,()=>{WEVENT.on=false;WB5.respawn=.6;}),1100);}
     else{talk([['Amroth',"More demons… we cannot face them all."]],false,()=>{WEVENT.on=false;WB5.respawn=.6;});}}
   if(BATTLE.on||BATTLE.pending||WIPE.dir||FADE.dir)return;
   if(WB5[key]&&!WB5.chaser){WB5.respawn-=dt;if(WB5.respawn<=0&&!WEVENT.on)wb5Chaser();}
   if(WB5.brownLeft===DUN.room&&!WB5.brown)wb5Brown();
-  for(const g of [WB5.chaser,WB5.brown]){if(!g)continue;g.a=Math.min(1,g.a+dt*2);if(g.calm>0){g.calm-=dt;g.mv=0;continue;}if(WEVENT.on||DLG.active){g.mv=0;continue;}
+  for(const g of [WB5.chaser,WB5.brown]){if(!g||g.boss)continue;g.a=Math.min(1,g.a+dt*2);if(g.calm>0){g.calm-=dt;g.mv=0;continue;}if(WEVENT.on||DLG.active){g.mv=0;continue;}
     const d=Math.hypot(lum.x-g.x,lum.y-g.y);
     if(g===WB5.chaser)demonStep(g,lum.x,lum.y,118,dt);
     else demonStep(g,lum.x,lum.y,100,dt);
@@ -118,3 +121,19 @@ let STONES_COOL=null;
 function drawStone(i,size){const im=IMG.rubble_stones;if(!ready(im))return;if(!STONES_COOL){const c=document.createElement('canvas');c.width=im.width;c.height=im.height;const x=c.getContext('2d');x.drawImage(im,0,0);
     x.globalCompositeOperation='multiply';x.fillStyle='#6f8796';x.fillRect(0,0,c.width,c.height);x.globalCompositeOperation='destination-in';x.drawImage(im,0,0);STONES_COOL=c;}
   ctx.drawImage(STONES_COOL,i*128,0,128,128,-size/2,-size/2,size,size);}
+
+/* ---------- Worldbind room 8 (18 in code): the torches die one by one, and a mini boss comes out of the dark ----------
+   Passing the left torch it gutters out and the baby cries; halfway, Amroth and Lum sense evil (then the usual demons come from the left);
+   at the right torch it dies too and the mini boss (a big brown demon for now, until its art arrives) walks out of the right tunnel.
+   It drops boots Lum can wear; after it the collapse worsens in rooms 8 and 9 and Amroth warns the chase goes on. */
+const WB8={L:1,R:1,boss:null,beat:0,intense:0,fadeL:0,fadeR:0};
+function wb8Dark(){return .4+(WB8.L?0:.14)+(WB8.R?0:.2);}
+function updateWB8(dt){
+  if(WB8.L&&lum.x>270&&C2.joined&&!WB8.beat){WB8.L=0;try{sfxSnuff();}catch(e){}setTimeout(()=>{try{sfxBabyCry(.7);}catch(e){}},700);}   /* passing the left torch */
+  if(WB8.R&&!WB8.beat&&WB5.said18&&lum.x>1060&&!DLG.active&&!BATTLE.on){WB8.R=0;try{sfxSnuff();}catch(e){}WEVENT.on=true;lum.state='idle';lum.vx=lum.vy=0;lum.face=1;   /* the right torch dies; something comes */
+    const [bx,by]=nearestFree(1285,525);WB8.boss={kind:'bdemon',scene:'dun',x:bx,y:by,face:-1,s:1.15,pack:1,calm:0,a:0,big:2,boss:1,noFlee:1,
+      over:{name:'Demon Brute',hp:40,atk:5,def:1,loot:'wbboots'},
+      onWin:()=>{WB8.boss=null;WB8.beat=1;WB8.intense=1;WB5.respawn=2.5;WB5.jolt=1;try{sfxRumble(2.6,1);}catch(e){}setTimeout(()=>talk([['Amroth',"They’re still chasing from behind!"]]),900);},
+      onLose:()=>{boHeal();const b=WB8.boss;[b.x,b.y]=nearestFree(1285,525);b.a=1;[lum.x,lum.y]=nearestFree(900,600);lum.face=1;resetAmrFollow();WEVENT.on=true;}};}
+  const b=WB8.boss;if(b&&!BATTLE.on&&!BATTLE.pending&&!WIPE.dir&&!FADE.dir){b.a=Math.min(1,b.a+dt*1.2);
+    if(b.a>.6&&!DLG.active){const d=Math.hypot(lum.x-b.x,lum.y-b.y);if(d>95)demonStep(b,lum.x,lum.y,70,dt);else{b.mv=0;WEVENT.on=false;startEncounter(b,'normal');}}}}

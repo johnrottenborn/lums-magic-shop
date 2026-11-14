@@ -170,7 +170,7 @@ function updateBlackout(dt){if(SCENE!=='dun'||DUN.room!==14){if(BO.st&&BO.st<9){
 let ROAR_T=0,ROARS=0;
 function demonRoarCheck(o,x,big){if(!o||o.roared||CAPTURE.on)return;const m=ctx.getTransform(),sx=m.a*x+m.e;if(sx<-20||sx>ctx.canvas.width+20)return;
   o.roared=1;ROARS++;const now=performance.now(),at=Math.max(now,ROAR_T);ROAR_T=at+380;setTimeout(()=>{try{sfxDemonRoar(big);}catch(e){}},at-now);}
-function drawDemonOW(x,y,face,a,mv,big,o){demonRoarCheck(o,x,big);const im=demonArt(big);if(!ready(im)||CAPTURE.on)return;   /* kept out of the battle backdrop; big = the brown demons, half again as large */
-  const k=dunH(y)/151,h=175*k*(big?1.5:1),w=h*im.width/im.height,br=1+.02*Math.sin(T*2.6+x),hop=mv?Math.abs(Math.sin(T*9))*6*k:0,tilt=mv?Math.sin(T*9)*.05:0;
+function drawDemonOW(x,y,face,a,mv,big,o){demonRoarCheck(o,x,big);const im=demonArt(big);if(!ready(im)||CAPTURE.on)return;   /* kept out of the battle backdrop; big = the brown demons, half again as large (2 = room 8's mini boss, larger still) */
+  const k=dunH(y)/151,h=175*k*(big===2?1.8:big?1.5:1),w=h*im.width/im.height,br=1+.02*Math.sin(T*2.6+x),hop=mv?Math.abs(Math.sin(T*9))*6*k:0,tilt=mv?Math.sin(T*9)*.05:0;
   ctx.save();ctx.globalAlpha=a*.35;ctx.fillStyle='#000';ctx.beginPath();ctx.ellipse(x,y,40*k,10*k,0,0,TAU);ctx.fill();ctx.restore();
   ctx.save();ctx.globalAlpha=a;ctx.translate(x,y-hop);ctx.rotate(tilt);ctx.scale(face>0?-1:1,br);ctx.drawImage(im,-w/2,-h,w,h);ctx.restore();}

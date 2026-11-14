@@ -141,9 +141,9 @@ function drawDun(){const R=DROOMS[DUN.room],im=IMG['dun'+DUN.room];if(!ready(im)
   ctx.setTransform(DPR,0,0,DPR,0,0);ctx.fillStyle='#07080c';ctx.fillRect(0,0,W,H);
   const qk=DUN.room===20&&WB10.st?WB10.q:DUN.room>=15&&DUN.room<=20?WB5.q:[0,0];ctx.setTransform(DPR*rz,0,0,DPR*rz,DPR*(W/2-WCAM.x*rz+qk[0]),DPR*qk[1]);ctx.drawImage(im,0,0,1375,768);   /* room 5 trembles */
   if(DUN.room===20)drawWB10Rubble();
-  if(DUN.room===14&&!BO.R&&BO.a<1){const g=ctx.createLinearGradient(780,0,1180,0);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,'rgba(0,0,0,.94)');ctx.fillStyle=g;ctx.fillRect(780,-500,2600,1800);}
+  if((DUN.room===14&&!BO.R&&BO.a<1)||(DUN.room===18&&!WB8.R)){const g=ctx.createLinearGradient(780,0,1180,0);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,'rgba(0,0,0,.94)');ctx.fillStyle=g;ctx.fillRect(780,-500,2600,1800);}
   if(DUN.room===14&&BO.a>0){ctx.fillStyle=`rgba(0,0,0,${BO.a})`;ctx.fillRect(-2000,-500,5375,1800);}
-  if(DUN.room===12&&!C2.torchLit&&IMG.dun12_torch_out&&IMG.dun12_torch_out.complete){ctx.drawImage(IMG.dun12_torch_out,70,270);ctx.save();for(let i=0;i<4;i++){const q=(T*.25+i/4)%1;ctx.globalAlpha=.35*(1-q);drawGlow(ctx,110+Math.sin(T+i)*6*q,368-q*90,10+q*22,'150,160,170',.8);}ctx.restore();}
+  if(((DUN.room===12&&!C2.torchLit)||(DUN.room===18&&!WB8.L))&&IMG.dun12_torch_out&&IMG.dun12_torch_out.complete){ctx.drawImage(IMG.dun12_torch_out,70,270);ctx.save();for(let i=0;i<4;i++){const q=(T*.25+i/4)%1;ctx.globalAlpha=.35*(1-q);drawGlow(ctx,110+Math.sin(T+i)*6*q,368-q*90,10+q*22,'150,160,170',.8);}ctx.restore();}
   if(DUN.room===3){if(!C1.webCut){ctx.save();ctx.strokeStyle='rgba(225,240,245,.75)';ctx.lineWidth=1.4;const cx=700,cy=450;for(let i=0;i<14;i++){const a=i/14*Math.PI-Math.PI;ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx+Math.cos(a)*120,cy+Math.sin(a)*-100+80);ctx.stroke();}
       for(let r_=20;r_<120;r_+=18){ctx.beginPath();for(let i=0;i<=14;i++){const a=i/14*Math.PI-Math.PI;const x=cx+Math.cos(a)*r_,y=cy+Math.sin(a)*-r_*.83+80*r_/120;i?ctx.lineTo(x,y):ctx.moveTo(x,y);}ctx.stroke();}ctx.restore();}
     ctx.save();ctx.globalCompositeOperation='lighter';for(let i=0;i<6;i++){const x=1150+i*28+Math.sin(T*1.3+i)*8,y=515+Math.sin(T*2+i*2)*4;drawGlow(ctx,x,y,14,'130,230,255',.25+.15*Math.sin(T*3+i));}ctx.restore();}
@@ -158,7 +158,8 @@ function drawDun(){const R=DROOMS[DUN.room],im=IMG['dun'+DUN.room];if(!ready(im)
     if(CH>=2&&C2.joined){const ka=dunH(AMR.y)/151;L.push([AMR.y-1,()=>{ctx.save();ctx.translate(AMR.x,AMR.y);ctx.scale(ka,ka);ctx.translate(-AMR.x,-AMR.y);drawAmrOW(AMR,1);ctx.restore();}]);}
     if(DUN.room===7)L.push([614,()=>{const t=IMG.dun7_table;if(!ready(t))return;const hid=lum.y<614&&Math.abs(lum.x-945)<240;ctx.save();ctx.globalAlpha=hid?.62:1;ctx.drawImage(t,730,425);ctx.restore();}]);
     if(DUN.room===14){for(const d of BO.ow)L.push([d.y,()=>drawDemonOW(d.x,d.y,d.face,d.a,d.mv,0,d)]);const g=BO.chaser;if(g)L.push([g.y,()=>drawDemonOW(g.x,g.y,g.face,g.a,g.mv,0,g)]);}
-    if(DUN.room>=15&&DUN.room<=17)for(const g of [WB5.chaser,WB5.brown])if(g)L.push([g.y,()=>drawDemonOW(g.x,g.y,g.face,g.a,g.mv,g.big,g)]);
+    if(DUN.room===18&&WB8.boss){const g=WB8.boss;L.push([g.y,()=>drawDemonOW(g.x,g.y,g.face,g.a,g.mv,2,g)]);}
+    if(DUN.room>=15&&DUN.room<=18)for(const g of [WB5.chaser,WB5.brown])if(g)L.push([g.y,()=>drawDemonOW(g.x,g.y,g.face,g.a,g.mv,g.big,g)]);
     for(const F of (R.fg||[]))L.push([F.y,()=>{ctx.save();ctx.beginPath();F.poly.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y));ctx.closePath();ctx.clip();ctx.drawImage(im,0,0,1375,768);ctx.restore();}]);   /* furniture that stands in front of whoever is behind it */
     L.sort((a,b)=>a[0]-b[0]);for(const [,f] of L)f();}
   if(DUN.room===14&&BO.a>0){ctx.fillStyle=`rgba(0,0,0,${BO.a*.55})`;ctx.fillRect(-2000,-500,5375,1800);}
@@ -168,11 +169,11 @@ function drawDun(){const R=DROOMS[DUN.room],im=IMG['dun'+DUN.room];if(!ready(im)
   // darkness: only the little lantern's circle (and any daylight from above) cuts through
   ctx.setTransform(DPR,0,0,DPR,0,0);const lit=BAG.includes('lantern');const [sx,sy]=wellToScreen(lum.x,lum.y-70*k);const zr=rz*(lit?1:.45);
   const r0=(BAG.includes('lantern')?120:70)*zr,r1=(BAG.includes('lantern')?260:170)*zr,R_=Math.hypot(W,H)*1.2,fl=1+.03*Math.sin(T*9);
-  const g=ctx.createRadialGradient(sx,sy,0,sx,sy,R_);g.addColorStop(0,'rgba(4,5,10,0)');g.addColorStop(Math.min(.99,r0*fl/R_),'rgba(4,5,10,0)');g.addColorStop(Math.min(.995,r1*fl/R_),`rgba(4,5,10,${R.dark})`);g.addColorStop(1,`rgba(4,5,10,${R.dark})`);
+  const g=ctx.createRadialGradient(sx,sy,0,sx,sy,R_);g.addColorStop(0,'rgba(4,5,10,0)');g.addColorStop(Math.min(.99,r0*fl/R_),'rgba(4,5,10,0)');g.addColorStop(Math.min(.995,r1*fl/R_),`rgba(4,5,10,${DUN.room===18?wb8Dark():R.dark})`);g.addColorStop(1,`rgba(4,5,10,${DUN.room===18?wb8Dark():R.dark})`);
   ctx.fillStyle=g;if(!CAPTURE.on)ctx.fillRect(0,0,W,H);
   ctx.save();ctx.globalCompositeOperation='lighter';if(lit)drawGlow(ctx,sx,sy,r0*1.3,'255,200,120',.12);for(const g of here){if(g.kind!=='bat'&&g.kind!=='spider')continue;const sp_=g.kind==='spider',kk=dunH(g.y)/151,[ex,ey]=wellToScreen(g.x+(g.face>0?1:-1)*(sp_?22:18)*kk,sp_?g.y-30*kk:g.y-150*kk-Math.sin(g.ph*3)*8);const tw=.55+.45*Math.sin(T*5+g.ph);drawGlow(ctx,ex-3,ey,5,'255,90,90',.8*tw);drawGlow(ctx,ex+3,ey,5,'255,90,90',.8*tw);}
   /* the torches: a warm pool of light on the walls and floor, a hot core at the flame, flickering */
-  if(DUN.room===12||DUN.room===14||DUN.room===16||DUN.room===18)for(const [tx,ty] of [[115,340],[1278,335]]){if(DUN.room===12&&tx<600&&!C2.torchLit)continue;if(DUN.room===14&&!(tx<600?BO.L:BO.R))continue;const lk=DUN.room===12&&tx<600&&C2.lightT!=null?Math.min(1,C2.lightT):DUN.room===14&&tx<600?BO.lt:1;const [px,py]=wellToScreen(tx,ty),[fx,fy]=wellToScreen(tx+(tx<600?60:-60),ty+260),f=1+.06*Math.sin(T*9+tx)+.04*Math.sin(T*23+tx*2);
+  if(DUN.room===12||DUN.room===14||DUN.room===16||DUN.room===18)for(const [tx,ty] of [[115,340],[1278,335]]){if(DUN.room===12&&tx<600&&!C2.torchLit)continue;if(DUN.room===14&&!(tx<600?BO.L:BO.R))continue;if(DUN.room===18&&!(tx<600?WB8.L:WB8.R))continue;const lk=DUN.room===12&&tx<600&&C2.lightT!=null?Math.min(1,C2.lightT):DUN.room===14&&tx<600?BO.lt:1;const [px,py]=wellToScreen(tx,ty),[fx,fy]=wellToScreen(tx+(tx<600?60:-60),ty+260),f=1+.06*Math.sin(T*9+tx)+.04*Math.sin(T*23+tx*2);
     drawGlow(ctx,px,py,320*rz*f,'255,140,60',.26*lk);drawGlow(ctx,fx,fy,260*rz*f,'255,150,80',.14*lk);drawGlow(ctx,px,py,90*rz*f,'255,200,120',.45*lk);drawGlow(ctx,px,py-14*rz,34*rz*f,'255,235,180',.6*lk);if(lk<1)drawGlow(ctx,px,py,140*rz,'255,240,200',(1-lk)*.8);}
   if(DUN.room===19){const [px,py]=wellToScreen(805,200);drawGlow(ctx,px,py,(160+10*Math.sin(T*5))*rz,'90,255,190',.26);;wbTorchGlow(19,px,py,rz);}
   if(DUN.room===17){const [px,py]=wellToScreen(818,280);drawGlow(ctx,px,py,(160+10*Math.sin(T*5))*rz,'90,255,190',.26);;wbTorchGlow(17,px,py,rz);}
