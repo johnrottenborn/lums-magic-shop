@@ -568,11 +568,33 @@ const CASES = {
     await g_(() => window.__g.NEAR.onInteract()); await wait(2200);
     check(await g_(() => window.__g.SCENE === 'dun' && window.__g.DUNX.room === 17 && window.__g.lum.y < 300), 'room 6 did not lead to the top of room 7');
     await wait(1200); check(await g_(() => window.__g.WB5.fall.length > 0), 'room 7 is not shaking');
+    // a third of the way in: Lum fears a collapse, Amroth says the exit is near; demons then come from the top of the stairs
     await p.keyboard.down('ArrowRight'); await wait(700); await p.keyboard.up('ArrowRight');
-    await p.keyboard.down('ArrowDown'); await p.keyboard.down('ArrowRight'); await wait(2600); await p.keyboard.up('ArrowDown'); await p.keyboard.up('ArrowRight'); await wait(400);
+    await p.keyboard.down('ArrowDown'); await p.keyboard.down('ArrowRight'); for (let i = 0; i < 30 && !(await g_(() => window.__g.DLG.active)); i++) await wait(150); await p.keyboard.up('ArrowDown'); await p.keyboard.up('ArrowRight');
+    { const l = await g_(() => window.__g.DLG.active && window.__g.DLG.lines.map(x => x[0] + ':' + x[1]).join(' | ')); check(l && /Lum:This place is going to collapse/.test(l) && /Amroth:We’re not far from the exit/.test(l), 'room 7\'s lines did not play a third of the way in: ' + JSON.stringify(l)); }
+    for (let i = 0; i < 3 && await g_(() => window.__g.DLG.active); i++) { await p.keyboard.press('Enter'); await wait(350); }
+    await p.keyboard.down('ArrowDown'); await p.keyboard.down('ArrowRight'); await wait(1600); await p.keyboard.up('ArrowDown'); await p.keyboard.up('ArrowRight'); await wait(400);
     check(await g_(() => window.__g.lum.y > 400), 'Lum could not walk down room 7\'s stairs');
+    check(await g_(() => { const c = window.__g.WB5.chaser; return c && window.__g.dunFree(c.x, c.y) && c.x < 700; }), 'no demon came from room 7\'s top entrance');
+    // the raven torch: it flares, and a brown demon comes from the right; it drops two potions
+    if (await g_(() => window.__g.BATTLE.on || window.__g.BATTLE.pending)) { for (let i = 0; i < 30 && !(await g_(() => window.__g.BATTLE.on)); i++) await wait(150); await wait(1000); await g_(() => { const B = window.__g.BATTLE; B.phase = 'win'; B.t = 1; B.rewarded = 0; });
+      for (let i = 0; i < 40 && (await g_(() => window.__g.BATTLE.on)); i++) { await p.keyboard.press('Space'); await wait(300); } for (let i = 0; i < 4 && await g_(() => window.__g.DLG.active); i++) { await p.keyboard.press('Enter'); await wait(300); } }
+    await wait(800);
+    await g_(() => { const g = window.__g; if (g.WB5.chaser) g.WB5.chaser.calm = 99; g.lum.x = 825; g.lum.y = 610; }); await wait(500);
+    await g_(() => window.__g.NEAR.onInteract()); await wait(1600);
+    check(await g_(() => window.__g.WBT.raven === 1 && !!window.__g.WB5.brown && window.__g.WB5.brown.x > 1000), 'the raven torch did not light and bring a brown demon from the right');
+    { const pots = await g_(() => window.__g.BAG.filter(x => x === 'potion').length);
+      await g_(() => { const g = window.__g; g.WB5.brown.x = g.lum.x + 60; g.WB5.brown.y = g.lum.y; });
+      for (let i = 0; i < 30 && !(await g_(() => window.__g.BATTLE.on)); i++) await wait(150);
+      await wait(1200); await g_(() => { const B = window.__g.BATTLE; B.phase = 'win'; B.t = 1; B.rewarded = 0; });
+      for (let i = 0; i < 40 && (await g_(() => window.__g.BATTLE.on)); i++) { await p.keyboard.press('Space'); await wait(300); }
+      check(await g_(() => window.__g.BAG.filter(x => x === 'potion').length) === pots + 2, 'room 7\'s brown demon did not drop two potions'); }
+    for (let i = 0; i < 6 && await g_(() => window.__g.DLG.active || true); i++) { await p.keyboard.press('Enter'); await wait(300); }
+    await g_(() => { const g = window.__g; if (g.WB5.chaser) g.WB5.chaser.calm = 99; g.lum.x = 800; g.lum.y = 640; }); await wait(300);
     await p.screenshot({ path: path.join(SHOTS, `worldbind-room7-${vp}.png`) });
     check(await g_(() => { const f = window.__g.dunFree; return [[322, 560], [322, 650], [240, 400], [460, 330], [790, 520]].every(([x, y]) => !f(x, y)); }), 'Lum can stand on room 7\'s pedestals');
+    await wait(1000); for (let i = 0; i < 6 && await g_(() => window.__g.DLG.active); i++) { await p.keyboard.press("Enter"); await wait(350); }
+    await g_(() => { const g = window.__g; if (g.WB5.chaser) g.WB5.chaser.calm = 99; });
     await g_(() => { const g = window.__g; g.lum.x = 1160; g.lum.y = 550; }); await wait(600);
     await g_(() => window.__g.NEAR.onInteract()); await wait(2200);
     check(await g_(() => window.__g.SCENE === 'dun' && window.__g.DUNX.room === 18), 'room 7 did not lead to room 8');

@@ -180,7 +180,7 @@ function updateBattle(dt){const B=BATTLE;if(B.hitstop>0){B.hitstop-=dt;return;}B
     case 'run':{const c=B.cmd;c.fill=Math.max(0,c.fill-dt*.28);h.fr=[0,1,2,3,4,5,6,7][Math.floor(B.t*14)%8];h.face=-1;if(B.t>2){h.face=1;h.fr=16;if(c.fill>=.6&&!(B.field&&(B.field.scripted||B.field.noFlee))){B.phase='fled';B.t=0;sfxFlee();}else{pop(h.x,h.y-150*S,"Can't escape!",'info');B.phase='pause';B.t=0;B.after='nextHero';}}break;}
     case 'fled':h.face=-1;h.ox-=dt*360;h.fr=[0,1,2,3,4,5,6,7][Math.floor(B.t*16)%8];if(B.t>.6&&!B.ending){B.ending=1;endBattle('flee');}break;
     case 'win':if(B.t>.9&&!B.rewarded){B.rewarded=1;sfxVictory();B.loot=[];for(const f_ of B.foes){if(f_.stolen)for(const id of f_.stolen){MATS[id]=(MATS[id]||0)+1;if(!BAG.includes(id))BAG.push(id);B.loot.push(id);}f_.stolen=null;const d=FOE_TYPES[f_.type].drop;if(d){MATS[d]=(MATS[d]||0)+1;if(!BAG.includes(d))BAG.push(d);B.loot.push(d);}
-      if(f_.flag)C1[f_.flag]=1;if(f_.loot){giveItem(f_.loot);B.loot.unshift(f_.loot);}}}
+      if(f_.flag)C1[f_.flag]=1;if(f_.loot){for(const id of [].concat(f_.loot)){giveItem(id);B.loot.unshift(id);}}}}   /* loot can be a list (several potions) */
       for(const h_ of B.heroes)if(!h_.ko)h_.fr=B.t>.9?(Math.floor(B.t*3)%2?20:19):16;break;
     case 'lose':{const h_=B.heroes[0];if(B.t>2.6&&!B.ending){B.ending=1;endBattle('lose');}break;}
   }
