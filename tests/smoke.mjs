@@ -592,7 +592,7 @@ const CASES = {
     await g_(() => window.__g.NEAR.onInteract()); await wait(1200);
     check(await g_(() => window.__g.SCENE === 'dun' && window.__g.DUNX.room === 21 && window.__g.dunFree(window.__g.lum.x, window.__g.lum.y)), 'the cottage door did not lead inside');
     await p.screenshot({ path: path.join(SHOTS, `amroth-cottage-inside-${vp}.png`) });
-    check(await g_(() => [[700, 640], [1000, 720], [1140, 690]].every(([x, y]) => window.__g.dunFree(x, y)) && !window.__g.dunFree(350, 720) && !window.__g.dunFree(1000, 650)), 'the cottage floor or its furniture is wrong');
+    check(await g_(() => [[650, 636], [1000, 720], [1140, 690]].every(([x, y]) => window.__g.dunFree(x, y)) && ![[350, 720], [230, 655], [440, 640], [1000, 650]].some(([x, y]) => window.__g.dunFree(x, y))), 'the cottage floor or its furniture is wrong (Lum must not walk on the table)');
     await g_(() => { const g = window.__g; g.lum.x = 1140; g.lum.y = 670; }); await wait(500);
     await g_(() => window.__g.NEAR.onInteract()); await wait(1200);
     check(await g_(() => window.__g.DUNX.room === 22 && window.__g.dunFree(window.__g.lum.x, window.__g.lum.y)), 'the stairs did not lead up to the loft');
@@ -602,16 +602,16 @@ const CASES = {
     await g_(() => window.__g.NEAR.onInteract()); await wait(1200);
     check(await g_(() => window.__g.DUNX.room === 21), 'the loft stairs did not lead back down');
     // no way into the basement yet; once the story opens it, the bookshelf left of the fireplace leads down
-    check(await g_(() => !window.__g.DUNINTS().some(d => d.door && Math.abs(d.x - 660) < 30)), 'the basement door should stay hidden until the story opens it');
-    await g_(() => { const g = window.__g; g.C2.basement = 1; g.enterDun(21, 660, 640, 1); }); await wait(600);
+    check(await g_(() => !window.__g.DUNINTS().some(d => d.door && Math.abs(d.x - 695) < 30)), 'the basement door should stay hidden until the story opens it');
+    await g_(() => { const g = window.__g; g.C2.basement = 1; g.enterDun(21, 690, 630, 1); }); await wait(600);
     await g_(() => window.__g.NEAR.onInteract()); await wait(1200);
     check(await g_(() => window.__g.DUNX.room === 23 && window.__g.dunFree(window.__g.lum.x, window.__g.lum.y)), 'the bookshelf did not lead down to the basement');
     await p.keyboard.down('ArrowRight'); await wait(1200); await p.keyboard.up('ArrowRight'); await wait(400);
     await p.screenshot({ path: path.join(SHOTS, `amroth-cottage-basement-${vp}.png`) });
     await g_(() => { const g = window.__g; g.lum.x = 270; g.lum.y = 570; }); await wait(500);
     await g_(() => window.__g.NEAR.onInteract()); await wait(1200);
-    check(await g_(() => window.__g.DUNX.room === 21), 'the basement ladder did not lead back up'); await g_(() => { window.__g.C2.basement = 0; });
-    await g_(() => { const g = window.__g; g.lum.x = 440; g.lum.y = 630; }); await wait(500);
+    check(await g_(() => window.__g.DUNX.room === 21), 'the basement ladder did not lead back up');
+    await g_(() => { const g = window.__g; g.lum.x = 625; g.lum.y = 630; }); await wait(500);
     await g_(() => window.__g.NEAR.onInteract()); await wait(1200);
     check(await g_(() => window.__g.SCENE === 'thorn' && Math.abs(window.__g.lum.x - window.__g.HOMEX - 1365) < 20), 'the front door did not lead back out to the step');
   },

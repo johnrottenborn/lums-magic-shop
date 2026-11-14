@@ -6,7 +6,7 @@
    the pond is painted in code and there is no fishing pier yet. */
 const HOMEX=CPATH.xt+3300,HOMEY=500,HW=1900,HH=1700;
 const HOME={t:99,arch:{x:523,y:470},cot:{x:1457,y:940,w:460,door:-92},pond:{x:1520,y:1290,rx:230,ry:105},yard:{x:1400,y:1130,rx:400,ry:270}};
-const HPATH_CTRL=[[523,440],[540,620],[470,800],[420,980],[560,1150],[820,1235],[1080,1195],[1250,1085],[1365,960]].map(([x,y])=>[x+HOMEX,y+HOMEY]);
+const HPATH_CTRL=[[523,440],[540,620],[470,800],[420,980],[560,1150],[820,1235],[1080,1195],[1250,1080],[1335,1028],[1365,990],[1365,962]].map(([x,y])=>[x+HOMEX,y+HOMEY]);
 const HPATH_PTS=splinePts(HPATH_CTRL,20);let HPATHP=null;
 const inHome=()=>lum.x>HOMEX-200;
 function hpathDist(x,y){let best=1e9;for(let i=0;i<HPATH_PTS.length-1;i++){const [ax,ay]=HPATH_PTS[i],[bx,by]=HPATH_PTS[i+1],dx=bx-ax,dy=by-ay,t=clamp(((x-ax)*dx+(y-ay)*dy)/(dx*dx+dy*dy),0,1),d=Math.hypot(x-ax-dx*t,y-ay-dy*t);if(d<best)best=d;}return best;}
@@ -25,6 +25,17 @@ function homeProps(P,PN){const X=x=>x+HOMEX,Y=y=>y+HOMEY,H_=(a,b)=>hash(a,b,971)
     // a tree's crown rises well above its roots, so keep the whole column above it clear of the path, the yard and the gatehouse
     let hit=false;for(let up=0;up<=460&&!hit;up+=40){const yy=ly-up;if((up<=230&&hpathDist(x,Y(yy))<(up?95:150))||inEll(lx,yy,HOME.yard,up?1:1.12)||inEll(lx,yy,HOME.pond,1.25)||inEll(lx,yy,{x:HOME.arch.x,y:HOME.arch.y,rx:280,ry:150}))hit=true;}if(hit)continue;
     const [img,w]=PN[Math.floor(H_(k,3)*PN.length)];P.push({t:'tree',img,x,y,w:w*(.8+H_(k,4)*.3),flip:H_(k,5)<.5,base:.95});}
+  // flowers from Lum's garden (the painted lavender, roses, delphiniums and magic blooms): beds along the cottage front and sides,
+  // and drifts around the roots of the firs nearest the cottage so no bare roots show
+  const C=HOME.cot,KINDS=['lavender','rose','delph','magic','lavender','rose','mint'],fl=[];let q=0;
+  const bloom=(lx,ly,s=1)=>{q++;if(hpathDist(X(lx),Y(ly))<48||inEll(lx,ly,HOME.pond,1.1))return;if(lx>C.x+C.door-48&&lx<C.x+C.door+48&&ly>C.y-30)return;   /* keep the step clear */
+    fl.push({t:'plant',w:70,kind:KINDS[Math.floor(H_(q,21)*KINDS.length)],i:Math.floor(H_(q,22)*4),x:X(lx),y:Y(ly),s:s*(.8+H_(q,23)*.45),flip:H_(q,24)<.5,ph:H_(q,25)*TAU});};
+  for(let lx=C.x-240;lx<=C.x+240;lx+=26){bloom(lx+(H_(lx,26)-.5)*10,C.y+6+H_(lx,27)*10);bloom(lx+13,C.y+30+H_(lx,28)*14,.9);}   /* beds along the front */
+  for(let i=0;i<46;i++){const r=H_(i,31),a=H_(i,32);bloom(C.x+215+r*150,C.y-170+a*240,1.05);}   /* the right side, thick with flowers */
+  for(let i=0;i<26;i++){const r=H_(i,33),a=H_(i,34);bloom(C.x-230-r*110,C.y-150+a*200);}   /* the left side */
+  for(const t of P){if(t.t!=='tree'||!/pine|spruce|twist|sapling/.test(t.img)||Math.hypot(t.x-X(C.x),t.y-Y(C.y))>900)continue;   /* drifts over the fir roots */
+    const rx=t.w*.36;for(let j=0;j<16;j++){const a=H_(j,t.x|0)*Math.PI*1.15-.08,rr=.35+H_(j+40,t.y|0)*.75;bloom(t.x-X(0)+Math.cos(a)*rx*rr,t.y-Y(0)+Math.sin(a)*rx*.34*rr+4,1.1);}}
+  P.push(...fl);
   // a few stones along the path
   for(let i=0;i<9;i++){const p=HPATH_PTS[Math.floor(i/9*HPATH_PTS.length)],sd=i%2?1:-1;P.push({t:'tree',img:'rock'+(1+i%4),x:p[0]+sd*(95+H_(i,7)*30),y:p[1]+H_(i,8)*20,w:70+H_(i,9)*40,flip:H_(i,10)<.5});}}
 /* ground pass: the winding path and the pond */
@@ -38,7 +49,7 @@ function drawHomeGround(x0,y0,x1,y1){if(x1<HOMEX-300)return;if(!HPATHP)HPATHP=bu
 /* interactions: the gatehouse arch back into the passage, the cottage door, the pond */
 function homeInts(){const X=x=>x+HOMEX,Y=y=>y+HOMEY;return [
   {x:X(HOME.arch.x),y:Y(HOME.arch.y+30),get reach(){return inHome()?85:0},door:true,onInteract:()=>dunGo(20,900,690,1)},
-  {x:X(HOME.cot.x+HOME.cot.door),y:Y(HOME.cot.y+15),get reach(){return inHome()?85:0},door:true,onInteract:()=>enterDun(21,435,640,1)},
+  {x:X(HOME.cot.x+HOME.cot.door),y:Y(HOME.cot.y+15),get reach(){return inHome()?85:0},door:true,onInteract:()=>enterDun(21,650,636,-1)},
   {x:X(HOME.pond.x-HOME.pond.rx+20),y:Y(HOME.pond.y),get reach(){return inHome()?110:0},onInteract:()=>say("A quiet pond. Rain dimples the water.")}];}
 /* out of the cottage's front door, onto the step */
 function leaveCottage(){SCENE='thorn';lum.x=HOMEX+HOME.cot.x+HOME.cot.door;lum.y=HOMEY+HOME.cot.y+30;lum.face=1;lum.dir='down';lum.state='idle';lum.vx=lum.vy=0;cam.x=lum.x;cam.y=lum.y+200;THORN.t=99;HOME.t=99;}
@@ -46,3 +57,7 @@ function enterHome(){SCENE='thorn';lum.x=HOMEX+HOME.arch.x;lum.y=HOMEY+HOME.arch
 function drawHomeTitle(){if(!inHome()||HOME.t>=4.5||SCENE!=='thorn')return;HOME.t+=1/60;const a=Math.min(1,HOME.t*1.5,(4.5-HOME.t)*1.2);ctx.save();ctx.setTransform(DPR,0,0,DPR,0,0);ctx.globalAlpha=a;ctx.textAlign='center';
   ctx.fillStyle='rgba(10,8,14,.5)';ctx.fillRect(0,H*.3-40,W,80);ctx.fillStyle='#e8eef6';ctx.font='700 26px "Alegreya SC", Georgia, serif';ctx.fillText("Amroth's Home",W/2,H*.3+10);ctx.restore();}
 THINT.push(...homeInts());
+/* a garden plant (painted in 03-garden) standing in the Stranglethorn world, swaying like it does at Lum's shop */
+function drawHomePlant(o){if(!PLANTS.lavender)paintPlants();const set=PLANTS[o.kind];if(!set)return;const sp=set[o.i%set.length],w=sp.w*o.s,h=sp.h*o.s;
+  const dx=o.x-lum.x,dy=(o.y-lum.y)*1.5,d=Math.hypot(dx,dy),push=d<46?(1-d/46)*Math.sign(dx||1)*.35:0,sk=Math.sin(T*1.6+o.ph)*.05+push;
+  ctx.save();ctx.translate(o.x,o.y);ctx.transform(1,0,sk,1,0,0);if(o.flip)ctx.scale(-1,1);ctx.drawImage(sp.c,-w/2,-h,w,h);ctx.restore();}
