@@ -172,7 +172,7 @@ function drawBattleDemon(f){const S=bS(),B=BATTLE,isBrute=f.type==='brute',bg=f.
   ctx.save();ctx.globalAlpha=al;ctx.translate(x+(f.hit>0?Math.sin(f.hit*50)*5:0)+wind*10*S,y);ctx.rotate(wind*.08);ctx.scale(1,br);ctx.drawImage(im,-w/2,-h,w,h);ctx.restore();
   /* fire gathers in the jaws as it winds up */
   const mx=x-w*.2+wind*10*S,my=y-h*.8;if(wind>0){ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,mx,my,(16+40*wind)*S,'255,140,50',.5+.3*wind);drawGlow(ctx,mx,my,(6+14*wind)*S,'255,230,160',.8);ctx.restore();}
-  if(me&&B.phase==='foeLeap'&&B.t>=0&&f.tgt){const u=Math.min(1,B.t/B.leapD),tx=f.tgt.x+f.tgt.ox,ty=f.tgt.y-85*S,px=mx+(tx-mx)*u,py=my+(ty-my)*u-Math.sin(Math.PI*u)*40*S;
+  if(me&&B.phase==='foeLeap'&&B.t>=0&&f.tgt&&f.mode!=='double'){   /* (the Brute's double attack is a charge, not a fireball) */const u=Math.min(1,B.t/B.leapD),tx=f.tgt.x+f.tgt.ox,ty=f.tgt.y-85*S,px=mx+(tx-mx)*u,py=my+(ty-my)*u-Math.sin(Math.PI*u)*40*S;
     ctx.save();ctx.globalCompositeOperation='lighter';for(let k=0;k<8;k++){const v=u-k*.045;if(v<0)continue;drawGlow(ctx,mx+(tx-mx)*v,my+(ty-my)*v-Math.sin(Math.PI*v)*40*S,(26-k*2.8)*S,k<3?'255,170,70':'230,80,30',.75-k*.08);}
     drawGlow(ctx,px,py,30*S,'255,235,170',.95);ctx.restore();drawFlames(ctx,px,py+16*S,70*S,.9);}
   if(f.showHp>0&&!f.dead){const bw=60*S,bx=x-bw/2,by=y+16*S;ctx.save();ctx.globalAlpha=Math.min(1,f.showHp*3);ctx.fillStyle='rgba(20,20,30,.55)';rr(bx-2,by-2,bw+4,10,5);ctx.fill();ctx.fillStyle='#7ee08a';rr(bx,by,bw*f.hp/f.max,6,3);ctx.fill();ctx.restore();}}

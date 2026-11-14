@@ -615,6 +615,14 @@ const CASES = {
     for (let i = 0; i < 60 && !(await g_(() => window.__g.BATTLE.on)); i++) await wait(150);
     check(await g_(() => window.__g.BATTLE.on && window.__g.BATTLE.foes[0].name === 'Demon Brute'), 'the mini boss battle did not start');
     await wait(1500); await p.screenshot({ path: path.join(SHOTS, `worldbind-room8-boss-battle-${vp}.png`) });
+    // the Brute's attacks land on the whole party
+    { const hp0 = await g_(() => ({ l: window.__g.HEROES.lum.hp, a: window.__g.HEROES.amroth.hp }));
+      await g_(() => { const B = window.__g.BATTLE, f = B.foes[0]; B.foeI = 0; f.tgt = B.heroes[0]; f.mode = 'fire'; B.cmd = { guard: false, lock: 0, tried: false }; B.phase = 'foeLeap'; B.t = 0; B.leapD = .5; });
+      await wait(250); await p.screenshot({ path: path.join(SHOTS, `worldbind-brute-attack-${vp}.png`) });
+      for (let i = 0; i < 30 && (await g_(() => window.__g.BATTLE.phase)) === 'foeLeap'; i++) await wait(100);
+      const hp1 = await g_(() => ({ l: window.__g.HEROES.lum.hp, a: window.__g.HEROES.amroth.hp }));
+      check(hp1.l < hp0.l && hp1.a < hp0.a, 'the Brute\'s attack did not hit the whole party: ' + JSON.stringify([hp0, hp1]));
+      await g_(() => { const H = window.__g.HEROES; H.lum.hp = H.lum.maxHp; H.amroth.hp = H.amroth.maxHp; for (const h of window.__g.BATTLE.heroes) h.ko = 0; }); }
     await g_(() => { const B = window.__g.BATTLE; B.phase = 'win'; B.t = 1; B.rewarded = 0; });
     for (let i = 0; i < 40 && (await g_(() => window.__g.BATTLE.on)); i++) { await p.keyboard.press('Space'); await wait(300); }
     check(await g_(() => window.__g.BAG.includes('wbboots') && window.__g.WB8.intense === 1), 'the mini boss did not drop the boots, or the collapse did not worsen');
