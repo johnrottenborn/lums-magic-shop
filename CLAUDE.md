@@ -38,7 +38,7 @@ Live at https://lums-magic-shop.vercel.app. Story and lore: `docs/story.md`. Mak
 | 26-oak-hollow | the five-room root dungeon under the old oak |
 | 26b-ch2-start | Chapter 2 "The Ashes of Awakening": opening cutscene (`C2`: narration on black, Amroth from the gatehouse, Stonebreak Elixir frees Lum, baby in Spar's ashes), Amroth follower (`AMR`); no saving yet |
 | (rooms) | The Worldbind Passage's rooms reuse the root-room engine in 26 (`DROOMS`, image `dun<n>`): room 11 is the first, through the gatehouse door (`enterWorldbind`) |
-| 26c-amroth-home | Amroth's home (`HOME`, `HOMEX/HOMEY`): outdoor area past Worldbind room 20, built as a far-east region of the Stranglethorn world; gatehouse in a stone mountain, a winding path through firs, the cottage and its pond. Stand-in art (hut, outpost, worldbind_cliff), no pier yet |
+| 26c-amroth-home | Amroth's home (`HOME`, `HOMEX/HOMEY`): outdoor area past Worldbind room 20, built as a far-east region of the Stranglethorn world; gatehouse in a stone mountain, a winding path through firs, the cottage and its pond. The cottage is the designer's art (`amroth_cottage`); the gatehouse and mountain are still stand-ins (outpost, worldbind_cliff), no pier yet |
 | 26d-worldbind-flight | Worldbind room 5 on: shaking and falling rubble (`WB5`), endless demon chasers, the lion/raven/serpent green-flame torches (`WBT`, all three will open a room in room 10), brown demons (`bdemon`: 1.5× size, double hit, drop a potion). Room 4's demon waves and left-side chaser are `BO` in 26b |
 | 27-update / 28-render / 29-loop | the main update, the main draw, and the frame loop plus `window.__g` (test hooks) |
 
