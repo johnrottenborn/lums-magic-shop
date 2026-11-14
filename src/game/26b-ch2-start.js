@@ -144,7 +144,8 @@ function updateBlackout(dt){if(SCENE!=='dun'||DUN.room!==14){if(BO.st&&BO.st<9){
     if(there&&BO.said&&!DLG.active){AMR.moving=0;go(4);}}
   else if(BO.st===4){if(BO.t>.6&&!BO.L){BO.L=1;BO.lt=0;BO.ow=demonPair();try{sfxIgnite();}catch(e){}}if(BO.L){BO.lt=Math.min(1,BO.lt+dt*1.5);BO.a=Math.max(0,1-BO.lt);}
     if(BO.t>2.2){go(5);WEVENT.on=false;startEncounter({kind:'demon',scene:'dun',x:lum.x+125,y:lum.y,s:1,pack:2,calm:0,noFlee:1,
-      onWin:()=>{BO.ow=[];BO.R=1;go(11);WEVENT.on=true;resetAmrFollow();},
+      onWin:()=>{BO.ow=[];go(11);   /* the right torch stays out: Amroth only relights the left one */
+      WEVENT.on=true;resetAmrFollow();},
       onLose:()=>{boHeal();BO.st=0;BO.a=0;BO.L=BO.R=1;BO.lt=1;BO.ow=[];BO.said=0;BO.done=0;enterDun(14,200,560,1);resetAmrFollow();}},'ambush');}}
   /* first fight won: Amroth's warning, then two more demons close in from either side */
   else if(BO.st===11){if(BO.t>.8&&!DLG.active&&!BO.warned){BO.warned=1;talk([['Amroth',"Demons should not be here!"]],false,()=>{go(12);const y=lum.y+4;const far=s=>{let x=lum.x+s*125;for(let k=0;k<44&&dunFree(x+s*10,y);k++)x+=s*10;return x;};BO.ow=[-1,1].map(s=>{const [tx]=onFloor(lum.x+s*125,y);return {x:far(s),y,face:-s,a:1,tx};});});}}

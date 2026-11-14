@@ -492,6 +492,7 @@ const CASES = {
     { const l = await g_(() => window.__g.DLG.active && window.__g.DLG.lines[0]); check(l && l[0] === 'Amroth' && /move quickly/.test(l[1]), 'Amroth did not urge them on after the second fight: ' + JSON.stringify(l)); }
     await p.keyboard.press('Enter'); await wait(1500);
     check(await g_(() => { const c = window.__g.BO.chaser; return !window.__g.WEVENT.on && c && c.x < window.__g.lum.x; }), 'no demon came from the left after the second fight');
+    check(await g_(() => window.__g.BO.L === 1 && window.__g.BO.R === 0), 'room 4: only the left torch should be lit');
     await p.screenshot({ path: path.join(SHOTS, `worldbind-demon-chase-${vp}.png`) });
     { let ok = true; for (let i = 0; i < 12; i++) { ok = ok && await g_(() => { const c = window.__g.BO.chaser; return !c || window.__g.dunFree(c.x, c.y); }); await wait(150); } check(ok, 'a room 4 demon walked off the floor'); }
     // the way back to room 3 is closed
