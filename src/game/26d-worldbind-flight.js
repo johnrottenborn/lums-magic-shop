@@ -16,7 +16,7 @@ function wb5Chaser(){const r9=DUN.room===19,[sx,sy]=DUN.room===16||DUN.room===18
   onWin:()=>{WB5.chaser=null;WB5.respawn=1.2;runLine();},onLose:()=>{boHeal();WB5.chaser=null;WB5.respawn=2.5;[lum.x,lum.y]=nearestFree(1000,620);lum.face=1;resetAmrFollow();}};}
 /* a brown demon from the room's right-hand entrance: room 5's (lion torch) drops a potion, room 7's (raven torch) two */
 function wb5Brown(){const [bx,by]=nearestFree(DUN.room===15?1215:1190,540),r7=DUN.room===17||DUN.room===19;   /* rooms 7 and 9 drop two potions */
-  WB5.brown={kind:'bdemon',scene:'dun',x:bx,y:by,face:-1,s:1,pack:1,calm:0,a:0,big:1,over:r7?{loot:['potion','potion']}:undefined,
+  WB5.brown={kind:'bdemon',scene:'dun',x:bx,y:by,face:-1,s:1,pack:1,calm:0,a:0,big:1,
   onWin:()=>{WB5.brown=null;WB5.brownLeft=0;setTimeout(()=>talk([['Amroth',"Keep running!"]]),900);},
   onLose:()=>{boHeal();WB5.brown.calm=3;[WB5.brown.x,WB5.brown.y]=nearestFree(1215,540);[lum.x,lum.y]=nearestFree(640,620);lum.face=1;resetAmrFollow();}};WB5.brownLeft=DUN.room;}
 /* demons walk only where Lum can walk: a 20px grid of the room's walkable floor (dunFree), searched breadth-first toward their target */
@@ -133,8 +133,7 @@ function wb8Dark(){return .4+(WB8.L?0:.14)+(WB8.R?0:.2);}
 function updateWB8(dt){
   if(WB8.L&&lum.x>270&&C2.joined&&!WB8.beat){WB8.L=0;try{sfxSnuff();}catch(e){}setTimeout(()=>{try{sfxBabyCry(.7);}catch(e){}},700);}   /* passing the left torch */
   if(WB8.R&&!WB8.beat&&WB5.said18&&lum.x>1060&&!DLG.active&&!BATTLE.on){WB8.R=0;try{sfxSnuff();}catch(e){}WEVENT.on=true;lum.state='idle';lum.vx=lum.vy=0;lum.face=1;   /* the right torch dies; something comes */
-    const [bx,by]=nearestFree(1285,525);WB8.boss={kind:'bdemon',scene:'dun',x:bx,y:by,face:-1,s:1.15,pack:1,calm:0,a:0,big:2,boss:1,noFlee:1,
-      over:{name:'Demon Brute',hp:40,atk:5,def:1,loot:'wbboots'},
+    const [bx,by]=nearestFree(1285,525);WB8.boss={kind:'brute',scene:'dun',x:bx,y:by,face:-1,s:1.15,pack:1,calm:0,a:0,big:2,boss:1,noFlee:1,
       onWin:()=>{WB8.boss=null;WB8.beat=1;WB8.intense=1;WB5.respawn=2.5;WB5.jolt=1;try{sfxRumble(2.6,1);}catch(e){}setTimeout(()=>talk([['Amroth',"They’re still chasing from behind!"]]),900);},
       onLose:()=>{boHeal();const b=WB8.boss;[b.x,b.y]=nearestFree(1285,525);b.a=1;[lum.x,lum.y]=nearestFree(900,600);lum.face=1;resetAmrFollow();WEVENT.on=true;}};}
   const b=WB8.boss;if(b&&!BATTLE.on&&!BATTLE.pending&&!WIPE.dir&&!FADE.dir){b.a=Math.min(1,b.a+dt*1.2);

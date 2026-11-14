@@ -543,7 +543,7 @@ const CASES = {
     await wait(150); await p.screenshot({ path: path.join(SHOTS, `worldbind-brown-fire-${vp}.png`) });
     await wait(1200); await g_(() => { const B = window.__g.BATTLE; B.phase = 'win'; B.t = 1; B.rewarded = 0; });
     for (let i = 0; i < 40 && (await g_(() => window.__g.BATTLE.on)); i++) { await p.keyboard.press('Space'); await wait(300); }
-    check(await g_(() => window.__g.BAG.filter(x => x === 'potion').length) === pots + 1, 'the brown demon did not drop a healing potion');
+    check(await g_(() => window.__g.BAG.filter(x => x === 'potion').length) === pots + 2, 'the brown demon did not drop two healing potions');
     for (let i = 0; i < 20 && !(await g_(() => window.__g.DLG.active)); i++) await wait(150);
     { const l = await g_(() => window.__g.DLG.active && window.__g.DLG.lines[0]); check(l && l[0] === 'Amroth' && /Keep running/.test(l[1]), 'Amroth did not say to keep running: ' + JSON.stringify(l)); }
     await p.keyboard.press('Enter'); await wait(300);

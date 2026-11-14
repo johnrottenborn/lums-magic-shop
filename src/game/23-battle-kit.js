@@ -4,7 +4,7 @@ const POWDER_LIST=[['spark','Sparkdust','Damage · unlimited',null],['frost','Fr
 const POWICON={spark:'icon4_sun_bottle',frost:'icon3_frost_bowl',thorn:'icon_pouch_rose',moon:'icon3_pastel_powders'};
 function drawPowderIcon(c,id,x,y,z){const im=IMG[POWICON[id]];if(ready(im)){c.drawImage(im,x-z/2,y-z/2,z,z);return true;}return false;}
 const PCOL={spark:'255,230,140',frost:'170,225,255',thorn:'170,220,120',moon:'200,170,255'};
-const WEAKTO={demon:'frost',bdemon:'frost',rslime:'frost',rvixen:'thorn',bigspider:'thorn',slime:'frost',jelly:'frost',fslime:'frost',slug:'frost',slugking:'frost',wisp:'frost',flora:'frost',spider:'thorn',vixen:'thorn',bigvixen:'thorn',bat:'spark',mimic:'spark',rskel:'moon',reaper:'moon',skel:'moon'};
+const WEAKTO={demon:'frost',bdemon:'frost',brute:'frost',rslime:'frost',rvixen:'thorn',bigspider:'thorn',slime:'frost',jelly:'frost',fslime:'frost',slug:'frost',slugking:'frost',wisp:'frost',flora:'frost',spider:'thorn',vixen:'thorn',bigvixen:'thorn',bat:'spark',mimic:'spark',rskel:'moon',reaper:'moon',skel:'moon'};
 const weakKnown=(t,p)=>WEAKTO[t]===p&&C1.weak&&C1.weak[t];
 function lumPowderHit(h,f,c){const B=BATTLE,S=bS(),st=heroStats(h.id),p=B.powder||'spark';let dmg=Math.max(1,st.atk+(c.nice?1:0)-f.def);const tp=foeCenter(f).top;const weak=WEAKTO[f.type]===p;
   if(h.chill){dmg=Math.max(1,dmg-1);h.chill=0;}
@@ -163,7 +163,8 @@ function drawBattleC1Foe(f){const S=bS(),B=BATTLE,x=f.x+f.ox,y=f.y+f.oy,sh=f.typ
 
 
 /* Worldbind demons: the designer's art (faces left), breathing, rearing back to wind up, then hurling a ball of fire at a hero */
-function drawBattleDemon(f){const S=bS(),B=BATTLE,bg=f.type==='bdemon',im=demonArt(bg);if(!ready(im))return;const x=f.x+f.ox,y=f.y+f.oy,h=Math.min(235*S*(bg?1.5:1),W*(bg?.58:.4))*(f.s||1)*(B.foes.length>=3?.8:1),   /* a pack of three is drawn a little smaller so it fits */w=h*im.width/im.height,me=B.foes[B.foeI]===f;
+function drawBattleDemon(f){const S=bS(),B=BATTLE,isBrute=f.type==='brute',bg=f.type==='bdemon'||isBrute,im=isBrute?IMG.demon_brute:demonArt(bg);   /* the Demon Brute (room 8's mini boss) has its own art */
+  if(!ready(im))return;const x=f.x+f.ox,y=f.y+f.oy,h=Math.min(235*S*(bg?1.5:1),W*(bg?.58:.4))*(f.s||1)*(B.foes.length>=3?.8:1),   /* a pack of three is drawn a little smaller so it fits */w=h*im.width/im.height,me=B.foes[B.foeI]===f;
   let al=1;if(f.dead){al=Math.max(0,1-f.dead/.7);if(al<=0)return;}
   const wind=me&&B.phase==='foeWind'?(f.wind||0):0,br=1+.015*Math.sin(T*2.4+f.ph);
   bshadow(x,y,h*.22,h*.05,.35*al);
