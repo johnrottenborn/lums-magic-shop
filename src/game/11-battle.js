@@ -257,8 +257,9 @@ function drawAflurry(){const B=BATTLE,a=B.af;if(B.phase!=='aflurry'||!a||a.done)
   const txt=a.hits+' / '+AF_N;ctx.strokeText(txt,x,c_.top-26*S);ctx.fillText(txt,x,c_.top-26*S);ctx.restore();}
 function drawBattleAmroth(h){const S=bS(),B=BATTLE,x=h.x+h.ox+Math.max(0,62*S-h.x-h.ox+20*S)*(h.ox<=0?1:0),y=h.y+h.oy,me=B.heroes[B.cur]===h,ph=B.phase,t=B.t,H_=AMR_BH*S;let an='bslash',fi=0,flip=false,rot=0,guard=true;   /* stands in the slash row's ready pose, side-on and facing right toward the foes (his guard row faces the viewer) */
   if(me&&(ph==='bonkRun'||ph==='bonkBack'||ph==='run'||ph==='fled')){guard=false;an='run';fi=Math.floor(t*12)%6;flip=ph==='bonkRun';}   /* his run row faces left */
-  else if(me&&ph==='bonkWind'){guard=false;an='bslash';fi=0;rot=-.1*Math.min(1,t/B.windD);}
-  else if(me&&ph==='bonkHit'){guard=false;an='bslash';fi=t<.08?0:t<.2?1:2;flip=false;}
+  else if(me&&ph==='bonkWind'){guard=false;an='bslash';fi=0;rot=-.22*Math.min(1,t/B.windD);}   /* draws the sword back */
+  else if(me&&ph==='bonkHit'){guard=false;an='bslash';flip=false;   /* the slash: a snap forward into the swing frame (with its arc), held, then the follow-through */
+    if(t<.04){fi=0;rot=-.22;}else if(t<.3){fi=1;const u=(t-.04)/.26;rot=-.22+.34*Math.min(1,u*3);}else{fi=2;rot=.12*(1-Math.min(1,(t-.3)/.15));}}
   else if(me&&ph==='aflurry'){guard=false;const a=B.af||{};an='bslash';fi=a.swing>.16?1:a.swing>0?2:0;flip=false;}
   bshadow(x,y+2,40*S,11*S,.35);ctx.save();ctx.translate(x,y+3);if(h.hurt>0)ctx.translate(Math.sin(h.hurt*60)*4,0);ctx.rotate(flip?-rot:rot);ctx.scale(.88,1);   /* a little slimmer */
   if(guard){const b=Math.sin(T*1.5);ctx.scale(1-.004*b,1+.01*b);}

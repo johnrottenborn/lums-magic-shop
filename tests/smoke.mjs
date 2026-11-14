@@ -394,6 +394,8 @@ const CASES = {
     check(await g_(() => window.__g.BATTLE.heroes.map(h => h.id).join(',')) === 'lum,amroth', 'Amroth is not in the battle');
     await g_(() => { const B = window.__g.BATTLE; B.cur = 1; window.__g.C1X.comboA = 5; }); await wait(900);
     await p.screenshot({ path: path.join(SHOTS, `amroth-in-battle-${vp}.png`) });
+    { const sl = await g_(() => { const g = window.__g, B = g.BATTLE, i = B.heroes.findIndex(h => h.id === 'amroth'); if (i < 0) return false; window.__sv = { cur: B.cur, phase: B.phase, t: B.t, sel: B.sel }; B.cur = i; B.foeT = B.foes[0]; B.phase = 'bonkHit'; B.t = 0; return true; });
+      if (sl) { await wait(140); await p.screenshot({ path: path.join(SHOTS, `amroth-slash-${vp}.png`) }); check(await g_(() => window.__g.BATTLE.phase === 'bonkHit' || window.__g.BATTLE.phase === 'bonkBack'), 'Amroth\'s slash did not play'); await g_(() => { const B = window.__g.BATTLE, v = window.__sv; B.cur = v.cur; B.phase = v.phase; B.t = v.t; B.sel = v.sel; for (const h of B.heroes) { h.ox = 0; h.oy = 0; } }); await wait(400); } }
     check(await g_(() => window.__g.battleMenuOpts().some(o => o[0] === 'burst' && o[1] === "Lion's Fury")), "no Lion's Fury at 5 stars");
     await g_(() => { const B = window.__g.BATTLE; B.phase = 'aflurry'; B.t = 0; B.af = { i: 0, bt: 0, hits: 0, hit: -1, pressed: 0, swing: 0 };
       const tick = () => { const a = B.af; if (!a || a.done || B.phase !== 'aflurry') return; if (!a.pressed && a.bt / 0.52 > 0.76) window.__g.battleAction(); requestAnimationFrame(tick); }; requestAnimationFrame(tick); });
