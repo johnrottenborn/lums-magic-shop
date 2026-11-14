@@ -38,8 +38,10 @@ function drawHomeGround(x0,y0,x1,y1){if(x1<HOMEX-300)return;if(!HPATHP)HPATHP=bu
 /* interactions: the gatehouse arch back into the passage, the cottage door, the pond */
 function homeInts(){const X=x=>x+HOMEX,Y=y=>y+HOMEY;return [
   {x:X(HOME.arch.x),y:Y(HOME.arch.y+30),get reach(){return inHome()?85:0},door:true,onInteract:()=>dunGo(20,900,690,1)},
-  {x:X(HOME.cot.x+HOME.cot.door),y:Y(HOME.cot.y+15),get reach(){return inHome()?85:0},onInteract:()=>say("Amroth's home.")},
+  {x:X(HOME.cot.x+HOME.cot.door),y:Y(HOME.cot.y+15),get reach(){return inHome()?85:0},door:true,onInteract:()=>enterDun(21,435,640,1)},
   {x:X(HOME.pond.x-HOME.pond.rx+20),y:Y(HOME.pond.y),get reach(){return inHome()?110:0},onInteract:()=>say("A quiet pond. Rain dimples the water.")}];}
+/* out of the cottage's front door, onto the step */
+function leaveCottage(){SCENE='thorn';lum.x=HOMEX+HOME.cot.x+HOME.cot.door;lum.y=HOMEY+HOME.cot.y+30;lum.face=1;lum.dir='down';lum.state='idle';lum.vx=lum.vy=0;cam.x=lum.x;cam.y=lum.y+200;THORN.t=99;HOME.t=99;}
 function enterHome(){SCENE='thorn';lum.x=HOMEX+HOME.arch.x;lum.y=HOMEY+HOME.arch.y+60;lum.face=1;lum.state='idle';lum.vx=lum.vy=0;cam.x=lum.x;cam.y=lum.y+200;THORN.t=99;HOME.t=0;if(/Amroth’s home/.test(GOAL.text)){GOAL.tag='';GOAL.text='';}}
 function drawHomeTitle(){if(!inHome()||HOME.t>=4.5||SCENE!=='thorn')return;HOME.t+=1/60;const a=Math.min(1,HOME.t*1.5,(4.5-HOME.t)*1.2);ctx.save();ctx.setTransform(DPR,0,0,DPR,0,0);ctx.globalAlpha=a;ctx.textAlign='center';
   ctx.fillStyle='rgba(10,8,14,.5)';ctx.fillRect(0,H*.3-40,W,80);ctx.fillStyle='#e8eef6';ctx.font='700 26px "Alegreya SC", Georgia, serif';ctx.fillText("Amroth's Home",W/2,H*.3+10);ctx.restore();}

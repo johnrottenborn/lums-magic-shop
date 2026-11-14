@@ -30,7 +30,18 @@ const DROOMS={
   19:{name:'Worldbind Passage',dark:.42,floor:[[375,195],[475,195],[530,275],[590,360],[650,450],[730,520],[790,580],[880,600],[1080,590],[1150,530],[1200,540],[1170,650],[1100,768],[480,768],[420,680],[300,560],[200,440],[180,330],[300,240]],
      block:[{x0:232,y0:498,x1:415,y1:690},{x0:180,y0:345,x1:300,y1:452},{x0:415,y0:296,x1:505,y1:372},{x0:225,y0:268,x1:295,y1:332},{x0:720,y0:462,x1:862,y1:575},{x:860,y:525,rx:55,ry:16}],light:[420,130,200]},   /* arrive at the top of the stairs (back to room 18); stone pedestals; a coiled serpent statue with a green flame; the tunnel stairs on the right lead on */
   20:{name:'Worldbind Passage',dark:.38,floor:[[792,395],[935,395],[948,595],[1060,605],[1180,640],[1235,768],[565,768],[585,700],[605,625],[765,598]],
-     light:[862,250,230]},   /* the serpent gate: arrive in the lit stairwell behind the carved archway (back to room 19), walk down through it; the way on is in the foreground */
+     light:[862,250,230]},
+  /* Amroth's cottage (the designer's interiors). 21: the main room, front door on the left, spiral stair up on the right */
+  21:{name:'',dark:0,home:1,floor:[[345,612],[705,606],[930,604],[1150,628],[1160,768],[120,768],[130,690]],
+     block:[{x0:120,y0:664,x1:612,y1:769},{x0:598,y0:664,x1:705,y1:769},{x0:910,y0:598,x1:1098,y1:692}],
+     fg:[{y:690,poly:[[150,636],[612,646],[640,640],[700,636],[705,768],[120,768]]},{y:688,poly:[[912,600],[1098,595],[1098,700],[905,700]]}]},
+  /* 23: the basement workshop under the cottage (behind the bookshelf left of the fireplace; opened by a story event) */
+  23:{name:'',dark:0,home:1,floor:[[140,522],[470,512],[1000,555],[1195,600],[1245,640],[1245,768],[350,768],[350,600],[140,575]],
+     block:[{x0:500,y0:486,x1:945,y1:696},{x0:660,y0:705,x1:905,y1:769},{x0:920,y0:600,x1:1060,y1:665}],
+     fg:[{y:698,poly:[[500,470],[950,470],[950,700],[496,700]]},{y:769,poly:[[680,712],[905,712],[905,768],[680,768]]},{y:769,poly:[[118,592],[360,592],[360,768],[118,768]]}]},
+  /* 22: the loft, the bed under the thatch; the stair comes up on the right behind the rail */
+  22:{name:'',dark:0,home:1,floor:[[120,738],[460,730],[1050,726],[1050,612],[1185,612],[1185,768],[110,768]],
+     block:[{x0:440,y0:430,x1:1052,y1:724}]},   /* the serpent gate (above): arrive in the lit stairwell behind the carved archway (back to room 19), walk down through it; the way on is in the foreground */
   5:{name:'Deeproot',sub:'turn back',dark:.86,floor:[[420,768],[480,640],[560,580],[620,540],[700,540],[800,580],[950,620],[1050,700],[1080,768]]}};
 const EYES5=[[200,144],[290,106],[275,181],[331,319],[500,140],[652,129],[625,238],[731,190],[512,422],[612,444],[212,481],[212,512],[440,275],[420,412],[610,282]];
 function dunFree(x,y){const R=DROOMS[DUN.room];if(!inPoly(x,y,R.floor))return false;if(DUN.room===20&&WB10.st&&y<615&&x>750&&x<965)return false;   /* the caved-in archway */
@@ -72,6 +83,11 @@ function setupDun(){DUNINT.length=0;const r=DUN.room,D=(x,y,reach,fn)=>DUNINT.pu
     L(730,545,110,["The old wall again. The air is getting colder the deeper we go.","Water drips somewhere behind the stones."]);}
   if(r===19){D(422,205,70,()=>dunGo(18,1215,540,-1));DUNINT.push({x:840,y:580,reach:95,onInteract:()=>touchWBTorch('serpent',["A great stone serpent, coiled and ready to strike. Its green flame burns brighter now."])});
     L(330,700,95,["Another empty pedestal."]);D(1165,545,80,()=>dunGo(20,862,425,1));}
+  if(r===21){D(435,618,70,()=>leaveCottage());D(1172,662,70,()=>dunGo(22,1115,700,-1));
+    L(820,612,90,["A warm fire crackles in the hearth. A kettle hangs over the flames."]);}
+  if(r===21&&C2.basement)D(660,612,70,()=>dunGo(23,300,580,1));   /* the bookshelf door to the basement, once the story opens it */
+  if(r===22){D(1160,728,70,()=>dunGo(21,1120,672,-1));}
+  if(r===23){D(258,560,70,()=>dunGo(21,680,640,1));}
   if(r===20){if(!WB10.st)D(862,405,60,()=>dunGo(19,1150,560,-1));
     DUNINT.push({x:900,y:745,reach:95,door:true,onInteract:()=>goScene(enterHome)});   /* out into the open: Amroth's home */
     L(300,600,110,["A carving of a many-headed serpent.","Three empty pedestals stand in a row beneath it."]);L(862,600,70,["Runes are carved above the arch. I can't read them."]);}
@@ -118,7 +134,7 @@ function updateDFoes(dt){const ok=!DLG.active&&!WEVENT.on&&!MENU.open&&!FADE.dir
 function drawDFoe(g){const k=dunH(g.y)/151,bob=Math.sin(g.ph*3)*8;if(g.kind==='bigspider'){const h=330*k;ctx.fillStyle='rgba(0,0,0,.35)';ctx.beginPath();ctx.ellipse(g.x,g.y,h*.5,h*.09,0,0,TAU);ctx.fill();ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,g.x,g.y-h*.35,h*.6,'150,120,200',.16+.05*Math.sin(T*1.5));ctx.restore();ctx.save();ctx.filter='brightness(1.45) contrast(1.1)';c1Frame(ctx,'spider_dark','idle',Math.floor(g.ph*4)%4,g.x,g.y,h,true,1,0);ctx.restore();return;}if(g.kind==='rvixen'){const mv=Math.hypot(g.tx-g.x,g.ty-g.y)>8,h=118*k;ctx.fillStyle='rgba(0,0,0,.3)';ctx.beginPath();ctx.ellipse(g.x,g.y,h*.42,h*.07,0,0,TAU);ctx.fill();c1Frame(ctx,'fox_red','run',mv?Math.floor(g.ph*14)%12:0,g.x,g.y,h,g.face>0,1,0);return;}if(g.kind==='spider'){const mv=Math.hypot(g.tx-g.x,g.ty-g.y)>8;ctx.fillStyle='rgba(0,0,0,.3)';ctx.beginPath();ctx.ellipse(g.x,g.y,34*k,7*k,0,0,TAU);ctx.fill();c1Frame(ctx,'spider',mv?'crawl':'idle',Math.floor(g.ph*(mv?12:4))%(mv?5:4),g.x,g.y,70*k,mv?g.face>0:g.face<0,1,0);return;}if(g.kind==='vixen'||g.kind==='bigvixen'){const h=(g.kind==='bigvixen'?230:120)*k,br=1+Math.sin(g.ph*(g.asleep?1.4:3))*.012;ctx.fillStyle='rgba(0,0,0,.3)';ctx.beginPath();ctx.ellipse(g.x,g.y,h*.42,h*.07,0,0,TAU);ctx.fill();ctx.save();ctx.translate(g.x,g.y);ctx.scale(1,br);ctx.translate(-g.x,-g.y);c1Frame(ctx,'fox',g.asleep?'hurt':'run',0,g.x,g.y,h,g.face>0,1,0);ctx.restore();
     ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,g.x,g.y-h*.4,h*.5,'255,170,90',.08+.03*Math.sin(g.ph*2));ctx.restore();return;}ctx.fillStyle='rgba(0,0,0,.25)';ctx.beginPath();ctx.ellipse(g.x,g.y,26*k,6*k,0,0,TAU);ctx.fill();
   c1Frame(ctx,'bat','fly',Math.floor(g.ph*9)%3,g.x,g.y-110*k-bob,90*k,g.face>0,1,0);}
-function enterDun(room,x,y,face){const prevRoom=SCENE==='dun'?DUN.room:0;buildDFoes();SCENE='dun';DUN.room=room;if(room>=6)C1['seen'+room]=1;lum.x=x??560;lum.y=y??640;lum.face=face||1;lum.vx=lum.vy=0;lum.state='idle';WCAM.x=lum.x;WTITLE.t=prevRoom>=11&&room>=11?99:0;setupDun();   /* the area title shows once, on entering the Worldbind Passage, not between its rooms */
+function enterDun(room,x,y,face){const prevRoom=SCENE==='dun'?DUN.room:0;buildDFoes();SCENE='dun';DUN.room=room;if(room>=6)C1['seen'+room]=1;lum.x=x??560;lum.y=y??640;lum.face=face||1;lum.vx=lum.vy=0;lum.state='idle';WCAM.x=lum.x;WTITLE.t=(prevRoom>=11&&room>=11)||DROOMS[room].home?99:0;setupDun();   /* the area title shows once, on entering the Worldbind Passage, not between its rooms */
   if(room===1&&!C1.dunSeen){C1.dunSeen=1;setTimeout(()=>talk([['Lum',"Cosmic? …Cosmic!"]]),900);}
   if(room===5)DUN.eyes=EYES5.map(()=>({b:rnd(0,6),t:0}));}
 function drawDun(){const R=DROOMS[DUN.room],im=IMG['dun'+DUN.room];if(!ready(im))return;const [rz]=roomView();
@@ -143,11 +159,12 @@ function drawDun(){const R=DROOMS[DUN.room],im=IMG['dun'+DUN.room];if(!ready(im)
     if(DUN.room===7)L.push([614,()=>{const t=IMG.dun7_table;if(!ready(t))return;const hid=lum.y<614&&Math.abs(lum.x-945)<240;ctx.save();ctx.globalAlpha=hid?.62:1;ctx.drawImage(t,730,425);ctx.restore();}]);
     if(DUN.room===14){for(const d of BO.ow)L.push([d.y,()=>drawDemonOW(d.x,d.y,d.face,d.a,d.mv,0,d)]);const g=BO.chaser;if(g)L.push([g.y,()=>drawDemonOW(g.x,g.y,g.face,g.a,g.mv,0,g)]);}
     if(DUN.room===15)for(const g of [WB5.chaser,WB5.brown])if(g)L.push([g.y,()=>drawDemonOW(g.x,g.y,g.face,g.a,g.mv,g.big,g)]);
+    for(const F of (R.fg||[]))L.push([F.y,()=>{ctx.save();ctx.beginPath();F.poly.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y));ctx.closePath();ctx.clip();ctx.drawImage(im,0,0,1375,768);ctx.restore();}]);   /* furniture that stands in front of whoever is behind it */
     L.sort((a,b)=>a[0]-b[0]);for(const [,f] of L)f();}
   if(DUN.room===14&&BO.a>0){ctx.fillStyle=`rgba(0,0,0,${BO.a*.55})`;ctx.fillRect(-2000,-500,5375,1800);}
   for(const p of PARTS)if(p.type==='fiz'||p.type==='puff'||p.type==='dust'){const k2=dunH(p.y)/151;ctx.save();ctx.translate(p.x,p.y);ctx.scale(k2,k2);ctx.translate(-p.x,-p.y);drawPartWell(p);ctx.restore();}
   if(DUN.room===15)drawWB5Fall();
-  if(DUN.room>=11&&!(DUN.room===14&&BO.a>.3))drawWorldbindAir(R);
+  if(DUN.room>=11&&DUN.room<=20&&!(DUN.room===14&&BO.a>.3))drawWorldbindAir(R);
   // darkness: only the little lantern's circle (and any daylight from above) cuts through
   ctx.setTransform(DPR,0,0,DPR,0,0);const lit=BAG.includes('lantern');const [sx,sy]=wellToScreen(lum.x,lum.y-70*k);const zr=rz*(lit?1:.45);
   const r0=(BAG.includes('lantern')?120:70)*zr,r1=(BAG.includes('lantern')?260:170)*zr,R_=Math.hypot(W,H)*1.2,fl=1+.03*Math.sin(T*9);
@@ -160,6 +177,9 @@ function drawDun(){const R=DROOMS[DUN.room],im=IMG['dun'+DUN.room];if(!ready(im)
   if(DUN.room===19){const [px,py]=wellToScreen(805,200);drawGlow(ctx,px,py,(160+10*Math.sin(T*5))*rz,'90,255,190',.26);;wbTorchGlow(19,px,py,rz);}
   if(DUN.room===17){const [px,py]=wellToScreen(818,280);drawGlow(ctx,px,py,(160+10*Math.sin(T*5))*rz,'90,255,190',.26);;wbTorchGlow(17,px,py,rz);}
   if(DUN.room===15){const [px,py]=wellToScreen(818,290);drawGlow(ctx,px,py,(170+10*Math.sin(T*5))*rz,'90,255,190',.26);;wbTorchGlow(15,px,py,rz);}
+  if(DUN.room===23){ctx.save();ctx.globalCompositeOperation='lighter';const fl=1+.05*Math.sin(T*6);for(const [x,y,c] of [[608,470,'255,190,110'],[876,460,'255,190,110'],[950,610,'140,220,255'],[780,290,'140,220,255']]){const [px,py]=wellToScreen(x,y);drawGlow(ctx,px,py,120*rz*fl,c,.18);}ctx.restore();}   /* lamps on the bench, glowing crystals */
+  if(DUN.room===21||DUN.room===22){ctx.save();ctx.globalCompositeOperation='lighter';const fl=1+.06*Math.sin(T*7)+.04*Math.sin(T*13);   /* the hearth fire / the oil lamp */
+    const [fx,fy]=wellToScreen(...(DUN.room===21?[862,560]:[1122,430]));drawGlow(ctx,fx,fy,(DUN.room===21?330:220)*rz*fl,'255,150,70',.2);drawGlow(ctx,fx,fy,90*rz*fl,'255,210,140',.3);ctx.restore();}
   if(R.light){const [lx,ly,lr]=R.light,[px,py]=wellToScreen(lx,ly);drawGlow(ctx,px,py,lr*rz,'180,210,255',.22);}
   ctx.restore();
   if(WTITLE.t<4.5&&!CAPTURE.on){const a=Math.min(1,WTITLE.t*1.5,(4.5-WTITLE.t)*1.2);ctx.save();ctx.globalAlpha=a;ctx.textAlign='center';ctx.fillStyle='rgba(10,8,14,.5)';ctx.fillRect(0,H*.3-40,W,80);
