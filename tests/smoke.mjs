@@ -660,9 +660,19 @@ const CASES = {
     await p.keyboard.down('ArrowDown'); for (let i = 0; i < 30 && !(await g_(() => window.__g.WB10.st)); i++) await wait(150); await p.keyboard.up('ArrowDown');
     check(await g_(() => window.__g.WB10.st === 1 && window.__g.WEVENT.on), 'the archway did not cave in at the bottom of room 10\'s stairs');
     await wait(700); await p.screenshot({ path: path.join(SHOTS, `worldbind-room10-collapse-${vp}.png`) });
+    // after the cave-in: Amroth and Lum speak; all three torches were lit, so the serpents glow and a chest appears
+    for (let i = 0; i < 30 && !(await g_(() => window.__g.DLG.active)); i++) await wait(150);
+    { const l = await g_(() => window.__g.DLG.active && window.__g.DLG.lines.map(x => x[0] + ':' + x[1]).join(' | ')); check(l && /Amroth:We made it/.test(l) && /Lum:And I think the passage will block the demons/.test(l) && /Amroth:My home is just outside/.test(l), 'room 10\'s lines after the cave-in: ' + JSON.stringify(l)); }
+    for (let i = 0; i < 4 && await g_(() => window.__g.DLG.active); i++) { await p.keyboard.press('Enter'); await wait(350); }
     for (let i = 0; i < 30 && await g_(() => window.__g.WEVENT.on); i++) await wait(150);
+    check(await g_(() => window.__g.WB10.glow > 0 && !!window.__g.WB10.chest), 'the serpents did not glow and the chest did not appear');
+    await wait(1200); await p.screenshot({ path: path.join(SHOTS, `worldbind-room10-chest-${vp}.png`) });
+    await g_(() => { const g = window.__g; g.lum.x = 900; g.lum.y = 728; }); await wait(500);
+    await g_(() => window.__g.NEAR.onInteract()); await wait(600);
+    check(await g_(() => window.__g.BAG.includes('serpentarmor') && !window.__g.WB10.chest), 'the chest did not give the Serpent Armor and disappear');
+    await g_(() => { const g = window.__g; g.lum.x = 857; g.lum.y = 625; }); await wait(300);
     check(await g_(() => window.__g.WB5.fall.length === 0), 'room 10 is still shaking after the cave-in');
-    check(await g_(() => window.__g.WB10.st === 2 && !window.__g.dunFree(857, 500) && !window.__g.DUNINTS().some(d => d.door && d.y < 450)), 'the way back up is not blocked after the cave-in');
+    check(await g_(() => window.__g.WB10.st >= 2 && !window.__g.dunFree(857, 500) && !window.__g.DUNINTS().some(d => d.door && d.y < 450)), 'the way back up is not blocked after the cave-in');
     await p.screenshot({ path: path.join(SHOTS, `worldbind-room10-blocked-${vp}.png`) });
     await p.keyboard.down('ArrowDown'); await wait(1500); await p.keyboard.up('ArrowDown'); await wait(500);
     check(await g_(() => window.__g.lum.y > 640 && !!(window.__g.NEAR && window.__g.NEAR.door)), 'Lum could not walk through the arch to the way on in the foreground');

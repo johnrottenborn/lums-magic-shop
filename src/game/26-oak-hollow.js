@@ -44,7 +44,7 @@ const DROOMS={
      block:[{x0:440,y0:430,x1:1052,y1:724}]},   /* the serpent gate (above): arrive in the lit stairwell behind the carved archway (back to room 19), walk down through it; the way on is in the foreground */
   5:{name:'Deeproot',sub:'turn back',dark:.86,floor:[[420,768],[480,640],[560,580],[620,540],[700,540],[800,580],[950,620],[1050,700],[1080,768]]}};
 const EYES5=[[200,144],[290,106],[275,181],[331,319],[500,140],[652,129],[625,238],[731,190],[512,422],[612,444],[212,481],[212,512],[440,275],[420,412],[610,282]];
-function dunFree(x,y){const R=DROOMS[DUN.room];if(!inPoly(x,y,R.floor))return false;if(DUN.room===20&&WB10.st&&y<615&&x>750&&x<965)return false;   /* the caved-in archway */
+function dunFree(x,y){const R=DROOMS[DUN.room];if(!inPoly(x,y,R.floor))return false;if(DUN.room===20&&WB10.st&&y<615&&x>750&&x<965)return false;if(DUN.room===20&&WB10.chest&&((x-900)/62)**2+((y-692)/22)**2<1)return false;   /* the caved-in archway */
   for(const b of (R.block||[]))if(b.x0!==undefined?(x>b.x0&&x<b.x1&&y>b.y0&&y<b.y1):((x-b.x)/b.rx)**2+((y-b.y)/b.ry)**2<1)return false;return true;}
 function solveDun(px,py,nx,ny){if(dunFree(nx,ny))return [nx,ny];if(dunFree(nx,py))return [nx,py];if(dunFree(px,ny))return [px,ny];return [px,py];}
 const dunH=y=>(150+(clamp(y,380,768)-620)*.28)*((DROOMS[DUN.room]||{}).hk||1);   /* hk: a room drawn closer up (the cottage) draws everyone bigger */
@@ -88,6 +88,7 @@ function setupDun(){DUNINT.length=0;const r=DUN.room,D=(x,y,reach,fn)=>DUNINT.pu
   if(r===21&&C2.basement)D(695,610,50,()=>dunGo(23,300,580,1));   /* the bookshelf door to the basement, once the story opens it */
   if(r===22){D(1160,728,70,()=>dunGo(21,1120,672,-1));}
   if(r===23){D(258,560,70,()=>dunGo(21,680,640,1));}
+  if(r===20&&WB10.chest)DUNINT.push({x:900,y:715,reach:85,onInteract:openWB10Chest});
   if(r===20){if(!WB10.st)D(862,405,60,()=>dunGo(19,1150,560,-1));
     DUNINT.push({x:900,y:745,reach:95,door:true,onInteract:()=>goScene(enterHome)});   /* out into the open: Amroth's home */
     L(300,600,110,["A carving of a many-headed serpent.","Three empty pedestals stand in a row beneath it."]);L(862,600,70,["Runes are carved above the arch. I can't read them."]);}
@@ -140,7 +141,7 @@ function enterDun(room,x,y,face){const prevRoom=SCENE==='dun'?DUN.room:0;buildDF
 function drawDun(){const R=DROOMS[DUN.room],im=IMG['dun'+DUN.room];if(!ready(im))return;const [rz]=roomView();
   ctx.setTransform(DPR,0,0,DPR,0,0);ctx.fillStyle='#07080c';ctx.fillRect(0,0,W,H);
   const qk=DUN.room===20&&WB10.st?WB10.q:DUN.room>=15&&DUN.room<=20?WB5.q:[0,0];ctx.setTransform(DPR*rz,0,0,DPR*rz,DPR*(W/2-WCAM.x*rz+qk[0]),DPR*qk[1]);ctx.drawImage(im,0,0,1375,768);   /* room 5 trembles */
-  if(DUN.room===20)drawWB10Rubble();
+  if(DUN.room===20){drawWB10Rubble();drawWB10Glow();}
   if((DUN.room===14&&!BO.R&&BO.a<1)||(DUN.room===18&&!WB8.R)){const g=ctx.createLinearGradient(780,0,1180,0);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,'rgba(0,0,0,.94)');ctx.fillStyle=g;ctx.fillRect(780,-500,2600,1800);}
   if(DUN.room===14&&BO.a>0){ctx.fillStyle=`rgba(0,0,0,${BO.a})`;ctx.fillRect(-2000,-500,5375,1800);}
   if(((DUN.room===12&&!C2.torchLit)||(DUN.room===18&&!WB8.L))&&IMG.dun12_torch_out&&IMG.dun12_torch_out.complete){ctx.drawImage(IMG.dun12_torch_out,70,270);ctx.save();for(let i=0;i<4;i++){const q=(T*.25+i/4)%1;ctx.globalAlpha=.35*(1-q);drawGlow(ctx,110+Math.sin(T+i)*6*q,368-q*90,10+q*22,'150,160,170',.8);}ctx.restore();}
@@ -158,6 +159,7 @@ function drawDun(){const R=DROOMS[DUN.room],im=IMG['dun'+DUN.room];if(!ready(im)
     if(CH>=2&&C2.joined){const ka=dunH(AMR.y)/151;L.push([AMR.y-1,()=>{ctx.save();ctx.translate(AMR.x,AMR.y);ctx.scale(ka,ka);ctx.translate(-AMR.x,-AMR.y);drawAmrOW(AMR,1);ctx.restore();}]);}
     if(DUN.room===7)L.push([614,()=>{const t=IMG.dun7_table;if(!ready(t))return;const hid=lum.y<614&&Math.abs(lum.x-945)<240;ctx.save();ctx.globalAlpha=hid?.62:1;ctx.drawImage(t,730,425);ctx.restore();}]);
     if(DUN.room===14){for(const d of BO.ow)L.push([d.y,()=>drawDemonOW(d.x,d.y,d.face,d.a,d.mv,0,d)]);const g=BO.chaser;if(g)L.push([g.y,()=>drawDemonOW(g.x,g.y,g.face,g.a,g.mv,0,g)]);}
+    if(DUN.room===20&&(WB10.chest||WB10.spark>0)){const cy=WB10.chest?WB10.chest.y:WB10.sy;L.push([cy,drawWB10Chest]);}
     if(DUN.room===18&&WB8.boss){const g=WB8.boss;L.push([g.y,()=>drawDemonOW(g.x,g.y,g.face,g.a,g.mv,2,g)]);}
     if(DUN.room>=15&&DUN.room<=19)for(const g of [WB5.chaser,WB5.brown])if(g){L.push([g.y,()=>drawDemonOW(g.x,g.y,g.face,g.a,g.mv,g.big,g)]);if(g.trio)for(const [tx,ty] of trioPos(g))L.push([ty,()=>drawDemonOW(tx,ty,g.face,g.a,g.mv,0)]);}
     for(const F of (R.fg||[]))L.push([F.y,()=>{ctx.save();ctx.beginPath();F.poly.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y));ctx.closePath();ctx.clip();ctx.drawImage(im,0,0,1375,768);ctx.restore();}]);   /* furniture that stands in front of whoever is behind it */

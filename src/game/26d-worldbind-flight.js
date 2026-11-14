@@ -93,12 +93,12 @@ function drawWB5Fall(){ctx.save();for(const p of WB5.fall){const fade=p.land?Mat
 const WB10={st:0,t:0,fill:0,q:[0,0],rocks:[]};
 const ARCH={cx:857,cy:305,r:93,x0:764,x1:950,y1:600};
 function archPath(c,pad=0){c.beginPath();c.moveTo(ARCH.x0-pad,ARCH.y1+pad);c.lineTo(ARCH.x0-pad,ARCH.cy);c.arc(ARCH.cx,ARCH.cy,ARCH.r+pad,Math.PI,0);c.lineTo(ARCH.x1+pad,ARCH.y1+pad);c.closePath();}
-function updateWorldbind10(dt){if(SCENE!=='dun'||DUN.room!==20){WB10.q=[0,0];return;}
+function updateWorldbind10(dt){updateWB10Reward(dt);if(SCENE!=='dun'||DUN.room!==20){WB10.q=[0,0];return;}
   if(!WB10.st&&C2.joined&&lum.y>=598&&!FADE.dir&&!DLG.active){WB10.st=1;WB10.t=0;WEVENT.on=true;lum.state='idle';lum.vx=lum.vy=0;lum.face=1;if(lum.y<618)lum.y=618;resetAmrFollow();setupDun();try{sfxRumble(2.6,1);}catch(e){}}
   if(WB10.st===1){WB10.t+=dt;const t=WB10.t,amp=t<1.8?9*(1-t/2):0;WB10.q=[rnd(-amp,amp),rnd(-amp,amp)*.7];
     if(t<1.4&&Math.random()<dt*40)WB10.rocks.push({x:rnd(ARCH.x0+10,ARCH.x1-10),y:rnd(200,260),vy:rnd(0,80),ground:rnd(560,620),s:rnd(9,22),rot:rnd(0,TAU),spin:rnd(-5,5),cell:Math.floor(rnd(0,7)),land:0});
     if(t>.35)WB10.fill=Math.min(1,WB10.fill+dt*.9);
-    if(t>2.4){WB10.st=2;WB10.q=[0,0];WEVENT.on=false;}}
+    if(t>2.4){WB10.st=2;WB10.q=[0,0];WEVENT.on=true;setTimeout(()=>talk([['Amroth',"We made it!"],['Lum',"And I think the passage will block the demons… for now…"],['Amroth',"My home is just outside."]],false,wb10AfterTalk),500);}}
   for(const p of WB10.rocks){if(p.land){p.land+=dt;continue;}p.vy+=900*dt;p.y+=p.vy*dt;p.rot+=dt*p.spin;if(p.y>=p.ground){p.y=p.ground;p.land=.001;}}
   for(let i=WB10.rocks.length-1;i>=0;i--)if(WB10.rocks[i].land>(WB10.fill>=1?.3:1.2))WB10.rocks.splice(i,1);}
 /* the blocked archway, drawn over the room image (under the characters) */
@@ -141,3 +141,16 @@ function updateWB8(dt){
     if(b.a>.6&&!DLG.active){const d=Math.hypot(lum.x-b.x,lum.y-b.y);if(d>95)demonStep(b,lum.x,lum.y,70,dt);else{b.mv=0;WEVENT.on=false;startEncounter(b,'normal');}}}}
 /* the two demons trailing room 9's pack leader, spaced along its path */
 function trioPos(g){const h=g.hist,out=[];for(const back of [8,16]){const p=h[Math.max(0,h.length-1-back)]||[g.x,g.y];out.push(p);}return out;}
+
+/* after the cave-in talk: if all three green-flame torches were lit, the archway's carved serpents glow and a chest appears */
+WB10.glow=0;WB10.chest=null;
+const wbAllTorches=()=>WBT.lion&&WBT.raven&&WBT.serpent;
+function wb10AfterTalk(){if(!wbAllTorches()||WB10.opened){WEVENT.on=false;return;}WB10.glowOn=1;try{sfxIgnite();}catch(e){}
+  setTimeout(()=>{WB10.chest={x:900,y:690,a:0};WB10.spark=1;try{sfxItem();}catch(e){}WEVENT.on=false;setupDun();},2200);}
+function updateWB10Reward(dt){if(WB10.glowOn)WB10.glow=Math.min(1,WB10.glow+dt*.6);const c=WB10.chest;if(c)c.a=Math.min(1,c.a+dt*1.5);if(WB10.spark>0)WB10.spark=Math.max(0,WB10.spark-dt*.8);}
+function openWB10Chest(){if(!WB10.chest)return;const c=WB10.chest;WB10.chest=null;WB10.opened=1;WB10.spark=1;WB10.sx=c.x;WB10.sy=c.y;giveItem('serpentarmor');setupDun();}
+/* glowing serpent lines (traced from the archway art) and the chest, in room coordinates */
+function drawWB10Glow(){if(WB10.glow<=0)return;const im=IMG.dun20_snakeglow;if(!ready(im))return;ctx.save();ctx.globalCompositeOperation='lighter';ctx.globalAlpha=WB10.glow*(.55+.2*Math.sin(T*2.2));ctx.drawImage(im,670,175);ctx.restore();}
+function drawWB10Chest(){const c=WB10.chest,im=IMG.chest_closed;
+  if(c&&ready(im)){const k=dunH(c.y)/150,w=118*k,h=w*270/298;ctx.save();ctx.globalAlpha=c.a*.4;ctx.fillStyle='#000';ctx.beginPath();ctx.ellipse(c.x,c.y,w*.45,w*.12,0,0,TAU);ctx.fill();ctx.globalAlpha=c.a;ctx.drawImage(im,c.x-w/2,c.y-h+4,w,h);ctx.restore();}
+  if(WB10.spark>0){const x=c?c.x:WB10.sx,y=(c?c.y:WB10.sy)-40;ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,x,y,(60+80*(1-WB10.spark)),'150,255,190',WB10.spark*.7);ctx.restore();}}
