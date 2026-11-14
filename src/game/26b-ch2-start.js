@@ -131,7 +131,8 @@ const BO={st:0,t:0,a:0,L:1,R:1,lt:1,ow:[],done:0,lock:0,chaser:null};
 function boHeal(){for(const id of PARTY_ORDER)HEROES[id].hp=HEROES[id].maxHp;}
 /* after the two fights a demon keeps coming from the left (room 3's side): running right gets away, beating it brings another */
 function spawnChaser(){BO.chaser={kind:'demon',scene:'dun',x:40,y:575,face:1,s:1,pack:1,calm:0,ph:0,a:0,
-  onWin:()=>{BO.chaser=null;BO.respawn=1.2;},onLose:()=>{boHeal();BO.chaser=null;BO.respawn=2;lum.x=900;lum.y=575;lum.face=1;resetAmrFollow();}};}
+  onWin:()=>{BO.chaser=null;BO.respawn=1.2;BO.wins=(BO.wins||0)+1;   /* after every fight with the left-side demons, a nudge to keep going (taking turns) */
+    setTimeout(()=>talk([BO.wins%2?['Lum',"There’s too many! We need to run…"]:['Amroth',"Let’s move quickly!"]]),700);},onLose:()=>{boHeal();BO.chaser=null;BO.respawn=2;lum.x=900;lum.y=575;lum.face=1;resetAmrFollow();}};}
 function demonPair(){const y=lum.y+4;return [{x:lum.x-125,y,face:1,a:.001},{x:lum.x+125,y,face:-1,a:.001}];}
 function updateBlackout(dt){if(SCENE!=='dun'||DUN.room!==14){if(BO.st&&BO.st<9){BO.st=0;BO.a=0;BO.L=BO.R=1;BO.lt=1;BO.ow=[];WEVENT.on=false;}BO.chaser=null;return;}
   const go=n=>{BO.st=n;BO.t=0;};BO.t+=dt;

@@ -139,7 +139,7 @@ function enterDun(room,x,y,face){const prevRoom=SCENE==='dun'?DUN.room:0;buildDF
   if(room===5)DUN.eyes=EYES5.map(()=>({b:rnd(0,6),t:0}));}
 function drawDun(){const R=DROOMS[DUN.room],im=IMG['dun'+DUN.room];if(!ready(im))return;const [rz]=roomView();
   ctx.setTransform(DPR,0,0,DPR,0,0);ctx.fillStyle='#07080c';ctx.fillRect(0,0,W,H);
-  const qk=DUN.room===15?WB5.q:DUN.room===20?WB10.q:[0,0];ctx.setTransform(DPR*rz,0,0,DPR*rz,DPR*(W/2-WCAM.x*rz+qk[0]),DPR*qk[1]);ctx.drawImage(im,0,0,1375,768);   /* room 5 trembles */
+  const qk=DUN.room===20&&WB10.st?WB10.q:DUN.room>=15&&DUN.room<=20?WB5.q:[0,0];ctx.setTransform(DPR*rz,0,0,DPR*rz,DPR*(W/2-WCAM.x*rz+qk[0]),DPR*qk[1]);ctx.drawImage(im,0,0,1375,768);   /* room 5 trembles */
   if(DUN.room===20)drawWB10Rubble();
   if(DUN.room===14&&!BO.R&&BO.a<1){const g=ctx.createLinearGradient(780,0,1180,0);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,'rgba(0,0,0,.94)');ctx.fillStyle=g;ctx.fillRect(780,-500,2600,1800);}
   if(DUN.room===14&&BO.a>0){ctx.fillStyle=`rgba(0,0,0,${BO.a})`;ctx.fillRect(-2000,-500,5375,1800);}
@@ -163,7 +163,7 @@ function drawDun(){const R=DROOMS[DUN.room],im=IMG['dun'+DUN.room];if(!ready(im)
     L.sort((a,b)=>a[0]-b[0]);for(const [,f] of L)f();}
   if(DUN.room===14&&BO.a>0){ctx.fillStyle=`rgba(0,0,0,${BO.a*.55})`;ctx.fillRect(-2000,-500,5375,1800);}
   for(const p of PARTS)if(p.type==='fiz'||p.type==='puff'||p.type==='dust'){const k2=dunH(p.y)/151;ctx.save();ctx.translate(p.x,p.y);ctx.scale(k2,k2);ctx.translate(-p.x,-p.y);drawPartWell(p);ctx.restore();}
-  if(DUN.room===15)drawWB5Fall();
+  if(wbQuaking())drawWB5Fall();
   if(DUN.room>=11&&DUN.room<=20&&!(DUN.room===14&&BO.a>.3))drawWorldbindAir(R);
   // darkness: only the little lantern's circle (and any daylight from above) cuts through
   ctx.setTransform(DPR,0,0,DPR,0,0);const lit=BAG.includes('lantern');const [sx,sy]=wellToScreen(lum.x,lum.y-70*k);const zr=rz*(lit?1:.45);

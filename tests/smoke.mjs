@@ -504,6 +504,9 @@ const CASES = {
     for (let i = 0; i < 30 && !(await g_(() => window.__g.BATTLE.on)); i++) await wait(150);
     await wait(1200); await g_(() => { const B = window.__g.BATTLE; B.phase = 'win'; B.t = 1; B.rewarded = 0; });
     for (let i = 0; i < 40 && (await g_(() => window.__g.BATTLE.on)); i++) { await p.keyboard.press('Space'); await wait(300); }
+    for (let i = 0; i < 20 && !(await g_(() => window.__g.DLG.active)); i++) await wait(150);
+    { const l = await g_(() => window.__g.DLG.active && window.__g.DLG.lines[0]); check(l && (/too many/.test(l[1]) || /move quickly/.test(l[1])), 'no line after beating a left-side demon: ' + JSON.stringify(l)); }
+    await p.keyboard.press('Enter');
     await wait(2000); check(await g_(() => !!window.__g.BO.chaser && window.__g.BO.chaser.x < 400), 'a new demon did not come from the left');
     await g_(() => { window.__g.BO.chaser.calm = 99; });
     check(await g_(() => !window.__g.WEVENT.on), 'room 4 did not hand control back');
@@ -548,6 +551,7 @@ const CASES = {
     await g_(() => { const g = window.__g; g.lum.x = 1220; g.lum.y = 540; }); await wait(600);
     await g_(() => window.__g.NEAR.onInteract()); await wait(2200);
     check(await g_(() => window.__g.SCENE === 'dun' && window.__g.DUNX.room === 17 && window.__g.lum.y < 300), 'room 6 did not lead to the top of room 7');
+    await wait(1200); check(await g_(() => window.__g.WB5.fall.length > 0), 'room 7 is not shaking');
     await p.keyboard.down('ArrowRight'); await wait(700); await p.keyboard.up('ArrowRight');
     await p.keyboard.down('ArrowDown'); await p.keyboard.down('ArrowRight'); await wait(2600); await p.keyboard.up('ArrowDown'); await p.keyboard.up('ArrowRight'); await wait(400);
     check(await g_(() => window.__g.lum.y > 400), 'Lum could not walk down room 7\'s stairs');
@@ -572,6 +576,7 @@ const CASES = {
     check(await g_(() => window.__g.WB10.st === 1 && window.__g.WEVENT.on), 'the archway did not cave in at the bottom of room 10\'s stairs');
     await wait(700); await p.screenshot({ path: path.join(SHOTS, `worldbind-room10-collapse-${vp}.png`) });
     for (let i = 0; i < 30 && await g_(() => window.__g.WEVENT.on); i++) await wait(150);
+    check(await g_(() => window.__g.WB5.fall.length === 0), 'room 10 is still shaking after the cave-in');
     check(await g_(() => window.__g.WB10.st === 2 && !window.__g.dunFree(857, 500) && !window.__g.DUNINTS().some(d => d.door && d.y < 450)), 'the way back up is not blocked after the cave-in');
     await p.screenshot({ path: path.join(SHOTS, `worldbind-room10-blocked-${vp}.png`) });
     await p.keyboard.down('ArrowDown'); await wait(1500); await p.keyboard.up('ArrowDown'); await wait(500);

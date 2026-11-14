@@ -19,14 +19,20 @@ function wb5Brown(){WB5.brown={kind:'bdemon',scene:'dun',x:1215,y:540,face:-1,s:
 /* step a roaming demon toward a point, sliding along walls; returns the distance left */
 function demonStep(g,tx,ty,sp,dt,ghost){const dx=tx-g.x,dy=ty-g.y,d=Math.hypot(dx,dy);if(d<2){g.mv=0;return d;}const m=Math.min(d,sp*dt),nx=g.x+dx/d*m,ny=g.y+dy/d*m;
   if(ghost||dunFree(nx,ny)){g.x=nx;g.y=ny;}else if(dunFree(nx,g.y))g.x=nx;else if(dunFree(g.x,ny))g.y=ny;else{g.x=nx;g.y=ny;}g.mv=1;if(Math.abs(dx)>3)g.face=dx>0?1:-1;return d-m;}
+/* rooms 5 to 10 (15-20 in code) all shake, until the archway in room 10 caves in */
+const wbQuaking=()=>SCENE==='dun'&&DUN.room>=15&&DUN.room<=20&&!(DUN.room===20&&WB10.st);
 function updateWorldbind5(dt){
-  if(SCENE!=='dun'||DUN.room!==15){WB5.chaser=null;WB5.trail.length=0;if(WB5.brown){WB5.brown=null;}WB5.fall.length=0;return;}
+  if(!wbQuaking()){WB5.fall.length=0;WB5.q=[0,0];}else{if(WB5.qRoom!==DUN.room){WB5.qRoom=DUN.room;WB5.fall.length=0;}wbQuake(dt);}
+  if(SCENE!=='dun'||DUN.room!==15){WB5.chaser=null;WB5.trail.length=0;if(WB5.brown){WB5.brown=null;}return;}
+  updateWB5Room(dt);}
+function wbQuake(dt){
   /* the mountain shakes: a constant tremor with heavier jolts, a low rumble, dust and pebbles from the ceiling */
   WB5.rumT-=dt;if(WB5.rumT<=0){WB5.rumT=rnd(3.5,5.5);WB5.jolt=.6;try{sfxRumble(1.8,.45);}catch(e){}}WB5.jolt=Math.max(0,(WB5.jolt||0)-dt);
   const amp=1.2+WB5.jolt*7;WB5.q=[rnd(-amp,amp),rnd(-amp,amp)*.7];
   if(Math.random()<dt*(WB5.jolt>0?28:9))WB5.fall.push({x:rnd(180,1250),y:rnd(-20,140),vy:rnd(40,90),g:rnd(500,700),ground:rnd(430,760),rock:Math.random()<.35,s:rnd(2,5),t:0,land:0,rot:rnd(0,TAU)});
   for(const p of WB5.fall){if(p.land){p.land+=dt;continue;}p.vy+=p.g*dt*(p.rock?1:.25);p.y+=p.vy*dt;p.rot+=dt*4;if(p.y>=p.ground){p.y=p.ground;p.land=.001;}}
-  for(let i=WB5.fall.length-1;i>=0;i--)if(WB5.fall[i].land>(WB5.fall[i].rock?1.6:.5))WB5.fall.splice(i,1);
+  for(let i=WB5.fall.length-1;i>=0;i--)if(WB5.fall[i].land>(WB5.fall[i].rock?1.6:.5))WB5.fall.splice(i,1);}
+function updateWB5Room(dt){
   /* Lum's path through the room, for the demons to follow down the stairs */
   const tr=WB5.trail,lt=tr[tr.length-1];if(!lt||Math.hypot(lum.x-lt[0],lum.y-lt[1])>14)tr.push([lum.x,lum.y]);
   /* a third of the way in (down the stairs, ~880 long in all): Amroth's warning, then the demons start coming */
