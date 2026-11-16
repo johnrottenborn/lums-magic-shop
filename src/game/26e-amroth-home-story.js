@@ -85,3 +85,7 @@ function almaTalk(){if(HST.st<6)return;if(!C2.venom&&(MATS.venomvine||0)>0){WEVE
   talk([['Alma',C2.venom?"Remember, Venomvine makes Poison Powder. Feel free to mix by the fire!":HST.st<7?"Amroth is outside by the pond. Go and speak with him.":"Safe travels, Lum. My sister will help you, I know it."]]);}
 function learnVenom(){if(C2.venom)return;C2.venom=1;POWDER_LIST.push(['venom','Poison Powder','1–3 damage · poisons 1–3 turns','venom']);RECIPES.push({id:'venom',name:'Poison Powder',out:2,desc:'1–3 damage · poisons 1–3 turns',need:{venomvine:2}});
   TOAST.t=0;TOAST.name='Learned: Poison Powder';TOAST.id='venom';try{sfxItem();}catch(e){}}
+
+/* the loft bed: ask first; resting passes the night and heals everyone */
+function hsBed(){if(HST.st<3){say("A big bed under a patchwork quilt.");return;}
+  askChoice("Rest until morning?",[["Rest",()=>{if(HST.st===3)hsRest();else{WEVENT.on=true;goScene(()=>{for(const id of PARTY_ORDER)HEROES[id].hp=HEROES[id].maxHp;lum.state='idle';WEVENT.on=false;setTimeout(()=>{TOAST.t=0;TOAST.name='Rested · HP restored';TOAST.id='potion';},300);});}}],["Not yet",()=>{}]]);}

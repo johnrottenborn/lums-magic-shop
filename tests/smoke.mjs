@@ -438,7 +438,9 @@ const CASES = {
     check(await g_(() => { const g = window.__g; return g.HST.st === 3 && !g.BAG.includes('baby') && g.ALMA.baby && !g.PARTY_ORDER.includes('amroth'); }), 'after the talk: Alma should hold the baby, Amroth leave the party, and Lum be told to rest');
     await p.screenshot({ path: path.join(SHOTS, `home-alma-baby-${vp}.png`) });
     await g_(() => window.__g.enterDun(22, 760, 745, 1)); await wait(1200);
-    await g_(() => window.__g.NEAR.onInteract()); await wait(2500);
+    await g_(() => window.__g.NEAR.onInteract()); await wait(400);
+    check(await g_(() => window.__g.CHOICE.on && /Rest/.test(window.__g.CHOICE.q)), 'the bed did not ask to rest');
+    await g_(() => window.__g.pickChoice(0)); await wait(2500);
     check(await g_(() => window.__g.HST.st === 4), 'resting in the loft bed did not bring the morning');
     await g_(() => window.__g.enterDun(21, 1120, 672, -1)); await wait(800);
     await talkAll(30);
