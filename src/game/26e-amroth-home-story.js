@@ -52,7 +52,7 @@ function hsHug(){HST.heart=1;try{sfxItem();}catch(e){}
     ['Alma',"Amroth is outside. Go and speak with him before you leave."]],false,()=>{HST.heart=0;HST.st=6;WEVENT.on=false;hsGoal('Speak with Amroth outside');}),900);}
 /* outside in the morning: Amroth by the pond */
 const HSAMR={x:0,y:0};
-function hsAmrPos(){return [HOMEX+HOME.pond.x-HOME.pond.rx*.55,HOMEY+HOME.pond.y-HOME.pond.ry*.95];}
+function hsAmrPos(){const [x,y]=pierPt(330,118);return [HOMEX+x,HOMEY+y];}   /* out at the end of the fishing pier */
 function hsAmrTalk(){if(HST.st<6)return;if(HST.st>6){say("Follow the coast east to Breezevale Cove.");return;}
   talk([['Amroth',"Good morning, Lum."],['Amroth',"I must stay here and protect Alma and the baby, in case the demons come."],
     ['Amroth',"You are more than capable. You can make it to Breezevale on your own and seek guidance from Sage Luma."],
@@ -67,7 +67,7 @@ function updateHomeStory(dt){HST.t+=dt;
   if(SCENE==='dun'&&DUN.room===21&&HST.meet===1&&!DLG.active){if(almaWalk(lum.x+95,lum.y+2,70,dt)){ALMA.face=-1;ALMA.dir='side';lum.face=1;HST.meet=2;HST.heart=1;hsMeetTalk();}}
   if(SCENE==='dun'&&DUN.room===21&&HST.st===4)hsMorningTalk();
   if(SCENE==='dun'&&DUN.room===21&&HST.walk&&!DLG.active){if(almaWalk(lum.x+(lum.x<700?80:-80),lum.y+1,80,dt)){ALMA.face=lum.x<ALMA.x?-1:1;ALMA.dir='side';lum.face=-ALMA.face;HST.walk=0;hsHug();}}
-  if(HST.amrOut&&SCENE==='thorn'){const [x,y]=hsAmrPos();AMR.x=x;AMR.y=y;AMR.moving=0;AMR.dir='down';}
+  if(HST.amrOut&&SCENE==='thorn'){const [x,y]=hsAmrPos();AMR.x=x;AMR.y=y;AMR.moving=0;AMR.dir='side';AMR.face=1;}   /* looking out over the water */
   if(HST.heart>0&&!DLG.active&&!HST.meet&&!HST.walk&&HST.st!==5)HST.heart=Math.max(0,HST.heart-dt);}
 /* night over the home (screen space), with warm windows and door; the chimney smoke in world space */
 function drawHomeSky(){if(SCENE!=='thorn'||!inHome())return;drawHomeNight();if(!HST.smoke.length)return;ctx.save();ctx.setTransform(DPR,0,0,DPR,0,0);for(const s of HST.smoke){const x=(s.x-cam.x)*zoom+W/2,y=(s.y-cam.y)*zoom+H/2;ctx.globalAlpha=Math.max(0,.32*(1-s.t/4))*(hsNight()?.8:1);ctx.fillStyle=hsNight()?'#9aa0ab':'#cfd2d6';ctx.beginPath();ctx.arc(x,y,s.r*zoom,0,TAU);ctx.fill();}ctx.restore();}

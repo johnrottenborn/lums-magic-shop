@@ -5,7 +5,7 @@
    Stand-in art until the designer's arrives: the mountain is 'worldbind_cliff', the gatehouse is 'outpost';
    the pond is painted in code and there is no fishing pier yet. */
 const HOMEX=CPATH.xt+3300,HOMEY=500,HW=1900,HH=1700;
-const HOME={t:99,arch:{x:523,y:470},gate:{x:300,y:1505},cot:{x:1457,y:940,w:460,door:-92},pond:{x:1520,y:1290,rx:230,ry:105},yard:{x:1400,y:1130,rx:400,ry:270}};
+const HOME={t:99,pier:{x:1400,y:1330,w:300},arch:{x:523,y:470},gate:{x:300,y:1505},cot:{x:1457,y:940,w:460,door:-92},pond:{x:1520,y:1290,rx:230,ry:105},yard:{x:1400,y:1130,rx:400,ry:270}};
 const HPATH_CTRL=[[523,440],[540,620],[470,800],[420,980],[560,1150],[820,1235],[1080,1195],[1250,1080],[1335,1028],[1362,985],[1365,950],[1365,925]]   /* runs right up under the front step */.map(([x,y])=>[x+HOMEX,y+HOMEY]);
 const HPATH_PTS=splinePts(HPATH_CTRL,20);let HPATHP=null;
 /* a second path branches off and winds south-southwest to the far gatehouse (the way to the coast) */
@@ -13,8 +13,13 @@ const HPATH2_CTRL=[[455,880],[400,1010],[330,1150],[285,1290],[300,1420],[300,15
 const HPATH2_PTS=splinePts(HPATH2_CTRL,20);let HPATH2P=null;
 const inHome=()=>lum.x>HOMEX-200;
 function hpathDist(x,y){let best=1e9;for(const PTS of [HPATH_PTS,HPATH2_PTS])for(let i=0;i<PTS.length-1;i++){const [ax,ay]=PTS[i],[bx,by]=PTS[i+1],dx=bx-ax,dy=by-ay,t=clamp(((x-ax)*dx+(y-ay)*dy)/(dx*dx+dy*dy),0,1),d=Math.hypot(x-ax-dx*t,y-ay-dy*t);if(d<best)best=d;}return best;}
+/* the fishing pier (the designer's art, 455x343) reaches from the pond's west bank out over the water; its deck is walkable */
+const PIERIMG=[455,343];
+function pierPt(ix,iy){const P=HOME.pier,k=P.w/PIERIMG[0];return [P.x-P.w/2+ix*k,P.y-PIERIMG[1]*k+iy*k];}
+const PIERDECK=[[8,168],[165,200],[440,100],[290,66]].map(([x,y])=>pierPt(x,y));
 const inEll=(lx,ly,e,k=1)=>((lx-e.x)/(e.rx*k))**2+((ly-e.y)/(e.ry*k))**2<1;
 function homeFree(x,y){const lx=x-HOMEX,ly=y-HOMEY;if(lx<30||lx>HW-30||ly<400||ly>HH-40)return false;
+  if(inPoly(lx,ly,PIERDECK))return true;   /* out on the pier */
   if(inEll(lx,ly,HOME.pond,1.05))return false;
   if(lx>HOME.cot.x-215&&lx<HOME.cot.x+225&&ly>HOME.cot.y-160&&ly<HOME.cot.y-6)return false;
   return hpathDist(x,y)<62||inEll(lx,ly,{x:HOME.arch.x,y:HOME.arch.y+70,rx:150,ry:90})||inEll(lx,ly,{x:HOME.gate.x,y:HOME.gate.y+70,rx:150,ry:90})||inEll(lx,ly,HOME.yard);}
@@ -24,6 +29,7 @@ const HTREES=[['hfir',240],['hbig',400],['hfir',260],['htwist',250],['hfir',230]
 function homeProps(P,PN){const X=x=>x+HOMEX,Y=y=>y+HOMEY,H_=(a,b)=>hash(a,b,971);
   P.push({t:'tree',img:'worldbind_cliff',x:X(620),y:Y(440),w:2500,flip:false,solid:1},{t:'tree',img:'worldbind_cliff',x:X(1480),y:Y(420),w:2400,flip:true,solid:1});
   P.push({t:'tree',img:'outpost',x:X(HOME.gate.x+52),y:Y(HOME.gate.y+8),sy:Y(HOME.gate.y-40),w:430,flip:false,solid:1});   /* the far gatehouse, bottom left (stand-in art) */
+  P.push({t:'tree',img:'pier',x:X(HOME.pier.x),y:Y(HOME.pier.y),sy:Y(HOME.pier.y-190),w:HOME.pier.w,flip:false,solid:1});   /* drawn before anyone standing on its deck */
   P.push({t:'gatebars',x:X(HOME.gate.x),y:Y(HOME.gate.y+9),w:120});
   P.push({t:'tree',img:'outpost',x:X(HOME.arch.x+52),y:Y(HOME.arch.y+8),sy:Y(HOME.arch.y-40),w:430,flip:false,solid:1});
   P.push({t:'tree',img:'amroth_cottage',x:X(HOME.cot.x),y:Y(HOME.cot.y),w:HOME.cot.w,flip:false,solid:1});   /* the designer's thatched cottage; its door is left of centre */
