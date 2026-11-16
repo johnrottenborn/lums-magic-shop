@@ -118,7 +118,12 @@ function buildThornFoes(){if(thFoesBuilt)return;thFoesBuilt=true;THFOES.length=0
   for(let r=0;r<TMZ.R;r++)for(let c=0;c<TMZ.C;c++){const k=r+','+c;if(skip.has(k)||THORN.pockets.some(([pr,pc])=>pr===r&&pc===c))continue;if(H_(r,c,201)>.3){continue;}
     const roll=H_(r,c,203),kind=roll<.32?'spider':roll<.55?'flora':roll<.78?'rslime':'rvixen',x=c*TCW+TCW/2+(H_(r,c,205)-.5)*120,y=r*TCH+TCH/2+20+(H_(r,c,207)-.5)*60,myid=1000+id++;
     if(dead.has(myid))continue;THFOES.push({kind,scene:'thorn',x,y,hx:x,hy:y,tx:x,ty:y,cx:c*TCW,cy:r*TCH,s:1,pack:kind==='flora'?1:(H_(r,c,209)<.4?2:1),calm:1,dead:0,t:rnd(0,4),ph:rnd(0,TAU),face:-1,id:myid,bl:0});}}
-function updateThornFoes(dt){const ok=!DLG.active&&!WEVENT.on&&!MENU.open&&!FADE.dir&&!BATTLE.on&&!BATTLE.pending&&!CHOICE.on;
+/* Evergreen Grove's roamers: Forest Foxes and Grove Wisps on the open ground (they wander a small patch, chase when near) */
+function addGroveFoes(){if(typeof GROVEX==='undefined'||THFOES.some(g=>g.grove))return;let id=5000;const dead=new Set(C1.thDead||[]);
+  for(const [lx,ly,kind,pack] of [[520,700,'ffox',1],[300,1150,'gwisp',1],[1030,1150,'ffox',2],[640,1320,'gwisp',2],[1000,580,'gwisp',1],[880,1700,'ffox',1],[420,1720,'gwisp',1]]){
+    const x=GROVEX+lx,y=GROVEY+ly,myid=id++;if(dead.has(myid)||!groveFree(x,y))continue;
+    THFOES.push({kind,grove:1,scene:'thorn',x,y,hx:x,hy:y,tx:x,ty:y,cx:x-TCW/2,cy:y-TCH/2,s:1,pack,calm:1,dead:0,t:rnd(0,4),ph:rnd(0,TAU),face:-1,id:myid,bl:0});}}
+function updateThornFoes(dt){addGroveFoes();const ok=!DLG.active&&!WEVENT.on&&!MENU.open&&!FADE.dir&&!BATTLE.on&&!BATTLE.pending&&!CHOICE.on;
   for(const g of THFOES){g.t+=dt;g.ph+=dt;g.calm=Math.max(0,g.calm-dt);const dx=lum.x-g.x,dy=lum.y-g.y,d=Math.hypot(dx,dy);
     if(g.kind==='flora'){g.bl=clamp(g.bl+(d<230?dt*1.4:-dt*.6),0,1);if(ok&&!g.calm&&d<72&&lum.bumpT<=0)startEncounter(g,'ambush');continue;}
     let sp=g.kind==='rslime'?40:g.kind==='spider'?58:72,tx=g.tx,ty=g.ty;g.chase=ok&&!g.calm&&d<190;
@@ -136,6 +141,8 @@ function drawThornFoe(g){if(CAPTURE.on&&g===BATTLE.capG)return;
   if(g.kind==='flora'){const fi=g.bl<1?Math.min(7,Math.floor(g.bl*8)):0;ctx.fillStyle='rgba(0,0,0,.28)';ctx.beginPath();ctx.ellipse(g.x,g.y,30,7,0,0,TAU);ctx.fill();c1Frame(ctx,'flora',g.bl<1?'bloom':'idle',g.bl<1?fi:Math.floor(T*6+g.ph*3)%6,g.x,g.y+2,118,g.x<lum.x,1,0);
     if(g.bl>.5){ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,g.x,g.y-80,40,'255,90,100',.18*g.bl);ctx.restore();}return;}
   if(g.kind==='rslime'){ctx.fillStyle='rgba(20,10,10,.25)';ctx.beginPath();ctx.ellipse(g.x,g.y+2,34,8,0,0,TAU);ctx.fill();const im=IMG.jelly_idle_red,w=104,h=w*(ready(im)?im.naturalHeight/im.naturalWidth:.7),hov=12+Math.sin(g.ph*1.6)*4;drawGlow(ctx,g.x,g.y-hov-h*.55,w*.7,'255,120,130',.22);drawJellySprite(im,g.x,g.y-hov,w,h,g.ph,0,1);return;}
+  if(g.kind==='ffox'){const h=118;ctx.fillStyle='rgba(0,0,0,.3)';ctx.beginPath();ctx.ellipse(g.x,g.y,h*.42,h*.07,0,0,TAU);ctx.fill();c1Frame(ctx,'fox_forest','run',g.moving?Math.floor(g.ph*14)%12:0,g.x,g.y,h,g.face>0,1,0);return;}
+  if(g.kind==='gwisp'){const h=96,hov=16+Math.sin(g.ph*2.2)*6;ctx.fillStyle='rgba(0,0,0,.22)';ctx.beginPath();ctx.ellipse(g.x,g.y,30,7,0,0,TAU);ctx.fill();ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,g.x,g.y-hov-h*.5,h*.8,'200,240,90',.3);ctx.restore();c1Frame(ctx,'wisp_grove','idle',Math.floor(g.ph*6)%4,g.x,g.y-hov,h,false,1,0);return;}
   if(g.kind==='rvixen'){const h=118;ctx.fillStyle='rgba(0,0,0,.3)';ctx.beginPath();ctx.ellipse(g.x,g.y,h*.42,h*.07,0,0,TAU);ctx.fill();c1Frame(ctx,'fox_red','run',g.moving?Math.floor(g.ph*14)%12:0,g.x,g.y,h,g.face>0,1,0);return;}}
 function drawThornBoss(){if(C1.thornBoss||(CAPTURE.on&&THBOSS===BATTLE.capG))return;const B_=THBOSS,h=190;ctx.fillStyle='rgba(0,0,0,.4)';ctx.beginPath();ctx.ellipse(B_.x,B_.y,h*.45,h*.09,0,0,TAU);ctx.fill();
   c1Frame(ctx,'spider_dark','idle',Math.floor(T*3)%4,B_.x,B_.y,h,true,1,0);ctx.save();ctx.globalCompositeOperation='lighter';for(const [ex,ey] of [[-.1,-.42],[-.03,-.44]])drawGlow(ctx,B_.x+ex*h,B_.y+ey*h,10,'255,40,40',.55+.2*Math.sin(T*3));ctx.restore();}

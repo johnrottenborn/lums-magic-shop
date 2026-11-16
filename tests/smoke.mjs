@@ -463,17 +463,33 @@ const CASES = {
     const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop', g_ = f => p.evaluate(f);
     await g_(() => { window.__g.startChapter2(); window.__g.c2Skip(); }); await wait(1500);
     await g_(() => { const g = window.__g; g.HST.st = 7; g.enterHome(); g.lum.x = g.HOMEX + g.HOME.gate.x; g.lum.y = g.HOMEY + 1660; }); await wait(800);
-    await g_(() => window.__g.NEAR && window.__g.NEAR.onInteract()); await wait(1500);
+    await g_(() => window.__g.NEAR && window.__g.NEAR.onInteract && window.__g.NEAR.onInteract()); await wait(1500);
+    await g_(() => { for (const f of window.__g.THFOES) if (f.grove) f.calm = 99; });   // keep the roamers still until their own checks
     check(await g_(() => window.__g.lum.x > window.__g.GROVEX && window.__g.groveFree(window.__g.lum.x, window.__g.lum.y)), 'the far gatehouse did not lead into Evergreen Grove');
     await p.screenshot({ path: path.join(SHOTS, `grove-entry-${vp}.png`) });
     check(await g_(() => { const g = window.__g, X = g.GROVEX, Y = g.GROVEY; return !g.groveFree(X + 300, Y + 1600) && !g.groveFree(X + 600, Y + 500) && g.groveFree(X + 560, Y + 1300); }), 'the lake and groves should be solid and the open ground walkable');
     { const f = await g_(() => { const g = window.__g, f = g.GFORAGE.find(q => q.venom); g.lum.x = f.x; g.lum.y = f.y + 30; return f.id; }); await wait(600);
-      await g_(() => window.__g.NEAR && window.__g.NEAR.onInteract()); await wait(300);
+      await g_(() => window.__g.NEAR && window.__g.NEAR.onInteract && window.__g.NEAR.onInteract()); await wait(300);
       check(await g_(() => (window.__g.MATS.venomvine || 0) >= 2), 'picking a Venomvine bush gave nothing'); }
     await g_(() => { const g = window.__g; g.lum.x = g.GROVEX + 840; g.lum.y = g.GROVEY + 1500; }); await wait(1500);
     await p.screenshot({ path: path.join(SHOTS, `grove-lake-${vp}.png`) });
+    // the grove's foes: Forest Foxes and Grove Wisps roam; their hits poison, and the poison stacks
+    check(await g_(() => { const f = window.__g.THFOES.filter(g => g.grove); return f.some(g => g.kind === 'ffox') && f.some(g => g.kind === 'gwisp'); }), 'no Forest Foxes or Grove Wisps in the grove');
+    for (const kind of ['ffox', 'gwisp']) {
+      await p.evaluate(k => { const g = window.__g, f = g.THFOES.find(q => q.grove && q.kind === k && !q.dead); g.lum.x = f.x - 40; g.lum.y = f.y; f.calm = 0; }, kind);
+      for (let i = 0; i < 40 && !(await g_(() => window.__g.BATTLE.on)); i++) await wait(150);
+      check(await p.evaluate(k => window.__g.BATTLE.on && window.__g.BATTLE.foes[0].type === k, kind), 'no battle with a ' + kind);
+      await wait(1200); await p.screenshot({ path: path.join(SHOTS, `grove-battle-${kind}-${vp}.png`) });
+      const stack = await g_(() => { const g = window.__g, B = g.BATTLE, f = B.foes[0], h = B.heroes[0]; h.poison = 0; g.foeAbility(f, h, 2, { guard: false }); g.foeAbility(f, h, 2, { guard: false }); return h.poison; });
+      check(stack === 4, kind + '\'s poison did not stack (got ' + stack + ')');
+      await g_(() => { const B = window.__g.BATTLE; B.phase = 'win'; B.t = 1; B.rewarded = 0; });
+      for (let i = 0; i < 40 && (await g_(() => window.__g.BATTLE.on)); i++) { await p.keyboard.press('Space'); await wait(300); }
+      for (let i = 0; i < 4 && await g_(() => window.__g.DLG.active); i++) { await p.keyboard.press('Enter'); await wait(300); }
+      await wait(600);
+      await g_(() => { for (const f of window.__g.THFOES) if (f.grove) f.calm = 99; });
+    }
     await g_(() => { const g = window.__g; g.lum.x = g.GROVEX + 780; g.lum.y = g.GROVEY + 150; }); await wait(600);
-    await g_(() => window.__g.NEAR && window.__g.NEAR.onInteract()); await wait(800);
+    await g_(() => window.__g.NEAR && window.__g.NEAR.onInteract && window.__g.NEAR.onInteract()); await wait(800);
     check(await g_(() => window.__g.lum.x < window.__g.GROVEX - 300), 'the north entrance did not lead back to Amroth\'s home');
   },
   async 'worldbind-passage'(p) {
