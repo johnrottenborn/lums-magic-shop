@@ -415,8 +415,13 @@ const CASES = {
     await g_(() => { window.__g.startChapter2(); window.__g.c2Skip(); }); await wait(1500);
     await g_(() => window.__g.enterHome()); await wait(1500);
     check(await g_(() => window.__g.HST.st === 1), 'arriving at the home did not make it night');
-    const gateDoor = () => g_(() => { const g = window.__g, d = g.THINTS().find(o => Math.abs(o.x - g.HOMEX - g.HOME.gate.x) < 5); return d ? !!d.door : null; });
-    check(await gateDoor() === false, 'the far gatehouse should be locked at night');
+    const gateDoor = () => g_(() => { const g = window.__g, d = g.THINTS().find(o => o.door && Math.abs(o.x - g.HOMEX - g.HOME.gate.x) < 5 && o.y > g.HOMEY + 1600); return d ? d.reach > 0 : null; });
+    check(await g_(() => { const g = window.__g; return !g.thornFree(g.HOMEX + g.HOME.gate.x, g.HOMEY + g.HOME.gate.y - 30); }), 'the far gate should block the arch at night');
+    // berry bushes to pick
+    { const r = await g_(() => { const g = window.__g, f = g.HFORAGE[0]; g.lum.x = f.x; g.lum.y = f.y + 30; return f.id; }); await wait(500);
+      const n0 = await g_(() => window.__g.MATS[window.__g.HFORAGE[0].id] || 0); await g_(() => window.__g.NEAR && window.__g.NEAR.onInteract()); await wait(300);
+      check(await g_(() => (window.__g.MATS[window.__g.HFORAGE[0].id] || 0)) > n0, 'picking a berry bush at the home gave nothing (' + r + ')');
+      await p.screenshot({ path: path.join(SHOTS, `home-forage-${vp}.png`) }); }
     await g_(() => { const g = window.__g; g.lum.x = g.HOMEX + 330; g.lum.y = g.HOMEY + 1250; }); await wait(1500);
     check(await g_(() => window.__g.dunFree ? true : true) && await g_(() => { const g = window.__g; return g.thornFree(g.HOMEX + 300, g.HOMEY + 1300); }), 'the branch path to the far gatehouse is not walkable');
     await p.screenshot({ path: path.join(SHOTS, `home-far-gate-${vp}.png`) });
@@ -438,8 +443,8 @@ const CASES = {
     await g_(() => window.__g.enterDun(21, 1120, 672, -1)); await wait(800);
     await talkAll(30);
     check(await g_(() => window.__g.HST.st === 6), 'the morning hug and talk did not finish');
-    check(await gateDoor() === true, 'the far gatehouse should be open after Lum sleeps');
     await g_(() => window.__g.leaveCottage()); await wait(1500);
+    check(await gateDoor() === true && await g_(() => { const g = window.__g; return g.thornFree(g.HOMEX + g.HOME.gate.x, g.HOMEY + g.HOME.gate.y - 30) && g.thornFree(g.HOMEX + g.HOME.gate.x, g.HOMEY + 1660); }), 'the far gatehouse should be open after Lum sleeps, with the path through to the south edge');
     await p.screenshot({ path: path.join(SHOTS, `home-morning-${vp}.png`) });
     await g_(() => { const g = window.__g, P = g.HST; const n = g.THINTS().find(o => o.reach > 0 && o.onInteract && String(o.onInteract).includes('hsAmrTalk')); g.lum.x = n.x; g.lum.y = n.y + 30; }); await wait(600);
     await g_(() => window.__g.NEAR.onInteract()); await wait(400);

@@ -9,8 +9,10 @@ const HOME={t:99,pier:{x:1400,y:1330,w:300},arch:{x:523,y:470},gate:{x:300,y:150
 const HPATH_CTRL=[[523,440],[540,620],[470,800],[420,980],[560,1150],[820,1235],[1080,1195],[1250,1080],[1335,1028],[1362,985],[1365,950],[1365,925]]   /* runs right up under the front step */.map(([x,y])=>[x+HOMEX,y+HOMEY]);
 const HPATH_PTS=splinePts(HPATH_CTRL,20);let HPATHP=null;
 /* a second path branches off and winds south-southwest to the far gatehouse (the way to the coast) */
-const HPATH2_CTRL=[[455,880],[400,1010],[330,1150],[285,1290],[300,1420],[300,1540]].map(([x,y])=>[x+HOMEX,y+HOMEY]);
+const HPATH2_CTRL=[[455,880],[400,1010],[330,1150],[290,1260],[300,1360],[300,1480],[300,1600],[300,1760]]   /* on through the gatehouse arch and out the bottom of the map */.map(([x,y])=>[x+HOMEX,y+HOMEY]);
 const HPATH2_PTS=splinePts(HPATH2_CTRL,20);let HPATH2P=null;
+/* berry bushes to forage (like the woods by Lum's shop): duskberry, dewberry, emberberry */
+const HFORAGE=[[600,700,6],[380,890,0],[620,1080,4],[230,1180,6],[1180,880,0],[1700,1180,4],[960,1290,6]].map(([x,y,k])=>({x:x+HOMEX,y:y+HOMEY,k,id:FORAGE_MAP[k],n:2,picked:0}));
 const inHome=()=>lum.x>HOMEX-200;
 function hpathDist(x,y){let best=1e9;for(const PTS of [HPATH_PTS,HPATH2_PTS])for(let i=0;i<PTS.length-1;i++){const [ax,ay]=PTS[i],[bx,by]=PTS[i+1],dx=bx-ax,dy=by-ay,t=clamp(((x-ax)*dx+(y-ay)*dy)/(dx*dx+dy*dy),0,1),d=Math.hypot(x-ax-dx*t,y-ay-dy*t);if(d<best)best=d;}return best;}
 /* the fishing pier (the designer's art, 455x343) reaches from the pond's west bank out over the water; its deck is walkable */
@@ -18,7 +20,9 @@ const PIERIMG=[455,343];
 function pierPt(ix,iy){const P=HOME.pier,k=P.w/PIERIMG[0];return [P.x-P.w/2+ix*k,P.y-PIERIMG[1]*k+iy*k];}
 const PIERDECK=[[8,168],[165,200],[440,100],[290,66]].map(([x,y])=>pierPt(x,y));
 const inEll=(lx,ly,e,k=1)=>((lx-e.x)/(e.rx*k))**2+((ly-e.y)/(e.ry*k))**2<1;
-function homeFree(x,y){const lx=x-HOMEX,ly=y-HOMEY;if(lx<30||lx>HW-30||ly<400||ly>HH-40)return false;
+function homeFree(x,y){const lx=x-HOMEX,ly=y-HOMEY;if(lx<30||lx>HW-30||ly<400||ly>HH-10)return false;
+  {const G=HOME.gate;if(lx>G.x-165&&lx<G.x+265&&ly>G.y-130&&ly<G.y+6&&(Math.abs(lx-G.x)>44||(HST.st<4&&ly>G.y-70)))return false;}   /* the far gatehouse: through the arch only, once the gate is up */
+  if(ly>HH-120&&Math.abs(lx-HOME.gate.x)<70)return true;   /* the path runs on to the south edge */
   if(inPoly(lx,ly,PIERDECK))return true;   /* out on the pier */
   if(inEll(lx,ly,HOME.pond,1.05))return false;
   if(lx>HOME.cot.x-215&&lx<HOME.cot.x+225&&ly>HOME.cot.y-160&&ly<HOME.cot.y-6)return false;
@@ -28,8 +32,11 @@ function homeFree(x,y){const lx=x-HOMEX,ly=y-HOMEY;if(lx<30||lx>HW-30||ly<400||l
 const HTREES=[['hfir',240],['hbig',400],['hfir',260],['htwist',250],['hfir',230],['hbig',380],['htwist',240]];
 function homeProps(P,PN){const X=x=>x+HOMEX,Y=y=>y+HOMEY,H_=(a,b)=>hash(a,b,971);
   P.push({t:'tree',img:'worldbind_cliff',x:X(620),y:Y(440),w:2500,flip:false,solid:1},{t:'tree',img:'worldbind_cliff',x:X(1480),y:Y(420),w:2400,flip:true,solid:1});
-  P.push({t:'tree',img:'outpost',x:X(HOME.gate.x+52),y:Y(HOME.gate.y+8),sy:Y(HOME.gate.y-40),w:430,flip:false,solid:1});   /* the far gatehouse, bottom left (stand-in art) */
+  P.push({t:'tree',img:'outpost_open',x:X(HOME.gate.x+52),y:Y(HOME.gate.y+8),sy:Y(HOME.gate.y-40),w:430,flip:false,solid:1});   /* the far gatehouse, bottom left (stand-in art) */
   P.push({t:'tree',img:'pier',x:X(HOME.pier.x),y:Y(HOME.pier.y),sy:Y(HOME.pier.y-190),w:HOME.pier.w,flip:false,solid:1});   /* drawn before anyone standing on its deck */
+  for(let i=0;i<22;i++){const lx=470+H_(i,61)*360,ly=1330+H_(i,62)*400;if(hpathDist(X(lx),Y(ly))<120||inEll(lx,ly,HOME.yard,1.05)||inEll(lx,ly,HOME.pond,1.3))continue;   /* thicker woods right of the far gatehouse */
+    const [img,w]=HTREES[Math.floor(H_(i,63)*HTREES.length)];P.push({t:'tree',img,x:X(lx),y:Y(ly),w:w*(.8+H_(i,64)*.3),flip:H_(i,65)<.5,base:.95});}
+  for(const f of HFORAGE)P.push({t:'shrub',k:f.k,x:f.x,y:f.y,s:SHR[f.k].s*.85,flip:f.x%2<1,ph:f.x*.01});
   P.push({t:'gatebars',x:X(HOME.gate.x),y:Y(HOME.gate.y+9),w:120});
   P.push({t:'tree',img:'outpost',x:X(HOME.arch.x+52),y:Y(HOME.arch.y+8),sy:Y(HOME.arch.y-40),w:430,flip:false,solid:1});
   P.push({t:'tree',img:'amroth_cottage',x:X(HOME.cot.x),y:Y(HOME.cot.y),w:HOME.cot.w,flip:false,solid:1});   /* the designer's thatched cottage; its door is left of centre */
@@ -63,7 +70,8 @@ function drawHomeGround(x0,y0,x1,y1){if(x1<HOMEX-300)return;if(!HPATHP)HPATHP=bu
 function homeInts(){const X=x=>x+HOMEX,Y=y=>y+HOMEY;return [
   {x:X(HOME.arch.x),y:Y(HOME.arch.y+30),get reach(){return inHome()?85:0},door:true,onInteract:()=>dunGo(20,900,690,1)},
   {x:X(HOME.cot.x+HOME.cot.door),y:Y(HOME.cot.y+15),get reach(){return inHome()?85:0},door:true,onInteract:()=>enterDun(21,440,628,1)},
-  {x:X(HOME.gate.x),y:Y(HOME.gate.y+30),get reach(){return inHome()?85:0},get door(){return HST.st>=4;},onInteract:()=>HST.st<4?say("The gate is down. It won't budge."):say("The gate is open. Beyond it, the path runs south to the coast.")},   /* the coastal path map comes next */
+  {x:X(HOME.gate.x),y:Y(HOME.gate.y-110),get reach(){return inHome()&&HST.st<4?85:0},onInteract:()=>say("The gate is down. It won't budge.")},
+  {x:X(HOME.gate.x),y:Y(HH-40),get reach(){return inHome()&&HST.st>=4?80:0},door:true,onInteract:()=>say("The coastal path lies ahead.")},   /* the coastal path map comes next */
   {x:X(HOME.pond.x-HOME.pond.rx+20),y:Y(HOME.pond.y),get reach(){return inHome()?110:0},onInteract:()=>say("A quiet pond. Rain dimples the water.")}];}
 /* out of the cottage's front door, onto the step */
 function leaveCottage(){SCENE='thorn';lum.x=HOMEX+HOME.cot.x+HOME.cot.door;lum.y=HOMEY+HOME.cot.y+30;lum.face=1;lum.dir='down';lum.state='idle';lum.vx=lum.vy=0;cam.x=lum.x;cam.y=lum.y+200;THORN.t=99;HOME.t=99;}
@@ -71,12 +79,12 @@ function enterHome(){SCENE='thorn';lum.x=HOMEX+HOME.arch.x;lum.y=HOMEY+HOME.arch
 function drawHomeTitle(){if(!inHome()||HOME.t>=4.5||SCENE!=='thorn')return;HOME.t+=1/60;const a=Math.min(1,HOME.t*1.5,(4.5-HOME.t)*1.2);ctx.save();ctx.setTransform(DPR,0,0,DPR,0,0);ctx.globalAlpha=a;ctx.textAlign='center';
   ctx.fillStyle='rgba(10,8,14,.5)';ctx.fillRect(0,H*.3-40,W,80);ctx.fillStyle='#e8eef6';ctx.font='700 26px "Alegreya SC", Georgia, serif';ctx.fillText("Amroth's Home",W/2,H*.3+10);ctx.restore();}
 THINT.push(...homeInts());
+for(const f of HFORAGE)THINT.push({x:f.x,y:f.y,get reach(){return inHome()?76:0},forage:f,onInteract:()=>pickForage(f)});
 /* a garden plant (painted in 03-garden) standing in the Stranglethorn world, swaying like it does at Lum's shop */
 function drawHomePlant(o){if(!PLANTS.lavender)paintPlants();const set=PLANTS[o.kind];if(!set)return;const sp=set[o.i%set.length],w=sp.w*o.s,h=sp.h*o.s;
   const dx=o.x-lum.x,dy=(o.y-lum.y)*1.5,d=Math.hypot(dx,dy),push=d<46?(1-d/46)*Math.sign(dx||1)*.35:0,sk=Math.sin(T*1.6+o.ph)*.05+push;
   ctx.save();ctx.translate(o.x,o.y);ctx.transform(1,0,sk,1,0,0);if(o.flip)ctx.scale(-1,1);ctx.drawImage(sp.c,-w/2,-h,w,h);ctx.restore();}
 /* the far gatehouse's portcullis: down until Lum has slept at the cottage */
-function drawHomeGate(){if(!inHome()||HST.st>=4)return;const gx=HOMEX+HOME.gate.x,gy=HOMEY+HOME.gate.y;ctx.save();ctx.fillStyle='rgba(10,10,14,.55)';ctx.fillRect(gx-46,gy-118,92,120);
-  ctx.strokeStyle='#3a3530';ctx.lineWidth=6;for(let x=gx-40;x<=gx+40;x+=16){ctx.beginPath();ctx.moveTo(x,gy-118);ctx.lineTo(x,gy+4);ctx.stroke();}
-  ctx.lineWidth=5;for(let y=gy-100;y<=gy;y+=26){ctx.beginPath();ctx.moveTo(gx-46,y);ctx.lineTo(gx+46,y);ctx.stroke();}
-  ctx.fillStyle='#4a443d';for(let x=gx-40;x<=gx+40;x+=16){ctx.beginPath();ctx.moveTo(x-4,gy+2);ctx.lineTo(x+4,gy+2);ctx.lineTo(x,gy+12);ctx.fill();}ctx.restore();}
+function drawHomeGate(){if(!inHome()||HST.st>=4)return;const gx=HOMEX+HOME.gate.x,gy=HOMEY+HOME.gate.y;ctx.save();  ctx.strokeStyle='#3a3530';ctx.lineWidth=6;for(let x=gx-44;x<=gx+44;x+=16){ctx.beginPath();ctx.moveTo(x,gy-170);ctx.lineTo(x,gy-28);ctx.stroke();}
+  ctx.lineWidth=5;for(let y=gy-150;y<=gy-34;y+=28){ctx.beginPath();ctx.moveTo(gx-50,y);ctx.lineTo(gx+50,y);ctx.stroke();}
+  ctx.fillStyle='#4a443d';for(let x=gx-44;x<=gx+44;x+=16){ctx.beginPath();ctx.moveTo(x-4,gy-30);ctx.lineTo(x+4,gy-30);ctx.lineTo(x,gy-20);ctx.fill();}ctx.restore();}
