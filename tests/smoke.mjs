@@ -393,6 +393,7 @@ const CASES = {
     for (let i = 0; i < 60; i++) { await wait(150); if (await g_(() => window.__g.BATTLE.phase) === 'heroMenu') break; }
     check(await g_(() => window.__g.BATTLE.heroes.map(h => h.id).join(',')) === 'lum,amroth', 'Amroth is not in the battle');
     await g_(() => { const B = window.__g.BATTLE; B.cur = 1; window.__g.C1X.comboA = 5; }); await wait(900);
+    check(await g_(() => { const c = window.__g.canWear; return c('lum', 'lumpouch') && c('lum', 'crystalpouch') && !c('lum', 'sparsword') && !c('lum', 'amrothsword') && !c('spar', 'lumpouch') && !c('amroth', 'crystalpouch') && c('spar', 'sparsword') && c('amroth', 'amrothsword'); }), 'weapon rules: pouches are Lum\'s only, swords never Lum\'s');
     await p.screenshot({ path: path.join(SHOTS, `amroth-in-battle-${vp}.png`) });
     { const sl = await g_(() => { const g = window.__g, B = g.BATTLE, i = B.heroes.findIndex(h => h.id === 'amroth'); if (i < 0) return false; window.__sv = { cur: B.cur, phase: B.phase, t: B.t, sel: B.sel }; B.cur = i; B.foeT = B.foes[0]; B.phase = 'bonkHit'; B.t = 0; return true; });
       if (sl) { await wait(140); await p.screenshot({ path: path.join(SHOTS, `amroth-slash-${vp}.png`) }); check(await g_(() => window.__g.BATTLE.phase === 'bonkHit' || window.__g.BATTLE.phase === 'bonkBack'), 'Amroth\'s slash did not play'); await g_(() => { const B = window.__g.BATTLE, v = window.__sv; B.cur = v.cur; B.phase = v.phase; B.t = v.t; B.sel = v.sel; for (const h of B.heroes) { h.ox = 0; h.oy = 0; } }); await wait(400); } }

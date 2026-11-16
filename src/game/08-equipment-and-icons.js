@@ -60,7 +60,11 @@ const CHEAD=[[117,66,54],[120,65,53],[118,66,53],[118,65,54],[120,65,54],[119,65
 
 function statLine(who){return heroStats(who);}
 function giveItem(id){BAG.push(id);if(typeof SAVEC!=='undefined')SAVEC.t=99;if(HIDDEN.some(([k])=>k===id))STATS.found[id]=1;TOAST.t=0;TOAST.name=ITEMS[id].name;TOAST.id=id;MENU.newItems++;sfxItem();}
-function equip(who,id){if((SCENE==='shop'||SCENE==='bed')&&id==='blade'){MENU.note="Cosmic: Not in here! I don't want Master Lum to find out about the sword…";MENU.noteT=3;return;}const it=ITEMS[id],cur=PARTY[who][it.slot];const i=BAG.indexOf(id);if(i<0)return;BAG.splice(i,1);if(cur)BAG.splice(i,0,cur);PARTY[who][it.slot]=id;syncMaxHp(who);sfxEquip();
+/* weapons belong to their fighters: powder pouches are Lum's alone, and Lum can't take up a sword (or axe) */
+const isPouch=id=>/pouch/.test(id);
+function canWear(who,id){const it=ITEMS[id];if(!it||it.slot!=='main')return true;return isPouch(id)?who==='lum':who!=='lum';}
+function wearNote(who,id){return isPouch(id)?"Only Lum can use a powder pouch.":"Lum fights with powders, not blades.";}
+function equip(who,id){if(!canWear(who,id)){MENU.note=wearNote(who,id);MENU.noteT=2.5;try{sfxBlip&&sfxBlip();}catch(e){}return;}if((SCENE==='shop'||SCENE==='bed')&&id==='blade'){MENU.note="Cosmic: Not in here! I don't want Master Lum to find out about the sword…";MENU.noteT=3;return;}const it=ITEMS[id],cur=PARTY[who][it.slot];const i=BAG.indexOf(id);if(i<0)return;BAG.splice(i,1);if(cur)BAG.splice(i,0,cur);PARTY[who][it.slot]=id;syncMaxHp(who);sfxEquip();
   MENU.sel={kind:'slot',slot:it.slot};if(TUT.stage===3&&id==='bucket'){TUT.stage=4;TUT.t=0;}}
 function satchelSlots(){return new Set(BAG.filter(b=>ITEMS[b]&&ITEMS[b].kind!=='mat')).size;}
 function unequip(who,slot){const id=PARTY[who][slot];if(!id)return;if(satchelSlots()>=8&&!BAG.includes(id)){MENU.note='Your satchel is full!';MENU.noteT=2;return;}PARTY[who][slot]=null;syncMaxHp(who);BAG.push(id);MENU.sel={kind:'bag',i:BAG.length-1};sfxPage(.5);}

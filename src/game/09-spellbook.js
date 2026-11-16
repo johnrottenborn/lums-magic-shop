@@ -99,7 +99,7 @@ function drawItemCard(c,cx,cy,cw,MH,members){let id=null,fromSlot=null;if(MENU.s
   hit(-5000,-5000,10000,10000,()=>{MENU.sel=null;MENU.pick=null;});
   c.font='italic 14.5px Alegreya, Georgia, serif';const lines=wrapText(c,it?it.desc:'Nothing is worn here yet.',cw-44);
   // gear in the satchel that fits this slot, so it can be equipped right here
-  const opts=fromSlot&&!pick?[...new Set(BAG.filter(b=>ITEMS[b]&&ITEMS[b].slot===fromSlot))]:[],ots=54,ogap=10,operRow=Math.max(1,Math.floor((cw-36+ogap)/(ots+ogap))),orows=Math.ceil(opts.length/operRow),optH=fromSlot&&!pick?34+(opts.length?orows*(ots+30):24):0;
+  const opts=fromSlot&&!pick?[...new Set(BAG.filter(b=>ITEMS[b]&&ITEMS[b].slot===fromSlot&&canWear(MH,b)))]:[],ots=54,ogap=10,operRow=Math.max(1,Math.floor((cw-36+ogap)/(ots+ogap))),orows=Math.ceil(opts.length/operRow),optH=fromSlot&&!pick?34+(opts.length?orows*(ots+30):24):0;
   const cmp=previewDelta(MH),nm=it?it.name:'Empty '+SLOTS.find(s=>s[0]===fromSlot)[1];
   const cnt=it&&!fromSlot?(it.kind==='mat'?(MATS[id]||0):BAG.filter(b=>b===id).length):0;
   const lab=pick?null:fromSlot&&id?'Unequip':it&&it.slot&&!fromSlot?'Equip':it&&it.heal?'Use':null;
@@ -125,7 +125,7 @@ function drawItemCard(c,cx,cy,cw,MH,members){let id=null,fromSlot=null;if(MENU.s
     c.font='700 17px "Alegreya SC", Georgia, serif';c.textAlign='center';c.fillText(l,bx+bw/2,by+29);
     hit(bx,by,bw,bh,()=>{if(!pri){MENU.sel=null;MENU.pick=null;sfxPage(.3);return;}
       if(l==='Unequip'){unequip(MH,fromSlot);MENU.sel=null;}
-      else if(l==='Equip'){equip(MH,id);MENU.sel=null;if(!BK.spread)MENU.page='char';}
+      else if(l==='Equip'){if(!canWear(MH,id)){equip(MH,id);}else{equip(MH,id);MENU.sel=null;if(!BK.spread)MENU.page='char';}}   /* a weapon this member can't use: show why and stay on the card */
       else if(l==='Use'){MENU.pick={id};if(members.length===1)useOn(members[0]);}});
     if(pri&&TUT.stage===3&&id==='bucket'){tutBox(c,bx,by,bw,bh,12);tutArrow(c,bx+bw/2,by-8,1);}});}
 function drawMenu(dt){const members=CH>0?PARTY_ORDER:[HERO];const MH=(MENU.who&&members.includes(MENU.who))?MENU.who:HERO;MENU.a=clamp(MENU.a+(MENU.open?dt*5:-dt*6),0,1);if(MENU.a<=0)return;MENU.noteT=Math.max(0,MENU.noteT-dt);
