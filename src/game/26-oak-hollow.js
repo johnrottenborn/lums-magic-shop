@@ -32,15 +32,15 @@ const DROOMS={
   20:{name:'Worldbind Passage',dark:.38,floor:[[792,395],[935,395],[948,595],[1060,605],[1180,640],[1235,768],[565,768],[585,700],[605,625],[765,598]],
      light:[862,250,230]},
   /* Amroth's cottage (the designer's interiors). 21: the main room, front door on the left, spiral stair up on the right */
-  21:{name:'',dark:0,home:1,hk:1.3,floor:[[605,612],[705,606],[930,604],[1150,628],[1160,768],[605,768]],   /* the table fills the floor in front of the door, so the way in is just to its right */
+  21:{name:'',dark:0,home:1,hk:1.3,floor:[[130,606],[705,606],[930,604],[1150,628],[1160,768],[606,768],[606,652],[130,652]],   /* a strip behind the table runs left to the door and the left wall; the table itself is solid */
      block:[{x0:598,y0:664,x1:705,y1:769},{x0:910,y0:598,x1:1098,y1:692}],
-     fg:[{y:690,poly:[[150,636],[612,646],[640,640],[700,636],[705,768],[120,768]]},{y:688,poly:[[912,600],[1098,595],[1098,700],[905,700]]}]},
+     fg:[{y:690,poly:[[120,650],[205,617],[315,609],[470,626],[612,645],[640,640],[700,636],[705,768],[120,768]]},   /* traced along the table top's back edge, so whoever walks behind it is hidden from the waist down */{y:688,poly:[[912,600],[1098,595],[1098,700],[905,700]]}]},
   /* 23: the basement workshop under the cottage (behind the bookshelf left of the fireplace; opened by a story event) */
   23:{name:'',dark:0,home:1,hk:1.25,floor:[[140,522],[470,512],[1000,555],[1195,600],[1245,640],[1245,768],[350,768],[350,600],[140,575]],
      block:[{x0:500,y0:486,x1:945,y1:696},{x0:660,y0:705,x1:905,y1:769},{x0:920,y0:600,x1:1060,y1:665}],
      fg:[{y:698,poly:[[500,470],[950,470],[950,700],[496,700]]},{y:769,poly:[[680,712],[905,712],[905,768],[680,768]]},{y:769,poly:[[118,592],[360,592],[360,768],[118,768]]}]},
   /* 22: the loft, the bed under the thatch; the stair comes up on the right behind the rail */
-  22:{name:'',dark:0,home:1,hk:1.5,floor:[[120,738],[460,730],[1050,726],[1050,612],[1185,612],[1185,768],[110,768]],
+  22:{name:'',dark:0,home:1,hk:1.9,floor:[[120,738],[460,730],[1050,726],[1050,612],[1185,612],[1185,768],[110,768]],
      block:[{x0:440,y0:430,x1:1052,y1:724}]},   /* the serpent gate (above): arrive in the lit stairwell behind the carved archway (back to room 19), walk down through it; the way on is in the foreground */
   5:{name:'Deeproot',sub:'turn back',dark:.86,floor:[[420,768],[480,640],[560,580],[620,540],[700,540],[800,580],[950,620],[1050,700],[1080,768]]}};
 const EYES5=[[200,144],[290,106],[275,181],[331,319],[500,140],[652,129],[625,238],[731,190],[512,422],[612,444],[212,481],[212,512],[440,275],[420,412],[610,282]];
@@ -83,7 +83,7 @@ function setupDun(){DUNINT.length=0;const r=DUN.room,D=(x,y,reach,fn)=>DUNINT.pu
     L(730,545,110,["The old wall again. The air is getting colder the deeper we go.","Water drips somewhere behind the stones."]);}
   if(r===19){D(422,205,70,()=>dunGo(18,1215,540,-1));DUNINT.push({x:840,y:580,reach:95,onInteract:()=>touchWBTorch('serpent',["A great stone serpent, coiled and ready to strike. Its green flame burns brighter now."])});
     L(330,700,95,["Another empty pedestal."]);D(1165,545,80,()=>dunGo(20,862,425,1));}
-  if(r===21){D(565,622,95,()=>leaveCottage());D(1172,662,70,()=>dunGo(22,1115,700,-1));
+  if(r===21){D(435,620,80,()=>leaveCottage());D(1172,662,70,()=>dunGo(22,1115,700,-1));
     L(820,612,90,["A warm fire crackles in the hearth. A kettle hangs over the flames."]);}
   if(r===21&&C2.basement)D(695,610,50,()=>dunGo(23,300,580,1));   /* the bookshelf door to the basement, once the story opens it */
   if(r===22){D(1160,728,70,()=>dunGo(21,1120,672,-1));}

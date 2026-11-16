@@ -6,7 +6,7 @@
    the pond is painted in code and there is no fishing pier yet. */
 const HOMEX=CPATH.xt+3300,HOMEY=500,HW=1900,HH=1700;
 const HOME={t:99,arch:{x:523,y:470},cot:{x:1457,y:940,w:460,door:-92},pond:{x:1520,y:1290,rx:230,ry:105},yard:{x:1400,y:1130,rx:400,ry:270}};
-const HPATH_CTRL=[[523,440],[540,620],[470,800],[420,980],[560,1150],[820,1235],[1080,1195],[1250,1080],[1335,1028],[1365,990],[1365,962]].map(([x,y])=>[x+HOMEX,y+HOMEY]);
+const HPATH_CTRL=[[523,440],[540,620],[470,800],[420,980],[560,1150],[820,1235],[1080,1195],[1250,1080],[1335,1028],[1362,985],[1365,950],[1365,925]]   /* runs right up under the front step */.map(([x,y])=>[x+HOMEX,y+HOMEY]);
 const HPATH_PTS=splinePts(HPATH_CTRL,20);let HPATHP=null;
 const inHome=()=>lum.x>HOMEX-200;
 function hpathDist(x,y){let best=1e9;for(let i=0;i<HPATH_PTS.length-1;i++){const [ax,ay]=HPATH_PTS[i],[bx,by]=HPATH_PTS[i+1],dx=bx-ax,dy=by-ay,t=clamp(((x-ax)*dx+(y-ay)*dy)/(dx*dx+dy*dy),0,1),d=Math.hypot(x-ax-dx*t,y-ay-dy*t);if(d<best)best=d;}return best;}
@@ -49,7 +49,7 @@ function drawHomeGround(x0,y0,x1,y1){if(x1<HOMEX-300)return;if(!HPATHP)HPATHP=bu
 /* interactions: the gatehouse arch back into the passage, the cottage door, the pond */
 function homeInts(){const X=x=>x+HOMEX,Y=y=>y+HOMEY;return [
   {x:X(HOME.arch.x),y:Y(HOME.arch.y+30),get reach(){return inHome()?85:0},door:true,onInteract:()=>dunGo(20,900,690,1)},
-  {x:X(HOME.cot.x+HOME.cot.door),y:Y(HOME.cot.y+15),get reach(){return inHome()?85:0},door:true,onInteract:()=>enterDun(21,650,636,-1)},
+  {x:X(HOME.cot.x+HOME.cot.door),y:Y(HOME.cot.y+15),get reach(){return inHome()?85:0},door:true,onInteract:()=>enterDun(21,440,628,1)},
   {x:X(HOME.pond.x-HOME.pond.rx+20),y:Y(HOME.pond.y),get reach(){return inHome()?110:0},onInteract:()=>say("A quiet pond. Rain dimples the water.")}];}
 /* out of the cottage's front door, onto the step */
 function leaveCottage(){SCENE='thorn';lum.x=HOMEX+HOME.cot.x+HOME.cot.door;lum.y=HOMEY+HOME.cot.y+30;lum.face=1;lum.dir='down';lum.state='idle';lum.vx=lum.vy=0;cam.x=lum.x;cam.y=lum.y+200;THORN.t=99;HOME.t=99;}
