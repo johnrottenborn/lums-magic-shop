@@ -443,6 +443,12 @@ const CASES = {
     await g_(() => window.__g.enterDun(21, 1120, 672, -1)); await wait(800);
     await talkAll(30);
     check(await g_(() => window.__g.HST.st === 6), 'the morning hug and talk did not finish');
+    // with Venomvine in her satchel, Alma teaches Poison Powder; then it can be mixed at the hearth
+    await g_(() => { const g = window.__g; g.MATS.venomvine = 2; if (!g.BAG.includes('venomvine')) g.BAG.push('venomvine'); g.lum.x = g.ALMA.x - 70; g.lum.y = g.ALMA.y; }); await wait(500);
+    await g_(() => window.__g.NEAR && window.__g.NEAR.onInteract()); await wait(400);
+    { const l = await g_(() => window.__g.DLG.active && window.__g.DLG.lines[0]); check(l && l[0] === 'Alma' && /Venomvine/.test(l[1]), 'Alma did not offer to teach with Venomvine: ' + JSON.stringify(l)); }
+    await talkAll(14);
+    check(await g_(() => window.__g.C2.venom === 1 && window.__g.RECIPES.some(r => r.id === 'venom')), 'Alma did not teach Poison Powder');
     await g_(() => window.__g.leaveCottage()); await wait(1500);
     check(await gateDoor() === true && await g_(() => { const g = window.__g; return g.thornFree(g.HOMEX + g.HOME.gate.x, g.HOMEY + g.HOME.gate.y - 30) && g.thornFree(g.HOMEX + g.HOME.gate.x, g.HOMEY + 1660); }), 'the far gatehouse should be open after Lum sleeps, with the path through to the south edge');
     await p.screenshot({ path: path.join(SHOTS, `home-morning-${vp}.png`) });

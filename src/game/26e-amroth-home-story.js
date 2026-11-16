@@ -77,3 +77,11 @@ function drawHomeNight(){if(!hsNight())return;ctx.save();ctx.setTransform(DPR,0,
   const [lx,ly]=sc(lum.x,lum.y-60);drawGlow(ctx,lx,ly,170*zoom,'150,170,220',.12);ctx.restore();}
 /* Amroth outside by the pond can be spoken to */
 THINT.push({get x(){return hsAmrPos()[0];},get y(){return hsAmrPos()[1]+10;},get reach(){return HST.amrOut&&HST.st>=6?95:0;},onInteract:()=>hsAmrTalk()});
+
+/* Alma teaches Poison Powder, once Lum carries Venomvine (talk to her in the cottage after the night) */
+function almaTalk(){if(HST.st<6)return;if(!C2.venom&&(MATS.venomvine||0)>0){WEVENT.on=true;ALMA.face=lum.x<ALMA.x?-1:1;lum.face=-ALMA.face;
+    talk([['Alma',"Is that Venomvine? Careful, its sap stings."],['Alma',"My sister taught me a trick with it when we were young. Grind the vine fine at a fire and it makes a powder that strikes, then leaves a poison behind."],
+      ['Alma',"Here, let me show you."]],false,()=>{learnVenom();setTimeout(()=>talk([['Lum',"Poison Powder… Thank you, Alma!"],['Alma',"Feel free to mix it by the fire, right here."]],false,()=>{WEVENT.on=false;}),900);});return;}
+  talk([['Alma',C2.venom?"Remember, Venomvine makes Poison Powder. Feel free to mix by the fire!":HST.st<7?"Amroth is outside by the pond. Go and speak with him.":"Safe travels, Lum. My sister will help you, I know it."]]);}
+function learnVenom(){if(C2.venom)return;C2.venom=1;POWDER_LIST.push(['venom','Poison Powder','1–3 damage · poisons 1–3 turns','venom']);RECIPES.push({id:'venom',name:'Poison Powder',out:2,desc:'1–3 damage · poisons 1–3 turns',need:{venomvine:2}});
+  TOAST.t=0;TOAST.name='Learned: Poison Powder';TOAST.id='venom';try{sfxItem();}catch(e){}}

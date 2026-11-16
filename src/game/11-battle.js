@@ -105,7 +105,9 @@ function beginHeroTurn(){const B=BATTLE,h=B.heroes[B.cur];if(h&&h.stuck){h.stuck
 function startRound(){const B=BATTLE;B.cur=0;B.defending={};for(const h of B.heroes)if(h.stuckImm>0&&!h.stuck)h.stuckImm--;while(B.cur<B.heroes.length&&B.heroes[B.cur].ko)B.cur++;if(B.cur>=B.heroes.length){B.phase='lose';B.t=0;return;}beginHeroTurn();}
 function nextFoe(){const B=BATTLE;B.foeI++;while(B.foeI<B.foes.length&&B.foes[B.foeI].dead)B.foeI++;
   if(B.foeI>=B.foes.length){if(B.heroes.some(h=>h.poison>0&&!h.ko)){B.phase='poisonTick';B.t=0;B.ptDone=0;return;}startRound();return;}
-  const f=B.foes[B.foeI];f.tgt=aliveHeroes()[(Math.random()*aliveHeroes().length)|0];f.heavyNow=0;
+  const f=B.foes[B.foeI];if(f.poison>0){f.poison--;f.hp=Math.max(0,f.hp-1);f.hit=.3;f.showHp=1.2;pop(f.x+f.ox,foeCenter(f).top-30*bS(),'1','poison');   /* venom works at the start of the foe's turn */
+    if(f.hp<=0){f.dead=.001;STATS.kills++;setTimeout(sfxSlimePop,150);if(!aliveFoes().length){B.phase='win';B.t=0;return;}nextFoe();return;}}
+  f.tgt=aliveHeroes()[(Math.random()*aliveHeroes().length)|0];f.heavyNow=0;
   if(f.type==='fokalur'){const al=aliveHeroes();f.tgt=al.find(h=>h.id==='lum')||al[0];f.spell=f.tgt.id==='lum'?'stone':'fire';B.phase='fokSpell';B.t=0;B.spellDone=0;pop(f.x,foeCenter(f).top-40*bS(),f.spell==='stone'?'Petrification!':'Hellfire!','info');sfxEerie&&sfxEerie();return;}
   if(f.skip>0){f.skip--;B.phase='foeSkip';B.t=0;pop(f.x,f.y-150*bS(),f.frozen?'Frozen solid!':f.drowsy?'Zzz…':'…dazed','info');if(f.frozen)f.thawT=1.1;f.drowsy=0;return;}
   if(f.type==='bigspider'){f.turn=(f.turn||0)+1;if(f.turn%3===0){f.web=1;pop(f.x,foeCenter(f).top-40*bS(),'Web Spray!','info');}}

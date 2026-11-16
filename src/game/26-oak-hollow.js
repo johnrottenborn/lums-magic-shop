@@ -84,7 +84,8 @@ function setupDun(){DUNINT.length=0;const r=DUN.room,D=(x,y,reach,fn)=>DUNINT.pu
   if(r===19){D(422,205,70,()=>dunGo(18,1215,540,-1));DUNINT.push({x:840,y:580,reach:95,onInteract:()=>touchWBTorch('serpent',["A great stone serpent, coiled and ready to strike. Its green flame burns brighter now."])});
     L(330,700,95,["Another empty pedestal."]);D(1165,545,80,()=>dunGo(20,862,425,1));}
   if(r===21){D(435,620,80,()=>leaveCottage());D(1172,662,70,()=>dunGo(22,1115,700,-1));
-    L(820,612,90,["A warm fire crackles in the hearth. A kettle hangs over the flames."]);}
+    DUNINT.push({x:820,y:612,reach:90,onInteract:()=>{if(canLumMix()&&HST.st>=6)openMix();else say("A warm fire crackles in the hearth. A kettle hangs over the flames.");}});   /* Lum can mix at Alma's hearth in the morning */}
+  if(r===21)DUNINT.push({get x(){return ALMA.x;},get y(){return ALMA.y+10;},get reach(){return ALMA.on&&HST.st>=6&&!DLG.active?90:0;},onInteract:almaTalk});   /* talk to Alma */
   if(r===21&&C2.basement)D(695,610,50,()=>dunGo(23,300,580,1));   /* the bookshelf door to the basement, once the story opens it */
   if(r===22){D(1160,728,70,()=>dunGo(21,1120,672,-1));DUNINT.push({x:760,y:738,reach:95,onInteract:hsRest});}
   if(r===23){D(258,560,70,()=>dunGo(21,680,640,1));}

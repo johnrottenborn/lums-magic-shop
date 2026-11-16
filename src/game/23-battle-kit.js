@@ -1,17 +1,18 @@
 /* ---------- Lum's battle kit: powders ---------- */
-const POWDERS={frost:3,thorn:3,moon:3};
+const POWDERS={frost:3,thorn:3,moon:3,venom:0};
 const POWDER_LIST=[['spark','Sparkdust','Damage · unlimited',null],['frost','Frostbloom Powder','Freezes · enemy may lose a turn','frost'],['thorn','Thornbane Powder','Weakens enemy attacks','thorn'],['moon','Moonmint Powder','Calms · strong vs undead','moon']];
-const POWICON={spark:'icon4_sun_bottle',frost:'icon3_frost_bowl',thorn:'icon_pouch_rose',moon:'icon3_pastel_powders'};
+const POWICON={spark:'icon4_sun_bottle',frost:'icon3_frost_bowl',thorn:'icon_pouch_rose',moon:'icon3_pastel_powders',venom:'icon_pouch_seal'};
 function drawPowderIcon(c,id,x,y,z){const im=IMG[POWICON[id]];if(ready(im)){c.drawImage(im,x-z/2,y-z/2,z,z);return true;}return false;}
-const PCOL={spark:'255,230,140',frost:'170,225,255',thorn:'170,220,120',moon:'200,170,255'};
+const PCOL={spark:'255,230,140',frost:'170,225,255',thorn:'170,220,120',moon:'200,170,255',venom:'150,220,90'};
 const WEAKTO={demon:'frost',bdemon:'frost',brute:'frost',rslime:'frost',rvixen:'thorn',bigspider:'thorn',slime:'frost',jelly:'frost',fslime:'frost',slug:'frost',slugking:'frost',wisp:'frost',flora:'frost',spider:'thorn',vixen:'thorn',bigvixen:'thorn',bat:'spark',mimic:'spark',rskel:'moon',reaper:'moon',skel:'moon'};
 const weakKnown=(t,p)=>WEAKTO[t]===p&&C1.weak&&C1.weak[t];
 function lumPowderHit(h,f,c){const B=BATTLE,S=bS(),st=heroStats(h.id),p=B.powder||'spark';let dmg=Math.max(1,st.atk+(c.nice?1:0)-f.def);const tp=foeCenter(f).top;const weak=WEAKTO[f.type]===p;
   if(h.chill){dmg=Math.max(1,dmg-1);h.chill=0;}
   if(p==='frost'){dmg=Math.max(1,dmg-1);if(c.nice||weak||Math.random()<.4){f.skip=1;f.frozen=1;f.thawT=0;f.frostT=0;pop(f.x+f.ox,tp-80*S,'Frozen!','nice');}}
+  else if(p==='venom'){dmg=1+Math.floor(Math.random()*3);f.poison=1+Math.floor(Math.random()*3);pop(f.x+f.ox,tp-80*S,'Poisoned!','nice');for(let i=0;i<10;i++)B.fx.push({k:'bub',x:f.x+f.ox+rnd(-25,25)*S,y:tp+rnd(0,60)*S,t:0,max:rnd(.5,.9)});}   /* Poison Powder (taught by Alma): 1-3 damage, then 1 poison damage on each of the foe's next 1-3 turns */
   else if(p==='thorn'){dmg=1;f.weak=3;f.vineT=0;pop(f.x+f.ox,tp-80*S,'Weakened!','nice');}
   else if(p==='moon'){if(UNDEAD(f.type)){dmg=Math.round(dmg*1.8);if(f.charged){f.charged=0;pop(f.x+f.ox,tp-80*S,'Interrupted!','nice');}else pop(f.x+f.ox,tp-80*S,'Soothed!','info');}else if(c.nice){f.skip=1;f.drowsy=1;pop(f.x+f.ox,tp-80*S,'Drowsy…','nice');}}
-  if(weak){if(!(p==='moon'&&UNDEAD(f.type)))dmg=Math.max(dmg+2,Math.ceil(dmg*1.6));(C1.weak=C1.weak||{})[f.type]=1;pop(f.x+f.ox+50*S,tp-45*S,'Weak!','weak');B.hitstop=Math.max(B.hitstop,.08);}
+  if(weak&&p!=='venom'){if(!(p==='moon'&&UNDEAD(f.type)))dmg=Math.max(dmg+2,Math.ceil(dmg*1.6));(C1.weak=C1.weak||{})[f.type]=1;pop(f.x+f.ox+50*S,tp-45*S,'Weak!','weak');B.hitstop=Math.max(B.hitstop,.08);}
   if(p!=='spark')POWDERS[p]=Math.max(0,POWDERS[p]-1);
   if(c.nice){C1.combo=Math.min(COMBO_MAX,(C1.combo||0)+1);if(C1.combo===COMBO_MAX)setTimeout(()=>{if(BATTLE.on)pop(h.x,h.y-210*S,'Starfall ready!','nice');},500);}else C1.combo=0;
   spawnPowderFx(p,f);hurtFoe(f,dmg,c.nice);}
