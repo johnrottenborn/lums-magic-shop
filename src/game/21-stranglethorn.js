@@ -89,11 +89,11 @@ function cellFloorMid(r,c){let sx=0,sy=0,n=0;for(let y=r*TCH+20;y<(r+1)*TCH-10;y
 function buildCosSightings(){if(COSSEE.length)return;const p=THORN.path,n=p.length;[.22,.42,.62,.8].forEach((f,i)=>{const [r,c]=p[Math.round(f*(n-1))],[x,y]=cellFloorMid(r,c);COSSEE.push({i,x,y,st:0,t:0,a:0,face:1});});{const [x,y]=cellFloorMid(TMZ.finish,TMZ.C-1);COSSEE.push({i:4,x,y,st:0,t:0,a:0,face:1,needBoss:1});}}
 function updateCosSightings(dt){buildCosSightings();const Rw=Math.min(W,H)*.5/zoom,free=!DLG.active&&!BATTLE.on&&!BATTLE.pending&&!MENU.open&&!WEVENT.on&&!FADE.dir;
   for(const s of COSSEE){if(C1['cosSeen'+s.i]&&s.st<2){s.st=3;continue;}if(s.st===3)continue;if(s.needBoss&&!C1.thornBoss)continue;const d=Math.hypot(lum.x-s.x,(lum.y-s.y)*1.2);s.t+=dt;
-    if(s.st===0&&free&&d<Rw*.95){s.st=1;s.t=0;s.face=1;}   /* he always faces and walks away to the right */
-    else if(s.st===1){s.a=Math.min(.95,s.a+dt*2);s.face=1;if(d<Rw*.38||s.t>4.5){s.st=2;s.t=0;s.face=1;C1['cosSeen'+s.i]=1;if(!DLG.active)say(COS_LINES[s.i%COS_LINES.length]);}}
-    else if(s.st===2){const nx=s.x+55*dt;if(thornFree(nx,s.y))s.x=nx;else{for(const dy of [6,-6,12,-12,20,-20])if(thornFree(nx,s.y+dy)){s.x=nx;s.y+=dy*.5;break;}}   /* follows the path's floor to the right */
+    if(s.st===0&&free&&d<Rw*.95){s.st=1;s.t=0;s.face=COS_BLADE.idle.native;}   /* he always faces and walks away to the right */
+    else if(s.st===1){s.a=Math.min(.95,s.a+dt*2);s.face=COS_BLADE.idle.native;if(d<Rw*.38||s.t>4.5){s.st=2;s.t=0;s.face=1;C1['cosSeen'+s.i]=1;if(!DLG.active)say(COS_LINES[s.i%COS_LINES.length]);}}
+    else if(s.st===2){const nx=s.x+30*dt;if(thornFree(nx,s.y))s.x=nx;else{for(const dy of [6,-6,12,-12,20,-20])if(thornFree(nx,s.y+dy)){s.x=nx;s.y+=dy*.5;break;}}   /* follows the path's floor to the right */
       if(!DLG.active)s.w=(s.w||0)+dt;if(s.w>2.5)s.a=Math.max(0,s.a-dt*.8);if(s.a<=0)s.st=3;}}}
-function drawCosGhost(s){if(!ready(catlas)||s.a<=0)return;const A=s.st===2?COS_BLADE.walk:COS_BLADE.idle,fr=s.st===2?A.frames[Math.floor(s.t*10)%A.frames.length]:A.frames[0];
+function drawCosGhost(s){if(!ready(catlas)||s.a<=0)return;const A=s.st===2?COS_BLADE.walk:COS_BLADE.idle,fr=s.st===2?A.frames[Math.floor(s.t*6)%A.frames.length]:A.frames[0];   /* stands facing down (the front frame); walks slowly right */
   ctx.save();ctx.globalAlpha=s.a;ctx.fillStyle='rgba(0,0,0,.25)';ctx.beginPath();ctx.ellipse(s.x,s.y+2,26,7,0,0,TAU);ctx.fill();
   ctx.translate(s.x,s.y+3);if(s.face!==A.native)ctx.scale(-1,1);const dw=CFW*CSPR,dh=CFH*CSPR;ctx.save();ctx.globalCompositeOperation='lighter';const bg=s.st===2?[18,-32,44]:[34,-66,44];drawGlow(ctx,bg[0],bg[1],bg[2],'255,40,50',.7+.12*Math.sin(T*5));ctx.restore();ctx.drawImage(catlas,fr*CFW,0,CFW,CFH,-dw/2,-dh*(264/270),dw,dh);ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,bg[0],bg[1],bg[2]*.5,'255,70,60',.45);ctx.restore();ctx.restore();
   ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,s.x,s.y-70,60,'140,170,255',.22*s.a);ctx.restore();}
