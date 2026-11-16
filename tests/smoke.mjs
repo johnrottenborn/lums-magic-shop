@@ -408,6 +408,39 @@ const CASES = {
     await g_(() => { const g = window.__g; g.openMenu(); g.MENU.page = 'char'; g.MENU.who = 'amroth'; }); await wait(600);
     await p.screenshot({ path: path.join(SHOTS, `amroth-spellbook-${vp}.png`) });
   },
+  async 'amroth-home-story'(p) {
+    // night at Amroth's home: the talk with Alma, Lum rests, the morning hug, and Amroth by the pond sends her east alone
+    const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop', g_ = f => p.evaluate(f);
+    const talkAll = async (n = 40) => { for (let i = 0; i < n; i++) { if (await g_(() => window.__g.DLG.active)) await p.keyboard.press('Enter'); await wait(260); } };
+    await g_(() => { window.__g.startChapter2(); window.__g.c2Skip(); }); await wait(1500);
+    await g_(() => window.__g.enterHome()); await wait(1500);
+    check(await g_(() => window.__g.HST.st === 1), 'arriving at the home did not make it night');
+    await g_(() => { const g = window.__g; g.lum.x = g.HOMEX + 1300; g.lum.y = g.HOMEY + 1060; }); await wait(1800);
+    await p.screenshot({ path: path.join(SHOTS, `home-night-${vp}.png`) });
+    await g_(() => { const g = window.__g; g.lum.x = g.HOMEX + 1365; g.lum.y = g.HOMEY + 965; }); await wait(500);
+    await g_(() => window.__g.NEAR.onInteract()); await wait(1600);
+    check(await g_(() => window.__g.SCENE === 'dun' && window.__g.DUNX.room === 21 && window.__g.HST.st === 2), 'the night talk did not start inside');
+    await wait(400); await p.screenshot({ path: path.join(SHOTS, `home-night-talk-${vp}.png`) });
+    for (let i = 0; i < 12; i++) { await p.keyboard.press('Enter'); await wait(300); }
+    for (let i = 0; i < 30 && !(await g_(() => window.__g.HST.heart > 0)); i++) { if (await g_(() => window.__g.DLG.active)) await p.keyboard.press('Enter'); await wait(250); }
+    await wait(300); await p.screenshot({ path: path.join(SHOTS, `home-alma-meet-${vp}.png`) });
+    await talkAll(40);
+    check(await g_(() => { const g = window.__g; return g.HST.st === 3 && !g.BAG.includes('baby') && g.ALMA.baby && !g.PARTY_ORDER.includes('amroth'); }), 'after the talk: Alma should hold the baby, Amroth leave the party, and Lum be told to rest');
+    await p.screenshot({ path: path.join(SHOTS, `home-alma-baby-${vp}.png`) });
+    await g_(() => window.__g.enterDun(22, 760, 745, 1)); await wait(1200);
+    await g_(() => window.__g.NEAR.onInteract()); await wait(2500);
+    check(await g_(() => window.__g.HST.st === 4), 'resting in the loft bed did not bring the morning');
+    await g_(() => window.__g.enterDun(21, 1120, 672, -1)); await wait(800);
+    await talkAll(30);
+    check(await g_(() => window.__g.HST.st === 6), 'the morning hug and talk did not finish');
+    await g_(() => window.__g.leaveCottage()); await wait(1500);
+    await p.screenshot({ path: path.join(SHOTS, `home-morning-${vp}.png`) });
+    await g_(() => { const g = window.__g, P = g.HST; const n = g.THINTS().find(o => o.reach > 0 && o.onInteract && String(o.onInteract).includes('hsAmrTalk')); g.lum.x = n.x; g.lum.y = n.y + 30; }); await wait(600);
+    await g_(() => window.__g.NEAR.onInteract()); await wait(400);
+    { const l = await g_(() => window.__g.DLG.active && window.__g.DLG.lines.map(x => x[1]).join(' ')); check(l && /protect Alma/.test(l) && /coast east/.test(l), 'Amroth by the pond did not speak: ' + JSON.stringify(l)); }
+    await talkAll(8);
+    check(await g_(() => window.__g.HST.st === 7 && /Breezevale/.test(window.__g.GOAL.text)), 'the task to Breezevale Cove was not set');
+  },
   async 'worldbind-passage'(p) {
     // the gatehouse door leads to the first room of the Worldbind Passage: arrive at the top of the stairs, walk down, and the door back works
     const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop', g_ = f => p.evaluate(f);
@@ -698,6 +731,7 @@ const CASES = {
     await g_(() => { const g = window.__g; g.lum.x = g.HOMEX + 1300; g.lum.y = g.HOMEY + 1080; }); await wait(1500);
     await p.screenshot({ path: path.join(SHOTS, `amroth-home-cottage-${vp}.png`) });
     // inside the cottage: the front door leads into the main room, the spiral stair up to the loft, and back out
+    await g_(() => { window.__g.HST.st = 7; window.__g.HST.amrOut = 1; });   // the night's story has its own test; tour the rooms freely here
     await g_(() => { const g = window.__g, X = g.HOMEX, Y = g.HOMEY; g.lum.x = X + 1365; g.lum.y = Y + 965; }); await wait(500);
     check(await g_(() => !!(window.__g.NEAR && window.__g.NEAR.door)), 'no door emote at the cottage door');
     await g_(() => window.__g.NEAR.onInteract()); await wait(1200);

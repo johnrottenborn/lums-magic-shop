@@ -1,0 +1,79 @@
+/* ---------- Chapter 2: the night at Amroth's home, and the morning after ----------
+   Out of the Worldbind Passage it is night; smoke rises from the cottage chimney and Alma is inside.
+   Inside: Amroth and Alma, Lum's story, Fokalur, Alma's sister Sage Luma in Breezevale Cove, Lum and Alma alike, the baby.
+   Amroth leaves the party (Lum alone from here); Lum rests in the loft. Morning: Alma's hug; Amroth by the pond sends Lum east.
+   HST.st: 0 not yet, 1 night outside, 2 the talk inside, 3 rest upstairs, 4 morning in the loft, 5 Alma downstairs, 6 see Amroth, 7 on to Breezevale */
+const HST={st:0,t:0,smoke:[],heart:0};
+const ALMA={x:860,y:650,face:-1,dir:'side',moving:0,ph:0,on:0,baby:0};
+const ALMA_H=128;
+const hsNight=()=>HST.st>=1&&HST.st<=3;
+function hsGoal(t){GOAL.tag='NEW TASK';GOAL.text=t;HINT.goalT=0;}
+/* arriving from the passage: night falls on the home */
+function hsArrive(){if(HST.st||!C2.joined)return;HST.st=1;hsGoal('Go inside Amroth’s home');}
+function almaWalk(tx,ty,sp,dt){const dx=tx-ALMA.x,dy=ty-ALMA.y,d=Math.hypot(dx,dy);if(d<3){ALMA.x=tx;ALMA.y=ty;ALMA.moving=0;return true;}const m=Math.min(d,sp*dt);ALMA.x+=dx/d*m;ALMA.y+=dy/d*m;ALMA.ph+=m;ALMA.moving=1;
+  if(Math.abs(dx)>Math.abs(dy)){ALMA.dir='side';ALMA.face=dx>0?1:-1;}else ALMA.dir=dy>0?'down':'up';return false;}
+function drawAlmaRoom(){if(!ALMA.on)return;const k=dunH(ALMA.y)/151,an=ALMA.moving?(ALMA.dir==='side'?'side':ALMA.dir):(ALMA.dir==='up'?'up':ALMA.dir==='side'?'side':'idle'),n=C1ATL.alma.rows[an][1],
+    fi=ALMA.moving?Math.floor(ALMA.ph/16)%n:Math.floor(T*2.2)%n;
+  ctx.save();ctx.translate(ALMA.x,ALMA.y);ctx.scale(k,k);ctx.fillStyle='rgba(10,10,20,.25)';ctx.beginPath();ctx.ellipse(0,2,28,8,0,0,TAU);ctx.fill();
+  c1Frame(ctx,'alma',an,an==='idle'&&!ALMA.moving?fi:fi,0,0,ALMA_H,an==='side'&&ALMA.face>0,1,0);
+  if(ALMA.baby&&ready(IMG.icon6_baby_bear)){const s=46;ctx.drawImage(IMG.icon6_baby_bear,-s/2+ALMA.face*6,-ALMA_H*.62,s,s);}   /* the baby in her arms */
+  ctx.restore();}
+/* the little hearts when Lum and Alma meet, and in the morning hug */
+function drawHearts(x,y){if(HST.heart<=0)return;ctx.save();for(let i=0;i<5;i++){const q=(T*.6+i/5)%1,hx=x+Math.sin(i*2.1+T)*26,hy=y-q*70;ctx.globalAlpha=HST.heart*(1-q)*.9;ctx.fillStyle='#ff9fb6';ctx.beginPath();
+  const s=7+3*Math.sin(i);ctx.moveTo(hx,hy+s*.6);ctx.bezierCurveTo(hx-s*1.2,hy-s*.2,hx-s*.4,hy-s*1.1,hx,hy-s*.4);ctx.bezierCurveTo(hx+s*.4,hy-s*1.1,hx+s*1.2,hy-s*.2,hx,hy+s*.6);ctx.fill();}ctx.restore();}
+/* the night talk inside, written from the designer's story notes */
+function hsNightTalk(){HST.st=2;WEVENT.on=true;AMR.x=lum.x+70;AMR.y=lum.y+4;AMR.dir='side';AMR.face=1;AMR.moving=0;ALMA.on=1;ALMA.x=860;ALMA.y=650;ALMA.face=-1;ALMA.dir='side';lum.face=1;
+  setTimeout(()=>talk([['Amroth',"Alma! Thank the stars, you’re safe."],['Alma',"Amroth! You’re home so late. What happened?"],
+    ['Amroth',"I found this woman at the summit’s clearing, just outside Stranglethorn. She had been turned to stone."],['Amroth',"Her name is Lum."],
+    ['Lum',"I live on the other side of Stranglethorn, at the edge of the world."],['Lum',"I was searching for my lost apprentice. His trail led me across Stranglethorn…"],
+    ['Lum',"…and when I found him, he had been possessed by Fokalur."],['Alma',"Fokalur… I’ve heard that name before."],['Amroth',"As have I. Your sister would know more, Alma."],
+    ['Alma',"Yes. My sister Luma is a sage in Breezevale Cove, the coastal town nearby. She knows the old stories better than anyone."]],false,hsMeet),700);}
+function hsMeet(){HST.meet=1;}   /* Alma steps up to Lum; they look at each other */
+function hsMeetTalk(){talk([['Alma',"…"],['Lum',"…"],['Alma',"You look just like me."],['Lum',"I was thinking the same thing. It’s strange… it feels like I’ve known you forever."],
+    ['Alma',"So do I."]],false,()=>{HST.heart=0;setTimeout(hsBabyTalk,500);});}
+function hsBabyTalk(){try{sfxBabyCry(.9);}catch(e){}
+  setTimeout(()=>talk([['Amroth',"And that isn’t all. On the way through the passage we were attacked by demons."],['Amroth',"We found this baby, too, in the ashes at the clearing."],
+    ['Amroth',"I have never seen demons before. I believe Fokalur is behind this invasion."],['Alma',"Oh… look at his kind eyes."]],false,()=>{
+      const i=BAG.indexOf('baby');if(i>=0)BAG.splice(i,1);ALMA.baby=1;   /* Alma takes the baby */
+      setTimeout(()=>talk([['Alma',"I’ll care for him for now."],['Alma',"Lum, you must be exhausted. Please, rest upstairs. We can talk more in the morning."]],false,hsToRest),600);}),1100);}
+function hsToRest(){HST.st=3;WEVENT.on=false;HST.amrIn=1;AMR.x=700;AMR.y=640;AMR.dir='side';AMR.face=1;AMR.moving=0;
+  C2.joined=0;const k=PARTY_ORDER.indexOf('amroth');if(k>=0)PARTY_ORDER.splice(k,1);   /* Lum goes on alone from here */
+  hsGoal('Rest upstairs');setupDun();}
+/* the loft bed */
+function hsRest(){if(HST.st!==3){say("A big bed under a patchwork quilt.");return;}WEVENT.on=true;goScene(()=>{HST.st=4;HST.amrIn=0;HST.amrOut=1;ALMA.on=1;ALMA.baby=0;ALMA.x=760;ALMA.y=650;ALMA.face=1;ALMA.dir='side';
+  for(const id of PARTY_ORDER)HEROES[id].hp=HEROES[id].maxHp;lum.x=900;lum.y=735;lum.face=1;lum.state='idle';WEVENT.on=false;GOAL.tag='';GOAL.text='';setupDun();
+  setTimeout(()=>{hsGoal('Go downstairs');},1500);});}
+/* the morning: Alma waits downstairs */
+function hsMorningTalk(){HST.st=5;WEVENT.on=true;lum.state='idle';lum.vx=lum.vy=0;
+  setTimeout(()=>talk([['Alma',"Good morning, Lum."]],false,()=>{HST.walk=1;}),600);}
+function hsHug(){HST.heart=1;try{sfxItem();}catch(e){}
+  setTimeout(()=>talk([['Lum',"Thank you for letting me rest."],['Alma',"You almost slept the day away!"],
+    ['Lum',"I feel responsible for what has happened. Fokalur has my apprentice… I must go after him."],['Alma',"My sister will know more. Go and see her."],
+    ['Alma',"Amroth is outside. Go and speak with him before you leave."]],false,()=>{HST.heart=0;HST.st=6;WEVENT.on=false;hsGoal('Speak with Amroth outside');}),900);}
+/* outside in the morning: Amroth by the pond */
+const HSAMR={x:0,y:0};
+function hsAmrPos(){return [HOMEX+HOME.pond.x-HOME.pond.rx*.55,HOMEY+HOME.pond.y-HOME.pond.ry*.95];}
+function hsAmrTalk(){if(HST.st<6)return;if(HST.st>6){say("Follow the coast east to Breezevale Cove.");return;}
+  talk([['Amroth',"Good morning, Lum."],['Amroth',"I must stay here and protect Alma and the baby, in case the demons come."],
+    ['Amroth',"You are more than capable. You can make it to Breezevale on your own and seek guidance from Sage Luma."],
+    ['Amroth',"I’ve opened the gate. Follow the coast east."]],false,()=>{HST.st=7;hsGoal('Follow the coast east to Breezevale Cove');});}
+function updateHomeStory(dt){HST.t+=dt;
+  if(SCENE==='thorn'&&inHome()&&C2.joined&&!HST.st)hsArrive();
+  /* chimney smoke */
+  if(SCENE==='thorn'&&inHome()&&Math.random()<dt*7){const [cx,cy]=[HOMEX+HOME.cot.x+31,HOMEY+HOME.cot.y-352];HST.smoke.push({x:cx+rnd(-5,5),y:cy,vx:rnd(4,14),vy:rnd(-28,-18),r:rnd(9,14),t:0});}
+  for(const s of HST.smoke){s.t+=dt;s.x+=s.vx*dt;s.y+=s.vy*dt;s.r+=dt*9;}for(let i=HST.smoke.length-1;i>=0;i--)if(HST.smoke[i].t>4)HST.smoke.splice(i,1);
+  /* inside, at night: the talk starts once Lum is through the door */
+  if(SCENE==='dun'&&DUN.room===21&&HST.st===1&&!FADE.dir&&!DLG.active)hsNightTalk();
+  if(SCENE==='dun'&&DUN.room===21&&HST.meet===1&&!DLG.active){if(almaWalk(lum.x+95,lum.y+2,70,dt)){ALMA.face=-1;ALMA.dir='side';lum.face=1;HST.meet=2;HST.heart=1;hsMeetTalk();}}
+  if(SCENE==='dun'&&DUN.room===21&&HST.st===4)hsMorningTalk();
+  if(SCENE==='dun'&&DUN.room===21&&HST.walk&&!DLG.active){if(almaWalk(lum.x+(lum.x<700?80:-80),lum.y+1,80,dt)){ALMA.face=lum.x<ALMA.x?-1:1;ALMA.dir='side';lum.face=-ALMA.face;HST.walk=0;hsHug();}}
+  if(HST.amrOut&&SCENE==='thorn'){const [x,y]=hsAmrPos();AMR.x=x;AMR.y=y;AMR.moving=0;AMR.dir='down';}
+  if(HST.heart>0&&!DLG.active&&!HST.meet&&!HST.walk&&HST.st!==5)HST.heart=Math.max(0,HST.heart-dt);}
+/* night over the home (screen space), with warm windows and door; the chimney smoke in world space */
+function drawHomeSky(){if(SCENE!=='thorn'||!inHome())return;drawHomeNight();if(!HST.smoke.length)return;ctx.save();ctx.setTransform(DPR,0,0,DPR,0,0);for(const s of HST.smoke){const x=(s.x-cam.x)*zoom+W/2,y=(s.y-cam.y)*zoom+H/2;ctx.globalAlpha=Math.max(0,.32*(1-s.t/4))*(hsNight()?.8:1);ctx.fillStyle=hsNight()?'#9aa0ab':'#cfd2d6';ctx.beginPath();ctx.arc(x,y,s.r*zoom,0,TAU);ctx.fill();}ctx.restore();}
+function drawHomeNight(){if(!hsNight())return;ctx.save();ctx.setTransform(DPR,0,0,DPR,0,0);ctx.fillStyle='rgba(8,12,34,.58)';ctx.fillRect(0,0,W,H);
+  ctx.globalCompositeOperation='lighter';const sc=(wx,wy)=>[(wx-cam.x)*zoom+W/2,(wy-cam.y)*zoom+H/2],C=HOME.cot;
+  for(const [dx,dy,r] of [[-150,-95,46],[-92,-60,40],[55,-95,46],[150,-110,46]]){const [x,y]=sc(HOMEX+C.x+dx,HOMEY+C.y+dy);drawGlow(ctx,x,y,r*zoom*2.2,'255,180,90',.32);drawGlow(ctx,x,y,r*zoom*.7,'255,220,150',.4);}
+  const [lx,ly]=sc(lum.x,lum.y-60);drawGlow(ctx,lx,ly,170*zoom,'150,170,220',.12);ctx.restore();}
+/* Amroth outside by the pond can be spoken to */
+THINT.push({get x(){return hsAmrPos()[0];},get y(){return hsAmrPos()[1]+10;},get reach(){return HST.amrOut&&HST.st>=6?95:0;},onInteract:()=>hsAmrTalk()});
