@@ -16,6 +16,8 @@ function homeFree(x,y){const lx=x-HOMEX,ly=y-HOMEY;if(lx<30||lx>HW-30||ly<400||l
   if(lx>HOME.cot.x-215&&lx<HOME.cot.x+225&&ly>HOME.cot.y-160&&ly<HOME.cot.y-6)return false;
   return hpathDist(x,y)<62||inEll(lx,ly,{x:HOME.arch.x,y:HOME.arch.y+70,rx:150,ry:90})||inEll(lx,ly,HOME.yard);}
 /* the region's scenery, added to Stranglethorn's prop list (21) */
+/* the designer's lush green evergreens for Amroth's home: a slim fir, a great tall one, a twisted little one */
+const HTREES=[['hfir',240],['hbig',400],['hfir',260],['htwist',250],['hfir',230],['hbig',380],['htwist',240]];
 function homeProps(P,PN){const X=x=>x+HOMEX,Y=y=>y+HOMEY,H_=(a,b)=>hash(a,b,971);
   P.push({t:'tree',img:'worldbind_cliff',x:X(620),y:Y(440),w:2500,flip:false,solid:1},{t:'tree',img:'worldbind_cliff',x:X(1480),y:Y(420),w:2400,flip:true,solid:1});
   P.push({t:'tree',img:'outpost',x:X(HOME.arch.x+52),y:Y(HOME.arch.y+8),sy:Y(HOME.arch.y-40),w:430,flip:false,solid:1});
@@ -24,7 +26,7 @@ function homeProps(P,PN){const X=x=>x+HOMEX,Y=y=>y+HOMEY,H_=(a,b)=>hash(a,b,971)
   let k=0;for(let gy=470;gy<HH+160;gy+=125)for(let gx=-40;gx<HW+80;gx+=140){k++;const lx=gx+(H_(k,1)-.5)*90,ly=gy+(H_(k,2)-.5)*70,x=X(lx),y=Y(ly);
     // a tree's crown rises well above its roots, so keep the whole column above it clear of the path, the yard and the gatehouse
     let hit=false;for(let up=0;up<=460&&!hit;up+=40){const yy=ly-up;if((up<=230&&hpathDist(x,Y(yy))<(up?95:150))||inEll(lx,yy,HOME.yard,up?1:1.12)||inEll(lx,yy,HOME.pond,1.25)||inEll(lx,yy,{x:HOME.arch.x,y:HOME.arch.y,rx:280,ry:150}))hit=true;}if(hit)continue;
-    const [img,w]=PN[Math.floor(H_(k,3)*PN.length)];P.push({t:'tree',img,x,y,w:w*(.8+H_(k,4)*.3),flip:H_(k,5)<.5,base:.95});}
+    const [img,w]=HTREES[Math.floor(H_(k,3)*HTREES.length)];P.push({t:'tree',img,x,y,w:w*(.8+H_(k,4)*.3),flip:H_(k,5)<.5,base:.95});}
   // flowers from Lum's garden (the painted lavender, roses, delphiniums and magic blooms): beds along the cottage front and sides,
   // and drifts around the roots of the firs nearest the cottage so no bare roots show
   const C=HOME.cot,KINDS=['lavender','rose','delph','magic','lavender','rose','mint'],fl=[];let q=0;
@@ -33,7 +35,7 @@ function homeProps(P,PN){const X=x=>x+HOMEX,Y=y=>y+HOMEY,H_=(a,b)=>hash(a,b,971)
   for(let lx=C.x-240;lx<=C.x+240;lx+=26){bloom(lx+(H_(lx,26)-.5)*10,C.y+6+H_(lx,27)*10);bloom(lx+13,C.y+30+H_(lx,28)*14,.9);}   /* beds along the front */
   for(let i=0;i<46;i++){const r=H_(i,31),a=H_(i,32);bloom(C.x+215+r*150,C.y-170+a*240,1.05);}   /* the right side, thick with flowers */
   for(let i=0;i<26;i++){const r=H_(i,33),a=H_(i,34);bloom(C.x-230-r*110,C.y-150+a*200);}   /* the left side */
-  for(const t of P){if(t.t!=='tree'||!/pine|spruce|twist|sapling/.test(t.img)||Math.hypot(t.x-X(C.x),t.y-Y(C.y))>900)continue;   /* drifts over the fir roots */
+  for(const t of P){if(t.t!=='tree'||!/pine|spruce|twist|sapling|hfir|hbig/.test(t.img)||Math.hypot(t.x-X(C.x),t.y-Y(C.y))>900)continue;   /* drifts over the fir roots */
     const rx=t.w*.36;for(let j=0;j<16;j++){const a=H_(j,t.x|0)*Math.PI*1.15-.08,rr=.35+H_(j+40,t.y|0)*.75;bloom(t.x-X(0)+Math.cos(a)*rx*rr,t.y-Y(0)+Math.sin(a)*rx*.34*rr+4,1.1);}}
   P.push(...fl);
   // a few stones along the path
