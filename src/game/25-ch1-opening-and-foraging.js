@@ -49,7 +49,7 @@ function buildForage(){if(forageBuilt)return;forageBuilt=true;
     const row=!sh&&ROWS.find(r=>Math.abs(r.ax+r.d[0]*20-o.x)<1&&Math.abs(r.ay+4-o.y)<1);if(!sh&&!row)continue;const orig=o.onInteract,line=sh?(sh.drained?"The slimes drained this one of its magic. With a little time and care, it'll bloom again.":LUMSHR[sh.k]):LUMHERB[row.kind];if(!line)continue;o.onInteract=()=>{if(CH>0)say(line);else orig();};}
   for(const f of FORAGE)INTERACTABLES.push({x:f.x,y:f.y,reach:f.herb?62:76,lum:true,c1:1,forage:f,onInteract:()=>{if(CH>0)pickForage(f);else{const o=INTERACTABLES.find(q=>q!==this&&!q.c1&&Math.hypot(q.x-f.x,q.y-f.y)<2);o&&o.onInteract();}}});}
 function resetForage(){buildForage();for(const f of FORAGE)f.picked=0;}
-const FORAGE_LINE={duskberry:"Plump duskberries.",dewberry:"Dewberries, still cold with morning dew.",emberberry:"Emberberries, warm as a little hearth.",moonleaf:"Fresh moonmint leaves."};
+const FORAGE_LINE={venomvine:"Venomvine. Its sap stings a little.",duskberry:"Plump duskberries.",dewberry:"Dewberries, still cold with morning dew.",emberberry:"Emberberries, warm as a little hearth.",moonleaf:"Fresh moonmint leaves."};
 function pickForage(f){if(f.picked){say(["I've picked this one clean. More will grow soon.","Nothing left to pick here for now."][(sayCount++)%2]);return;}
   f.picked=1;MATS[f.id]=(MATS[f.id]||0)+f.n;if(!BAG.includes(f.id))BAG.push(f.id);TOAST.t=0;TOAST.name=`${ITEMS[f.id].name} ×${f.n}`;TOAST.id=f.id;MENU.newItems++;sfxItem&&sfxItem();if(typeof SAVEC!=='undefined')SAVEC.t=99;
   for(let i=0;i<10;i++)PARTS.push({type:'fdust',x:f.x+rnd(-24,24),y:f.y,z:rnd(20,70),vx:rnd(-10,10),vy:rnd(-4,4),vz:rnd(10,30),life:0,max:rnd(.5,1),s:rnd(1,2),col:'255,240,190'});
@@ -60,7 +60,7 @@ function drawForage(list=FORAGE){if(CH<1||C1I.on)return;ctx.save();ctx.globalCom
   ctx.restore();}
 
 /* ---------- ingredient icons (drawn in code) ---------- */
-const FORAGE_IC={duskberry:['92,52,120','150,104,190'],dewberry:['70,120,190','150,200,240'],emberberry:['200,70,40','255,160,90'],moonleaf:1};
+const FORAGE_IC={venomvine:['52,96,40','150,210,70'],duskberry:['92,52,120','150,104,190'],dewberry:['70,120,190','150,200,240'],emberberry:['200,70,40','255,160,90'],moonleaf:1};
 function drawForageIcon(c,id,x,y,s){c.save();c.translate(x,y);c.lineJoin='round';
   if(id==='moonleaf'){for(const [a,l] of [[-.5,.42],[.15,.46],[.75,.38]]){c.save();c.rotate(a);c.beginPath();c.moveTo(0,s*.18);c.quadraticCurveTo(s*.2,-s*l*.4,0,-s*l);c.quadraticCurveTo(-s*.2,-s*l*.4,0,s*.18);c.closePath();
       const g=c.createLinearGradient(0,-s*l,0,s*.18);g.addColorStop(0,'#c8ecc4');g.addColorStop(1,'#5f9a6a');c.fillStyle=g;c.fill();c.strokeStyle='#355c40';c.lineWidth=Math.max(1,s*.03);c.stroke();

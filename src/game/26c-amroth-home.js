@@ -13,7 +13,7 @@ const HPATH2_CTRL=[[455,880],[400,1010],[330,1150],[290,1260],[300,1360],[300,14
 const HPATH2_PTS=splinePts(HPATH2_CTRL,20);let HPATH2P=null;
 /* berry bushes to forage (like the woods by Lum's shop): duskberry, dewberry, emberberry */
 const HFORAGE=[[600,700,6],[380,890,0],[620,1080,4],[230,1180,6],[1180,880,0],[1700,1180,4],[960,1290,6]].map(([x,y,k])=>({x:x+HOMEX,y:y+HOMEY,k,id:FORAGE_MAP[k],n:2,picked:0}));
-const inHome=()=>lum.x>HOMEX-200;
+const inHome=()=>lum.x>HOMEX-200&&lum.x<HOMEX+2700;   /* (Evergreen Grove lies further east) */
 function hpathDist(x,y){let best=1e9;for(const PTS of [HPATH_PTS,HPATH2_PTS])for(let i=0;i<PTS.length-1;i++){const [ax,ay]=PTS[i],[bx,by]=PTS[i+1],dx=bx-ax,dy=by-ay,t=clamp(((x-ax)*dx+(y-ay)*dy)/(dx*dx+dy*dy),0,1),d=Math.hypot(x-ax-dx*t,y-ay-dy*t);if(d<best)best=d;}return best;}
 /* the fishing pier (the designer's art, 455x343) reaches from the pond's west bank out over the water; its deck is walkable */
 const PIERIMG=[455,343];
@@ -72,7 +72,7 @@ function homeInts(){const X=x=>x+HOMEX,Y=y=>y+HOMEY;return [
   {x:X(HOME.arch.x),y:Y(HOME.arch.y+30),get reach(){return inHome()?85:0},door:true,onInteract:()=>dunGo(20,900,690,1)},
   {x:X(HOME.cot.x+HOME.cot.door),y:Y(HOME.cot.y+15),get reach(){return inHome()?85:0},door:true,onInteract:()=>enterDun(21,440,628,1)},
   {x:X(HOME.gate.x),y:Y(HOME.gate.y-110),get reach(){return inHome()&&HST.st<4?85:0},onInteract:()=>say("The gate is down. It won't budge.")},
-  {x:X(HOME.gate.x),y:Y(HH-40),get reach(){return inHome()&&HST.st>=4?80:0},door:true,onInteract:()=>say("The coastal path lies ahead.")},   /* the coastal path map comes next */
+  {x:X(HOME.gate.x),y:Y(HH-40),get reach(){return inHome()&&HST.st>=4?80:0},door:true,onInteract:()=>enterGrove(false)},   /* the coastal path map comes next */
   {x:X(HOME.pond.x-HOME.pond.rx+20),y:Y(HOME.pond.y),get reach(){return inHome()?110:0},onInteract:()=>say("A quiet pond. Rain dimples the water.")}];}
 /* out of the cottage's front door, onto the step */
 function leaveCottage(){SCENE='thorn';lum.x=HOMEX+HOME.cot.x+HOME.cot.door;lum.y=HOMEY+HOME.cot.y+30;lum.face=1;lum.dir='down';lum.state='idle';lum.vx=lum.vy=0;cam.x=lum.x;cam.y=lum.y+200;THORN.t=99;HOME.t=99;}

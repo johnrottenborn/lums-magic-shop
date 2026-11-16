@@ -37,6 +37,7 @@ const ITEMS={
   crystalpouch:{name:'Foxfire Pouch',slot:'main',stats:{atk:2,mag:1},desc:"A soft fox-fur pouch, found in a cobwebbed chest beneath the old oak. Powders thrown from it sting a little more. +2 ATK, +1 MAG."},
   vanecharm:{name:"Cross Necklace",slot:'charm',stats:{def:1,mag:1},desc:"Worn wooden beads and a little carved cross, polished smooth by years of thumbs. Someone must be missing it. +1 DEF, +1 MAG."},
   lantern:{name:"Gravekeeper's Lantern",kind:'key',desc:"Vane's old lantern. It has never once gone out. It will light the dark paths ahead."},
+  venomvine:{name:'Venomvine',kind:'mat',desc:"A dark, thorny vine from Evergreen Grove. Its sap stings. Careful handling needed."},
   duskberry:{name:'Duskberries',kind:'mat',desc:"Dark, sweet berries from Lum's garden. With a little heat they become a Healing Potion."},
   dewberry:{name:'Dewberries',kind:'mat',desc:"Blue berries that stay cold with morning dew, even at noon. Their chill goes into Frostbloom Powder."},
   emberberry:{name:'Emberberries',kind:'mat',desc:"Warm to the touch and sharp on the tongue. Their bite goes into Thornbane Powder."},

@@ -452,6 +452,24 @@ const CASES = {
     await talkAll(8);
     check(await g_(() => window.__g.HST.st === 7 && /Breezevale/.test(window.__g.GOAL.text)), 'the task to Breezevale Cove was not set');
   },
+  async 'evergreen-grove'(p) {
+    // through the far gatehouse into Evergreen Grove: walkable old path, trees and the lake are solid, bushes to pick, and back out north
+    const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop', g_ = f => p.evaluate(f);
+    await g_(() => { window.__g.startChapter2(); window.__g.c2Skip(); }); await wait(1500);
+    await g_(() => { const g = window.__g; g.HST.st = 7; g.enterHome(); g.lum.x = g.HOMEX + g.HOME.gate.x; g.lum.y = g.HOMEY + 1660; }); await wait(800);
+    await g_(() => window.__g.NEAR && window.__g.NEAR.onInteract()); await wait(1500);
+    check(await g_(() => window.__g.lum.x > window.__g.GROVEX && window.__g.groveFree(window.__g.lum.x, window.__g.lum.y)), 'the far gatehouse did not lead into Evergreen Grove');
+    await p.screenshot({ path: path.join(SHOTS, `grove-entry-${vp}.png`) });
+    check(await g_(() => { const g = window.__g, X = g.GROVEX, Y = g.GROVEY; return !g.groveFree(X + 300, Y + 1600) && !g.groveFree(X + 600, Y + 500) && g.groveFree(X + 560, Y + 1300); }), 'the lake and groves should be solid and the open ground walkable');
+    { const f = await g_(() => { const g = window.__g, f = g.GFORAGE.find(q => q.venom); g.lum.x = f.x; g.lum.y = f.y + 30; return f.id; }); await wait(600);
+      await g_(() => window.__g.NEAR && window.__g.NEAR.onInteract()); await wait(300);
+      check(await g_(() => (window.__g.MATS.venomvine || 0) >= 2), 'picking a Venomvine bush gave nothing'); }
+    await g_(() => { const g = window.__g; g.lum.x = g.GROVEX + 840; g.lum.y = g.GROVEY + 1500; }); await wait(1500);
+    await p.screenshot({ path: path.join(SHOTS, `grove-lake-${vp}.png`) });
+    await g_(() => { const g = window.__g; g.lum.x = g.GROVEX + 780; g.lum.y = g.GROVEY + 150; }); await wait(600);
+    await g_(() => window.__g.NEAR && window.__g.NEAR.onInteract()); await wait(800);
+    check(await g_(() => window.__g.lum.x < window.__g.GROVEX - 300), 'the north entrance did not lead back to Amroth\'s home');
+  },
   async 'worldbind-passage'(p) {
     // the gatehouse door leads to the first room of the Worldbind Passage: arrive at the top of the stairs, walk down, and the door back works
     const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop', g_ = f => p.evaluate(f);
