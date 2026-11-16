@@ -62,7 +62,8 @@ function homeProps(P,PN){const X=x=>x+HOMEX,Y=y=>y+HOMEY,H_=(a,b)=>hash(a,b,971)
 function drawHomeGround(x0,y0,x1,y1){if(x1<HOMEX-300)return;if(!HPATHP)HPATHP=buildPath(HPATH_CTRL,125,8.2);if(!HPATH2P)HPATH2P=buildPath(HPATH2_CTRL,110,8.2);drawPath(HPATH2P,x0,x1);drawPath(HPATHP,x0,x1);
   const p=HOME.pond,cx=p.x+HOMEX,cy=p.y+HOMEY;ctx.save();
   ctx.fillStyle='rgba(58,44,30,.55)';ctx.beginPath();ctx.ellipse(cx,cy+6,p.rx+22,p.ry+16,0,0,TAU);ctx.fill();
-  const g=ctx.createRadialGradient(cx-p.rx*.2,cy-p.ry*.3,10,cx,cy,p.rx*1.05);g.addColorStop(0,'#5d8c98');g.addColorStop(.6,'#3c6a78');g.addColorStop(1,'#26474f');ctx.fillStyle=g;ctx.beginPath();ctx.ellipse(cx,cy,p.rx,p.ry,0,0,TAU);ctx.fill();
+  ctx.fillStyle=waterPattern(ctx,'water_tile',.5)||'#3c6a78';ctx.beginPath();ctx.ellipse(cx,cy,p.rx,p.ry,0,0,TAU);ctx.fill();   /* the designer's water art */
+  {const g=ctx.createRadialGradient(cx,cy,p.rx*.4,cx,cy,p.rx*1.02);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,'rgba(10,30,40,.35)');ctx.fillStyle=g;ctx.beginPath();ctx.ellipse(cx,cy,p.rx,p.ry,0,0,TAU);ctx.fill();}
   ctx.clip();ctx.strokeStyle='rgba(220,240,245,.35)';ctx.lineWidth=1.4;for(let i=0;i<14;i++){const q=(T*.5+hash(i,1,973))%1,rx=cx+(hash(i,2,973)-.5)*p.rx*1.6,ry=cy+(hash(i,3,973)-.5)*p.ry*1.5,r=4+q*22;ctx.globalAlpha=1-q;ctx.beginPath();ctx.ellipse(rx,ry,r,r*.4,0,0,TAU);ctx.stroke();}
   ctx.globalAlpha=1;ctx.fillStyle='rgba(255,255,255,.12)';ctx.beginPath();ctx.ellipse(cx-p.rx*.3,cy-p.ry*.4,p.rx*.35,p.ry*.18,-.1,0,TAU);ctx.fill();ctx.restore();
   ctx.save();ctx.strokeStyle='rgba(40,30,20,.6)';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(cx,cy,p.rx,p.ry,0,0,TAU);ctx.stroke();ctx.restore();}

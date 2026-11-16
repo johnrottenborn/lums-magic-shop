@@ -36,11 +36,10 @@ function buildCreek(R){riverR=R;let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;for(const p of
   soft(.2,q=>{q.fillStyle='rgba(58,84,40,.5)';creekPoly(q,p=>15+cnz(p.s,1)*5,0,CK.length-1,2);q.fill();});
   g.fillStyle='#8a6a45';creekPoly(g,p=>4.2+cnz(p.s,3)*2.2);g.fill();
   g.fillStyle='rgba(178,142,94,.85)';creekPoly(g,p=>2+cnz(p.s,5)*1.1);g.fill();
-  g.fillStyle='#a6d1ea';creekPoly(g,0);g.fill();
+  g.fillStyle=waterPattern(g,'water_rocks',.45)||'#4f8fb8';creekPoly(g,0);g.fill();   /* the designer's stony-stream water art */
   g.save();creekPoly(g,0);g.clip();
   soft(.2,q=>{
-    q.fillStyle='rgba(96,154,210,.72)';creekPoly(q,p=>-p.w*.42+Math.sin(p.s/60)*4,0,CK.length-1,2);q.fill();
-    q.fillStyle='rgba(72,128,190,.4)';creekPoly(q,p=>-p.w*.7,0,CK.length-1,2);q.fill();
+    q.fillStyle='rgba(200,236,240,.35)';creekPoly(q,0,0,CK.length-1,2);q.fill();q.fillStyle=waterPattern(q,'water_rocks',.45)||'rgba(0,0,0,0)';creekPoly(q,p=>-6,0,CK.length-1,2);q.fill();
     q.lineWidth=12;q.strokeStyle='rgba(84,128,96,.42)';q.beginPath();for(const p of CK)q.lineTo(p.x+p.nx*(p.w-4),p.y+p.ny*(p.w-4));q.stroke();
     q.lineWidth=8;q.strokeStyle='rgba(96,140,104,.26)';q.beginPath();for(const p of CK)q.lineTo(p.x-p.nx*(p.w-3),p.y-p.ny*(p.w-3));q.stroke();
     for(let i=0;i<40;i++){const p=CK[(hash(i,1,701)*CK.length)|0],u=(hash(i,2,701)*2-1)*.8,r=8+hash(i,3,701)*18,light=hash(i,4,701)<.55;
@@ -88,9 +87,9 @@ function buildPond(R){const pad=70,x0=POND.x-POND.rx*1.25-pad,y0=POND.y-POND.ry*
   g.fillStyle='#8a6a45';pondPath(g,th=>5+cnz(th*80,3)*2.2);g.fill();
   g.save();g.globalCompositeOperation='destination-out';{const m=pondMouth();const gg=g.createRadialGradient(m.x,m.y,0,m.x,m.y,m.w*1.3);gg.addColorStop(0,'rgba(0,0,0,1)');gg.addColorStop(.7,'rgba(0,0,0,.8)');gg.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=gg;g.fillRect(m.x-m.w*2,m.y-m.w*2,m.w*4,m.w*4);}g.restore();
   g.fillStyle='rgba(178,142,94,.85)';pondPath(g,th=>2.4+cnz(th*80,5)*1.2);g.fill();
-  g.fillStyle='#a6d1ea';pondPath(g,0);g.fill();
+  g.fillStyle=waterPattern(g,'water_tile',.55)||'#4f8fb8';pondPath(g,0);g.fill();   /* the designer's open-water art */
   g.save();pondPath(g,0);g.clip();
-  soft(.2,q=>{q.fillStyle='rgba(96,154,210,.7)';pondPath(q,-POND.ry*.32);q.fill();q.fillStyle='rgba(66,120,184,.45)';pondPath(q,-POND.ry*.6);q.fill();
+  soft(.2,q=>{q.fillStyle='rgba(200,236,240,.3)';pondPath(q,0);q.fill();q.fillStyle=waterPattern(q,'water_tile',.55)||'rgba(0,0,0,0)';pondPath(q,-8);q.fill();
     q.lineWidth=16;q.strokeStyle='rgba(84,128,96,.4)';pondPath(q,-6);q.stroke();
     for(let i=0;i<14;i++){const th=hash(i,1,901)*TAU,d=hash(i,2,901)*.75,r=12+hash(i,3,901)*22;q.fillStyle=hash(i,4,901)<.55?'rgba(220,242,250,.34)':'rgba(70,120,180,.18)';q.beginPath();q.ellipse(POND.x+Math.cos(th)*POND.rx*d,POND.y+Math.sin(th)*POND.ry*d,r,r*.6,0,0,TAU);q.fill();}});
   g.lineCap='round';for(let i=0;i<26;i++){const th=hash(i,1,911)*TAU,d=.25+hash(i,2,911)*.6,L=20+hash(i,3,911)*40,x=POND.x+Math.cos(th)*POND.rx*d,y=POND.y+Math.sin(th)*POND.ry*d;

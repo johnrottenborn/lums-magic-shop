@@ -4,7 +4,7 @@ function resize(){
   const r=game.getBoundingClientRect();W=r.width;H=r.height;DPR=Math.min(devicePixelRatio||1,2.5);
   cv.width=Math.round(W*DPR);cv.height=Math.round(H*DPR);
   ZOOM0=Math.min(W/620,H/1150);zoom=ZOOM0*ZOOMK;
-  {const nr=Math.min(1.5,zoom*DPR);if(Math.abs(nr-riverR)>.15||!estCv||!creekCv){buildCreek(nr);buildPond(Math.min(1.6,nr*1.2));dirtCache.clear();buildEstateGround(Math.min(1.5,nr*1.3));}}
+  {const nr=Math.min(1.5,zoom*DPR);if(Math.abs(nr-riverR)>.15||!estCv||!creekCv){WATERBUILT=ready(IMG.water_tile)&&ready(IMG.water_rocks);buildCreek(nr);buildPond(Math.min(1.6,nr*1.2));dirtCache.clear();buildEstateGround(Math.min(1.5,nr*1.3));}}
   layoutButtons();
   if(!grainCv){grainCv=document.createElement('canvas');grainCv.width=grainCv.height=256;const g=grainCv.getContext('2d');const id=g.createImageData(256,256);
     for(let i=0;i<id.data.length;i+=4){const v=200+Math.random()*55;id.data[i]=v;id.data[i+1]=v*.98;id.data[i+2]=v*.92;id.data[i+3]=255;}g.putImageData(id,0,0);}
@@ -168,7 +168,8 @@ function drawSay(){
   if(DLG.active){const [who,text]=DLG.lines[DLG.i];const pcName=PC==='cosmic'?'Cosmic':PC==='spar'?'Spar':'Lum';const clr_=SCENE==='thorn'&&typeof FKS!=='undefined'&&FKS.st>0&&!C1.fkDone;let sp=who==='Fokalur'?(clr_?{x:FKS.cx,y:FKS.cy}:lum):who==='Cosmic'&&clr_?{x:FKS.cx,y:FKS.cy}:who===pcName?lum:who==='Amroth'?AMR:who==='Alma'?ALMA:who==='Jak'||who==='Spar'?jakPos():who==='Vane'&&SCENE==='vhut'?VHVANE:who==='Vane'&&VANE?VANE:who==='Voice'?{x:HUTDOOR.x,y:HUTDOOR.y}:(who==='Cosmic'?cos:{x:0,y:-30});if(who==='Lum'&&PC==='cosmic')sp=SCENE==='shop'?SHOPLUM:{x:0,y:-30};BUBBLE_BASE=sp.y;const h=who==='Fokalur'?505:who==='Jak'?190:who==='Spar'?136:who==='Amroth'?132:who==='Alma'?150:who==='Cosmic'?160:who==='Vane'?165:who==='Voice'?120:(PC!=='cosmic'&&who==='Lum'?160:182);const a=Math.min(1,DLG.t*6);if(SCENE==='thgate'&&THGATE.lx){bubbleAt(cam.x+(THGATE.lx-W/2)/zoom,cam.y+(THGATE.ly-H/2)/zoom,text,who,a,false);}else bubbleAt(sp.x,sp.y-h,text,who,a,false);BUBBLE_BASE=null;}
   else if(cos.bubble>0&&!cos.hidden){bubbleAt(cos.x,cos.y-150,cos.bubbleText,null,Math.min(1,cos.bubble*3,(2.4-cos.bubble)*6),true);}}
 function rr(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();}
-function drawUI(){drawHomeSky();drawUIinner();drawC1IntroUI();drawC1Title();drawC2UI();drawHomeTitle();drawMix();drawChoice();drawSceneFade();drawWipe();}
+function drawUI(){if(!WATERBUILT&&creekCv&&ready(IMG.water_tile)&&ready(IMG.water_rocks)){WATERBUILT=true;buildCreek(riverR);buildPond(Math.min(1.6,riverR*1.2));}   /* repaint the water once its art has loaded */
+  drawHomeSky();drawUIinner();drawC1IntroUI();drawC1Title();drawC2UI();drawHomeTitle();drawMix();drawChoice();drawSceneFade();drawWipe();}
 let menuLast=performance.now();
 function drawUIinner(){const _n=performance.now(),_dt=Math.min(.05,(_n-menuLast)/1000);menuLast=_n;drawIntroOverlay();drawSoundBtn();if(INTRO.on&&!INTRO.talking)return;if(!INTRO.on&&!WEV.end&&!C1RES.t){ctx.save();UI_FADE=INTRO.ui;drawUI_();drawBookBtn();drawToast();ctx.restore();UI_FADE=1;drawMenu(_dt);}if(INTRO.on&&INTRO.talking){drawSay();}}
 let UI_FADE=1;

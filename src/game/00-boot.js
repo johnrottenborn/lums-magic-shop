@@ -58,3 +58,8 @@ function drawFlames(c,x,y,h,a){if(a<=0||h<=0)return;const sd=((x*.37+y*.11)|0)%9
     const col=t<.2?'255,214,140':t<.5?'250,130,60':'210,66,36';drawGlow(c,px,py,r,col,(1-t)*.24*a);}
   c.globalCompositeOperation='source-over';for(let i=0;i<7;i++){const t=(T*.16+hash(i,sd+7,71))%1,px=x+(hash(i,sd+8,71)-.5)*h*.3+Math.sin(T*.6+i)*h*.14*t,py=y-h*(.85+t*1.1),r=h*.14+h*.3*t;drawGlow(c,px,py,r,'110,102,108',.22*(1-t)*Math.min(1,t*4)*a);}
   c.restore();c.globalAlpha=ga;}
+
+/* the designer's water art, as a repeating texture for every water surface (creeks, ponds, and anything new): 'water_tile' is open water, 'water_rocks' a stony stream bed */
+const WATERPAT={};let WATERBUILT=false;
+function waterPattern(c,kind='water_tile',scale=.6){const im=IMG[kind];if(!ready(im))return null;let p=WATERPAT[kind];if(!p||p.c!==c){p={c,pat:c.createPattern(im,'repeat')};WATERPAT[kind]=p;}
+  const m=new DOMMatrix();m.scaleSelf(scale,scale);try{p.pat.setTransform(m);}catch(e){}return p.pat;}
