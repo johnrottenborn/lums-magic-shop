@@ -167,7 +167,7 @@ function readProg(){try{return JSON.parse(localStorage.getItem(PROG_KEY)||'{}')|
 function recordPrologue(stars,badges,keep){try{const p=readProg();p.prologue=p.prologue||{};p.prologue.done=1;p.prologue.best=Math.max(p.prologue.best||0,stars);p.prologue.badges=p.prologue.badges||{};for(const b of badges||[])if(b.got)p.prologue.badges[b.id]=1;const KR={duskflower:1,moonmint:2,mooncharm:3},cur=p.prologue.keepsake&&KR[p.prologue.keepsake.id]?p.prologue.keepsake:null;if(keep&&(!cur||KR[cur.id]<KR[keep.id]))p.prologue.keepsake=keep;else p.prologue.keepsake=cur;localStorage.setItem(PROG_KEY,JSON.stringify(p));}catch(e){}}
 const PLAYTEST=true; // New Game always opens chapter select; Chapter 1 stays locked (greyed) until the Prologue is finished
 const CHSEL={on:false,sel:0,confirm:null,note:'',noteT:0,hits:[],t:0};
-const CHAPTERS=[{id:'prologue',title:'Prologue'},{id:'ch1',title:'Chapter 1',art:'ch1_card'},{id:'ch2',title:'Chapter 2',art:'ch2_card'}];
+const CHAPTERS=[{id:'prologue',title:'Prologue'},{id:'ch1',title:'Chapter 1',art:'ch1_card'},{id:'ch2',title:'Chapter 2',art:'ch2_card'},{id:'ch2home',title:'Chapter 2 · Amroth’s Home',sub:'Playtest: start at the passage exit with Amroth',slim:1}];   /* playtest shortcut */
 /* Chapter 2 is open for the designer to walk the clearing while it is being built; lock it (add ch2:['ch1','Chapter 1']) before release */
 const CH_NEEDS={ch1:['prologue','Prologue']};
 const chLocked=c=>{const n=CH_NEEDS[c.id];if(!n)return false;const p=readProg();return !(p[n[0]]&&p[n[0]].done);};
@@ -175,7 +175,7 @@ function openChapterSelect(){CHSEL.on=true;CHSEL.sel=0;CHSEL.confirm=null;CHSEL.
 function chselPick(i){CHSEL.sel=i;if(chLocked(CHAPTERS[i])){CHSEL.note='Finish the '+CH_NEEDS[CHAPTERS[i].id][1]+' to unlock '+CHAPTERS[i].title;CHSEL.noteT=2.6;return;}CHSEL.confirm=i;sfxPage&&sfxPage(.6);}
 function chselStart(){const c=CHAPTERS[CHSEL.confirm];CHSEL.confirm=null;
   if(c.id==='prologue'){CHSEL.on=false;newGame();return;}
-  if(chLocked(c))return;CHSEL.on=false;if(c.id==='ch2')startChapter2();else startChapter1();}
+  if(chLocked(c))return;CHSEL.on=false;if(c.id==='ch2home'){startChapter2();c2Skip();WB10.st=2;enterHome();return;}if(c.id==='ch2')startChapter2();else startChapter1();}
 function chselTap(x,y){for(const h of CHSEL.hits)if(x>h.x&&x<h.x+h.w&&y>h.y&&y<h.y+h.h){h.act();return;}if(CHSEL.confirm!==null)CHSEL.confirm=null;}
 function chselKey(code){if(CHSEL.confirm!==null){if(code==='Enter'||code==='Space'||code==='KeyE')chselStart();if(code==='Escape'||code==='Backspace')CHSEL.confirm=null;return;}
   if(code==='ArrowUp'||code==='KeyW')CHSEL.sel=Math.max(0,CHSEL.sel-1);if(code==='ArrowDown'||code==='KeyS')CHSEL.sel=Math.min(CHAPTERS.length-1,CHSEL.sel+1);
@@ -186,8 +186,8 @@ function drawChapterSelect(){const dt=1/60;CHSEL.t+=dt;CHSEL.noteT=Math.max(0,CH
   // back
   ctx.font='700 15px "Alegreya SC", Georgia, serif';ctx.fillStyle='#2f2a3a';ctx.textAlign='left';ctx.fillText('‹ Back',20,30);CHSEL.hits.push({x:6,y:10,w:90,h:40,act:()=>{CHSEL.on=false;}});
   ctx.textAlign='center';ctx.font='700 26px "Alegreya SC", Georgia, serif';ctx.fillText('Choose a Chapter',W/2,H*.11);
-  const bw=Math.min(W-40,400),bx=W/2-bw/2,bh=Math.round(bw*.5);let y=H*.17;
-  CHAPTERS.forEach((c,i)=>{const h=c.art||i===0?bh:Math.round(bh*.62),sel=CHSEL.sel===i&&!TOUCHUI(),pop=Math.min(1,Math.max(0,(CHSEL.t-.08*i)*4));ctx.save();ctx.globalAlpha=pop;ctx.translate(0,(1-pop)*16);
+  const bw=Math.min(W-40,400),bx=W/2-bw/2,bh=Math.round(Math.min(bw*.5,(H*.8-30)/3.5));let y=H*.15;   /* sized so all four cards fit */
+  CHAPTERS.forEach((c,i)=>{const h=c.art||i===0?bh:Math.round(bh*(c.slim?.34:.62)),sel=CHSEL.sel===i&&!TOUCHUI(),pop=Math.min(1,Math.max(0,(CHSEL.t-.08*i)*4));ctx.save();ctx.globalAlpha=pop;ctx.translate(0,(1-pop)*16);
     ctx.fillStyle='rgba(40,30,20,.18)';rr(bx+2,y+5,bw,h,16);ctx.fill();
     ctx.save();rr(bx,y,bw,h,16);ctx.clip();
     if(c.id==='prologue'){coverImg(IMG.forest_bg,bx,y,bw,h,.5,.35);const ci=IMG.cottage;if(ready(ci)){const ch=h*.92,cw=ch*ci.naturalWidth/ci.naturalHeight;ctx.drawImage(ci,bx+bw*.62-cw/2,y+h-ch+h*.06,cw,ch);}
@@ -201,7 +201,7 @@ function drawChapterSelect(){const dt=1/60;CHSEL.t+=dt;CHSEL.noteT=Math.max(0,CH
       if(lk){ctx.font='italic 15px Alegreya, Georgia, serif';ctx.fillStyle='#d8d4de';ctx.fillText('Finish the '+CH_NEEDS[c.id][1]+' to unlock',bx+18,y+h-18);}else for(let k=0;k<5;k++)drawStar(bx+30+k*30,y+h-18,11,clamp(cb-k,0,1));}
     else{const g=ctx.createLinearGradient(bx,y,bx,y+h);g.addColorStop(0,'#efe4cc');g.addColorStop(1,'#dccaa4');ctx.fillStyle=g;ctx.fillRect(bx,y,bw,h);
       ctx.strokeStyle='rgba(120,90,50,.18)';ctx.lineWidth=1;for(let k=0;k<8;k++){ctx.beginPath();ctx.moveTo(bx,y+h*(k+.5)/8);ctx.bezierCurveTo(bx+bw*.3,y+h*(k+.2)/8,bx+bw*.7,y+h*(k+.8)/8,bx+bw,y+h*(k+.5)/8);ctx.stroke();}
-      ctx.textAlign='left';ctx.fillStyle='#3a2c1a';ctx.font='700 24px "Alegreya SC", Georgia, serif';ctx.fillText(c.title,bx+18,y+h*.42);ctx.font='italic 16px Alegreya, Georgia, serif';ctx.fillStyle='#6a5232';ctx.fillText(c.sub,bx+18,y+h*.72);}
+      ctx.textAlign='left';ctx.fillStyle='#3a2c1a';ctx.font=`700 ${c.slim?18:24}px "Alegreya SC", Georgia, serif`;ctx.fillText(c.title,bx+18,y+h*.38);ctx.font=`italic ${c.slim?13:16}px Alegreya, Georgia, serif`;ctx.fillStyle='#6a5232';ctx.fillText(c.sub,bx+18,y+h*.72);}
     ctx.restore();ctx.strokeStyle=sel?'#e0a83a':'#c49a4e';ctx.lineWidth=sel?3:1.6;rr(bx,y,bw,h,16);ctx.stroke();
     if(sel){ctx.save();ctx.globalCompositeOperation='multiply';ctx.restore();}
     ctx.restore();CHSEL.hits.push({x:bx,y,w:bw,h,act:()=>chselPick(i)});y+=h+22;});

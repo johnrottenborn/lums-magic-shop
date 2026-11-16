@@ -493,6 +493,14 @@ const CASES = {
     await g_(() => window.__g.NEAR && window.__g.NEAR.onInteract && window.__g.NEAR.onInteract()); await wait(800);
     check(await g_(() => window.__g.lum.x < window.__g.GROVEX - 300), 'the north entrance did not lead back to Amroth\'s home');
   },
+  async 'ch2-home-shortcut'(p) {
+    // chapter select: the playtest card under Chapter 2 starts at the passage exit with Lum and Amroth
+    const g_ = f => p.evaluate(f);
+    await g_(() => window.__g.openChapterSelect()); await wait(1200);
+    await g_(() => { const g = window.__g; g.CHSEL.confirm = g.CHAPTERS.findIndex(c => c.id === 'ch2home'); }); await wait(300);
+    await g_(() => window.__g.CHSEL.hits.slice(-2)[0].act()); await wait(2500);
+    check(await g_(() => { const g = window.__g; return g.SCENE === 'thorn' && g.lum.x > g.HOMEX - 200 && g.PARTY_ORDER.includes('amroth') && g.C2.joined && g.HST.st === 1; }), 'the Amroth\'s Home shortcut did not start at the passage exit with Amroth');
+  },
   async 'worldbind-passage'(p) {
     // the gatehouse door leads to the first room of the Worldbind Passage: arrive at the top of the stairs, walk down, and the door back works
     const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop', g_ = f => p.evaluate(f);
