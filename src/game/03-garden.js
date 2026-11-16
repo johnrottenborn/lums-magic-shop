@@ -136,12 +136,16 @@ function placeEstate(){
   tree('willow',-800,30,.74,0);tree('birch',-400,-80,.8,1,'birch3');tree('birch',600,-95,.85,0,'birch2');tree('willow',990,-40,.66,1);tree('willow',660,-40,.6,0);tree('birch',940,120,.7,1,'birch3');tree('birch',980,260,.48,0,'birch1');
   tree('birch',-830,330,.52,0,'birch1');tree('willow',-820,640,.7,1);tree('birch',-800,930,.88,0,'birch2');tree('birch',-840,1200,.5,1,'birch1');tree('willow',-790,1460,.68,0);
   tree('birch',920,330,.86,1,'birch3');tree('willow',930,640,.68,0);tree('birch',880,950,.5,1,'birch1');tree('birch',850,1260,.86,0,'birch2');tree('willow',760,1460,.62,1);
+  /* one more row along the far south, behind the hedges: birches and willows whose crowns rise over the hedge line (the road south stays clear) */
+  {let q=0;for(let x=-960;x<=1120;x+=150){q++;const jx=x+(hash(q,1,833)-.5)*70;if(Math.abs(jx)<150)continue;const r=hash(q,2,833),y=1735+(hash(q,3,833)-.5)*40,fl=hash(q,4,833)<.5?1:0;
+    if(r<.35)tree('willow',jx,y,.36+hash(q,5,833)*.1,fl);else tree('birch',jx,y,.32+hash(q,5,833)*.14,fl,['birch1','birch2','birch3'][(hash(q,6,833)*3)|0]);}}
   tree('birch',560,330,.7,0,'birch2');tree('birch',740,1330,.48,0,'birch1');tree('willow',-430,1480,.56,1);tree('birch',-180,1390,.78,1,'birch3');
   // hedges of potion shrubs close the west, east and south edges
   {let k=0;const RK=['rock1','rock2','rock3','rock4'];const hedge=(x,y)=>{k++;if(hash(k,9,811)<.22){const img=RK[(hash(k,10,811)*4)|0];ESTATE.push({t:'img',img,x:x+(hash(k,2,811)-.5)*30,y:y+20,ax:.5,ay:.72,s:.8+hash(k,4,811)*.4,shadow:1,flip:hash(k,5,811)<.5});return;}const i=(hash(k,7,811)*SHR.length)|0;ESTATE.push({t:'shrub',k:i,x:x+(hash(k,2,811)-.5)*36,y:y+(hash(k,3,811)-.5)*24,s:SHR[i].s*(1.15+hash(k,4,811)*.3),flip:hash(k,5,811)<.5,ph:hash(k,8,811)*TAU});};
     for(let y=120;y<=1560;y+=70){hedge(-960,y);hedge(-1030,y+35);hedge(1070,y);hedge(1140,y+35);}
     for(let x=-1000;x<=1160;x+=80){if(Math.abs(x)>60){hedge(x,1600);}hedge(x+40,1660);}
-    for(const x of [-175,-110,110,175])hedge(x,1640);   /* close the gaps beside the road at the bottom of the view */
+    for(const x of [-175,-110,110,175])hedge(x,1640);
+    for(let x=-1000;x<=1160;x+=95){if(Math.abs(x)>90)hedge(x+20,1705);}   /* and a further row of random shrubs */   /* close the gaps beside the road at the bottom of the view */
     // a big bush right across the path south; the blade cuts it away with the hedge
     ESTATE.push({t:'shrub',k:1,x:20,y:1612,s:SHR[1].s*1.35,flip:false,ph:1.3});
     for(let x=-1000;x<=-700;x+=60){hedge(x,-60);}}
