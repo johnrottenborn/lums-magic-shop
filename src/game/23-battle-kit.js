@@ -181,7 +181,7 @@ function drawBattleDemon(f){const S=bS(),B=BATTLE,isBrute=f.type==='brute',bg=f.
 
 /* the Water Nymph (designer's art): stands in her casting pose; on her turn water gathers in her raised hand and two water bolts fly at a hero */
 function drawBattleNymph(f){const S=bS(),B=BATTLE,me=B.foes[B.foeI]===f,x=f.x+f.ox,y=f.y+f.oy,h=Math.min(230*S,W*.42)*(f.s||1);let al=1;if(f.dead){al=Math.max(0,1-f.dead/.7);if(al<=0)return;}
-  bshadow(x,y,h*.2,h*.05,.3*al);ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,x,y-h*.5,h*.55,'90,170,255',(.12+.05*Math.sin(T*2+f.ph))*al);ctx.restore();
+  bshadow(x,y,h*.2,h*.05,.3*al);ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,x,y-h*.5,h*.5,'90,170,255',(.07+.03*Math.sin(T*2+f.ph))*al);ctx.restore();
   const wind=me&&B.phase==='foeWind'?(f.wind||0):0;ctx.save();ctx.globalAlpha=al;c1Frame(ctx,'nymph','idle',Math.floor(T*5+f.ph)%6,x+(f.hit>0?Math.sin(f.hit*50)*4:0),y+Math.sin(T*1.6+f.ph)*3*S,h,false,al,f.hit>0?Math.min(1,f.hit*3):0);ctx.restore();
   const hx=x-h*.27,hy=y-h*.66;if(wind>0){ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,hx,hy,(14+36*wind)*S,'120,200,255',.6);drawGlow(ctx,hx,hy,(5+12*wind)*S,'230,248,255',.8);ctx.restore();}
   if(me&&B.phase==='foeLeap'&&B.t>=0&&f.tgt){const u=Math.min(1,B.t/B.leapD),tx=f.tgt.x+f.tgt.ox,ty=f.tgt.y-85*S;ctx.save();ctx.globalCompositeOperation='lighter';
