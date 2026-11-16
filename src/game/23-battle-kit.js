@@ -4,7 +4,7 @@ const POWDER_LIST=[['spark','Sparkdust','Damage · unlimited',null],['frost','Fr
 const POWICON={spark:'icon4_sun_bottle',frost:'icon3_frost_bowl',thorn:'icon_pouch_rose',moon:'icon3_pastel_powders',venom:'icon_pouch_seal'};
 function drawPowderIcon(c,id,x,y,z){const im=IMG[POWICON[id]];if(ready(im)){c.drawImage(im,x-z/2,y-z/2,z,z);return true;}return false;}
 const PCOL={spark:'255,230,140',frost:'170,225,255',thorn:'170,220,120',moon:'200,170,255',venom:'150,220,90'};
-const WEAKTO={ffox:'thorn',gwisp:'frost',demon:'frost',bdemon:'frost',brute:'frost',rslime:'frost',rvixen:'thorn',bigspider:'thorn',slime:'frost',jelly:'frost',fslime:'frost',slug:'frost',slugking:'frost',wisp:'frost',flora:'frost',spider:'thorn',vixen:'thorn',bigvixen:'thorn',bat:'spark',mimic:'spark',rskel:'moon',reaper:'moon',skel:'moon'};
+const WEAKTO={nymph:'spark',ffox:'thorn',gwisp:'frost',demon:'frost',bdemon:'frost',brute:'frost',rslime:'frost',rvixen:'thorn',bigspider:'thorn',slime:'frost',jelly:'frost',fslime:'frost',slug:'frost',slugking:'frost',wisp:'frost',flora:'frost',spider:'thorn',vixen:'thorn',bigvixen:'thorn',bat:'spark',mimic:'spark',rskel:'moon',reaper:'moon',skel:'moon'};
 const weakKnown=(t,p)=>WEAKTO[t]===p&&C1.weak&&C1.weak[t];
 function lumPowderHit(h,f,c){const B=BATTLE,S=bS(),st=heroStats(h.id),p=B.powder||'spark';let dmg=Math.max(1,st.atk+(c.nice?1:0)-f.def);const tp=foeCenter(f).top;const weak=WEAKTO[f.type]===p;
   if(h.chill){dmg=Math.max(1,dmg-1);h.chill=0;}
@@ -177,4 +177,14 @@ function drawBattleDemon(f){const S=bS(),B=BATTLE,isBrute=f.type==='brute',bg=f.
   if(me&&B.phase==='foeLeap'&&B.t>=0&&f.tgt&&f.mode!=='double'){   /* (the Brute's double attack is a charge, not a fireball) */const u=Math.min(1,B.t/B.leapD),tx=f.tgt.x+f.tgt.ox,ty=f.tgt.y-85*S,px=mx+(tx-mx)*u,py=my+(ty-my)*u-Math.sin(Math.PI*u)*40*S;
     ctx.save();ctx.globalCompositeOperation='lighter';for(let k=0;k<8;k++){const v=u-k*.045;if(v<0)continue;drawGlow(ctx,mx+(tx-mx)*v,my+(ty-my)*v-Math.sin(Math.PI*v)*40*S,(26-k*2.8)*S,k<3?'255,170,70':'230,80,30',.75-k*.08);}
     drawGlow(ctx,px,py,30*S,'255,235,170',.95);ctx.restore();drawFlames(ctx,px,py+16*S,70*S,.9);}
+  if(f.showHp>0&&!f.dead){const bw=60*S,bx=x-bw/2,by=y+16*S;ctx.save();ctx.globalAlpha=Math.min(1,f.showHp*3);ctx.fillStyle='rgba(20,20,30,.55)';rr(bx-2,by-2,bw+4,10,5);ctx.fill();ctx.fillStyle='#7ee08a';rr(bx,by,bw*f.hp/f.max,6,3);ctx.fill();ctx.restore();}}
+
+/* the Water Nymph (designer's art): stands in her casting pose; on her turn water gathers in her raised hand and two water bolts fly at a hero */
+function drawBattleNymph(f){const S=bS(),B=BATTLE,me=B.foes[B.foeI]===f,x=f.x+f.ox,y=f.y+f.oy,h=Math.min(230*S,W*.42)*(f.s||1);let al=1;if(f.dead){al=Math.max(0,1-f.dead/.7);if(al<=0)return;}
+  bshadow(x,y,h*.2,h*.05,.3*al);ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,x,y-h*.5,h*.55,'90,170,255',(.12+.05*Math.sin(T*2+f.ph))*al);ctx.restore();
+  const wind=me&&B.phase==='foeWind'?(f.wind||0):0;ctx.save();ctx.globalAlpha=al;c1Frame(ctx,'nymph','idle',Math.floor(T*5+f.ph)%6,x+(f.hit>0?Math.sin(f.hit*50)*4:0),y+Math.sin(T*1.6+f.ph)*3*S,h,false,al,f.hit>0?Math.min(1,f.hit*3):0);ctx.restore();
+  const hx=x-h*.27,hy=y-h*.66;if(wind>0){ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,hx,hy,(14+36*wind)*S,'120,200,255',.6);drawGlow(ctx,hx,hy,(5+12*wind)*S,'230,248,255',.8);ctx.restore();}
+  if(me&&B.phase==='foeLeap'&&B.t>=0&&f.tgt){const u=Math.min(1,B.t/B.leapD),tx=f.tgt.x+f.tgt.ox,ty=f.tgt.y-85*S;ctx.save();ctx.globalCompositeOperation='lighter';
+    for(let k=0;k<8;k++){const v=u-k*.045;if(v<0)continue;const px=hx+(tx-hx)*v,py=hy+(ty-hy)*v-Math.sin(Math.PI*v)*50*S;drawGlow(ctx,px,py,(22-k*2.4)*S,k<3?'150,215,255':'70,140,230',.75-k*.08);}
+    const px=hx+(tx-hx)*u,py=hy+(ty-hy)*u-Math.sin(Math.PI*u)*50*S;drawGlow(ctx,px,py,26*S,'235,250,255',.95);ctx.restore();}
   if(f.showHp>0&&!f.dead){const bw=60*S,bx=x-bw/2,by=y+16*S;ctx.save();ctx.globalAlpha=Math.min(1,f.showHp*3);ctx.fillStyle='rgba(20,20,30,.55)';rr(bx-2,by-2,bw+4,10,5);ctx.fill();ctx.fillStyle='#7ee08a';rr(bx,by,bw*f.hp/f.max,6,3);ctx.fill();ctx.restore();}}

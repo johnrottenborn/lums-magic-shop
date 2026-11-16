@@ -475,13 +475,14 @@ const CASES = {
     await p.screenshot({ path: path.join(SHOTS, `grove-lake-${vp}.png`) });
     // the grove's foes: Forest Foxes and Grove Wisps roam; their hits poison, and the poison stacks
     check(await g_(() => { const f = window.__g.THFOES.filter(g => g.grove); return f.some(g => g.kind === 'ffox') && f.some(g => g.kind === 'gwisp'); }), 'no Forest Foxes or Grove Wisps in the grove');
-    for (const kind of ['ffox', 'gwisp']) {
+    for (const kind of ['ffox', 'gwisp', 'nymph']) {
       await p.evaluate(k => { const g = window.__g, f = g.THFOES.find(q => q.grove && q.kind === k && !q.dead); g.lum.x = f.x - 40; g.lum.y = f.y; f.calm = 0; }, kind);
       for (let i = 0; i < 40 && !(await g_(() => window.__g.BATTLE.on)); i++) await wait(150);
       check(await p.evaluate(k => window.__g.BATTLE.on && window.__g.BATTLE.foes[0].type === k, kind), 'no battle with a ' + kind);
       await wait(1200); await p.screenshot({ path: path.join(SHOTS, `grove-battle-${kind}-${vp}.png`) });
       const stack = await g_(() => { const g = window.__g, B = g.BATTLE, f = B.foes[0], h = B.heroes[0]; h.poison = 0; g.foeAbility(f, h, 2, { guard: false }); g.foeAbility(f, h, 2, { guard: false }); return h.poison; });
-      check(stack === 4, kind + '\'s poison did not stack (got ' + stack + ')');
+      if (kind !== 'nymph') check(stack === 4, kind + '\'s poison did not stack (got ' + stack + ')');
+      if (kind === 'nymph') { await g_(() => { const B = window.__g.BATTLE, f = B.foes[0]; B.foeI = 0; f.tgt = B.heroes[0]; B.cmd = { guard: false, lock: 0, tried: false }; B.phase = 'foeLeap'; B.t = 0; B.leapD = .6; }); await wait(300); await p.screenshot({ path: path.join(SHOTS, `grove-nymph-spell-${vp}.png`) }); await wait(1500); }
       await g_(() => { const B = window.__g.BATTLE; B.phase = 'win'; B.t = 1; B.rewarded = 0; });
       for (let i = 0; i < 40 && (await g_(() => window.__g.BATTLE.on)); i++) { await p.keyboard.press('Space'); await wait(300); }
       for (let i = 0; i < 4 && await g_(() => window.__g.DLG.active); i++) { await p.keyboard.press('Enter'); await wait(300); }
