@@ -15,6 +15,10 @@ const HPATH2_PTS=splinePts(HPATH2_CTRL,20);let HPATH2P=null;
 const HFORAGE=[[600,700,6],[380,890,0],[620,1080,4],[230,1180,6],[1180,880,0],[1700,1180,4],[960,1290,6]].map(([x,y,k])=>({x:x+HOMEX,y:y+HOMEY,k,id:FORAGE_MAP[k],n:2,picked:0}));
 const inHome=()=>lum.x>HOMEX-200&&lum.x<HOMEX+2700;   /* (Evergreen Grove lies further east) */
 function hpathDist(x,y){let best=1e9;for(const PTS of [HPATH_PTS,HPATH2_PTS])for(let i=0;i<PTS.length-1;i++){const [ax,ay]=PTS[i],[bx,by]=PTS[i+1],dx=bx-ax,dy=by-ay,t=clamp(((x-ax)*dx+(y-ay)*dy)/(dx*dx+dy*dy),0,1),d=Math.hypot(x-ax-dx*t,y-ay-dy*t);if(d<best)best=d;}return best;}
+/* berry bushes sit just beside the paths, never on them: each one is nudged to the nearest spot off the path, still within reach of it */
+for(const f of HFORAGE){if(hpathDist(f.x,f.y)>=115)continue;let best=null;for(let r=10;r<260&&!best;r+=10)for(let a=0;a<TAU;a+=TAU/24){const x=f.x+Math.cos(a)*r,y=f.y+Math.sin(a)*r,lx=x-HOMEX,ly=y-HOMEY,d=hpathDist(x,y);
+  if(d<115||d>150||((lx-HOME.pond.x)/(HOME.pond.rx+60))**2+((ly-HOME.pond.y)/(HOME.pond.ry+60))**2<1||(lx>HOME.cot.x-240&&lx<HOME.cot.x+250&&ly>HOME.cot.y-170&&ly<HOME.cot.y+40))continue;best=[x,y];break;}
+  if(best)[f.x,f.y]=best;}
 /* the fishing pier (the designer's art, 455x343) reaches from the pond's west bank out over the water; its deck is walkable */
 const PIERIMG=[455,343];
 function pierPt(ix,iy){const P=HOME.pier,k=P.w/PIERIMG[0];return [P.x-P.w/2+ix*k,P.y-PIERIMG[1]*k+iy*k];}

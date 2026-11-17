@@ -5,7 +5,7 @@
    HST.st: 0 not yet, 1 night outside, 2 the talk inside, 3 rest upstairs, 4 morning in the loft, 5 Alma downstairs, 6 see Amroth, 7 on to Breezevale */
 const HST={st:0,t:0,smoke:[],heart:0};
 const ALMA={x:860,y:650,face:-1,dir:'side',moving:0,ph:0,on:0,baby:0};
-const ALMA_H=128;
+const ALMA_H=104;   /* the same height as Lum */
 const hsNight=()=>HST.st>=1&&HST.st<=3;
 function hsGoal(t){GOAL.tag='NEW TASK';GOAL.text=t;HINT.goalT=0;}
 /* arriving from the passage: night falls on the home */
@@ -13,7 +13,7 @@ function hsArrive(){if(HST.st||!C2.joined)return;HST.st=1;hsGoal('Go inside Amro
 function almaWalk(tx,ty,sp,dt){const dx=tx-ALMA.x,dy=ty-ALMA.y,d=Math.hypot(dx,dy);if(d<3){ALMA.x=tx;ALMA.y=ty;ALMA.moving=0;return true;}const m=Math.min(d,sp*dt);ALMA.x+=dx/d*m;ALMA.y+=dy/d*m;ALMA.ph+=m;ALMA.moving=1;
   if(Math.abs(dx)>Math.abs(dy)){ALMA.dir='side';ALMA.face=dx>0?1:-1;}else ALMA.dir=dy>0?'down':'up';return false;}
 function drawAlmaRoom(){if(!ALMA.on)return;const k=dunH(ALMA.y)/151,an=ALMA.moving?(ALMA.dir==='side'?'side':ALMA.dir):(ALMA.dir==='up'?'up':ALMA.dir==='side'?'side':'idle'),n=C1ATL.alma.rows[an][1],
-    fi=ALMA.moving?Math.floor(ALMA.ph/16)%n:Math.floor(T*2.2)%n;
+    fi=ALMA.moving?Math.floor(ALMA.ph/16)%n:an==='side'?3:0;   /* standing still: one still frame, no stepping on the spot */
   ctx.save();ctx.translate(ALMA.x,ALMA.y);ctx.scale(k,k);ctx.fillStyle='rgba(10,10,20,.25)';ctx.beginPath();ctx.ellipse(0,2,28,8,0,0,TAU);ctx.fill();
   c1Frame(ctx,'alma',an,fi,0,0,ALMA_H,an==='side'&&ALMA.face<0,1,0);   /* her side rows face right */
   if(ALMA.baby&&ready(IMG.icon6_baby_bear)){const s=46;ctx.drawImage(IMG.icon6_baby_bear,-s/2+ALMA.face*6,-ALMA_H*.62,s,s);}   /* the baby in her arms */
