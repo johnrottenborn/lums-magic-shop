@@ -51,6 +51,10 @@ function bwProps(P){const X=x=>x+BWX,Y=y=>y+BWY;let k=0;
   /* big rock formations over the cliff at the sharp bends (one over the cliff face, one down in the surf); Lum walks behind them */
   const offPath=(x,y,w)=>{for(let k=0;k<120;k++){let near=null,nd=1e9;for(const fx of [-.42,-.2,0,.2,.42])for(const fy of [0,.28,.5,.72,.9]){const px=x+fx*w*(1-fy*.5),py=y-fy*w;for(const [ax,ay] of BPATH_PTS){const d=Math.hypot(ax-px,ay-py);if(d<nd){nd=d;near=[ax,ay,px,py];}}}   /* its base and lower body, across its width */
       if(nd>BW_OFF+30)break;const dx=near[2]-near[0],dy=near[3]-near[1],L=Math.hypot(dx,dy)||1;x+=dx/L*14;y+=dy/L*14;}return [x,y];};   /* nudge a rock's base off the path so it never blocks the way */
+  /* the first bend: a heap of boulders down the cliff face between the path and its big formation, hiding the strip's seam */
+  {const [bx,by]=BBENDS[0],RK=['crockpile','crockheap','crockegg','crockpile'];let q=0;for(let i=2;i<BPATH_PTS.length-2;i+=3){const [ax,ay]=BPATH_PTS[i];if(Math.hypot(ax-bx,ay-by)>480)continue;const [cx,cy]=BPATH_PTS[i+1],dx=cx-ax,dy=cy-ay,L=Math.hypot(dx,dy)||1,ox=-dy/L,oy=dx/L;
+    for(const off of [BW_OFF+62,BW_OFF+150]){q++;const x=ax+ox*off+(BH_(q,51)-.5)*30,y=ay+oy*off+(BH_(q,52)-.5)*20,w=(off<BW_OFF+100?95:140)*(.85+BH_(q,53)*.35);if(bpathDist(x,y)<BW_OFF+30||bpathDist(x,y-w*.35)<BW_OFF+10)continue;
+      P.push({t:'tree',img:RK[q%4],x,y,w,flip:BH_(q,54)<.5,base:.9,solid:1});}}}
   for(const [x,y,ox,oy,i] of BBENDS){const w=[330,320,280][i%3]*(.95+BH_(i,31)*.25),o1=BW_OFF+150,o2=BW_OFF+290;
     {const sx=i===0?230:0;const [px,py]=offPath(x+ox*o1+sx,y+oy*o1+110,w*1.35);   /* the first bend's big formation sits further right, clear of the path that wraps round it */P.push({t:'tree',img:['crockspire','crockheap','crockpile'][i%3],x:px,y:py,w:w*1.35,flip:BH_(i,32)<.5,base:.9,solid:1});}
     {const [px,py]=offPath(x+ox*o2+(BH_(i,33)-.5)*60+(i===0?200:0),y+oy*o2+150,w*.95);P.push({t:'tree',img:['crockheap','crockpile','crockspire'][i%3],x:px,y:py,w:w*.95,flip:BH_(i,34)<.5,base:.9,solid:1});}}
