@@ -127,3 +127,18 @@ function drawBWFx(){if(!inBW()||SCENE!=='thorn')return;const dt=1/60,vw=W/zoom,v
     const [idx,native]=b.spr,im=seabirdImg(idx);if(!im)continue;const w=im.width*b.s,h=im.height*b.s,beat=Math.sin(b.flap),dir=b.vx>0?1:-1;
     ctx.save();ctx.translate(b.x,b.y+beat*1.5);ctx.rotate(b.bank*.25*dir);if(dir!==native)ctx.scale(-1,1);ctx.scale(1,.86+.14*beat);ctx.drawImage(im,-w/2,-h/2,w,h);ctx.restore();
     ctx.fillStyle='rgba(20,40,50,.08)';ctx.beginPath();ctx.ellipse(b.x,b.y+110,w*.3,w*.1,0,0,TAU);ctx.fill();}}
+
+/* the Ruins Overlook (room 24): drifting sea mist, gulls wheeling over the water, and its own eerie music (05-audio) */
+const OVL={gulls:[],cry:4};
+function drawOverlookMist(front){const dt=1/60;ctx.save();
+  if(!front){
+    for(let i=0;i<9;i++){const sp=6+hash(i,1,611)*10,x=((hash(i,2,611)*1700+T*sp)%1900)-260,y=330+hash(i,3,611)*230,r=150+hash(i,4,611)*170;   /* banks rolling slowly across the sea */
+      ctx.globalAlpha=.32+.14*Math.sin(T*.3+i);drawGlow(ctx,x,y,r,'232,236,240',.55);drawGlow(ctx,x+r*.6,y+12,r*.7,'226,232,238',.45);}
+    /* gulls, white against the mist, wheeling slowly and crying now and then */
+    if(!OVL.gulls.length)for(let i=0;i<4;i++)OVL.gulls.push({cx:200+i*320,cy:230+hash(i,5,611)*140,rx:120+hash(i,6,611)*160,ry:28+hash(i,7,611)*30,w:.18+hash(i,8,611)*.16,ph:hash(i,9,611)*TAU,s:.32+hash(i,10,611)*.14,spr:BIRD_SPR[i%BIRD_SPR.length],flap:0});
+    for(const g of OVL.gulls){g.ph+=g.w*dt;g.flap+=dt*(Math.sin(g.ph*3)>0?7:1.5);const x=g.cx+Math.cos(g.ph)*g.rx,y=g.cy+Math.sin(g.ph)*g.ry,dir=-Math.sin(g.ph)>0?1:-1,[idx,native]=g.spr,im=seabirdImg(idx);if(!im)continue;
+      const w=im.width*g.s,h=im.height*g.s,beat=Math.sin(g.flap);ctx.save();ctx.globalAlpha=.9;ctx.translate(x,y+beat);ctx.rotate(Math.sin(g.ph)*.18*dir);if(dir!==native)ctx.scale(-1,1);ctx.scale(1,.85+.15*beat);ctx.drawImage(im,-w/2,-h/2,w,h);ctx.restore();}
+    OVL.cry-=dt;if(OVL.cry<=0){OVL.cry=5+Math.random()*9;try{sfxGull();}catch(e){}}}
+  else for(let i=0;i<6;i++){const sp=10+hash(i,11,611)*14,x=((hash(i,12,611)*1600+T*sp)%1800)-200,y=560+hash(i,13,611)*200,r=110+hash(i,14,611)*120;   /* thin wisps drifting over the lookout, in front of Lum */
+    ctx.globalAlpha=.16+.08*Math.sin(T*.4+i*2);drawGlow(ctx,x,y,r,'236,240,244',.5);}
+  ctx.restore();}

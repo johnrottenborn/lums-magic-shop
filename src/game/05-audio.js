@@ -56,7 +56,7 @@ const NOTE=n=>440*Math.pow(2,(n-69)/12);
 const PROG=[[50,[62,66,69,73]],[47,[59,62,66,69]],[43,[55,59,62,66]],[45,[57,61,64,69]],[50,[62,66,69,74]],[54,[57,61,66,69]],[43,[55,59,64,67]],[45,[57,61,64,67]]];
 const MEL=[[78,-1,81,-1,78,76,-1,74],[76,-1,-1,74,73,-1,71,-1],[74,-1,79,-1,78,-1,74,-1],[76,-1,73,-1,69,-1,-1,-1],[78,-1,81,83,81,-1,78,-1],[76,-1,78,-1,73,-1,-1,-1],[74,76,79,-1,78,76,74,-1],[73,-1,76,-1,74,-1,-1,-1]];
 const ARP=[0,1,2,3,2,1,2,1],EIGHTH=60/64/2;
-function scheduleMusic(){if(SND.lullUntil&&SND.ctx.currentTime<SND.lullUntil){SND.nextNote=SND.lullUntil+.3;return;}if(BMUS.on){scheduleBattleMusic();return;}if(NIGHT.on){SND.nextNote=SND.ctx.currentTime+.1;return;}if(SCENE==='dun'&&DUN.room>=11&&DUN.room<=20){scheduleWorldbindMusic();return;}if(CH>0&&(SCENE==='woods'||SCENE==='dun'||SCENE==='thorn'||SCENE==='thgate')){scheduleWoodsMusic();return;}SND.wStep=0;const c=SND.ctx;while(SND.nextNote<c.currentTime+.25){const t=SND.nextNote,s=SND.step,bar=Math.floor(s/8)%PROG.length,e=s%8,[root,ch]=PROG[bar],section=Math.floor(s/64)%4;
+function scheduleMusic(){if(SND.lullUntil&&SND.ctx.currentTime<SND.lullUntil){SND.nextNote=SND.lullUntil+.3;return;}if(BMUS.on){scheduleBattleMusic();return;}if(NIGHT.on){SND.nextNote=SND.ctx.currentTime+.1;return;}if(SCENE==='dun'&&DUN.room>=11&&DUN.room<=20){scheduleWorldbindMusic();return;}if(SCENE==='dun'&&DUN.room===24){scheduleOverlookMusic();return;}if(CH>0&&(SCENE==='woods'||SCENE==='dun'||SCENE==='thorn'||SCENE==='thgate')){scheduleWoodsMusic();return;}SND.wStep=0;const c=SND.ctx;while(SND.nextNote<c.currentTime+.25){const t=SND.nextNote,s=SND.step,bar=Math.floor(s/8)%PROG.length,e=s%8,[root,ch]=PROG[bar],section=Math.floor(s/64)%4;
     if(e===0){pluck(t,NOTE(root-12),.22,2.6,SND.music,0,.5);pad(t,ch.slice(0,3).map(NOTE),EIGHTH*8+.4,.012);}
     if(e===4)pluck(t,NOTE(root),.12,1.8,SND.music,0,.5);
     pluck(t+(Math.random()-.5)*.012,NOTE(ch[ARP[e]]),.07+(e===0?.03:0),1.6,SND.music,(ARP[e]-1.5)*.25,.7);
@@ -161,3 +161,19 @@ function scheduleWorldbindMusic(){const c=SND.ctx,BAR=7.5;if(!SND.wbNext||SND.wb
       const v=c.createOscillator(),vg=c.createGain();v.frequency.value=4.5;vg.gain.value=6;v.connect(vg);vg.connect(o.frequency);f.type='bandpass';f.frequency.value=700;f.Q.value=1.5;
       og.gain.setValueAtTime(0,t+2);og.gain.linearRampToValueAtTime(.03,t+3.4);og.gain.linearRampToValueAtTime(0,t+6.2);o.connect(f);f.connect(og);og.connect(SND.music);o.start(t+2);v.start(t+2);o.stop(t+6.4);v.stop(t+6.4);}}
   SND.nextNote=c.currentTime+.1;}
+
+/* the Ruins Overlook: thin and eerie. A hollow open fifth that never resolves, a high glassy bell drifting in the mist, a wind that swells and sighs, and now and then a far-off voice sliding down */
+const OVLPROG=[[45,[57,64,69]],[44,[56,63,68]],[41,[53,60,65]],[43,[55,62,66]]];
+function scheduleOverlookMusic(){const c=SND.ctx,BAR=9;if(!SND.ovNext||SND.ovNext<c.currentTime-1)SND.ovNext=c.currentTime+.2;
+  while(SND.ovNext<c.currentTime+.5){const t=SND.ovNext,b=SND.ovBar||0,[root,ch]=OVLPROG[b%OVLPROG.length];SND.ovBar=b+1;SND.ovNext=t+BAR;
+    pad(t,[NOTE(root),NOTE(root+7)],BAR+2,.014);pad(t+1.5,ch.map(n=>NOTE(n)),BAR,.009);   /* the hollow fifth, and a pale chord over it */
+    for(let k=0;k<3;k++)if(Math.random()<.75)bell(t+1+k*2.6+Math.random()*.8,NOTE(ch[(b+k)%3]+24+(Math.random()<.3?1:0)),.026,5,SND.music,(Math.random()-.5)*.8);   /* glassy bells, sometimes a semitone off */
+    {const o=c.createOscillator(),f=c.createBiquadFilter(),g=c.createGain(),lfo=c.createOscillator(),lg=c.createGain();o.type='sawtooth';o.frequency.value=NOTE(root-12);f.type='bandpass';f.Q.value=9;f.frequency.setValueAtTime(300,t);   /* the wind */
+      lfo.frequency.value=.13;lg.gain.value=260;lfo.connect(lg);lg.connect(f.frequency);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.03,t+BAR*.5);g.gain.linearRampToValueAtTime(0,t+BAR+1.5);o.connect(f);f.connect(g);g.connect(SND.music);o.start(t);lfo.start(t);o.stop(t+BAR+2);lfo.stop(t+BAR+2);}
+    if(b%3===2){const o=c.createOscillator(),g=c.createGain(),v=c.createOscillator(),vg=c.createGain();o.type='sine';o.frequency.setValueAtTime(NOTE(ch[2]+12),t+3);o.frequency.exponentialRampToValueAtTime(NOTE(ch[2]+6),t+7.5);   /* a far-off voice */
+      v.frequency.value=5;vg.gain.value=6;v.connect(vg);vg.connect(o.frequency);g.gain.setValueAtTime(0,t+3);g.gain.linearRampToValueAtTime(.02,t+4.5);g.gain.linearRampToValueAtTime(0,t+8);o.connect(g);g.connect(SND.music);o.start(t+3);v.start(t+3);o.stop(t+8.2);v.stop(t+8.2);}}}
+/* a gull's cry: a quick bright yelp that falls, twice */
+function sfxGull(){if(!SND.ready||!SND.on)return;const c=SND.ctx,t0=c.currentTime,pn=panNode(Math.random()-.5);pn.connect(SND.sfx||SND.master||SND.music);
+  for(let k=0;k<2+(Math.random()<.5?1:0);k++){const t=t0+k*.28,o=c.createOscillator(),g=c.createGain(),f=c.createBiquadFilter();o.type='sawtooth';f.type='bandpass';f.frequency.value=2200;f.Q.value=3;
+    o.frequency.setValueAtTime(1500,t);o.frequency.linearRampToValueAtTime(1900,t+.05);o.frequency.exponentialRampToValueAtTime(900,t+.24);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.035,t+.03);g.gain.exponentialRampToValueAtTime(.001,t+.26);
+    o.connect(f);f.connect(g);g.connect(pn);o.start(t);o.stop(t+.3);}}
