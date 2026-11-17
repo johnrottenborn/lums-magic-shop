@@ -172,9 +172,10 @@ THINT.push({get x(){return BVX+BVSOUTH.x;},get y(){return BVY+BVSOUTH.y;},get re
 const BVFOLK_H=116;   /* Lum stands about 98 tall */
 const BVNPC=[{room:25,atlas:'breeze_boy',x:850,y:525,h:150,name:'Breezevale Merchant',lines:[["Welcome in! Have a look around."]]},
   {room:26,atlas:'breeze_boy',x:1250,y:668,name:'Townsman',lines:[["Oh! Hello there. Come in out of the rain."]]},
+  {room:27,atlas:'jak2',x:960,y:700,name:'Jak',sc:1.35,slim:1,lines:[["…"]]},
   {room:26,atlas:'breeze_girl',x:1172,y:660,name:'Townswoman',lines:[["Would you like some tea? The kettle's still warm."]]}];
 function drawBVNpc(n){const k=dunH(n.y)/151,face=lum.x>n.x;ctx.save();ctx.fillStyle='rgba(10,10,20,.25)';ctx.beginPath();ctx.ellipse(n.x,n.y,22*k,7*k,0,0,TAU);ctx.fill();ctx.restore();
-  const talking=DLG.active&&DLG.lines&&DLG.lines[DLG.i||0]&&DLG.lines[DLG.i||0][0]===n.name,an=talking&&Math.abs(lum.x-n.x)>60?'side':'down';ctx.save();ctx.translate(n.x,0);ctx.scale(.86,1);ctx.translate(-n.x,0);c1Frame(ctx,n.atlas,an,0,n.x,n.y,n.h||BVFOLK_H*k,an==='side'&&face,1,0);ctx.restore();}   /* townsfolk: a little taller than Lum, slim */
+  const talking=DLG.active&&DLG.lines&&DLG.lines[DLG.i||0]&&DLG.lines[DLG.i||0][0]===n.name,an=talking&&Math.abs(lum.x-n.x)>60?'side':'down';ctx.save();ctx.translate(n.x,0);ctx.scale(n.slim?1:.86,1);ctx.translate(-n.x,0);c1Frame(ctx,n.atlas,an,0,n.x,n.y,n.h||BVFOLK_H*k*(n.sc||1),an==='side'&&face,1,0);ctx.restore();}   /* townsfolk: a little taller than Lum, slim */
 /* the Breezevale Merchant's trades */
 function bvTakeMat(id,n){MATS[id]-=n;if(MATS[id]<=0){MATS[id]=0;const i=BAG.indexOf(id);if(i>=0)BAG.splice(i,1);}}
 function bvMerchant(intro){const have=id=>MATS[id]||0,M=[['Fox Tail','foxtail',1,'potion','Healing Potion'],['Wisp Silk','wispsilk',1,'antidote','Antidote']];

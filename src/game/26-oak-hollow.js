@@ -104,7 +104,8 @@ function setupDun(){DUNINT.length=0;const r=DUN.room,D=(x,y,reach,fn)=>DUNINT.pu
   if(r===21&&C2.basement)D(695,610,50,()=>dunGo(23,300,580,1));   /* the bookshelf door to the basement, once the story opens it */
   if(r===25){D(445,728,95,()=>goScene(()=>leaveBVHouse(2)));for(const n of BVNPC)if(n.room===25)DUNINT.push({x:n.x,y:n.y+60,reach:110,onInteract:()=>bvNpcTalk(n)});}
   if(r===26){D(330,758,100,()=>goScene(()=>leaveBVHouse(3)));DUNINT.push({x:540,y:612,reach:95,fire:true,onInteract:()=>{if(canLumMix())openMix();else say("A little iron stove, warm and ticking.");}});   /* the stove: Lum can mix here */for(const n of BVNPC)if(n.room===26)DUNINT.push({x:n.x,y:n.y+10,reach:95,onInteract:()=>bvNpcTalk(n)});}
-  if(r===27){D(590,612,90,()=>goScene(()=>leaveBVHouse(4)));}
+  if(r===27){D(590,612,90,()=>goScene(()=>leaveBVHouse(4)));for(const n of BVNPC)if(n.room===27)DUNINT.push({x:n.x,y:n.y+10,reach:100,onInteract:()=>bvNpcTalk(n)});
+    DUNINT.push({x:330,y:640,reach:110,fire:true,onInteract:()=>{if(canLumMix())openMix();else say("A warm fire crackles in the hearth.");}});}   /* the hearth: Lum can mix here */
   if(r===22){D(1160,728,70,()=>dunGo(21,1120,672,-1));DUNINT.push({x:760,y:738,reach:95,dynDoor:1,door:false,onInteract:hsBed});   /* the bed: '…' bubble, asks to rest */}
   if(r===23){D(258,560,70,()=>dunGo(21,680,640,1));}
   if(r===20&&WB10.chest)DUNINT.push({x:900,y:715,reach:85,onInteract:openWB10Chest});
