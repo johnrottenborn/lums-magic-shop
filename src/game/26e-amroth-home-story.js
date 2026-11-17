@@ -15,14 +15,19 @@ function almaWalk(tx,ty,sp,dt){const dx=tx-ALMA.x,dy=ty-ALMA.y,d=Math.hypot(dx,d
 function drawAlmaRoom(){if(!ALMA.on)return;const k=dunH(ALMA.y)/151,an=ALMA.moving?(ALMA.dir==='side'?'side':ALMA.dir):(ALMA.dir==='up'?'up':ALMA.dir==='side'?'side':'idle'),n=C1ATL.alma.rows[an][1],
     fi=ALMA.moving?Math.floor(ALMA.ph/16)%n:Math.floor(T*2.2)%n;
   ctx.save();ctx.translate(ALMA.x,ALMA.y);ctx.scale(k,k);ctx.fillStyle='rgba(10,10,20,.25)';ctx.beginPath();ctx.ellipse(0,2,28,8,0,0,TAU);ctx.fill();
-  c1Frame(ctx,'alma',an,an==='idle'&&!ALMA.moving?fi:fi,0,0,ALMA_H,an==='side'&&ALMA.face>0,1,0);
+  c1Frame(ctx,'alma',an,fi,0,0,ALMA_H,an==='side'&&ALMA.face<0,1,0);   /* her side rows face right */
   if(ALMA.baby&&ready(IMG.icon6_baby_bear)){const s=46;ctx.drawImage(IMG.icon6_baby_bear,-s/2+ALMA.face*6,-ALMA_H*.62,s,s);}   /* the baby in her arms */
   ctx.restore();}
 /* the little hearts when Lum and Alma meet, and in the morning hug */
 function drawHearts(x,y){if(HST.heart<=0)return;ctx.save();for(let i=0;i<5;i++){const q=(T*.6+i/5)%1,hx=x+Math.sin(i*2.1+T)*26,hy=y-q*70;ctx.globalAlpha=HST.heart*(1-q)*.9;ctx.fillStyle='#ff9fb6';ctx.beginPath();
   const s=7+3*Math.sin(i);ctx.moveTo(hx,hy+s*.6);ctx.bezierCurveTo(hx-s*1.2,hy-s*.2,hx-s*.4,hy-s*1.1,hx,hy-s*.4);ctx.bezierCurveTo(hx+s*.4,hy-s*1.1,hx+s*1.2,hy-s*.2,hx,hy+s*.6);ctx.fill();}ctx.restore();}
 /* the night talk inside, written from the designer's story notes */
-function hsNightTalk(){HST.st=2;WEVENT.on=true;AMR.x=lum.x+70;AMR.y=lum.y+4;AMR.dir='side';AMR.face=1;AMR.moving=0;ALMA.on=1;ALMA.x=860;ALMA.y=650;ALMA.face=-1;ALMA.dir='side';lum.face=1;
+/* Alma waits right of the fireplace by the chair (always facing left); Amroth walks in to the left of the fireplace, Lum just below him, both facing her */
+const HSPOS={alma:[925,640],amr:[715,616],lum:[730,690]};
+function hsNightTalk(){HST.st=2;WEVENT.on=true;lum.vx=lum.vy=0;AMR.x=lum.x-20;AMR.y=lum.y-6;AMR.dir='side';AMR.face=1;AMR.moving=0;ALMA.on=1;[ALMA.x,ALMA.y]=HSPOS.alma;ALMA.face=-1;ALMA.dir='side';ALMA.moving=0;lum.face=1;HST.enter=1;HST.et=0;}
+function hsEnterWalk(dt){HST.et+=dt;const a=amrWalk(HSPOS.amr[0],HSPOS.amr[1],85,dt),l=HST.et<.45||c1Walk(HSPOS.lum[0],HSPOS.lum[1],85,dt);if(a){AMR.dir='side';AMR.face=1;}
+  if(a&&l&&HST.et>.45){HST.enter=2;c1Idle();lum.face=1;AMR.face=1;AMR.moving=0;setTimeout(hsNightLines,350);}}
+function hsNightLines(){
   setTimeout(()=>talk([['Amroth',"Alma! Thank the stars, you’re safe."],['Alma',"Amroth! You’re home so late. What happened?"],
     ['Amroth',"I found this woman at the summit’s clearing, just outside Stranglethorn. She had been turned to stone."],['Amroth',"Her name is Lum."],
     ['Lum',"I live on the other side of Stranglethorn, at the edge of the world."],['Lum',"I was searching for my lost apprentice. His trail led me across Stranglethorn…"],
@@ -64,6 +69,7 @@ function updateHomeStory(dt){HST.t+=dt;
   for(const s of HST.smoke){s.t+=dt;s.x+=s.vx*dt;s.y+=s.vy*dt;s.r+=dt*9;}for(let i=HST.smoke.length-1;i>=0;i--)if(HST.smoke[i].t>4)HST.smoke.splice(i,1);
   /* inside, at night: the talk starts once Lum is through the door */
   if(SCENE==='dun'&&DUN.room===21&&HST.st===1&&!FADE.dir&&!DLG.active)hsNightTalk();
+  if(SCENE==='dun'&&DUN.room===21&&HST.st===2&&HST.enter===1&&!FADE.dir)hsEnterWalk(dt);
   if(SCENE==='dun'&&DUN.room===21&&HST.meet===1&&!DLG.active){if(almaWalk(lum.x+95,lum.y+2,70,dt)){ALMA.face=-1;ALMA.dir='side';lum.face=1;HST.meet=2;HST.heart=1;hsMeetTalk();}}
   if(SCENE==='dun'&&DUN.room===21&&HST.st===4)hsMorningTalk();
   if(SCENE==='dun'&&DUN.room===21&&HST.walk&&!DLG.active){if(almaWalk(lum.x+(lum.x<700?80:-80),lum.y+1,80,dt)){ALMA.face=lum.x<ALMA.x?-1:1;ALMA.dir='side';lum.face=-ALMA.face;HST.walk=0;hsHug();}}
