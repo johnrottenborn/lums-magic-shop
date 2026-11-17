@@ -23,9 +23,11 @@ const HTRUNKS=[];   /* tree roots (region coords): the grass is walkable, the tr
 const inEll=(lx,ly,e,k=1)=>((lx-e.x)/(e.rx*k))**2+((ly-e.y)/(e.ry*k))**2<1;
 function homeFree(x,y){const lx=x-HOMEX,ly=y-HOMEY;if(lx<30||lx>HW-30||ly<400||ly>HH-10)return false;
   {const G=HOME.gate;if(lx>G.x-165&&lx<G.x+265&&ly>G.y-130&&ly<G.y+6&&(Math.abs(lx-G.x)>44||(HST.st<4&&ly>G.y-70)))return false;}   /* the far gatehouse: through the arch only, once the gate is up */
+  if(ly>HOME.gate.y-60&&Math.abs(lx-HOME.gate.x)>(ly>HOME.gate.y+40?75:44)&&!(lx>HOME.gate.x+215&&hpathDist(x,y)<62))return false;   /* the woods either side of the far gatehouse can't be walked through */
   if(ly>HH-120&&Math.abs(lx-HOME.gate.x)<70)return true;   /* the path runs on to the south edge */
   if(inPoly(lx,ly,PIERDECK))return true;   /* out on the pier */
   if(inEll(lx,ly,HOME.pond,1.05)||inEll(lx,ly,HOME.pond2,1.05))return false;
+  if(lx>HOME.pond2.x-HOME.pond2.rx-70&&ly>HOME.pond.y+HOME.pond.ry*.55)return false;   /* the willow wood below the pond */
   if(lx>HOME.cot.x-215&&lx<HOME.cot.x+225&&ly>HOME.cot.y-160&&ly<HOME.cot.y-6)return false;
   if(hpathDist(x,y)<62)return true;
   if(inEll(lx,ly,{x:HOME.arch.x,y:HOME.arch.y+70,rx:150,ry:90}))return true;
@@ -42,9 +44,17 @@ function homeProps(P,PN){const X=x=>x+HOMEX,Y=y=>y+HOMEY,H_=(a,b)=>hash(a,b,971)
   for(let i=0;i<22;i++){const lx=(i%2?520:20)+H_(i,61)*(i%2?320:170),ly=1330+H_(i,62)*400;if(hpathDist(X(lx),Y(ly))<300||hpathDist(X(lx),Y(ly-200))<180||(Math.abs(lx-HOME.gate.x)<240&&ly>HOME.gate.y-280)||inEll(lx,ly,HOME.yard,1.05)||inEll(lx,ly,HOME.pond,1.3))continue;   /* thicker woods right of the far gatehouse */
     const [img,w]=HTREES[Math.floor(H_(i,63)*HTREES.length)];HTRUNKS.push([lx,ly]);P.push({t:'tree',img,x:X(lx),y:Y(ly),w:w*(.8+H_(i,64)*.3),flip:H_(i,65)<.5,base:.95});}
   /* willows and long grass around the pond, softening its edge */
-  {const p=HOME.pond,q=HOME.pond2;for(const [wx,wy,s_,f] of [[p.x+p.rx+10,p.y+p.ry*.55,.4,1],[p.x+p.rx*.35,p.y+p.ry+170,.36,0],[q.x-q.rx-40,q.y+q.ry+120,.38,0],[p.x+p.rx+20,p.y-p.ry-30,.34,1]])P.push({t:'willow',w:340,x:X(wx),y:Y(wy),s:s_,flip:!!f,ph:wx*.01});
+  {const p=HOME.pond,q=HOME.pond2;for(const [wx,wy,s_,f] of [[p.x+p.rx+10,p.y+p.ry*.55,.4,1],[q.x-q.rx-40,q.y+q.ry+120,.38,0],[p.x+p.rx+20,p.y-p.ry-30,.34,1]])P.push({t:'willow',w:340,x:X(wx),y:Y(wy),s:s_,flip:!!f,ph:wx*.01});
+    for(let i=0,wx=1150;wx<HW+120;wx+=210,i++)for(const r of [0,1]){const yy=HH+95+r*100+(H_(i+r*9,141)-.5)*40,xx=wx+r*105+(H_(i+r*9,142)-.5)*50;P.push({t:'willow',w:460,x:X(xx),y:Y(yy),s:.52+H_(i+r*9,143)*.1,flip:H_(i+r*9,144)<.5,ph:xx*.013});}   /* big willows filling the ground south of the pond */
     for(let i=0;i<70;i++){const e=i<14?HOME.pond2:p,a=H_(i,91)*TAU,r=1.02+H_(i,92)*.14,gx=e.x+Math.cos(a)*e.rx*r,gy=e.y+Math.sin(a)*e.ry*r;if(inEll(gx,gy,p,.99)||inEll(gx,gy,HOME.pond2,.99)||inPoly(gx,gy,PIERDECK)||hpathDist(X(gx),Y(gy))<60)continue;
       P.push({t:'tuft',w:40,x:X(gx),y:Y(gy),n:5+Math.floor(H_(i,93)*4),h:26+H_(i,94)*22,hue:H_(i,95)});}}
+  /* a dense wall of firs and shrubs either side of the far gatehouse, so the only way south is through its arch */
+  {const G=HOME.gate;let k=0;
+    for(let ly=G.y-70;ly<HH+140;ly+=70)for(let lx=G.x+215;lx<1060;lx+=78){k++;const jx=lx+(H_(k,121)-.5)*40,jy=ly+(H_(k,122)-.5)*30;
+      let clear=true;for(let up=0;up<=420&&clear;up+=35)if(hpathDist(X(jx),Y(jy-up))<(up<120?110:90))clear=false;
+      if(clear&&H_(k,123)<.55){const [img,w]=HTREES[Math.floor(H_(k,124)*HTREES.length)];HTRUNKS.push([jx,jy]);P.push({t:'tree',img,x:X(jx),y:Y(jy),w:w*(.7+H_(k,125)*.3),flip:H_(k,126)<.5,base:.95});}
+      else if(hpathDist(X(jx),Y(jy))>85){const kk=[1,3,10,5][Math.floor(H_(k,127)*4)];P.push({t:'shrub',k:kk,x:X(jx),y:Y(jy),s:SHR[kk].s*(.75+H_(k,128)*.3),flip:H_(k,129)<.5,ph:jx*.01});}}
+    for(let ly=G.y-60;ly<HH+140;ly+=75){k++;for(const lx of [40,120]){const jx=lx+(H_(k,131)-.5)*30;P.push({t:'shrub',k:[1,3,10][k%3],x:X(jx),y:Y(ly),s:SHR[1].s*.85,flip:k%2<1,ph:jx*.01});}}}
   for(const f of HFORAGE)P.push({t:'shrub',k:f.k,x:f.x,y:f.y,s:SHR[f.k].s*.85,flip:f.x%2<1,ph:f.x*.01});
   P.push({t:'gatebars',x:X(HOME.gate.x),y:Y(HOME.gate.y+9),w:120});
   P.push({t:'tree',img:'outpost',x:X(HOME.arch.x+52),y:Y(HOME.arch.y+8),sy:Y(HOME.arch.y-40),w:430,flip:false,solid:1});
