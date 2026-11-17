@@ -176,6 +176,6 @@ function drawBVNpc(n){const k=dunH(n.y)/151,face=lum.x>n.x;ctx.save();ctx.fillSt
   const talking=DLG.active&&DLG.lines&&DLG.lines[DLG.i||0]&&DLG.lines[DLG.i||0][0]===n.name,an=talking&&Math.abs(lum.x-n.x)>60?'side':'down';c1Frame(ctx,n.atlas,an,0,n.x,n.y,n.h||96*k,an==='side'&&face,1,0);}
 function bvNpcTalk(n){lum.face=lum.x<n.x?1:-1;talk(n.lines.map(l=>[n.name,l[0]]));}
 function leaveBVHouse(i){const h=BVHOUSES[i];SCENE='thorn';lum.x=BVX+bvDoorX(h);lum.y=BVY+h.y+60;lum.face=1;lum.dir='down';lum.state='idle';lum.vx=lum.vy=0;cam.x=lum.x;cam.y=lum.y;THORN.t=99;BVT.t=99;}
-for(const [i,h] of BVHOUSES.entries())THINT.push({x:BVX+bvDoorX(h),y:BVY+h.y+24,get reach(){return inBV()?78:-1;},door:i===2||i===3,onInteract:()=>i===2?dunGo(25,660,700,-1):i===3?dunGo(26,330,720,1):say(h.name==='mayor'?"The Mayor's house. No one answers.":"Lum knocks. No one answers.")});
+for(const [i,h] of BVHOUSES.entries())THINT.push({x:BVX+bvDoorX(h),y:BVY+h.y+24,get reach(){return inBV()?78:-1;},door:i>=2,onInteract:()=>i===2?dunGo(25,660,700,-1):i===3?dunGo(26,330,720,1):i===4?dunGo(27,590,650,1):say(h.name==='mayor'?"The Mayor's house. No one answers.":"Lum knocks. No one answers.")});
 
 THINT.push({get x(){return BVX+BVGIRL.x;},get y(){return BVY+BVGIRL.y+10;},get reach(){return inBV()?85:-1;},onInteract:bvGirlTalk});
