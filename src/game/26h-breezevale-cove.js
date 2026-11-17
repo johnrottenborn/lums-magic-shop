@@ -145,7 +145,7 @@ function buildBVCobbles(){const K=.9,R=BVPAVE+30,ox=BVC.x-R,oy=BVC.y-R,S=R*2,c=d
   g.lineWidth=26;g.strokeStyle='rgba(84,92,58,.55)';g.beginPath();g.arc(BVC.x,BVC.y,BVPAVE,0,TAU);g.stroke();g.lineWidth=8;g.strokeStyle='rgba(60,66,44,.6)';g.stroke();   /* a mossy kerb where the paving meets the grass */
   return [c,ox,oy,K];}
 /* the fountain plays: rings on its basin and a soft mist at the top jet */
-function drawBVFx(){if(!inBV()||SCENE!=='thorn')return;{const lx=lum.x-BVX;if(lx>BVBR.x0-20&&lx<BVBR.x1+20&&Math.abs(lum.y-BVY-bvBridgeY(lx))<45)lum.y=BVY+bvBridgeY(lx);}   /* on the bridge, Lum's feet follow the deck up and over the arch */const fx=BVX+BVFOUNT.x,fy=BVY+BVFOUNT.y,w=BVFOUNT.w;ctx.save();
+function drawBVFx(){if(!inBV()||SCENE!=='thorn')return;updateBVSnake();{const lx=lum.x-BVX;if(lx>BVBR.x0-20&&lx<BVBR.x1+20&&Math.abs(lum.y-BVY-bvBridgeY(lx))<45)lum.y=BVY+bvBridgeY(lx);}   /* on the bridge, Lum's feet follow the deck up and over the arch */const fx=BVX+BVFOUNT.x,fy=BVY+BVFOUNT.y,w=BVFOUNT.w;ctx.save();
   /* all of it kept tight to the art: rings on the lower pool, a little mist on the top jet, drops falling in the curtains, glints on the pool */
   for(let i=0;i<6;i++){const q=(T*.45+i/6)%1,[px,py]=bvFP(.3+BVH_(i,61)*.5,.665+BVH_(i,62)*.04),r=3+q*w*.025;ctx.strokeStyle=`rgba(235,245,250,${(.45*(1-q)).toFixed(3)})`;ctx.lineWidth=1.6;ctx.beginPath();ctx.ellipse(px,py,r,r*.35,0,0,TAU);ctx.stroke();}
   {const [jx,jy]=bvFP(.535,.06);drawGlow(ctx,jx,jy,w*.035+Math.sin(T*3)*3,'235,245,252',.3);}
@@ -180,8 +180,8 @@ function drawBVTitle(){if(!inBV()||BVT.t>=4.5||SCENE!=='thorn')return;BVT.t+=1/6
 THINT.push({get x(){return BVX+BVSOUTH.x;},get y(){return BVY+BVSOUTH.y;},get reach(){return inBV()?80:-1;},door:true,onInteract:()=>goScene(enterBWEast)},
   {get x(){return BVX+BVSDOOR.x;},get y(){return BVY+BVSDOOR.y;},get reach(){return inBV()&&lum.y<BVY+BVSBR.y1-60?85:-1;},door:true,onInteract:()=>dunGo(29,690,722,1)});
 /* the clam houses can be entered: a shop (bottom-left) and a sitting room (bottom-right); their townsfolk (lines still to settle with the designer) */
-const BVFOLK_H=116;   /* Lum stands about 98 tall */
-const BVNPC=[{room:25,atlas:'breeze_boy',x:850,y:525,h:150,name:'Breezevale Merchant',lines:[["Welcome in! Have a look around."]]},
+const BVFOLK_H=158;   /* Lum stands about 98 tall; the townsfolk are about a head taller */
+const BVNPC=[{room:25,atlas:'breeze_boy',x:850,y:525,name:'Breezevale Merchant',lines:[["Welcome in! Have a look around."]]},
   {room:26,atlas:'breeze_boy',x:115,y:708,name:'Townsman',lines:[["Oh! Hello there. Come in out of the rain."]]},
   {room:28,atlas:'breeze_boy',x:870,y:722,name:'Fisherman',lines:[["Mind the nets! Come warm yourself by the fire."]]},
   {room:28,atlas:'breeze_girl',x:965,y:730,name:'Fisherwoman',lines:[["The rain keeps the fish close to shore. A good season."]]},
@@ -198,6 +198,23 @@ function bvMerchant(intro){const have=id=>MATS[id]||0,M=[['Fox Tail','foxtail',1
   opts.push(['Leave',()=>{}]);
   const go=()=>askChoice('Breezevale Merchant \u00b7 Trades',opts);if(intro)talk([['Breezevale Merchant',"Welcome in! I don't take coin, only trades. Have a look."]],false,go);else go();}
 function bvNpcTalk(n){if(n.name==='Breezevale Merchant'){lum.face=lum.x<n.x?1:-1;bvMerchant(true);return;}lum.face=lum.x<n.x?1:-1;if(n.back&&lum.y>n.y&&Math.abs(lum.x-n.x)<=60){lum.state='idleUp';lum.at=-1e9;}talk(n.lines.map(l=>[n.name,l[0]]));}   /* Lum looks up at whoever stands just above her */
+/* the Sea Snake under the east bridge: from the middle of the deck Lum sees movement below; with Sea Bait she can drop it in, and the snake rises and attacks */
+const BVSNK={t:-1,x:0,y:0};
+function bvBridgeMid(){const mx=(BVBR.x0+BVBR.x1)/2;return [mx,bvBridgeY(mx)];}
+function bvBridgeLook(){lum.state='idle';talk([['Lum',"There's some kind of movement down below…"]],false,()=>{if(BAG.includes('seabait'))setTimeout(()=>askChoice('Drop Sea Bait?',[['Yes',bvDropBait],['No',()=>{}]]),200);});}
+function bvDropBait(){const i=BAG.indexOf('seabait');if(i<0)return;BAG.splice(i,1);const [mx]=bvBridgeMid();BVSNK.t=0;BVSNK.w0=performance.now();BVSNK.x=BVX+mx-30;BVSNK.y=BVY+BVBR.y+270;WEVENT.on=true;lum.vx=lum.vy=0;}
+function updateBVSnake(){if(BVSNK.t<0)return;const t0=BVSNK.t;BVSNK.t=(performance.now()-BVSNK.w0)/1000;lum.vx=lum.vy=0;const t=BVSNK.t;
+  if(t0<.55&&t>=.55){sfxSplash&&sfxSplash();}
+  if(t0<1.1&&t>=1.1){sfxSplash&&sfxSplash();}
+  if(t>=2.4){BVSNK.t=-1;WEVENT.on=false;startEncounter({kind:'seasnake',s:1,x:lum.x,y:lum.y},'normal');}}
+function drawBVSnake(){if(BVSNK.t<0||!inBV()||SCENE!=='thorn')return;const t=BVSNK.t,[mx,my]=bvBridgeMid(),bx=BVX+mx,by=BVY+my;
+  if(t<.55){const u=t/.55;ctx.fillStyle='#8a6a4a';ctx.beginPath();ctx.ellipse(bx,by-40+u*(BVSNK.y-by+40),6,4,0,0,TAU);ctx.fill();}   /* the bait falls */
+  const rings=(t0,x,y,big)=>{if(t<t0)return;const q=t-t0;for(let i=0;i<3;i++){const r=(q*1.2+i*.25);if(r>1.2)continue;ctx.strokeStyle=`rgba(225,240,250,${(.6*(1-r/1.2)).toFixed(3)})`;ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(x,y,big*(10+r*60),big*(3+r*18),0,0,TAU);ctx.stroke();}};
+  rings(.55,BVSNK.x,BVSNK.y,1);rings(1.1,BVSNK.x,BVSNK.y,1.6);
+  const im=IMG.seasnake;if(t>1.1&&ready(im)){const u=clamp((t-1.1)/.9,0,1),e=1-(1-u)**3,h=270,w=h*im.width/im.height;   /* it rises out of the water */
+    ctx.save();ctx.beginPath();ctx.rect(BVSNK.x-w,BVSNK.y-h*1.4,w*2,h*1.4+4);ctx.clip();ctx.translate(BVSNK.x,BVSNK.y+h*(1-e)*.95);ctx.rotate(Math.sin(t*3)*.04);ctx.drawImage(im,-w*.5,-h,w,h);ctx.restore();
+    ctx.save();ctx.globalAlpha=.5*(1-u*.5);ctx.fillStyle='rgba(235,245,252,.7)';for(let i=0;i<14;i++){const a=i/14*TAU+t,r=20+((t*90+i*13)%50);ctx.beginPath();ctx.arc(BVSNK.x+Math.cos(a)*r,BVSNK.y-Math.abs(Math.sin(a))*r*.6,2.2,0,TAU);ctx.fill();}ctx.restore();}}
+THINT.push({get x(){return BVX+bvBridgeMid()[0];},get y(){return BVY+bvBridgeMid()[1];},get reach(){return inBV()&&BVSNK.t<0?60:-1;},onInteract:bvBridgeLook});
 function leaveSanctuary(){SCENE='thorn';lum.x=BVX+BVSDOOR.x;lum.y=BVY+BVSDOOR.y+30;lum.face=1;lum.dir='down';lum.state='idle';lum.vx=lum.vy=0;cam.x=lum.x;cam.y=lum.y;THORN.t=99;BVT.t=99;}   /* back out of the Sanctuary onto the blue bridge */
 function leaveBVHouse(i){const h=BVHOUSES[i];SCENE='thorn';lum.x=BVX+bvDoorX(h);lum.y=BVY+h.y+60;lum.face=1;lum.dir='down';lum.state='idle';lum.vx=lum.vy=0;cam.x=lum.x;cam.y=lum.y;THORN.t=99;BVT.t=99;}
 for(const [i,h] of BVHOUSES.entries())THINT.push({x:BVX+bvDoorX(h),y:BVY+h.y+24,get reach(){return inBV()?78:-1;},door:i>=2||i===0,onInteract:()=>i===0?dunGo(28,240,660,1):i===2?dunGo(25,470,690,1):i===3?dunGo(26,330,720,1):i===4?dunGo(27,590,650,1):say(h.name==='mayor'?"The Mayor's house. No one answers.":"Lum knocks. No one answers.")});

@@ -957,6 +957,22 @@ const CASES = {
     await g_(() => window.__g.NEAR.onInteract()); await wait(1500);
     check(await g_(() => window.__g.SCENE === 'thorn' && window.__g.inBV() && window.__g.bvFree(window.__g.lum.x, window.__g.lum.y)), 'leaving the Sanctuary did not lead back onto the blue bridge in Breezevale');
   },
+  async 'sea-snake'(p) {
+    const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop', g_ = (f, a) => p.evaluate(f, a);
+    await g_(() => { const g = window.__g; g.startChapter2(); g.c2Skip(); g.WB10.st = 2; g.chPlaytestBreezeway(); g.enterBreezevale(); const [x, y] = g.bvBridgeMid(); g.lum.x = g.BVX + x; g.lum.y = g.BVY + y; }); await wait(900);
+    await g_(() => window.__g.NEAR.onInteract()); await wait(400);
+    check(await g_(() => window.__g.DLG.active && /movement down below/.test(window.__g.DLG.lines[0][1])), 'Lum should notice movement below the bridge');
+    await g_(() => { const g = window.__g; g.DLG.active = false; g.DLG.onEnd && g.DLG.onEnd(); }); await wait(500);
+    check(await g_(() => !window.__g.CHOICE.on), 'without Sea Bait there should be no "Drop Sea Bait?" window');
+    await g_(() => { const g = window.__g; g.BAG.push('seabait'); g.NEAR.onInteract(); }); await wait(400);
+    await g_(() => { const g = window.__g; g.DLG.active = false; g.DLG.onEnd && g.DLG.onEnd(); }); await wait(500);
+    check(await g_(() => window.__g.CHOICE.on && window.__g.CHOICE.q === 'Drop Sea Bait?'), 'with Sea Bait Lum should be asked "Drop Sea Bait?"');
+    await g_(() => window.__g.pickChoice(0)); await wait(1800);
+    await p.screenshot({ path: path.join(SHOTS, `sea-snake-rise-${vp}.png`) });
+    await wait(2600);
+    check(await g_(() => window.__g.BATTLE.on && window.__g.BATTLE.foes[0].type === 'seasnake' && !window.__g.BAG.includes('seabait')), 'dropping the Sea Bait did not bring up the Sea Snake for a battle');
+    await p.screenshot({ path: path.join(SHOTS, `sea-snake-battle-${vp}.png`) });
+  },
   async 'breezevale-merchant'(p) {
     const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop', g_ = (f, a) => p.evaluate(f, a);
     await g_(() => { const g = window.__g; g.startChapter2(); g.c2Skip(); g.WB10.st = 2; g.chPlaytestBreezeway(); g.MATS.foxtail = 1; g.BAG.push('foxtail'); g.MATS.seagem = 2; g.BAG.push('seagem'); g.enterBreezevale(); g.enterDun(25, 850, 640, 1); }); await wait(1200);
