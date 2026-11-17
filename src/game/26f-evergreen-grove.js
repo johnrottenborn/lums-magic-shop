@@ -28,10 +28,11 @@ const GTRUNKS=[],GSPOTS=[];
   let clear=true;for(let up=0;up<=400&&clear;up+=40)if(gpathDist(lx+GROVEX,ly-up+GROVEY)<(up?110:150)||Math.hypot(lx-GENTRY.x,ly-up-GENTRY.y)<260)clear=false;if(!clear)continue;   /* the old path and the way in stay in view */
   const [img,w]=HTREES[Math.floor(GH_(k,73)*HTREES.length)];GTRUNKS.push([lx,ly]);GSPOTS.push({lx,ly,img,w:w*(.75+GH_(k,74)*.35),flip:GH_(k,75)<.5});}}
 /* the south end: thick woods either side of the old path down to the exit, the path itself left clear */
-const GSHRUBS=[];
+const GSHRUBS=[],SWOODS=[];
 {let k=0;for(let ly=1560;ly<GH+120;ly+=72)for(let lx=40;lx<GW-20;lx+=80){k++;const jx=lx+(GH_(k,151)-.5)*44,jy=ly+(GH_(k,152)-.5)*34;
   if(inPoly(jx,jy,GLAKE)||inPoly(jx,jy+40,GLAKE))continue;const d=gpathDist(jx+GROVEX,jy+GROVEY);if(d<150)continue;
   let clear=true;for(let up=40;up<=360&&clear;up+=40)if(gpathDist(jx+GROVEX,jy-up+GROVEY)<105)clear=false;
+  SWOODS.push([jx,jy]);
   if(clear&&GH_(k,153)<.5&&d>130){const [img,w]=HTREES[Math.floor(GH_(k,154)*HTREES.length)];GTRUNKS.push([jx,jy]);GSPOTS.push({lx:jx,ly:jy,img,w:w*(.7+GH_(k,155)*.3),flip:GH_(k,156)<.5});}
   else GSHRUBS.push({lx:jx,ly:jy,k:[1,3,10,5][Math.floor(GH_(k,157)*4)],s:.75+GH_(k,158)*.3,flip:GH_(k,159)<.5});}}
 const nearTree=(lx,ly)=>{let b=1e9;for(const [tx,ty] of GTRUNKS)b=Math.min(b,Math.hypot(lx-tx,(ly-ty)*1.4));return b;};
@@ -48,7 +49,7 @@ function groveFree(x,y){const lx=x-GROVEX,ly=y-GROVEY;
   if(lx<30||lx>GW-30||ly<120||ly>GH-150)return false;
   if(inPoly(lx,ly,GLAKE))return false;
   if(gpathDist(x,y)<55)return true;   /* the old path runs through the groves */
-  if(ly>1530&&gpathDist(x,y)>=55&&!inPoly(lx,ly,GLAKE))return false;   /* the thick south woods: the path only */
+  if(ly>1500)for(const [wx,wy] of SWOODS)if(((lx-wx)/62)**2+((ly-wy)/54)**2<1)return false;   /* the thick south woods; the open grass beside the path stays walkable */
   for(const [tx,ty] of GTRUNKS)if(Math.abs(lx-tx)<34&&ly-ty<14&&ty-ly<22)return false;   /* the grass is open; only the trunks are solid */
   return true;}
 /* evergreens filling every grove, flowers on the open ground, stones along the old path */
