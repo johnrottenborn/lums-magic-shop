@@ -56,15 +56,24 @@ const DROOMS={
      block:[{x0:470,y0:540,x1:815,y1:690},{x0:1040,y0:470,x1:1380,y1:769},{x0:0,y0:640,x1:150,y1:769},{x0:130,y0:680,x1:340,y1:769}],
      fg:[{y:688,poly:[[415,470],[815,470],[815,690],[415,690]]}]},   /* the table and chairs */
   24:{name:'Ruins Overlook',dark:0,wide:1,hk:.62,floor:[[690,768],[700,705],[738,655],[768,603],[782,560],[780,512],[766,488],[756,450],[788,433],[880,431],[922,450],[914,480],[872,498],[860,560],[868,612],[880,664],[902,715],[922,768]]},
+  /* 29: the Sanctuary of Water's front (the designer's painting): carved double doors in a glass-domed hall, steps up between two fern planters, spouts pouring into pools either side */
+  29:{name:'Sanctuary of Water',dark:0,wide:1,hk:1,floor:[[590,768],[596,720],[580,700],[568,640],[592,610],[596,592],[500,590],[420,588],[418,568],[600,574],[700,580],[800,574],[985,568],[985,588],[900,590],[806,592],[810,610],[808,640],[795,700],[782,720],[790,768]],
+     fg:[{y:640,poly:[[478,500],[592,500],[592,652],[478,652]]},{y:640,poly:[[788,500],[905,500],[905,652],[788,652]]}]},   /* the fern planters */
+  /* 30: the Sanctuary's great hall (the designer's painting), seen from the doorway: a cobbled walk winds between pools to a grand stair; two arched bridges cross the water */
+  30:{name:'',dark:0,wide:1,hk:.85,hd:.67,floor:[[300,768],[392,700],[450,688],[440,640],[470,612],[555,580],[600,555],[648,548],[652,520],[690,500],[715,498],[790,498],[830,505],[855,515],[800,530],[760,548],[742,575],[730,595],[705,615],[690,640],[692,700],[680,768]],
+     more:[[[402,518],[478,512],[486,540],[408,546]]],   /* the stone ledge under the left waterfall, by the far doorway */
+     arch:[{x0:470,x1:652,y0:538,y1:552,dy:9,top:[[470,535],[500,530],[520,524],[540,520],[560,520],[580,526],[600,536],[620,548],[652,552]]},{x0:728,x1:985,y0:590,y1:590,dy:8,top:[[728,590],[735,570],[760,565],[790,560],[810,556],[870,557],[900,560],[930,568],[960,578],[985,583]]}],   /* the two bridges: walked along their decks, feet just behind the front rail */
+     fg:[{y:562,poly:[[470,526],[500,520],[520,514],[540,510],[560,510],[580,516],[600,526],[620,538],[648,543],[648,566],[470,562]]},{y:600,poly:[[728,560],[760,553],[790,548],[810,544],[870,545],[900,548],[930,556],[960,566],[995,576],[995,602],[728,602]]}]},   /* their front rails */
   /* 22: the loft, the bed under the thatch; the stair comes up on the right behind the rail */
   22:{name:'',dark:0,home:1,hk:1.9,floor:[[120,738],[460,730],[1050,726],[1050,612],[1185,612],[1185,768],[110,768]],
      block:[{x0:440,y0:430,x1:1052,y1:724}]},   /* the serpent gate (above): arrive in the lit stairwell behind the carved archway (back to room 19), walk down through it; the way on is in the foreground */
   5:{name:'Deeproot',sub:'turn back',dark:.86,floor:[[420,768],[480,640],[560,580],[620,540],[700,540],[800,580],[950,620],[1050,700],[1080,768]]}};
 const EYES5=[[200,144],[290,106],[275,181],[331,319],[500,140],[652,129],[625,238],[731,190],[512,422],[612,444],[212,481],[212,512],[440,275],[420,412],[610,282]];
-function dunFree(x,y){const R=DROOMS[DUN.room];if(!inPoly(x,y,R.floor))return false;if(DUN.room===20&&WB10.st&&y<615&&x>750&&x<965)return false;if(DUN.room===20&&WB10.chest&&((x-900)/62)**2+((y-692)/22)**2<1)return false;   /* the caved-in archway */
+function dunArch(x,y){const R=DROOMS[DUN.room];for(const a of (R&&R.arch)||[])if(x>=a.x0&&x<=a.x1){const t=(x-a.x0)/(a.x1-a.x0);const yg=a.y0+(a.y1-a.y0)*t;if(Math.abs(y-yg)<a.dy){const P=a.top;let k=0;while(k<P.length-2&&x>P[k+1][0])k++;const u=clamp((x-P[k][0])/(P[k+1][0]-P[k][0]),0,1);return Math.max(0,yg-(P[k][1]+(P[k+1][1]-P[k][1])*u));}}return -1;}   /* how high a bridge deck lifts whoever is on it (-1: not on one) */
+function dunFree(x,y){const R=DROOMS[DUN.room];if(!inPoly(x,y,R.floor)&&!(R.more||[]).some(P=>inPoly(x,y,P))&&dunArch(x,y)<0)return false;if(DUN.room===20&&WB10.st&&y<615&&x>750&&x<965)return false;if(DUN.room===20&&WB10.chest&&((x-900)/62)**2+((y-692)/22)**2<1)return false;   /* the caved-in archway */
   for(const b of (R.block||[]))if(b.x0!==undefined?(x>b.x0&&x<b.x1&&y>b.y0&&y<b.y1):((x-b.x)/b.rx)**2+((y-b.y)/b.ry)**2<1)return false;return true;}
 function solveDun(px,py,nx,ny){if(dunFree(nx,ny))return [nx,ny];if(dunFree(nx,py))return [nx,py];if(dunFree(px,ny))return [px,ny];return [px,py];}
-const dunH=y=>(150+(clamp(y,380,768)-620)*.28)*((DROOMS[DUN.room]||{}).hk||1);   /* hk: a room drawn closer up (the cottage) draws everyone bigger */
+const dunH=y=>(150+(clamp(y,380,768)-620)*((DROOMS[DUN.room]||{}).hd||.28))*((DROOMS[DUN.room]||{}).hk||1);   /* hd: how fast people shrink into the distance */   /* hk: a room drawn closer up (the cottage) draws everyone bigger */
 const DUNINT=[];
 /* the Hidden Spring under Stranglethorn: a drink restores everyone's HP */
 /* the Fox Hood waits on the Briar Den floor once both foxes there are gone */
@@ -108,6 +117,8 @@ function setupDun(){DUNINT.length=0;const r=DUN.room,D=(x,y,reach,fn)=>DUNINT.pu
   if(r===21&&C2.basement)D(695,610,50,()=>dunGo(23,300,580,1));   /* the bookshelf door to the basement, once the story opens it */
   if(r===25){D(445,728,95,()=>goScene(()=>leaveBVHouse(2)));for(const n of BVNPC)if(n.room===25)DUNINT.push({x:n.x,y:n.y+60,reach:110,onInteract:()=>bvNpcTalk(n)});}
   if(r===26){D(330,758,100,()=>goScene(()=>leaveBVHouse(3)));DUNINT.push({x:540,y:612,reach:95,fire:true,onInteract:()=>{if(canLumMix())openMix();else say("A little iron stove, warm and ticking.");}});   /* the stove: Lum can mix here */for(const n of BVNPC)if(n.room===26)DUNINT.push({x:n.x,y:n.y+10,reach:95,onInteract:()=>bvNpcTalk(n)});}
+  if(r===29){D(690,750,90,()=>goScene(leaveSanctuary));D(700,592,95,()=>dunGo(30,470,725,1));}
+  if(r===30){D(470,748,95,()=>dunGo(29,700,612,1));}
   if(r===28){D(190,650,95,()=>goScene(()=>leaveBVHouse(0)));for(const n of BVNPC)if(n.room===28)DUNINT.push({x:n.x,y:n.y+10,reach:95,onInteract:()=>bvNpcTalk(n)});
     DUNINT.push({x:905,y:585,reach:110,fire:true,onInteract:()=>{if(canLumMix())openMix();else say("A warm fire crackles under the kettle.");}});}   /* the hearth: Lum can mix here */
   if(r===27){D(590,612,90,()=>goScene(()=>leaveBVHouse(4)));for(const n of BVNPC)if(n.room===27)DUNINT.push({x:n.x,y:n.y+10,reach:100,onInteract:()=>bvNpcTalk(n)});
@@ -182,7 +193,7 @@ function drawDun(){const R=DROOMS[DUN.room],im=IMG['dun'+DUN.room];if(!ready(im)
     if(ready(im))ctx.drawImage(im,HOOD.x-22,HOOD.y-44+b,44,44);ctx.globalCompositeOperation='lighter';drawGlow(ctx,HOOD.x,HOOD.y-22,30,'255,226,150',.25+.12*Math.sin(T*3));ctx.restore();}
   // characters, depth-sorted; the cellar's table is drawn over anyone standing behind it
   const k=dunH(lum.y)/151,here=DFOES.filter(g=>g.room===DUN.room);{const L=here.map(g=>[g.y,()=>drawDFoe(g)]);
-    L.push([lum.y,()=>{ctx.save();ctx.translate(lum.x,lum.y);ctx.scale(k,k);ctx.translate(-lum.x,-lum.y);drawLum();ctx.restore();}]);
+    L.push([lum.y,()=>{ctx.save();ctx.translate(lum.x,lum.y-Math.max(0,dunArch(lum.x,lum.y)));ctx.scale(k,k);ctx.translate(-lum.x,-lum.y);drawLum();ctx.restore();}]);
     if(CH===1&&jakInParty()&&JAKF){const kj=dunH(JAKF.y)/151;L.push([JAKF.y-1,()=>{ctx.save();ctx.translate(JAKF.x,JAKF.y);ctx.scale(kj,kj);ctx.translate(-JAKF.x,-JAKF.y);drawJakOW();ctx.restore();}]);}   /* Spar comes down into the rooms with Lum */
     for(const n of BVNPC)if(n.room===DUN.room)L.push([n.y,()=>drawBVNpc(n)]);
     if(DUN.room===21){L.push([ALMA.y,()=>{drawAlmaRoom();}]);if(HST.heart>0)L.push([9999,()=>drawHearts((lum.x+ALMA.x)/2,Math.min(lum.y,ALMA.y)-150*dunH(lum.y)/151)]);}
@@ -193,6 +204,7 @@ function drawDun(){const R=DROOMS[DUN.room],im=IMG['dun'+DUN.room];if(!ready(im)
     if(DUN.room===18&&WB8.boss){const g=WB8.boss;L.push([g.y,()=>drawDemonOW(g.x,g.y,g.face,g.a,g.mv,2,g)]);}
     if(DUN.room>=15&&DUN.room<=19)for(const g of [WB5.chaser,WB5.brown])if(g){L.push([g.y,()=>drawDemonOW(g.x,g.y,g.face,g.a,g.mv,g.big,g)]);if(g.trio)for(const [tx,ty] of trioPos(g))L.push([ty,()=>drawDemonOW(tx,ty,g.face,g.a,g.mv,0)]);}
     for(const F of (R.fg||[]))L.push([F.y,()=>{ctx.save();ctx.beginPath();F.poly.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y));ctx.closePath();ctx.clip();ctx.drawImage(im,0,0,1375,768);ctx.restore();}]);   /* furniture that stands in front of whoever is behind it */
+    if(DUN.room===29&&NIGHT.rain)L.push([9997,()=>{ctx.save();drawRain(1/60);ctx.restore();}]);   /* the Sanctuary's front is out in the rain */
     if(DUN.room===24){L.unshift([-1,()=>drawOverlookMist(0)]);L.push([9998,()=>drawOverlookMist(1)]);}   /* mist over the sea behind, low wisps drifting in front */
     L.sort((a,b)=>a[0]-b[0]);for(const [,f] of L)f();}
   if(DUN.room===14&&BO.a>0){ctx.fillStyle=`rgba(0,0,0,${BO.a*.55})`;ctx.fillRect(-2000,-500,5375,1800);}

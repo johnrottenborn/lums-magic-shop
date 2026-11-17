@@ -926,6 +926,26 @@ const CASES = {
     await g_(() => { const g = window.__g; g.lum.x = g.BVX + (g.BVBR.x0 + g.BVBR.x1) / 2; g.lum.y = g.BVY + g.BVBR.y - g.BVBR.h * .29; }); await wait(1200);
     await p.screenshot({ path: path.join(SHOTS, `breezevale-bridge-${vp}.png`) });
   },
+  async 'sanctuary-of-water'(p) {
+    const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop', g_ = (f, a) => p.evaluate(f, a);
+    await g_(() => { const g = window.__g; g.startChapter2(); g.c2Skip(); g.WB10.st = 2; g.chPlaytestBreezeway(); g.enterBreezevale(); g.lum.x = g.BVX + g.BVSDOOR.x; g.lum.y = g.BVY + g.BVSDOOR.y + 20; }); await wait(700);
+    check(await g_(() => !!(window.__g.NEAR && window.__g.NEAR.door)), 'the blue bridge should have the door to the Sanctuary of Water');
+    await g_(() => window.__g.NEAR.onInteract()); await wait(1500);
+    check(await g_(() => window.__g.SCENE === 'dun' && window.__g.DUN.room === 29), 'the bridge door did not lead to the Sanctuary front (room 29)');
+    await wait(2500); await p.screenshot({ path: path.join(SHOTS, `sanctuary-front-${vp}.png`) });
+    await g_(() => { const g = window.__g; g.lum.x = 700; g.lum.y = 600; }); await wait(600);
+    await g_(() => window.__g.NEAR.onInteract()); await wait(1500);
+    check(await g_(() => window.__g.DUN.room === 30), 'the Sanctuary doors did not lead into the hall (room 30)');
+    await g_(() => { const g = window.__g; g.lum.x = 560; g.lum.y = 545; }); await wait(900);
+    check(await g_(() => window.__g.dunFree(560, 545) && window.__g.dunFree(860, 590) && window.__g.dunFree(750, 505) && !window.__g.dunFree(850, 680)), 'the hall\'s walkable floor (path, bridges, stair foot; not the water) is wrong');
+    await p.screenshot({ path: path.join(SHOTS, `sanctuary-hall-${vp}.png`) });
+    await g_(() => { const g = window.__g; g.lum.x = 470; g.lum.y = 735; }); await wait(600);
+    await g_(() => window.__g.NEAR.onInteract()); await wait(1500);
+    check(await g_(() => window.__g.DUN.room === 29), 'the hall\'s doorway did not lead back out to the Sanctuary front');
+    await g_(() => { const g = window.__g; g.lum.x = 690; g.lum.y = 745; }); await wait(600);
+    await g_(() => window.__g.NEAR.onInteract()); await wait(1500);
+    check(await g_(() => window.__g.SCENE === 'thorn' && window.__g.inBV() && window.__g.bvFree(window.__g.lum.x, window.__g.lum.y)), 'leaving the Sanctuary did not lead back onto the blue bridge in Breezevale');
+  },
   async 'breezevale-merchant'(p) {
     const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop', g_ = (f, a) => p.evaluate(f, a);
     await g_(() => { const g = window.__g; g.startChapter2(); g.c2Skip(); g.WB10.st = 2; g.chPlaytestBreezeway(); g.MATS.foxtail = 1; g.BAG.push('foxtail'); g.MATS.seagem = 2; g.BAG.push('seagem'); g.enterBreezevale(); g.enterDun(25, 850, 640, 1); }); await wait(1200);

@@ -178,7 +178,7 @@ function drawBVTitle(){if(!inBV()||BVT.t>=4.5||SCENE!=='thorn')return;BVT.t+=1/6
   ctx.fillStyle='rgba(20,16,12,.55)';ctx.fillRect(0,H*.3-40,W,80);ctx.fillStyle='#f6ecd8';ctx.font=`600 ${Math.round(Math.min(30,W/13))}px Georgia,serif`;ctx.fillText('Breezevale Cove',W/2,H*.3+10);ctx.restore();}
 /* the way back down to the Breezeway, the way north (the Sanctuary of Water, still to come), and the house doors (no one answers yet) */
 THINT.push({get x(){return BVX+BVSOUTH.x;},get y(){return BVY+BVSOUTH.y;},get reach(){return inBV()?80:-1;},door:true,onInteract:()=>goScene(enterBWEast)},
-  {get x(){return BVX+BVSDOOR.x;},get y(){return BVY+BVSDOOR.y;},get reach(){return inBV()&&lum.y<BVY+BVSBR.y1-60?85:-1;},door:true,onInteract:()=>say("The way to the Sanctuary of Water lies beyond.")});
+  {get x(){return BVX+BVSDOOR.x;},get y(){return BVY+BVSDOOR.y;},get reach(){return inBV()&&lum.y<BVY+BVSBR.y1-60?85:-1;},door:true,onInteract:()=>dunGo(29,690,722,1)});
 /* the clam houses can be entered: a shop (bottom-left) and a sitting room (bottom-right); their townsfolk (lines still to settle with the designer) */
 const BVFOLK_H=116;   /* Lum stands about 98 tall */
 const BVNPC=[{room:25,atlas:'breeze_boy',x:850,y:525,h:150,name:'Breezevale Merchant',lines:[["Welcome in! Have a look around."]]},
@@ -198,6 +198,7 @@ function bvMerchant(intro){const have=id=>MATS[id]||0,M=[['Fox Tail','foxtail',1
   opts.push(['Leave',()=>{}]);
   const go=()=>askChoice('Breezevale Merchant \u00b7 Trades',opts);if(intro)talk([['Breezevale Merchant',"Welcome in! I don't take coin, only trades. Have a look."]],false,go);else go();}
 function bvNpcTalk(n){if(n.name==='Breezevale Merchant'){lum.face=lum.x<n.x?1:-1;bvMerchant(true);return;}lum.face=lum.x<n.x?1:-1;talk(n.lines.map(l=>[n.name,l[0]]));}
+function leaveSanctuary(){SCENE='thorn';lum.x=BVX+BVSDOOR.x;lum.y=BVY+BVSDOOR.y+30;lum.face=1;lum.dir='down';lum.state='idle';lum.vx=lum.vy=0;cam.x=lum.x;cam.y=lum.y;THORN.t=99;BVT.t=99;}   /* back out of the Sanctuary onto the blue bridge */
 function leaveBVHouse(i){const h=BVHOUSES[i];SCENE='thorn';lum.x=BVX+bvDoorX(h);lum.y=BVY+h.y+60;lum.face=1;lum.dir='down';lum.state='idle';lum.vx=lum.vy=0;cam.x=lum.x;cam.y=lum.y;THORN.t=99;BVT.t=99;}
 for(const [i,h] of BVHOUSES.entries())THINT.push({x:BVX+bvDoorX(h),y:BVY+h.y+24,get reach(){return inBV()?78:-1;},door:i>=2||i===0,onInteract:()=>i===0?dunGo(28,240,660,1):i===2?dunGo(25,470,690,1):i===3?dunGo(26,330,720,1):i===4?dunGo(27,590,650,1):say(h.name==='mayor'?"The Mayor's house. No one answers.":"Lum knocks. No one answers.")});
 
