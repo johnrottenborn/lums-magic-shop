@@ -12,13 +12,13 @@ const BVSBR={x:BVC.x,y1:BVC.y-BVC.r+60,w:300,h:614};BVSBR.y0=BVSBR.y1-BVSBR.h;co
 const BVSDOOR={x:BVSBR.x,y:BVSBR.y0+70};
 const BVBR={x0:1880,x1:2130,y:850,w:270};BVBR.h=BVBR.w*346/700;BVBR.rise=BVBR.h*.29;   /* the bridge: deck ends at y, the deck (between the two handrails) rises in the middle */
 /* door: where the front door is across the art (0..1, unflipped); smoke: the chimney top (u,v of the art), if it has one */
-const BVHOUSES=[{img:'breeze_shellhouse',x:620,y:650,w:585,name:'shell',flip:true,door:.34,smoke:[.28,.19]},{img:'breeze_mayorhouse',x:1350,y:620,w:790,name:'mayor',door:.58,smoke:[.55,.17]},
+const BVHOUSES=[{img:'breeze_shellhouse',x:503,y:650,w:351,name:'shell',flip:true,noR:1,door:.34,smoke:[.28,.19]},{img:'breeze_mayorhouse',x:1350,y:620,w:790,name:'mayor',noL:1,door:.58,smoke:[.55,.17]},
   {img:'breeze_clamhouse',x:590,y:1370,w:600,name:'clam',door:.86},{img:'breeze_clamhouse',x:1510,y:1370,w:600,name:'clam2',flip:true,door:.86},{img:'breeze_shellhouse',x:2495,y:875,w:620,name:'shell2',door:.36,smoke:[.28,.19]}];
 const bvDoorX=h=>h.x+(h.door-.5)*h.w*(h.flip?-1:1);
 /* a house's yard: two curves of grass, from up each side of the house, round its front corners, to either side of the door */
 function bvYard(h){const L=h.x-h.w*.45,R=h.x+h.w*.45,d=bvDoorX(h),y=h.y+8,up=h.y-h.w*.2,gap=80,out=[];
-  out.push(d-L>gap+120?[[L-8,up],[L-14,y-30],[L+30,y],[d-gap,y]]:[[L-8,up],[L-14,y-30],[L+12,y]]);   /* a short side (door near the corner) only wraps the corner */
-  out.push(R-d>gap+120?[[d+gap,y],[R-30,y],[R+14,y-30],[R+8,up]]:[[R-12,y],[R+14,y-30],[R+8,up]]);return out;}
+  if(!h.noL)out.push(d-L>gap+120?[[L-8,up],[L-14,y-30],[L+30,y],[d-gap,y]]:[[L-8,up],[L-14,y-30],[L+12,y]]);   /* a short side (door near the corner) only wraps the corner */
+  if(!h.noR)out.push(R-d>gap+120?[[d+gap,y],[R-30,y],[R+14,y-30],[R+8,up]]:[[R-12,y],[R+14,y-30],[R+8,up]]);return out;}
 const BVFOUNT={x:1050,y:990,w:760};
 const bvFP=(u,v)=>{const F=BVFOUNT,h=F.w*633/1100;return [BVX+F.x+(u-.5)*F.w,BVY+F.y-h*.95+v*h];};   /* a point on the fountain art (u,v across it) */
 const inBV=()=>lum.x>BVX-300;
@@ -33,7 +33,7 @@ const BVISLE=(()=>{const P=[];for(let a=Math.PI/2;a>-Math.PI*1.5;a-=.06)P.push([
 const BVCOB=(()=>{const F=BVFOUNT,ring=[];for(let a=0;a<=TAU+.01;a+=.2)ring.push([F.x+Math.cos(a)*230,F.y-50+Math.sin(a)*135]);
   const to=(x,y)=>{const a=Math.atan2(y-(F.y-50),x-F.x);return [[F.x+Math.cos(a)*230,F.y-50+Math.sin(a)*135],[(F.x+x)/2+(BVH_(x,1)-.5)*40,(F.y-50+y)/2+(BVH_(y,2)-.5)*30],[x,y]];};
   return [ring,...BVHOUSES.slice(0,4).map(h=>to(h.x,h.y+40)),to(BVGATE.x,BVGATE.y-30),to(BVBR.x0+20,BVBR.y),to(BVNORTH.x,BVNORTH.y+30)].map(P=>smoothPath(P));})();
-function bvSolid(lx,ly){for(const h of BVHOUSES){const cy=h.y-h.w*.13;if(((lx-h.x)/(h.w*.43))**2+((ly-cy)/(h.w*.17))**2<1)return true;}
+function bvSolid(lx,ly){for(const h of BVHOUSES){if(Math.abs(lx-h.x)<h.w*.47&&ly<h.y-6&&ly>h.y-h.w*.36)return true;}   /* the whole footprint of each house, porches included */
   if(((lx-BVFOUNT.x)/(BVFOUNT.w*.47))**2+((ly-BVFOUNT.y+BVFOUNT.w*.08)/(BVFOUNT.w*.11))**2<1)return true;
   if(Math.abs(ly-BVGATE.y+60)<34&&Math.abs(lx-BVGATE.x)>92&&Math.abs(lx-BVGATE.x)<250)return true;   /* the gateposts and their stone footings */
   if(((lx-BVGIRL.x)/30)**2+((ly-BVGIRL.y)/14)**2<1)return true;   /* the townsgirl */
