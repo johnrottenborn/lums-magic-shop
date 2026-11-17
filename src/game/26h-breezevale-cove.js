@@ -8,8 +8,9 @@ const BVX=BWX+5200,BVY=500,BVW=2950,BVH=2400,BVT={t:99};
 const BVC={x:1050,y:950,r:850},BVI={x:2450,y:850,r:350};   /* the town green, and the islet */
 const BVGATE={x:BVC.x,y:BVC.y+BVC.r+10},BVSOUTH={x:BVC.x,y:BVH-90},BVNORTH={x:BVC.x,y:BVC.y-BVC.r+70};
 /* the stone bridge north from the green over the sea toward the Sanctuary of Water (the designer's middle bridge, recoloured blue); its door is at the far end */
-const BVSBR={x:BVC.x,y1:BVC.y-BVC.r+60,w:300,h:614};BVSBR.y0=BVSBR.y1-BVSBR.h;const BVTOP=BVSBR.y0-330;
-const BVSDOOR={x:BVSBR.x,y:BVSBR.y0+70};
+const BVSBR={x:BVC.x,y1:BVC.y-BVC.r+125,w:300,h:614};BVSBR.y0=BVSBR.y1-BVSBR.h;   /* its foot rests on the edge of the cobbles */
+const BVTOP=BVSBR.y1-400;   /* the view stops with just the start of the bridge showing */
+const BVSDOOR={x:BVSBR.x,y:BVSBR.y1-150};   /* the way on, a little way along the bridge */
 const BVBR={x0:1880,x1:2130,y:850,w:270};BVBR.h=BVBR.w*346/700;BVBR.rise=BVBR.h*.29;   /* the bridge: deck ends at y, the deck (between the two handrails) rises in the middle */
 /* door: where the front door is across the art (0..1, unflipped); smoke: the chimney top (u,v of the art), if it has one */
 const BVHOUSES=[{img:'breeze_shellhouse',x:503,y:650,w:351,name:'shell',flip:true,noR:1,door:.34,smoke:[.28,.19]},{img:'breeze_mayorhouse',x:1350,y:620,w:790,name:'mayor',noL:1,door:.58,smoke:[.55,.17]},
@@ -33,7 +34,7 @@ const BVISLE=(()=>{const P=[];for(let a=Math.PI/2;a>-Math.PI*1.5;a-=.06)P.push([
 const BVCOB=(()=>{const F=BVFOUNT,ring=[];for(let a=0;a<=TAU+.01;a+=.2)ring.push([F.x+Math.cos(a)*230,F.y-50+Math.sin(a)*135]);
   const to=(x,y)=>{const a=Math.atan2(y-(F.y-50),x-F.x);return [[F.x+Math.cos(a)*230,F.y-50+Math.sin(a)*135],[(F.x+x)/2+(BVH_(x,1)-.5)*40,(F.y-50+y)/2+(BVH_(y,2)-.5)*30],[x,y]];};
   return [ring,...BVHOUSES.slice(0,4).map(h=>to(h.x,h.y+40)),to(BVGATE.x,BVGATE.y-30),to(BVBR.x0+20,BVBR.y),to(BVNORTH.x,BVNORTH.y+30)].map(P=>smoothPath(P));})();
-function bvSolid(lx,ly){for(const h of BVHOUSES){if(Math.abs(lx-h.x)<h.w*.47&&ly<h.y-6&&ly>h.y-h.w*.36)return true;}   /* the whole footprint of each house, porches included */
+function bvSolid(lx,ly){for(const h of BVHOUSES){if(Math.abs(lx-h.x)<h.w*.47&&ly<h.y-6&&ly>h.y-Math.min(h.w*.36,150))return true;}   /* the whole footprint of each house, porches included */
   if(((lx-BVFOUNT.x)/(BVFOUNT.w*.47))**2+((ly-BVFOUNT.y+BVFOUNT.w*.08)/(BVFOUNT.w*.11))**2<1)return true;
   if(Math.abs(ly-BVGATE.y+60)<34&&Math.abs(lx-BVGATE.x)>92&&Math.abs(lx-BVGATE.x)<250)return true;   /* the gateposts and their stone footings */
   if(((lx-BVGIRL.x)/30)**2+((ly-BVGIRL.y)/14)**2<1)return true;   /* the townsgirl */
@@ -50,7 +51,7 @@ function bvFree(x,y){const lx=x-BVX,ly=y-BVY;
   if(lx>=BVBR.x1-30&&lx<BVBR.x1+60&&Math.abs(ly-BVBR.y)<30)return true;
   let ok=Math.hypot(lx-BVC.x,ly-BVC.y)<BVC.r-55||Math.hypot(lx-BVI.x,ly-BVI.y)<BVI.r-40||(Math.abs(lx-BVC.x)<BVROAD-25&&ly>BVC.y&&ly<BVH-40);
   if(ly<BVNORTH.y-30)ok=false;
-  if(Math.abs(lx-BVSBR.x)<36&&ly>BVSDOOR.y-10&&ly<BVNORTH.y+10)return true;   /* along the bridge deck, between its stone rails */
+  if(Math.abs(lx-BVSBR.x)<36&&ly>BVSDOOR.y-12&&ly<BVSBR.y1)return true;   /* along the bridge deck, between its stone rails */
   return ok&&!bvSolid(lx,ly);}
 /* hydrangeas, tinted per house so each doorstep has its own colour (the designer's coastal flowers, smaller here) */
 const BVTINT={};
@@ -172,7 +173,7 @@ function drawBVTitle(){if(!inBV()||BVT.t>=4.5||SCENE!=='thorn')return;BVT.t+=1/6
   ctx.fillStyle='rgba(20,16,12,.55)';ctx.fillRect(0,H*.3-40,W,80);ctx.fillStyle='#f6ecd8';ctx.font=`600 ${Math.round(Math.min(30,W/13))}px Georgia,serif`;ctx.fillText('Breezevale Cove',W/2,H*.3+10);ctx.restore();}
 /* the way back down to the Breezeway, the way north (the Sanctuary of Water, still to come), and the house doors (no one answers yet) */
 THINT.push({get x(){return BVX+BVSOUTH.x;},get y(){return BVY+BVSOUTH.y;},get reach(){return inBV()?80:-1;},door:true,onInteract:()=>goScene(enterBWEast)},
-  {get x(){return BVX+BVSDOOR.x;},get y(){return BVY+BVSDOOR.y;},get reach(){return inBV()?85:-1;},door:true,onInteract:()=>say("The way to the Sanctuary of Water lies beyond.")});
+  {get x(){return BVX+BVSDOOR.x;},get y(){return BVY+BVSDOOR.y;},get reach(){return inBV()&&lum.y<BVY+BVSBR.y1-60?85:-1;},door:true,onInteract:()=>say("The way to the Sanctuary of Water lies beyond.")});
 /* the clam houses can be entered: a shop (bottom-left) and a sitting room (bottom-right); their townsfolk (lines still to settle with the designer) */
 const BVFOLK_H=116;   /* Lum stands about 98 tall */
 const BVNPC=[{room:25,atlas:'breeze_boy',x:850,y:525,h:150,name:'Breezevale Merchant',lines:[["Welcome in! Have a look around."]]},
