@@ -36,7 +36,7 @@ const BVCOB=(()=>{const F=BVFOUNT,ring=[];for(let a=0;a<=TAU+.01;a+=.2)ring.push
   return [ring,...BVHOUSES.slice(0,4).map(h=>to(h.x,h.y+40)),to(BVGATE.x,BVGATE.y-30),to(BVBR.x0+20,BVBR.y),to(BVNORTH.x,BVNORTH.y+30)].map(P=>smoothPath(P));})();
 function bvSolid(lx,ly){for(const h of BVHOUSES){if(Math.abs(lx-h.x)<h.w*.47&&ly<h.y-6&&ly>h.y-Math.min(h.w*.36,150))return true;}   /* the whole footprint of each house, porches included */
   if(((lx-BVFOUNT.x)/(BVFOUNT.w*.47))**2+((ly-BVFOUNT.y+BVFOUNT.w*.08)/(BVFOUNT.w*.11))**2<1)return true;
-  if(Math.abs(ly-BVGATE.y+60)<34&&Math.abs(lx-BVGATE.x)>92&&Math.abs(lx-BVGATE.x)<250)return true;   /* the gateposts and their stone footings */
+  if(Math.abs(ly-BVGATE.y+60)<34&&Math.abs(lx-BVGATE.x)>128&&Math.abs(lx-BVGATE.x)<262)return true;   /* the gateposts and their stone footings */
   if(((lx-BVGIRL.x)/30)**2+((ly-BVGIRL.y)/14)**2<1)return true;   /* the townsgirl */
   for(const [tx,ty] of BVTRUNKS)if(Math.abs(lx-tx)<32&&ly-ty<14&&ty-ly<22)return true;
   return false;}
@@ -76,7 +76,9 @@ function bvProps(P){const X=x=>x+BVX,Y=y=>y+BVY;
   for(const h of BVHOUSES)P.push({t:'tree',img:h.img,x:X(h.x),y:Y(h.y),w:h.w,flip:!!h.flip,base:.97,solid:1});
   P.push({t:'bvgirl',x:X(BVGIRL.x),y:Y(BVGIRL.y),w:80});
   P.push({t:'tree',img:'breeze_fountain',x:X(BVFOUNT.x),y:Y(BVFOUNT.y),w:BVFOUNT.w,flip:false,base:.95,solid:1});
-  P.push({t:'tree',img:'breeze_gate',x:X(BVGATE.x),y:Y(BVGATE.y-50),w:420,sx:1.2,flip:false,base:.97,solid:1});   /* a little wider, its footing stones on the rim of the green */
+  P.push({t:'tree',img:'breeze_gate2',x:X(BVGATE.x),y:Y(BVGATE.y-50),w:520,flip:false,base:.98,solid:1});   /* the designer's driftwood archway (no doors), its footing stones on the rim of the green */
+  /* small boulders down both edges of the road, covering the seam where it meets the cliff faces */
+  for(let y=BVGATE.y+30,i=0;y<BVH+60;y+=95,i++)for(const side of [-1,1]){const k=i*2+(side>0);P.push({t:'tree',img:['crockegg','crockpile','crockegg','crockheap'][k%4],x:X(BVC.x+side*(BVROAD+10+BVH_(k,71)*10)),y:Y(y+BVH_(k,72)*30),w:40+BVH_(k,73)*22,flip:BVH_(k,74)<.5,base:.9});}
   /* grass and small flowers tucked along the gate's footings, hiding where they meet the cliff and the road */
   for(const [dx,dy,k] of [[-262,-40,'t'],[-232,-30,'f'],[-196,-36,'t'],[-112,-46,'t'],[-96,-34,'f'],[96,-34,'f'],[112,-46,'t'],[196,-36,'t'],[232,-30,'f'],[262,-40,'t'],[-82,-6,'t'],[82,-6,'t']])
     if(k==='t')P.push({t:'tuft',w:40,x:X(BVGATE.x+dx),y:Y(BVGATE.y+dy),n:6,h:26+Math.abs(dx)%7*2,hue:.4});
