@@ -12,6 +12,7 @@ const AMR_H=137,AMR_BH=166;   /* same size beside Lum in and out of battle */
 C1ATL.alma={"cw":200,"ch":250,"rows":{"down":[0,6],"up":[1,5],"side":[2,4],"run":[3,6],"idle":[4,6]}}; // Alma (Amroth's wife, not in battle): down walk, up walk, side walk + run (face LEFT), standing idle. Not placed in the game yet
 C1ATL.luma=C1ATL.alma; // Sage Luma, Alma's much older sister (water temple, neighbouring town): Alma's frames recoloured, light blond hair and white robes. Not placed in the game yet
 C1ATL.breeze_girl={"cw":200,"ch":250,"rows":{"down":[0,6],"up":[1,5],"side":[2,4],"run":[3,6],"idle":[4,6]}}; // a Breezevale townsgirl (citizen, not in battle): down walk, up walk, side walk + run (face LEFT; flip for right), standing idle. For Breezevale Cove, not placed yet
+C1ATL.breeze_boy=C1ATL.breeze_girl; // a Breezevale townsboy (citizen, not in battle): same layout as the townsgirl. For Breezevale Cove, not placed yet
 C1ATL.spar={"cw": 261, "ch": 306, "rows": {"down": [0, 5], "up": [1, 5], "side": [2, 5], "bidle": [3, 4], "brun": [4, 5]}}; // Spar: down/up/side walks (side faces right), battle idle + run with his sword (run faces left)
 const SPAR_H=139,SPAR_BH=164; // overworld / battle draw heights (a head taller than Lum)
 function c1Frame(c,sh,anim,i,x,y,h,flip,alpha,flash){const im=IMG[sh],A=C1ATL[sh];if(!ready(im)||!A.rows[anim])return;const [r,n]=A.rows[anim];i=clamp(i|0,0,n-1);const k=h/A.ch;
