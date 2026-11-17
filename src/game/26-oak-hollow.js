@@ -41,8 +41,8 @@ const DROOMS={
      fg:[{y:698,poly:[[500,470],[950,470],[950,700],[496,700]]},{y:769,poly:[[680,712],[905,712],[905,768],[680,768]]},{y:769,poly:[[118,592],[360,592],[360,768],[118,768]]}]},
   /* 24: the Ruins Overlook, off the west end of the Coastal Breezeway (the designer's painting): a stony path climbs to steps and a ring-walled lookout over the misty ruins */
   /* 25: inside the bottom-left clam house in Breezevale Cove, a seaside shop (the designer's painting); the shopkeeper stands behind the counter */
-  25:{name:'',dark:0,home:1,hk:1.15,floor:[[300,595],[545,592],[560,566],[690,566],[690,610],[1012,610],[1018,592],[1150,592],[1180,604],[1150,628],[950,632],[950,742],[372,742],[368,640],[290,628]],
-     fg:[{y:612,poly:[[680,470],[1012,476],[1012,612],[680,612]]}]},   /* the counter, in front of whoever stands behind it */
+  25:{name:'',dark:0,home:1,hk:1.15,floor:[[300,595],[545,592],[560,566],[690,566],[690,602],[1012,602],[1018,592],[1150,592],[1180,604],[1150,628],[950,632],[950,742],[372,742],[368,640],[290,628]],
+     fg:[{y:592,poly:[[680,470],[1012,476],[1012,590],[680,590]]}]},   /* the counter, in front of whoever stands behind it */
   /* 26: inside the bottom-right clam house, a cosy sitting room (the designer's painting) */
   26:{name:'',dark:0,home:1,hk:1.3,floor:[[40,700],[110,670],[430,650],[480,608],[600,602],[680,628],[1040,626],[1100,604],[1150,642],[1330,652],[1290,684],[1255,768],[40,768]],
      block:[{x0:555,y0:612,x1:852,y1:702},{x0:838,y0:640,x1:1142,y1:769},{x0:1255,y0:650,x1:1380,y1:769}],
