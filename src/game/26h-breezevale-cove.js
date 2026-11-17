@@ -186,7 +186,7 @@ const BVNPC=[{room:25,atlas:'breeze_boy',x:850,y:525,name:'Breezevale Merchant',
   {room:28,atlas:'breeze_boy',x:870,y:722,name:'Fisherman',lines:[["Mind the nets! Come warm yourself by the fire."]]},
   {room:28,atlas:'breeze_girl',x:965,y:730,name:'Fisherwoman',lines:[["The rain keeps the fish close to shore. A good season."]]},
   {room:31,atlas:'luma',x:688,y:618,name:'Sage Luma',slim:1,idle:1,back:1,sc:.92,lines:[["…"]]},   /* Alma's older sister; her lines are still to come */
-  {room:27,atlas:'jak2',x:960,y:700,name:'Jak',sc:1.35,slim:1,lines:[["…"]]},
+  {room:27,atlas:'jak2',x:960,y:700,name:'Jak',sc:.97,slim:1,gone:()=>jak2In(),lines:[["…"]]},   /* until he joins Lum */
   {room:26,atlas:'breeze_girl',x:205,y:694,name:'Townswoman',lines:[["Would you like some tea? The kettle's still warm."]]}];
 function drawBVNpc(n){const k=dunH(n.y)/151,face=lum.x>n.x;ctx.save();ctx.fillStyle='rgba(10,10,20,.25)';ctx.beginPath();ctx.ellipse(n.x,n.y,22*k,7*k,0,0,TAU);ctx.fill();ctx.restore();
   const talking=DLG.active&&DLG.lines&&DLG.lines[DLG.i||0]&&DLG.lines[DLG.i||0][0]===n.name,an=talking&&Math.abs(lum.x-n.x)>60?'side':talking&&n.back&&lum.y<n.y?'up':n.back&&!talking?'up':'down';   /* back: stands facing north, turns to Lum when she speaks with her */ctx.save();ctx.translate(n.x,0);ctx.scale(n.slim?1:.86,1);ctx.translate(-n.x,0);c1Frame(ctx,n.atlas,an==='down'&&n.idle?'idle':an,0,n.x,n.y,n.h||BVFOLK_H*k*(n.sc||1),an==='side'&&face,1,0);ctx.restore();}   /* townsfolk: a little taller than Lum, slim */
@@ -197,7 +197,7 @@ function bvMerchant(intro){const have=id=>MATS[id]||0,M=[['Fox Tail','foxtail',1
   /* Healing Potion Potency (C2.potency, healRoll) is kept for later; the Sea Gems now buy Sea Bait */
   opts.push(['Leave',()=>{}]);
   const go=()=>askChoice('Breezevale Merchant \u00b7 Trades',opts);if(intro)talk([['Breezevale Merchant',"Welcome in! I don't take coin, only trades. Have a look."]],false,go);else go();}
-function bvNpcTalk(n){if(n.name==='Breezevale Merchant'){lum.face=lum.x<n.x?1:-1;bvMerchant(true);return;}lum.face=lum.x<n.x?1:-1;if(n.back&&lum.y>n.y&&Math.abs(lum.x-n.x)<=60){lum.state='idleUp';lum.at=-1e9;}talk(n.lines.map(l=>[n.name,l[0]]));}   /* Lum looks up at whoever stands just above her */
+function bvNpcTalk(n){if(n.name==='Jak'){lum.face=lum.x<n.x?1:-1;jakTalk();return;}if(n.name==='Breezevale Merchant'){lum.face=lum.x<n.x?1:-1;bvMerchant(true);return;}lum.face=lum.x<n.x?1:-1;if(n.back&&lum.y>n.y&&Math.abs(lum.x-n.x)<=60){lum.state='idleUp';lum.at=-1e9;}talk(n.lines.map(l=>[n.name,l[0]]));}   /* Lum looks up at whoever stands just above her */
 /* the Sea Snake under the east bridge: from the middle of the deck Lum sees movement below; with Sea Bait she can drop it in, and the snake rises and attacks */
 const BVSNK={t:-1,x:0,y:0};
 function bvBridgeMid(){const mx=(BVBR.x0+BVBR.x1)/2;return [mx,bvBridgeY(mx)];}
@@ -215,6 +215,22 @@ function drawBVSnake(){if(BVSNK.t<0||!inBV()||SCENE!=='thorn')return;const t=BVS
     ctx.save();ctx.beginPath();ctx.rect(BVSNK.x-w,BVSNK.y-h*1.4,w*2,h*1.4+4);ctx.clip();ctx.translate(BVSNK.x,BVSNK.y+h*(1-e)*.95);ctx.rotate(Math.sin(t*3)*.04);ctx.drawImage(im,-w*.5,-h,w,h);ctx.restore();
     ctx.save();ctx.globalAlpha=.5*(1-u*.5);ctx.fillStyle='rgba(235,245,252,.7)';for(let i=0;i<14;i++){const a=i/14*TAU+t,r=20+((t*90+i*13)%50);ctx.beginPath();ctx.arc(BVSNK.x+Math.cos(a)*r,BVSNK.y-Math.abs(Math.sin(a))*r*.6,2.2,0,TAU);ctx.fill();}ctx.restore();}}
 THINT.push({get x(){return BVX+bvBridgeMid()[0];},get y(){return BVY+bvBridgeMid()[1];},get reach(){return inBV()&&BVSNK.t<0?60:-1;},onInteract:bvBridgeLook});
+/* Jak in the islet shell house: he is hunting the Sea Serpent for its skin; bring him a Sea Snake Skin and he joins Lum and will show her a secret way to the old ruins */
+function jakTalk(){if(!(MATS.snakeskin>0)){talk([['Jak',"These heavy rains over the last week have swallowed up the cave of the Sea Serpent."],['Jak',"I've been hunting it for its rare serpent skin. I saw it just off the coast. It comes close to shore to eat fish."],['Jak',"I'd like to help you, I really would. But rain like this only comes along every few years. It's my best chance to catch it for that prized skin."]]);return;}
+  talk([['Jak',"Wait… is that Sea Serpent skin?!"]],false,()=>setTimeout(()=>askChoice('Give Jak the Sea Snake Skin?',[['Yes',jakGetsSkin],['No',()=>talk([['Jak',"Well, if you change your mind, you know where to find me."]])]]),200));}
+function jakGetsSkin(){bvTakeMat('snakeskin',1);sfxItem&&sfxItem();talk([['Jak',"You really caught it? Ha! A deal's a deal, then. I'm coming with you."],['Lum',"Can you show me the way to the old ruins?"],['Jak',"The old ruins? I know a secret route there. Why you'd want to go poking around some old ruins, I'll never know. Nothing ever happens there…"],['Jak',"…but a deal's a deal."]],false,jak2Join);}
+function jak2Join(){C2.jak=1;if(!PARTY_ORDER.includes('jak'))PARTY_ORDER.push('jak');HEROES.jak.hp=HEROES.jak.maxHp;const n=BVNPC.find(n=>n.name==='Jak');JK2.x=n?n.x:lum.x;JK2.y=n?n.y:lum.y;JK2.dir='down';JK2.moving=0;JK2CRUMB.length=0;}
+const JK2={x:0,y:0,face:1,dir:'down',moving:0,ph:0},JK2CRUMB=[];
+function jak2In(){return CH>=2&&typeof C2!=='undefined'&&!!C2.jak;}
+function resetJak2Follow(){JK2.x=lum.x;JK2.y=lum.y;JK2.moving=0;JK2.face=lum.face;JK2CRUMB.length=0;}
+function updateJak2Follow(dt){if(!jak2In()||(SCENE!=='thorn'&&SCENE!=='dun'))return;const lc=JK2CRUMB[JK2CRUMB.length-1];
+  if(!lc||Math.hypot(lc[0]-lum.x,lc[1]-lum.y)>6){JK2CRUMB.push([lum.x,lum.y]);if(JK2CRUMB.length>80)JK2CRUMB.shift();}
+  const gap=SCENE==='dun'?56:70;let acc=0,tx=JK2.x,ty=JK2.y,px=lum.x,py=lum.y,found=false;for(let i=JK2CRUMB.length-1;i>=0;i--){const [cx,cy]=JK2CRUMB[i];acc+=Math.hypot(cx-px,cy-py);px=cx;py=cy;if(acc>=gap){tx=cx;ty=cy;found=true;break;}}
+  if(!found){JK2.moving=0;if(!DLG.active){JK2.dir='side';JK2.face=lum.face;}return;}
+  const dx=tx-JK2.x,dy=ty-JK2.y,d=Math.hypot(dx,dy);if(d<=2){JK2.moving=0;return;}const m=Math.min(d,Math.min(260,70+d*3)*dt);JK2.x+=dx/d*m;JK2.y+=dy/d*m;JK2.ph+=m;JK2.moving=1;
+  if(Math.abs(dy)>Math.abs(dx)*1.2)JK2.dir=dy>0?'down':'up';else{JK2.dir='side';JK2.face=dx<0?-1:1;}}
+function drawJak2OW(){if(CAPTURE.on)return;const vert=JK2.dir==='up'||JK2.dir==='down',an=vert?JK2.dir:'side',n=C1ATL.jak2.rows[an][1];ctx.fillStyle='rgba(10,10,20,.25)';ctx.beginPath();ctx.ellipse(JK2.x,JK2.y+2,30,8,0,0,TAU);ctx.fill();
+  c1Frame(ctx,'jak2',an,JK2.moving?Math.floor(JK2.ph/16)%n:0,JK2.x,JK2.y+3,JAK2_H,!vert&&JK2.face<0,1,0);}   /* his side rows face right */
 function leaveSanctuary(){SCENE='thorn';lum.x=BVX+BVSDOOR.x;lum.y=BVY+BVSDOOR.y+30;lum.face=1;lum.dir='down';lum.state='idle';lum.vx=lum.vy=0;cam.x=lum.x;cam.y=lum.y;THORN.t=99;BVT.t=99;}   /* back out of the Sanctuary onto the blue bridge */
 function leaveBVHouse(i){const h=BVHOUSES[i];SCENE='thorn';lum.x=BVX+bvDoorX(h);lum.y=BVY+h.y+60;lum.face=1;lum.dir='down';lum.state='idle';lum.vx=lum.vy=0;cam.x=lum.x;cam.y=lum.y;THORN.t=99;BVT.t=99;}
 for(const [i,h] of BVHOUSES.entries())THINT.push({x:BVX+bvDoorX(h),y:BVY+h.y+24,get reach(){return inBV()?78:-1;},door:i>=2||i===0,onInteract:()=>i===0?dunGo(28,240,660,1):i===2?dunGo(25,470,690,1):i===3?dunGo(26,330,720,1):i===4?dunGo(27,590,650,1):say(h.name==='mayor'?"The Mayor's house. No one answers.":"Lum knocks. No one answers.")});

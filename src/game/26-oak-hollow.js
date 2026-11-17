@@ -127,7 +127,7 @@ function setupDun(){DUNINT.length=0;const r=DUN.room,D=(x,y,reach,fn)=>DUNINT.pu
   if(r===31){D(690,755,70,()=>dunGo(30,812,372,1));for(const n of BVNPC)if(n.room===31)DUNINT.push({x:n.x,y:n.y+10,reach:100,onInteract:()=>bvNpcTalk(n)});}
   if(r===28){D(190,650,95,()=>goScene(()=>leaveBVHouse(0)));for(const n of BVNPC)if(n.room===28)DUNINT.push({x:n.x,y:n.y+10,reach:95,onInteract:()=>bvNpcTalk(n)});
     DUNINT.push({x:905,y:585,reach:110,fire:true,onInteract:()=>{if(canLumMix())openMix();else say("A warm fire crackles under the kettle.");}});}   /* the hearth: Lum can mix here */
-  if(r===27){D(590,612,90,()=>goScene(()=>leaveBVHouse(4)));for(const n of BVNPC)if(n.room===27)DUNINT.push({x:n.x,y:n.y+10,reach:100,onInteract:()=>bvNpcTalk(n)});
+  if(r===27){D(590,612,90,()=>goScene(()=>leaveBVHouse(4)));for(const n of BVNPC)if(n.room===27)DUNINT.push({x:n.x,y:n.y+10,get reach(){return n.gone&&n.gone()?-1:100;},onInteract:()=>bvNpcTalk(n)});
     DUNINT.push({x:330,y:640,reach:110,fire:true,onInteract:()=>{if(canLumMix())openMix();else say("A warm fire crackles in the hearth.");}});}   /* the hearth: Lum can mix here */
   if(r===22){D(1160,728,70,()=>dunGo(21,1120,672,-1));DUNINT.push({x:760,y:738,reach:95,dynDoor:1,door:false,onInteract:hsBed});   /* the bed: '…' bubble, asks to rest */}
   if(r===23){D(258,560,70,()=>dunGo(21,680,640,1));}
@@ -201,7 +201,8 @@ function drawDun(){const R=DROOMS[DUN.room],im=IMG['dun'+DUN.room];if(!ready(im)
   const k=dunH(lum.y)/151,here=DFOES.filter(g=>g.room===DUN.room);{const L=here.map(g=>[g.y,()=>drawDFoe(g)]);
     L.push([lum.y,()=>{ctx.save();ctx.translate(lum.x,lum.y-Math.max(0,dunArch(lum.x,lum.y)));ctx.scale(k,k);ctx.translate(-lum.x,-lum.y);drawLum();ctx.restore();}]);
     if(CH===1&&jakInParty()&&JAKF){const kj=dunH(JAKF.y)/151;L.push([JAKF.y-1,()=>{ctx.save();ctx.translate(JAKF.x,JAKF.y);ctx.scale(kj,kj);ctx.translate(-JAKF.x,-JAKF.y);drawJakOW();ctx.restore();}]);}   /* Spar comes down into the rooms with Lum */
-    for(const n of BVNPC)if(n.room===DUN.room)L.push([n.y,()=>drawBVNpc(n)]);
+    for(const n of BVNPC)if(n.room===DUN.room&&!(n.gone&&n.gone()))L.push([n.y,()=>drawBVNpc(n)]);
+    if(jak2In()){const kj=dunH(JK2.y)/151;L.push([JK2.y-1,()=>{ctx.save();ctx.translate(JK2.x,JK2.y);ctx.scale(kj,kj);ctx.translate(-JK2.x,-JK2.y);drawJak2OW();ctx.restore();}]);}   /* Jak follows Lum into rooms once he joins in Chapter 2 */
     if(DUN.room===21){L.push([ALMA.y,()=>{drawAlmaRoom();}]);if(HST.heart>0)L.push([9999,()=>drawHearts((lum.x+ALMA.x)/2,Math.min(lum.y,ALMA.y)-150*dunH(lum.y)/151)]);}
     if(CH>=2&&(C2.joined||(HST.amrIn&&DUN.room===21))){const ka=dunH(AMR.y)/151;L.push([AMR.y-1,()=>{ctx.save();ctx.translate(AMR.x,AMR.y);ctx.scale(ka,ka);ctx.translate(-AMR.x,-AMR.y);drawAmrOW(AMR,1);ctx.restore();}]);}
     if(DUN.room===7)L.push([614,()=>{const t=IMG.dun7_table;if(!ready(t))return;const hid=lum.y<614&&Math.abs(lum.x-945)<240;ctx.save();ctx.globalAlpha=hid?.62:1;ctx.drawImage(t,730,425);ctx.restore();}]);
