@@ -89,6 +89,10 @@ function drawBWTitle(){if(!inBW()||BWT.t>=4.5||SCENE!=='thorn')return;BWT.t+=1/6
 /* the way back up to Evergreen Grove and the road on to Breezevale Cove (east; map still to come). The archways are scenery only */
 THINT.push({get x(){return BWX+BENTRY.x;},get y(){return BWY+BENTRY.y-BSPUR;},get reach(){return inBW()?80:-1;},door:true,onInteract:()=>goScene(()=>enterGrove(true))},
   {get x(){return BWX+BWW-70;},get y(){return BWY+BEAST.y;},get reach(){return inBW()?80:-1;},door:true,onInteract:()=>say("Breezevale Cove lies ahead.")});
+/* the west end of the path leads out to the Ruins Overlook (room 24) and back */
+const bwWestY=()=>BPATH_PTS.reduce((b,p)=>Math.abs(p[0]-BWX-50)<Math.abs(b[0]-BWX-50)?p:b)[1];
+THINT.push({get x(){return BWX+46;},get y(){return bwWestY()-20;},get reach(){return inBW()&&lum.x<BWX+220?80:-1;},door:true,onInteract:()=>dunGo(24,806,705,1)});
+function leaveOverlook(){SCENE='thorn';lum.x=BWX+150;lum.y=bwWestY();lum.face=1;lum.dir='side';lum.state='idle';lum.vx=lum.vy=0;cam.x=lum.x;cam.y=lum.y;THORN.t=99;BWT.t=99;}
 /* the same foes as Evergreen Grove, out along the path */
 function addBWFoes(){if(THFOES.some(g=>g.bw))return;let id=5200;const dead=new Set(C1.thDead||[]),n=BPATH_PTS.length;
   for(const [f,kind,pack] of [[.07,'gwisp',1],[.16,'ffox',1],[.27,'nymph',1],[.36,'ffox',2],[.47,'gwisp',2],[.58,'ffox',1],[.67,'nymph',1],[.76,'gwisp',1],[.86,'ffox',2],[.94,'gwisp',1]]){

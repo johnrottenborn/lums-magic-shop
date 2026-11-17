@@ -39,6 +39,8 @@ const DROOMS={
   23:{name:'',dark:0,home:1,hk:1.25,floor:[[140,522],[470,512],[1000,555],[1195,600],[1245,640],[1245,768],[350,768],[350,600],[140,575]],
      block:[{x0:500,y0:486,x1:945,y1:696},{x0:660,y0:705,x1:905,y1:769},{x0:920,y0:600,x1:1060,y1:665}],
      fg:[{y:698,poly:[[500,470],[950,470],[950,700],[496,700]]},{y:769,poly:[[680,712],[905,712],[905,768],[680,768]]},{y:769,poly:[[118,592],[360,592],[360,768],[118,768]]}]},
+  /* 24: the Ruins Overlook, off the west end of the Coastal Breezeway (the designer's painting): a stony path climbs to steps and a ring-walled lookout over the misty ruins */
+  24:{name:'Ruins Overlook',dark:0,wide:1,hk:.62,floor:[[690,768],[700,705],[738,655],[768,603],[782,560],[780,512],[766,488],[756,450],[788,433],[880,431],[922,450],[914,480],[872,498],[860,560],[868,612],[880,664],[902,715],[922,768]]},
   /* 22: the loft, the bed under the thatch; the stair comes up on the right behind the rail */
   22:{name:'',dark:0,home:1,hk:1.9,floor:[[120,738],[460,730],[1050,726],[1050,612],[1185,612],[1185,768],[110,768]],
      block:[{x0:440,y0:430,x1:1052,y1:724}]},   /* the serpent gate (above): arrive in the lit stairwell behind the carved archway (back to room 19), walk down through it; the way on is in the foreground */
@@ -83,6 +85,7 @@ function setupDun(){DUNINT.length=0;const r=DUN.room,D=(x,y,reach,fn)=>DUNINT.pu
     L(730,545,110,["The old wall again. The air is getting colder the deeper we go.","Water drips somewhere behind the stones."]);}
   if(r===19){D(422,205,70,()=>dunGo(18,1215,540,-1));DUNINT.push({x:840,y:580,reach:95,onInteract:()=>touchWBTorch('serpent',["A great stone serpent, coiled and ready to strike. Its green flame burns brighter now."])});
     L(330,700,95,["Another empty pedestal."]);D(1165,545,80,()=>dunGo(20,862,425,1));}
+  if(r===24){D(806,750,95,()=>goScene(leaveOverlook));DUNINT.push({x:838,y:440,reach:95,onInteract:()=>talk([['Lum',"Ancient ruins, rising out of the mist far across the water…"],['Lum',"There's no easy way down to them from here. I'll have to find another way."]])});}
   if(r===21){D(452,612,100,()=>goScene(leaveCottage));D(1172,662,70,()=>dunGo(22,1115,700,-1));
     DUNINT.push({x:820,y:612,reach:90,get fire(){return HST.st>=6;},onInteract:()=>{if(canLumMix()&&HST.st>=6)openMix();else say("A warm fire crackles in the hearth. A kettle hangs over the flames.");}});   /* Lum can mix at Alma's hearth in the morning */}
   if(r===21)DUNINT.push({get x(){return ALMA.x;},get y(){return ALMA.y+10;},get reach(){return ALMA.on&&(HST.st===3||HST.st>=5)&&!DLG.active&&!WEVENT.on?90:-1;},onInteract:almaTalk});   /* talk to Alma */

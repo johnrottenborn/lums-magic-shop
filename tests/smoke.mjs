@@ -910,9 +910,20 @@ const CASES = {
     check(await g_(() => window.__g.SEAB.length === 3), 'no white seabirds over the Coastal Breezeway');
     /* the west end: the archways above the path are scenery (no door), and the view starts at the map's west edge with the path running off it */
     await g_(() => { const g = window.__g; for (const q of g.THFOES || []) q.calm = 99; let x = g.BWX + 30; const P = g.BPATH_PTS.reduce((b, p) => Math.abs(p[0] - x) < Math.abs(b[0] - x) ? p : b); g.lum.x = x; g.lum.y = P[1]; }); await wait(1500);
-    check(await g_(() => window.__g.bwFree(window.__g.lum.x, window.__g.lum.y) && !(window.__g.NEAR && window.__g.NEAR.door)), 'the west end of the Coastal Breezeway has a door, or Lum cannot stand there');
+    check(await g_(() => window.__g.bwFree(window.__g.lum.x, window.__g.lum.y) && !!(window.__g.NEAR && window.__g.NEAR.door)), 'no door to the Ruins Overlook at the west end of the Coastal Breezeway');
     check(await g_(() => { const g = window.__g; return g.cam.x > g.BWX; }), 'the view shows past the west edge of the Coastal Breezeway');
     await p.screenshot({ path: path.join(SHOTS, `breezeway-west-${vp}.png`) });
+    /* the Ruins Overlook: walk up the path and the steps to the ring-walled lookout, look out at the ruins, and go back */
+    await g_(() => window.__g.NEAR.onInteract()); await wait(1600);
+    check(await g_(() => { const g = window.__g; return g.SCENE === 'dun' && g.DUNX.room === 24 && g.dunFree(g.lum.x, g.lum.y) && g.dunFree(830, 560) && g.dunFree(840, 450) && !g.dunFree(600, 450) && !g.dunFree(840, 380); }), 'the Ruins Overlook path, steps or lookout are not walkable as drawn');
+    await wait(3500); await p.screenshot({ path: path.join(SHOTS, `ruins-overlook-${vp}.png`) });
+    await g_(() => { const g = window.__g; g.lum.x = 838; g.lum.y = 455; }); await wait(500);
+    await g_(() => window.__g.NEAR.onInteract()); await wait(400);
+    check(await g_(() => window.__g.DLG.active && window.__g.DLG.lines.some(l => /no easy way/.test(l[1]))), 'looking out from the overlook does not say there is no easy way to the ruins');
+    await p.screenshot({ path: path.join(SHOTS, `ruins-overlook-look-${vp}.png`) });
+    await g_(() => { const g = window.__g; g.DLG.active = false; g.lum.x = 806; g.lum.y = 720; }); await wait(500);
+    await g_(() => window.__g.NEAR.onInteract()); await wait(1600);
+    check(await g_(() => window.__g.inBW() && window.__g.SCENE === 'thorn'), 'the overlook door did not lead back to the Coastal Breezeway');
     await g_(() => { const g = window.__g, P = g.BPATH_PTS[Math.floor(0.98 * g.BPATH_PTS.length)]; g.lum.x = P[0]; g.lum.y = P[1]; }); await wait(900);
     check(await g_(() => !!(window.__g.NEAR && window.__g.NEAR.door)), 'no door emote at the east end of the Coastal Breezeway');
     await p.screenshot({ path: path.join(SHOTS, `breezeway-east-${vp}.png`) });
