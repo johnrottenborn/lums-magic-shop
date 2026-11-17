@@ -160,7 +160,9 @@ function drawThornFog(pass){if(!THFOG){THFOG=makeFogTex();THFOG.tint=document.cr
     const g=ctx.createLinearGradient(0,H*.55,0,H);g.addColorStop(0,'rgba(170,165,190,0)');g.addColorStop(1,'rgba(150,145,175,.16)');ctx.fillStyle=g;ctx.fillRect(0,H*.55,W,H*.45);}}
 function updateThornAtmos(dt){const A=THORN.motes||(THORN.motes=[]);const vw=W/zoom,vh=H/zoom;
   while(A.length<46)A.push({x:cam.x+rnd(-vw/2,vw/2),y:cam.y+rnd(-vh/2,vh/2),z:rnd(20,160),vx:rnd(-6,6),vy:rnd(-4,4),ph:rnd(0,TAU),k:'mote',s:rnd(1.2,2.6)});
-  if(Math.random()<dt*1.4)A.push({x:cam.x+rnd(-vw/2,vw/2),y:cam.y-vh/2-40,z:0,vx:rnd(10,30),vy:rnd(28,46),ph:rnd(0,TAU),k:'petal',s:rnd(4,6.5),rot:rnd(0,TAU)});
+  const pastWB=lum.x>HOMEX-200;   /* no red leaves once Lum is out of the Worldbind Passage (Amroth's home and beyond) */
+  if(pastWB){for(let i=A.length-1;i>=0;i--)if(A[i].k==='petal')A.splice(i,1);}
+  else if(Math.random()<dt*1.4)A.push({x:cam.x+rnd(-vw/2,vw/2),y:cam.y-vh/2-40,z:0,vx:rnd(10,30),vy:rnd(28,46),ph:rnd(0,TAU),k:'petal',s:rnd(4,6.5),rot:rnd(0,TAU)});
   for(let i=A.length-1;i>=0;i--){const m=A[i];m.x+=(m.vx+Math.sin(T*.7+m.ph)*8)*dt;m.y+=m.vy*dt;if(m.k==='petal')m.rot+=dt*2;
     if(Math.abs(m.x-cam.x)>vw*.7||Math.abs(m.y-cam.y)>vh*.7)A.splice(i,1);}
   // the forest whispers

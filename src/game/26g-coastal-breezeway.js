@@ -15,7 +15,7 @@ BEAST.y=(()=>{let b=null;for(const [x,y] of BPATH_PTS)if(!b||Math.abs(x-BWX-BEAS
 const BARCHES=[[135,250,false],[375,250,true],[615,250,false]],BARCH_X1=780;   /* x, width, flipped */
 const BW_OFF=66,BSPUR=300;   /* a short side path north from the hump up to the door back to Evergreen Grove */
 const bspurDist=(x,y)=>{const lx=x-BWX-BENTRY.x,ly=y-BWY;return Math.hypot(lx,ly<BENTRY.y-BSPUR?ly-(BENTRY.y-BSPUR):ly>BENTRY.y?ly-BENTRY.y:0);};
-const bwClear=(lx,ly,m)=>Math.abs(lx-BENTRY.x)<m&&ly<BENTRY.y+30;   /* nothing grows over the way up to the grove */   /* path centre to the top of the cliff strip */
+const bwClear=(lx,ly,m)=>Math.abs(lx-BENTRY.x)<m&&ly<BENTRY.y+30;   /* nothing grows on the way up to the grove (trees and flowers line its edges) */   /* path centre to the top of the cliff strip */
 const inBW=()=>lum.x>BWX-300;
 const BH_=(a,b)=>hash(a,b,5153);
 function bpathDist(x,y){let best=1e9;for(let i=0;i<BPATH_PTS.length-1;i++){const [ax,ay]=BPATH_PTS[i],[bx,by]=BPATH_PTS[i+1],dx=bx-ax,dy=by-ay,t=clamp(((x-ax)*dx+(y-ay)*dy)/(dx*dx+dy*dy||1),0,1);best=Math.min(best,Math.hypot(x-ax-dx*t,y-ay-dy*t));}return best;}
@@ -24,7 +24,7 @@ function bwFree(x,y){const lx=x-BWX;if(lx<24||lx>BWW-20)return false;return bpat
 /* evergreens filling the land, hydrangeas along the path's north side, rocks along the path and sea stacks out in the water */
 function bwProps(P){const X=x=>x+BWX,Y=y=>y+BWY;let k=0;
   for(let gy=-140;gy<BWH;gy+=92)for(let gx=-60;gx<BWW+80;gx+=100){k++;const lx=gx+(BH_(k,1)-.5)*56,ly=gy+(BH_(k,2)-.5)*44;
-    if(!inPoly(lx,ly,BLAND)||BH_(k,3)<.2||bwClear(lx,ly,200))continue;let clear=true;for(let up=0;up<=380&&clear;up+=38)if(bpathDist(X(lx),Y(ly-up))<(up?150:190))clear=false;if(!clear)continue;   /* the path stays in view */
+    if(!inPoly(lx,ly,BLAND)||BH_(k,3)<.2||bwClear(lx,ly,150))continue;let clear=true;for(let up=0;up<=380&&clear;up+=38)if(bpathDist(X(lx),Y(ly-up))<(up?150:190))clear=false;if(!clear)continue;   /* the path stays in view */
     const [img,w]=HTREES[Math.floor(BH_(k,4)*HTREES.length)];P.push({t:'tree',img,x:X(lx),y:Y(ly),w:w*(.72+BH_(k,5)*.32),flip:BH_(k,6)<.5,base:.95});}
   /* hydrangeas and boulders on the land side of the path */
   const HY=[['hydrsmall',120],['hydrmid',150],['hydrbig',175],['hydrtree',250]],RK=[['crockpile',110],['crockegg',70],['crockheap',120]];
@@ -36,6 +36,10 @@ function bwProps(P){const X=x=>x+BWX,Y=y=>y+BWY;let k=0;
   const SB=['crockegg','crockpile','crockheap'];for(let i=2;i<BPATH_PTS.length-3;i++){const [ax,ay]=BPATH_PTS[i],[bx,by]=BPATH_PTS[i+1],[cx,cy]=BPATH_PTS[i+2],dx=bx-ax,dy=by-ay,L=Math.hypot(dx,dy)||1,ox=-dy/L,oy=dx/L,turn=Math.abs(Math.atan2(dx*(cy-by)-dy*(cx-bx),dx*(cx-bx)+dy*(cy-by)));
     if(!(turn>.12&&i%4===0)&&!(i%10===0&&BH_(i,21)<.35))continue;const off=BW_OFF+4+BH_(i,22)*8,x=ax+ox*off,y=ay+oy*off;if(bpathDist(x,y)<BW_OFF+6||x-BWX<20)continue;
     P.push({t:'tree',img:SB[Math.floor(BH_(i,23)*SB.length)],x,y:y+4,w:38+BH_(i,24)*26,flip:BH_(i,25)<.5,base:.9});}
+  /* hydrangeas and the odd small evergreen lining both edges of the side path up to the grove, all the way off the top of the map */
+  for(let j=0,uy=BENTRY.y-70;uy>-220;uy-=92,j++)for(const sd of [-1,1]){const r=BH_(j*2+(sd>0),41),x=X(BENTRY.x+sd*(112+BH_(j*2+(sd>0),42)*24)),y=Y(uy+(BH_(j*2+(sd>0),43)-.5)*30);
+    if(r<.78){const [img,w]=HY[Math.floor(BH_(j*2+(sd>0),44)*3)];P.push({t:'tree',img,x,y,w:w*(.5+BH_(j*2+(sd>0),45)*.2),flip:sd>0,base:.97});}
+    else{const [img,w]=HTREES[Math.floor(BH_(j*2+(sd>0),46)*HTREES.length)];P.push({t:'tree',img,x:x+sd*40,y,w:w*.6,flip:sd<0,base:.95});}}
   /* sea stacks out in the bays and the open sea */
   for(const [sx,sy,img,w] of [[300,1900,'crockspire',300],[1150,2550,'crockheap',260],[2100,2700,'crockspire',340],[3350,2300,'crockheap',300],[3750,1500,'crockspire',280],[3200,1200,'crockpile',200],[700,2700,'crockpile',220],[2700,2550,'crockegg',150]].map(([a,b,c,d])=>[a,b,c,d]))
     if(!inPoly(sx,sy,BLAND)&&bpathDist(X(sx),Y(sy))>330)P.push({t:'tree',img,x:X(sx),y:Y(sy),w,flip:sx%2<1,base:.9});
@@ -54,7 +58,7 @@ function drawBWGround(x0,y0,x1,y1){if(x1<BWX-300)return;if(!BPATHP)BPATHP=buildP
   ctx.restore();
   ctx.save();ctx.strokeStyle='#5d4a35';ctx.lineWidth=2*(BW_OFF+14);ctx.lineJoin=ctx.lineCap='round';ctx.beginPath();BPATH_PTS.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y));ctx.stroke();ctx.restore();   /* earth under the path and the cliff's soft top edge, so no sea shows through */
   drawBWCliff(x0,y0,x1,y1);
-  if(!BSPURP)BSPURP=buildPath([[BWX+BENTRY.x,BWY+BENTRY.y+50],[BWX+BENTRY.x+6,BWY+BENTRY.y-BSPUR*.5],[BWX+BENTRY.x,BWY+BENTRY.y-BSPUR-30]],100,7.1);drawPath(BSPURP,x0,x1);
+  if(!BSPURP)BSPURP=buildPath([[BWX+BENTRY.x,BWY+BENTRY.y+50],[BWX+BENTRY.x+6,BWY+BENTRY.y-BSPUR*.5],[BWX+BENTRY.x-8,BWY+BENTRY.y-BSPUR-260],[BWX+BENTRY.x+4,BWY-400]],100,7.1);drawPath(BSPURP,x0,x1);
   drawPath(BPATHP,x0,x1);}
 /* the designer's cliff strip, laid slice by slice along the outer edge of the path (grass on the path side, surf on the sea side) */
 function drawBWCliff(x0,y0,x1,y1){const im=IMG.cliff_edge;if(!ready(im))return;const BAND=300,k=BAND/im.naturalHeight,iw=im.naturalWidth,OFF=BW_OFF;let u=0;
