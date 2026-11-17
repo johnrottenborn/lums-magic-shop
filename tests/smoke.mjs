@@ -885,6 +885,17 @@ const CASES = {
     const stole = await p.evaluate(() => { const g = window.__g, rnd = Math.random; g.PARTY.lum.charm = 'foxtotem'; const b = g.MATS.slimeparts || 0; Math.random = () => 0.1; g.foxRingSteal({ type: 'slime', x: 0, y: 0 }); Math.random = rnd; return (g.MATS.slimeparts || 0) - b; });
     check(stole === 1, 'the Carved Fox Totem did not steal on a successful roll');
   },
+  async 'breeze-girl-atlas'(p) {
+    const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop';
+    const ok = await p.evaluate(() => { const g = window.__g, A = g.C1ATL.breeze_girl, im = g.IMG.breeze_girl; if (!A || !im || !im.naturalWidth) return false;
+      const c = document.createElement('canvas'); c.width = 900; c.height = 300; const x = c.getContext('2d'); x.fillStyle = '#4a7a5a'; x.fillRect(0, 0, 900, 300);
+      [['down', 0], ['up', 1], ['side', 2], ['run', 3], ['idle', 0]].forEach(([a, i], j) => g.c1Frame(x, 'breeze_girl', a, i, 90 + j * 170, 270, 220, false, 1, 0));
+      c.id = 'bgshot'; c.style.cssText = 'position:fixed;left:0;top:0;width:900px;height:300px;z-index:99;max-width:100vw'; document.body.appendChild(c);
+      return im.naturalWidth === A.cw * 6 && im.naturalHeight === A.ch * 5; });
+    check(ok, 'the Breezevale townsgirl atlas did not load at the expected size');
+    await wait(200); await p.screenshot({ path: path.join(SHOTS, `breeze-girl-${vp}.png`) });
+    await p.evaluate(() => document.getElementById('bgshot').remove());
+  },
   async 'chapter-select-lock'(p) {
     const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop';
     await p.evaluate(() => { localStorage.removeItem('lums-magic-shop-progress'); window.__g.openChapterSelect(); }); await wait(900);
