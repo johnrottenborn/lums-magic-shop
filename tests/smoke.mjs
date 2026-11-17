@@ -907,9 +907,14 @@ const CASES = {
     check(await g_(() => window.__g.inBV() && window.__g.bvFree(window.__g.lum.x, window.__g.lum.y)), 'the Breezeway\'s east door did not lead into Breezevale Cove');
     await wait(3500); await p.screenshot({ path: path.join(SHOTS, `breezevale-arrive-${vp}.png`) });
     check(await g_(() => { const g = window.__g, X = g.BVX, Y = g.BVY, f = (x, y) => g.bvFree(X + x, Y + y);
-      const B = g.BVBR, mx = (B.x0 + B.x1) / 2; return f(1000, 1400) && f(1000, 1150) && f(mx, B.y - B.rise) && f(2190, 960) && !f(1000, 900) && !f(200, 850) && !f(mx, B.y + 150); }), 'Breezevale\'s walkable ground is wrong (green, bridge and islet open; fountain and sea solid)');
-    await g_(() => { const g = window.__g; g.lum.x = g.BVX + 1000; g.lum.y = g.BVY + 1100; }); await wait(1500);
+      const B = g.BVBR, C = g.BVC, mx = (B.x0 + B.x1) / 2; return f(C.x, C.y + 650) && f(C.x + 200, C.y + 250) && f(mx, B.y - B.rise) && f(2450, 1050) && !f(C.x, C.y + 20) && !f(C.x - C.r - 80, C.y) && !f(mx, B.y + 150); }), 'Breezevale\'s walkable ground is wrong (green, bridge and islet open; fountain and sea solid)');
+    await g_(() => { const g = window.__g; g.lum.x = g.BVX + g.BVC.x; g.lum.y = g.BVY + g.BVC.y + 230; }); await wait(1500);
     await p.screenshot({ path: path.join(SHOTS, `breezevale-fountain-${vp}.png`) });
+    await g_(() => { const g = window.__g, t = g.THINTS().find(o => o.onInteract && /bvGirlTalk/.test(String(o.onInteract))); g.lum.x = t.x + 50; g.lum.y = t.y; }); await wait(600);
+    await g_(() => window.__g.NEAR.onInteract()); await wait(400);
+    check(await g_(() => { const l = window.__g.DLG.active && window.__g.DLG.lines; return l && /Welcome to Breezevale Cove/.test(l[0][1]) && /rain makes me so happy/.test(l[1][1]); }), 'the townsgirl by the fountain did not greet Lum');
+    await p.screenshot({ path: path.join(SHOTS, `breezevale-townsgirl-${vp}.png`) });
+    await g_(() => { window.__g.DLG.active = false; });
     await g_(() => { const g = window.__g; g.lum.x = g.BVX + (g.BVBR.x0 + g.BVBR.x1) / 2; g.lum.y = g.BVY + g.BVBR.y - g.BVBR.rise; }); await wait(1200);
     await p.screenshot({ path: path.join(SHOTS, `breezevale-bridge-${vp}.png`) });
   },
