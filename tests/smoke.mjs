@@ -443,10 +443,15 @@ const CASES = {
     await g_(() => window.__g.pickChoice(0)); await wait(2500);
     check(await g_(() => window.__g.HST.st === 4), 'resting in the loft bed did not bring the morning');
     await g_(() => window.__g.enterDun(21, 1120, 672, -1)); await wait(800);
+    check(await g_(() => window.__g.HST.st === 5 && !window.__g.DLG.active), 'the morning talk started on its own instead of waiting for Lum to speak to Alma');
+    const ax = await g_(() => window.__g.ALMA.x); await wait(600);
+    check(await g_(() => window.__g.ALMA.x) === ax, 'Alma moved in the morning instead of waiting by the fire');
+    await g_(() => { const g = window.__g; g.lum.x = g.ALMA.x + 10; g.lum.y = g.ALMA.y + 45; }); await wait(400);
+    await g_(() => window.__g.NEAR.onInteract()); await wait(400);
     await talkAll(30);
     check(await g_(() => window.__g.HST.st === 6), 'the morning hug and talk did not finish');
     // with Venomvine in her satchel, Alma teaches Poison Powder; then it can be mixed at the hearth
-    await g_(() => { const g = window.__g; g.MATS.venomvine = 2; if (!g.BAG.includes('venomvine')) g.BAG.push('venomvine'); g.lum.x = g.ALMA.x - 70; g.lum.y = g.ALMA.y; }); await wait(500);
+    await g_(() => { const g = window.__g; g.MATS.venomvine = 2; if (!g.BAG.includes('venomvine')) g.BAG.push('venomvine'); g.lum.x = g.ALMA.x + 10; g.lum.y = g.ALMA.y + 45; }); await wait(500);
     await g_(() => window.__g.NEAR && window.__g.NEAR.onInteract()); await wait(400);
     { const l = await g_(() => window.__g.DLG.active && window.__g.DLG.lines[0]); check(l && l[0] === 'Alma' && /Venomvine/.test(l[1]), 'Alma did not offer to teach with Venomvine: ' + JSON.stringify(l)); }
     await talkAll(14);
@@ -469,7 +474,7 @@ const CASES = {
     await g_(() => { for (const f of window.__g.THFOES) if (f.grove) f.calm = 99; });   // keep the roamers still until their own checks
     check(await g_(() => window.__g.lum.x > window.__g.GROVEX && window.__g.groveFree(window.__g.lum.x, window.__g.lum.y)), 'the far gatehouse did not lead into Evergreen Grove');
     await p.screenshot({ path: path.join(SHOTS, `grove-entry-${vp}.png`) });
-    check(await g_(() => { const g = window.__g, X = g.GROVEX, Y = g.GROVEY; return !g.groveFree(X + 300, Y + 1600) && !g.groveFree(X + 600, Y + 500) && g.groveFree(X + 560, Y + 1300); }), 'the lake and groves should be solid and the open ground walkable');
+    check(await g_(() => { const g = window.__g, X = g.GROVEX, Y = g.GROVEY; return !g.groveFree(X + 300, Y + 1600) && !g.groveFree(X + 20, Y + 1500) && g.groveFree(X + 560, Y + 1300) && g.groveFree(X + 1000, Y + 900); }), 'the lake should be solid and the grass walkable');
     { const f = await g_(() => { const g = window.__g, f = g.GFORAGE.find(q => q.venom); g.lum.x = f.x; g.lum.y = f.y + 30; return f.id; }); await wait(600);
       await g_(() => window.__g.NEAR && window.__g.NEAR.onInteract && window.__g.NEAR.onInteract()); await wait(300);
       check(await g_(() => (window.__g.MATS.venomvine || 0) >= 2), 'picking a Venomvine bush gave nothing'); }

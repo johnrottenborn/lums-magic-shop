@@ -95,7 +95,7 @@ function drawHomeGround(x0,y0,x1,y1){if(x1<HOMEX-300)return;if(!HPATHP)HPATHP=bu
 /* interactions: the gatehouse arch back into the passage, the cottage door, the pond */
 function homeInts(){const X=x=>x+HOMEX,Y=y=>y+HOMEY;return [
   {x:X(HOME.arch.x),y:Y(HOME.arch.y+30),get reach(){return inHome()?85:0},door:true,onInteract:()=>dunGo(20,900,690,1)},
-  {x:X(HOME.cot.x+HOME.cot.door),y:Y(HOME.cot.y+15),get reach(){return inHome()?85:0},door:true,onInteract:()=>enterDun(21,440,628,1)},
+  {x:X(HOME.cot.x+HOME.cot.door),y:Y(HOME.cot.y+15),get reach(){return inHome()?85:0},door:true,onInteract:()=>enterDun(21,440,604,1)},
   {x:X(HOME.gate.x),y:Y(HOME.gate.y-110),get reach(){return inHome()&&HST.st<4?85:0},onInteract:()=>say("The gate is down. It won't budge.")},
   {x:X(HOME.gate.x),y:Y(HH-40),get reach(){return inHome()&&HST.st>=4?80:0},door:true,onInteract:()=>enterGrove(false)},   /* the coastal path map comes next */
   {x:X(HOME.pond.x-HOME.pond.rx+20),y:Y(HOME.pond.y),get reach(){return inHome()?110:0},onInteract:()=>say("A quiet pond. Rain dimples the water.")}];}

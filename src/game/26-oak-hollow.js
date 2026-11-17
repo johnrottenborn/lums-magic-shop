@@ -32,7 +32,7 @@ const DROOMS={
   20:{name:'Worldbind Passage',dark:.38,floor:[[792,395],[935,395],[948,595],[1060,605],[1180,640],[1235,768],[565,768],[585,700],[605,625],[765,598]],
      light:[862,250,230]},
   /* Amroth's cottage (the designer's interiors). 21: the main room, front door on the left, spiral stair up on the right */
-  21:{name:'',dark:0,home:1,hk:1.3,floor:[[130,606],[705,606],[930,604],[1150,628],[1160,768],[606,768],[606,652],[130,652]],   /* a strip behind the table runs left to the door and the left wall; the table itself is solid */
+  21:{name:'',dark:0,home:1,hk:1.3,floor:[[300,592],[705,592],[930,600],[1150,628],[1160,768],[606,768],[606,640],[470,622],[300,617]],   /* a narrow strip between the wall and the table's back edge runs left past the door to the back chair; the table itself is solid */
      block:[{x0:598,y0:664,x1:705,y1:769},{x0:910,y0:598,x1:1098,y1:692}],
      fg:[{y:690,poly:[[120,650],[205,617],[315,609],[470,626],[612,645],[640,640],[700,636],[705,768],[120,768]]},   /* traced along the table top's back edge, so whoever walks behind it is hidden from the waist down */{y:688,poly:[[912,600],[1098,595],[1098,700],[905,700]]}]},
   /* 23: the basement workshop under the cottage (behind the bookshelf left of the fireplace; opened by a story event) */
@@ -85,7 +85,7 @@ function setupDun(){DUNINT.length=0;const r=DUN.room,D=(x,y,reach,fn)=>DUNINT.pu
     L(330,700,95,["Another empty pedestal."]);D(1165,545,80,()=>dunGo(20,862,425,1));}
   if(r===21){D(435,620,80,()=>leaveCottage());D(1172,662,70,()=>dunGo(22,1115,700,-1));
     DUNINT.push({x:820,y:612,reach:90,get fire(){return HST.st>=6;},onInteract:()=>{if(canLumMix()&&HST.st>=6)openMix();else say("A warm fire crackles in the hearth. A kettle hangs over the flames.");}});   /* Lum can mix at Alma's hearth in the morning */}
-  if(r===21)DUNINT.push({get x(){return ALMA.x;},get y(){return ALMA.y+10;},get reach(){return ALMA.on&&HST.st>=6&&!DLG.active?90:0;},onInteract:almaTalk});   /* talk to Alma */
+  if(r===21)DUNINT.push({get x(){return ALMA.x;},get y(){return ALMA.y+10;},get reach(){return ALMA.on&&HST.st>=5&&!DLG.active&&!WEVENT.on?90:0;},onInteract:almaTalk});   /* talk to Alma */
   if(r===21&&C2.basement)D(695,610,50,()=>dunGo(23,300,580,1));   /* the bookshelf door to the basement, once the story opens it */
   if(r===22){D(1160,728,70,()=>dunGo(21,1120,672,-1));DUNINT.push({x:760,y:738,reach:95,dynDoor:1,door:false,onInteract:hsBed});   /* the bed: '…' bubble, asks to rest */}
   if(r===23){D(258,560,70,()=>dunGo(21,680,640,1));}

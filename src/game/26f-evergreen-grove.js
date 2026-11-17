@@ -13,7 +13,7 @@ const GTREES=[
   gp([[640,870],[820,850],[900,620],[1110,590],[1140,740],[1020,780],[1000,1000],[960,1220],[880,1200],[860,1000],[780,960],[640,950]]),   /* middle-east blob and strip */
   gp([[580,1500],[700,1450],[880,1480],[1020,1560],[1010,1700],[960,1720],[820,1620],[640,1560]]),   /* south clump */
 ];
-const GLAKE=gp([[70,1100],[150,1080],[270,1080],[330,1190],[480,1250],[600,1430],[620,1530],[480,1540],[300,1530],[110,1520],[70,1400]]);
+const GLAKE=gp([[-200,1020],[60,1010],[220,1030],[340,1130],[500,1210],[640,1380],[700,1600],[690,1900],[300,1900],[-200,1900]]);   /* runs off the west and south edges of the map */
 /* the old path: north entrance to south exit, around the groves (worn and broken in places) */
 const GPATH_CTRL=gp([[650,60],[620,230],[470,300],[300,440],[245,640],[230,860],[300,990],[480,1050],[640,1180],[760,1330],[930,1400],[1060,1460],[1100,1600],[1040,1780]]).map(([x,y])=>[x+GROVEX,y+GROVEY]);
 const GPATH_PTS=splinePts(GPATH_CTRL,20);let GPATHP=null;
@@ -21,7 +21,9 @@ const GENTRY={x:650*1.2,y:90*1.2},GEXIT={x:1040*1.2,y:1700*1.2};
 /* berry bushes and the new Venomvine (a dark, thorny vine bush) to forage */
 const GFORAGE=[[320,560,6],[380,1000,0],[700,1250,4],[1050,1380,6],[480,330,0],[760,780,4],[1080,1100,0],[300,1000,'venom'],[880,1300,'venom'],[560,300,'venom']]
   .map(([x,y,k])=>({x:x*1.2+GROVEX,y:y*1.2+GROVEY,k:k==='venom'?11:k,venom:k==='venom',id:k==='venom'?'venomvine':FORAGE_MAP[k],n:2,picked:0}));
+for(const f of GFORAGE){if(gpathDist(f.x,f.y)>=105&&!inPoly(f.x-GROVEX,f.y-GROVEY,GLAKE))continue;let best=null;for(let r=10;r<300&&!best;r+=10)for(let a=0;a<TAU;a+=TAU/24){const x=f.x+Math.cos(a)*r,y=f.y+Math.sin(a)*r,d=gpathDist(x,y);if(d<105||d>145||inPoly(x-GROVEX,y-GROVEY,GLAKE))continue;best=[x,y];break;}if(best)[f.x,f.y]=best;}   /* beside the old path, never on it */
 const inGrove=()=>lum.x>GROVEX-300;
+const GTRUNKS=[];   /* tree roots (region coords): Lum walks the grass between them */
 const GH_=(a,b)=>hash(a,b,4417);
 function gpathDist(x,y){let best=1e9;for(let i=0;i<GPATH_PTS.length-1;i++){const [ax,ay]=GPATH_PTS[i],[bx,by]=GPATH_PTS[i+1],dx=bx-ax,dy=by-ay,t=clamp(((x-ax)*dx+(y-ay)*dy)/(dx*dx+dy*dy||1),0,1);best=Math.min(best,Math.hypot(x-ax-dx*t,y-ay-dy*t));}return best;}
 function groveFree(x,y){const lx=x-GROVEX,ly=y-GROVEY;
@@ -30,15 +32,17 @@ function groveFree(x,y){const lx=x-GROVEX,ly=y-GROVEY;
   if(lx<30||lx>GW-30||ly<120||ly>GH-150)return false;
   if(inPoly(lx,ly,GLAKE))return false;
   if(gpathDist(x,y)<55)return true;   /* the old path runs through the groves */
-  for(const T of GTREES)if(inPoly(lx,ly+18,T))return false;
+  for(const [tx,ty] of GTRUNKS)if(Math.abs(lx-tx)<34&&ly-ty<14&&ty-ly<22)return false;   /* the grass is open; only the trunks are solid */
   return true;}
 /* evergreens filling every grove, flowers on the open ground, stones along the old path */
 function groveProps(P){const X=x=>x+GROVEX,Y=y=>y+GROVEY;let k=0;
   for(let gy=60;gy<GH;gy+=95)for(let gx=20;gx<GW;gx+=105){k++;const lx=gx+(GH_(k,71)-.5)*60,ly=gy+(GH_(k,72)-.5)*50;
-    if(!GTREES.some(T=>inPoly(lx,ly,T))||gpathDist(X(lx),Y(ly))<150)continue;   /* the old path stays clear */const [img,w]=HTREES[Math.floor(GH_(k,73)*HTREES.length)];
+    if(!GTREES.some(T=>inPoly(lx,ly,T))||inPoly(lx,ly,GLAKE)||GH_(k,76)<.4)continue;   /* thinned out, so there is room to wander */
+    let clear=true;for(let up=0;up<=400&&clear;up+=40)if(gpathDist(X(lx),Y(ly-up))<(up?110:150)||Math.hypot(lx-GENTRY.x,ly-up-GENTRY.y)<260)clear=false;if(!clear)continue;   /* the old path and the way in stay in view */
+    const [img,w]=HTREES[Math.floor(GH_(k,73)*HTREES.length)];GTRUNKS.push([lx,ly]);
     P.push({t:'tree',img,x:X(lx),y:Y(ly),w:w*(.75+GH_(k,74)*.35),flip:GH_(k,75)<.5,base:.95});}
   /* trees beyond the map edge so it never looks bare */
-  for(let gy=0;gy<GH+200;gy+=160){P.push({t:'tree',img:'hfir',x:X(-60),y:Y(gy),w:260,flip:false,base:.95});P.push({t:'tree',img:'hbig',x:X(GW+70),y:Y(gy),w:380,flip:true,base:.95});}
+  for(let gy=0;gy<GH+200;gy+=160){if(!inPoly(-60,gy,GLAKE))P.push({t:'tree',img:'hfir',x:X(-60),y:Y(gy),w:260,flip:false,base:.95});P.push({t:'tree',img:'hbig',x:X(GW+70),y:Y(gy),w:380,flip:true,base:.95});}
   const KINDS=['lavender','rose','delph','magic','mint'];let q=0;
   for(let i=0;i<150;i++){const lx=60+GH_(i,81)*(GW-120),ly=160+GH_(i,82)*(GH-360);if(!groveFree(X(lx),Y(ly))||gpathDist(X(lx),Y(ly))<50)continue;q++;
     const n=1+Math.floor(GH_(i,83)*3);for(let j=0;j<n;j++)P.push({t:'plant',w:70,kind:KINDS[Math.floor(GH_(i,84)*KINDS.length)],i:Math.floor(GH_(i+j,85)*4),x:X(lx+j*22-20),y:Y(ly+(j%2)*10),s:.8+GH_(i+j,86)*.4,flip:GH_(i+j,87)<.5,ph:GH_(i+j,88)*TAU});}
@@ -56,7 +60,7 @@ function drawGroveGround(x0,y0,x1,y1){if(x1<GROVEX-300)return;if(!GPATHP)GPATHP=
   ctx.strokeStyle='rgba(225,242,248,.35)';ctx.lineWidth=1.4;for(let i=0;i<20;i++){const q=(T*.4+hash(i,1,983))%1,rx=150+hash(i,2,983)*500,ry=1320+hash(i,3,983)*480,r=4+q*24;ctx.globalAlpha=1-q;ctx.beginPath();ctx.ellipse(rx,ry,r,r*.4,0,0,TAU);ctx.stroke();}ctx.restore();
   lake(0);
   ctx.strokeStyle='rgba(40,30,20,.55)';ctx.lineWidth=2;ctx.stroke();ctx.restore();}
-function enterGrove(fromSouth){SCENE='thorn';const p=fromSouth?GEXIT:GENTRY;lum.x=GROVEX+p.x;lum.y=GROVEY+p.y+(fromSouth?-70:60);if(!fromSouth){const q=GPATH_PTS.find(([x,y])=>y>GROVEY+560)||GPATH_PTS[4];lum.x=q[0];lum.y=q[1];}   /* a little way down the old path, in view */lum.face=1;lum.state='idle';lum.vx=lum.vy=0;cam.x=lum.x;cam.y=lum.y;THORN.t=99;GVT.t=0;}
+function enterGrove(fromSouth){SCENE='thorn';const p=fromSouth?GEXIT:GENTRY;lum.x=GROVEX+p.x;lum.y=GROVEY+p.y+(fromSouth?-70:70);   /* just inside the way in from Amroth's home */lum.face=1;lum.state='idle';lum.vx=lum.vy=0;cam.x=lum.x;cam.y=lum.y;THORN.t=99;GVT.t=0;}
 function drawGroveTitle(){if(!inGrove()||GVT.t>=4.5||SCENE!=='thorn')return;GVT.t+=1/60;const a=Math.min(1,GVT.t*1.5,(4.5-GVT.t)*1.2);ctx.save();ctx.setTransform(DPR,0,0,DPR,0,0);ctx.globalAlpha=a;ctx.textAlign='center';
   ctx.fillStyle='rgba(20,16,12,.55)';ctx.fillRect(0,H*.3-40,W,80);ctx.fillStyle='#f6ecd8';ctx.font=`600 ${Math.round(Math.min(30,W/13))}px Georgia,serif`;ctx.fillText('Evergreen Grove',W/2,H*.3+10);ctx.restore();}
 /* the north entrance (back to Amroth's home) and the south exit (the Coastal Path, map still to come) */
