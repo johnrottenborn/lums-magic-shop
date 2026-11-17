@@ -10,7 +10,7 @@ const BVGATE={x:BVC.x,y:BVC.y+BVC.r+10},BVSOUTH={x:BVC.x,y:BVH-90},BVNORTH={x:BV
 const BVBR={x0:1880,x1:2130,y:850,w:270};BVBR.h=BVBR.w*346/700;BVBR.rise=BVBR.h*.29;   /* the bridge: deck ends at y, the deck (between the two handrails) rises in the middle */
 /* door: where the front door is across the art (0..1, unflipped); smoke: the chimney top (u,v of the art), if it has one */
 const BVHOUSES=[{img:'breeze_shellhouse',x:620,y:650,w:585,name:'shell',flip:true,door:.34,smoke:[.28,.19]},{img:'breeze_mayorhouse',x:1350,y:620,w:790,name:'mayor',door:.58,smoke:[.55,.17]},
-  {img:'breeze_clamhouse',x:590,y:1370,w:600,name:'clam',door:.86},{img:'breeze_clamhouse',x:1510,y:1370,w:600,name:'clam2',flip:true,door:.86},{img:'breeze_shellhouse',x:2495,y:875,w:620,name:'shell2',door:.34,smoke:[.28,.19]}];
+  {img:'breeze_clamhouse',x:590,y:1370,w:600,name:'clam',door:.86},{img:'breeze_clamhouse',x:1510,y:1370,w:600,name:'clam2',flip:true,door:.86},{img:'breeze_shellhouse',x:2495,y:875,w:620,name:'shell2',door:.36,smoke:[.28,.19]}];
 const bvDoorX=h=>h.x+(h.door-.5)*h.w*(h.flip?-1:1);
 const BVFOUNT={x:1050,y:1010,w:380};
 const inBV=()=>lum.x>BVX-300;
@@ -32,7 +32,7 @@ function bvSolid(lx,ly){for(const h of BVHOUSES){const cy=h.y-h.w*.13;if(((lx-h.
   for(const [tx,ty] of BVTRUNKS)if(Math.abs(lx-tx)<32&&ly-ty<14&&ty-ly<22)return true;
   return false;}
 const BVTRUNKS=[];
-const BVISLEPATH=()=>{const h=BVHOUSES[4];return [[BVBR.x1-10,BVBR.y],[BVBR.x1+90,BVBR.y+40],[bvDoorX(h)-40,h.y+60],[bvDoorX(h),h.y+18]];};
+const BVISLEPATH=()=>{const h=BVHOUSES[4];return [[BVBR.x1-10,BVBR.y],[BVBR.x1+90,BVBR.y+40],[bvDoorX(h)-30,h.y+60],[bvDoorX(h),h.y+10],[bvDoorX(h),h.y-48]];};   /* right up under the door step */
 function bvIslePathDist(x,y){const P=BVISLEPATH();let b=1e9;for(let i=0;i<P.length-1;i++){const [ax,ay]=P[i],[bx,by]=P[i+1],dx=bx-ax,dy=by-ay,t=clamp(((x-ax)*dx+(y-ay)*dy)/(dx*dx+dy*dy||1),0,1);b=Math.min(b,Math.hypot(x-ax-dx*t,y-ay-dy*t));}return b;}
 /* where Lum may walk: the green, the road, the islet and over the bridge */
 function bvBridgeY(lx){const t=clamp((lx-BVBR.x0)/(BVBR.x1-BVBR.x0),0,1);return BVBR.y-BVBR.rise*Math.sin(Math.PI*t);}
@@ -118,7 +118,7 @@ function buildBVCobbles(){const K=.9,R=BVPAVE+30,ox=BVC.x-R,oy=BVC.y-R,S=R*2,c=d
   for(const h of BVHOUSES.slice(0,4)){const yw=h.w*.62,yh=118,yx=h.x-yw/2,yy=h.y-10;   /* each house's yard: a small green plot out front, a kerb round it and a gap of cobbles to the door */
     g.fillStyle='#5f7d45';g.beginPath();g.roundRect(yx,yy,yw,yh,26);g.fill();g.fillStyle='rgba(120,150,80,.5)';for(let i=0;i<70;i++){const px=yx+12+BVH_(i,h.x)*(yw-24),py=yy+10+BVH_(i,h.y)*(yh-20);g.beginPath();g.ellipse(px,py,3,1.6,0,0,TAU);g.fill();}
     g.lineWidth=7;g.strokeStyle='rgba(70,76,52,.75)';g.stroke();
-    const dx=bvDoorX(h);g.save();g.beginPath();g.rect(dx-34,yy-6,68,yh+12);g.clip();g.fillStyle='#8f8b78';g.fillRect(dx-34,yy-6,68,yh+12);drawStrip(g,IMG.cobble_strip,smoothPath([[dx,yy-20],[dx,yy+yh+20]]),false);g.restore();}
+    const dx=bvDoorX(h);g.save();g.beginPath();g.rect(dx-34,yy-46,68,yh+52);g.clip();g.fillStyle='#8f8b78';g.fillRect(dx-34,yy-46,68,yh+52);drawStrip(g,IMG.cobble_strip,smoothPath([[dx,yy-60],[dx,yy+yh+20]]),false);g.restore();}
   g.lineWidth=26;g.strokeStyle='rgba(84,92,58,.55)';g.beginPath();g.arc(BVC.x,BVC.y,BVPAVE,0,TAU);g.stroke();g.lineWidth=8;g.strokeStyle='rgba(60,66,44,.6)';g.stroke();   /* a mossy kerb where the paving meets the grass */
   return [c,ox,oy,K];}
 /* the fountain plays: rings on its basin and a soft mist at the top jet */
