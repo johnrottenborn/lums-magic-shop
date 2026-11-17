@@ -12,6 +12,10 @@ const BVBR={x0:1880,x1:2130,y:850,w:270};BVBR.h=BVBR.w*346/700;BVBR.rise=BVBR.h*
 const BVHOUSES=[{img:'breeze_shellhouse',x:620,y:650,w:585,name:'shell',flip:true,door:.34,smoke:[.28,.19]},{img:'breeze_mayorhouse',x:1350,y:620,w:790,name:'mayor',door:.58,smoke:[.55,.17]},
   {img:'breeze_clamhouse',x:590,y:1370,w:600,name:'clam',door:.86},{img:'breeze_clamhouse',x:1510,y:1370,w:600,name:'clam2',flip:true,door:.86},{img:'breeze_shellhouse',x:2495,y:875,w:620,name:'shell2',door:.36,smoke:[.28,.19]}];
 const bvDoorX=h=>h.x+(h.door-.5)*h.w*(h.flip?-1:1);
+/* a house's yard: two curves of grass, from up each side of the house, round its front corners, to either side of the door */
+function bvYard(h){const L=h.x-h.w*.45,R=h.x+h.w*.45,d=bvDoorX(h),y=h.y+8,up=h.y-h.w*.2,gap=80,out=[];
+  out.push(d-L>gap+120?[[L-8,up],[L-14,y-30],[L+30,y],[d-gap,y]]:[[L-8,up],[L-14,y-30],[L+12,y]]);   /* a short side (door near the corner) only wraps the corner */
+  out.push(R-d>gap+120?[[d+gap,y],[R-30,y],[R+14,y-30],[R+8,up]]:[[R-12,y],[R+14,y-30],[R+8,up]]);return out;}
 const BVFOUNT={x:1050,y:1010,w:380};
 const inBV=()=>lum.x>BVX-300;
 const BVH_=(a,b)=>hash(a,b,6271);
@@ -71,8 +75,8 @@ function bvProps(P){const X=x=>x+BVX,Y=y=>y+BVY;
   P.push({t:'bvbrf',x:X((BVBR.x0+BVBR.x1)/2),y:Y(BVBR.y+60),w:BVBR.w});   /* its front handrail and posts again, in front of her: she walks between the rails */
   /* hydrangeas at each doorstep, in that house's colours, and a few along the paths and round the fountain */
   const TINTS={shell:['blue','lilac'],mayor:['cream','white'],clam:['pink','coral'],clam2:['coral','pink'],shell2:['lilac','blue']},HY=['hydrsmall','hydrmid','hydrbig'];
-  for(const h of BVHOUSES.slice(0,4)){const tt=TINTS[h.name],yw=h.w*.62,dx=bvDoorX(h);for(let j=0;j<6;j++){const lx=h.x-yw/2+24+j/5*(yw-48);if(Math.abs(lx-dx)<56)continue;const ly=h.y+(j%2?96:40);
-    P.push({t:'bvf',img:HY[(j+h.x)%3],tint:tt[j%2],x:X(lx),y:Y(ly),w:(66+BVH_(j,h.y)*26),flip:BVH_(j,7)<.5});}}
+  for(const h of BVHOUSES.slice(0,4)){const tt=TINTS[h.name];let j=0;for(const C_ of bvYard(h)){const sm=smoothPath(C_),L_=sm[sm.length-1].s;for(let d=20;d<L_-10;d+=62){const p=sm.find(q=>q.s>=d);j++;
+    P.push({t:'bvf',img:HY[(j+h.x)%3],tint:tt[j%2],x:X(p.x),y:Y(p.y+14),w:(60+BVH_(j,h.y)*24),flip:BVH_(j,7)<.5});}}}
   {const h=BVHOUSES[4],tt=TINTS.shell2;let q=0;for(let a=0;a<TAU;a+=.32){for(const rr of [.62,.86]){q++;const lx=BVI.x+Math.cos(a+rr)*BVI.r*rr,ly=BVI.y+Math.sin(a+rr)*BVI.r*rr*.9+30;
       if(((lx-h.x)/(h.w*.47))**2+((ly-(h.y-h.w*.16))/(h.w*.22))**2<1)continue;if(bvIslePathDist(lx,ly)<70)continue;   /* not on the house, nor on the path from the bridge */
       P.push({t:'bvf',img:HY[q%3],tint:tt[q%2],x:X(lx),y:Y(ly),w:60+BVH_(q,31)*30,flip:q%2===0});}}}
@@ -115,10 +119,11 @@ function buildBVCobbles(){const K=.9,R=BVPAVE+30,ox=BVC.x-R,oy=BVC.y-R,S=R*2,c=d
   g.save();g.beginPath();g.arc(BVC.x,BVC.y,BVPAVE,0,TAU);g.clip();
   for(let y=BVC.y-BVPAVE-40,row=0;y<BVC.y+BVPAVE+40;y+=COB_W*.8,row++){const sh=row%2?37:0,sm=smoothPath([[BVC.x-BVPAVE-80-sh,y],[BVC.x+BVPAVE+80,y]]);drawStrip(g,IMG.cobble_strip,sm,false);}   /* rows of the designer's cobbles, overlapping, every other row shifted */
   g.restore();
-  for(const h of BVHOUSES.slice(0,4)){const yw=h.w*.62,yh=118,yx=h.x-yw/2,yy=h.y-10;   /* each house's yard: a small green plot out front, a kerb round it and a gap of cobbles to the door */
-    g.fillStyle='#5f7d45';g.beginPath();g.roundRect(yx,yy,yw,yh,26);g.fill();g.fillStyle='rgba(120,150,80,.5)';for(let i=0;i<70;i++){const px=yx+12+BVH_(i,h.x)*(yw-24),py=yy+10+BVH_(i,h.y)*(yh-20);g.beginPath();g.ellipse(px,py,3,1.6,0,0,TAU);g.fill();}
-    g.lineWidth=7;g.strokeStyle='rgba(70,76,52,.75)';g.stroke();
-    const dx=bvDoorX(h);g.save();g.beginPath();g.rect(dx-34,yy-46,68,yh+52);g.clip();g.fillStyle='#8f8b78';g.fillRect(dx-34,yy-46,68,yh+52);drawStrip(g,IMG.cobble_strip,smoothPath([[dx,yy-60],[dx,yy+yh+20]]),false);g.restore();}
+  g.save();g.beginPath();g.arc(BVC.x,BVC.y,BVPAVE,0,TAU);g.clip();   /* yards stay inside the paved square: no odd patch on the grass ring */
+  for(const h of BVHOUSES.slice(0,4))for(const P of bvYard(h)){   /* each house's yard: a strip of grass hugging its front and wrapping round its sides, cobbles left clear at the door */
+    g.lineCap=g.lineJoin='round';g.beginPath();P.forEach(([x,y],i)=>i?g.lineTo(x,y):g.moveTo(x,y));g.lineWidth=84;g.strokeStyle='rgba(70,76,52,.75)';g.stroke();g.lineWidth=74;g.strokeStyle='#5f7d45';g.stroke();
+    g.fillStyle='rgba(120,150,80,.5)';for(let i=0;i<40;i++){const k=BVH_(i,h.x+P[0][0])*(P.length-1),j=Math.min(P.length-2,k|0),t=k-j,px=P[j][0]+(P[j+1][0]-P[j][0])*t+(BVH_(i,7)-.5)*50,py=P[j][1]+(P[j+1][1]-P[j][1])*t+(BVH_(i,8)-.5)*40;g.beginPath();g.ellipse(px,py,3,1.6,0,0,TAU);g.fill();}}
+  g.restore();
   g.lineWidth=26;g.strokeStyle='rgba(84,92,58,.55)';g.beginPath();g.arc(BVC.x,BVC.y,BVPAVE,0,TAU);g.stroke();g.lineWidth=8;g.strokeStyle='rgba(60,66,44,.6)';g.stroke();   /* a mossy kerb where the paving meets the grass */
   return [c,ox,oy,K];}
 /* the fountain plays: rings on its basin and a soft mist at the top jet */
