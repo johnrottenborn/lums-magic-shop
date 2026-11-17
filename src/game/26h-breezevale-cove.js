@@ -174,7 +174,15 @@ const BVNPC=[{room:25,atlas:'breeze_boy',x:850,y:525,h:150,name:'Breezevale Merc
   {room:26,atlas:'breeze_girl',x:470,y:690,name:'Townswoman',lines:[["Would you like some tea? The kettle's still warm."]]}];
 function drawBVNpc(n){const k=dunH(n.y)/151,face=lum.x>n.x;ctx.save();ctx.fillStyle='rgba(10,10,20,.25)';ctx.beginPath();ctx.ellipse(n.x,n.y,22*k,7*k,0,0,TAU);ctx.fill();ctx.restore();
   const talking=DLG.active&&DLG.lines&&DLG.lines[DLG.i||0]&&DLG.lines[DLG.i||0][0]===n.name,an=talking&&Math.abs(lum.x-n.x)>60?'side':'down';c1Frame(ctx,n.atlas,an,0,n.x,n.y,n.h||96*k,an==='side'&&face,1,0);}
-function bvNpcTalk(n){lum.face=lum.x<n.x?1:-1;talk(n.lines.map(l=>[n.name,l[0]]));}
+/* the Breezevale Merchant's trades */
+function bvTakeMat(id,n){MATS[id]-=n;if(MATS[id]<=0){MATS[id]=0;const i=BAG.indexOf(id);if(i>=0)BAG.splice(i,1);}}
+function bvMerchant(intro){const have=id=>MATS[id]||0,M=[['Fox Tail','foxtail',1,'potion','Healing Potion'],['Wisp Silk','wispsilk',1,'antidote','Antidote']];
+  const opts=M.map(([nm,id,n,get,gn])=>[gn,()=>{if(have(id)<n){talk([['Breezevale Merchant',`Bring me a ${nm} and it's yours.`]],false,()=>bvMerchant());return;}bvTakeMat(id,n);giveItem(get);setTimeout(()=>bvMerchant(),350);},[id,n,get,`for ${n} ${nm} \u00b7 you have ${have(id)}`,have(id)<n]]);
+  if(!C2.potency)opts.push(['Potion Potency',()=>{if(have('seagem')<2){talk([['Breezevale Merchant',"Two Sea Gems, and I'll teach you the old Breezevale way of brewing. Your Healing Potions will heal twice as much."]],false,()=>bvMerchant());return;}
+    bvTakeMat('seagem',2);C2.potency=1;sfxItem&&sfxItem();talk([['Breezevale Merchant',"Steep the herbs in sea-water by moonlight, and stir it three times the other way. That's all there is to it!"],['Lum',"My Healing Potions will heal twice as much now!"]],false,()=>bvMerchant());},['seagem',2,'potion','Potions heal 2\u00d7 \u00b7 you have '+have('seagem'),have('seagem')<2]]);
+  opts.push(['Leave',()=>{}]);
+  const go=()=>askChoice('Breezevale Merchant \u00b7 Trades',opts);if(intro)talk([['Breezevale Merchant',"Welcome in! I don't take coin, only trades. Have a look."]],false,go);else go();}
+function bvNpcTalk(n){if(n.name==='Breezevale Merchant'){lum.face=lum.x<n.x?1:-1;bvMerchant(true);return;}lum.face=lum.x<n.x?1:-1;talk(n.lines.map(l=>[n.name,l[0]]));}
 function leaveBVHouse(i){const h=BVHOUSES[i];SCENE='thorn';lum.x=BVX+bvDoorX(h);lum.y=BVY+h.y+60;lum.face=1;lum.dir='down';lum.state='idle';lum.vx=lum.vy=0;cam.x=lum.x;cam.y=lum.y;THORN.t=99;BVT.t=99;}
 for(const [i,h] of BVHOUSES.entries())THINT.push({x:BVX+bvDoorX(h),y:BVY+h.y+24,get reach(){return inBV()?78:-1;},door:i>=2,onInteract:()=>i===2?dunGo(25,660,700,-1):i===3?dunGo(26,330,720,1):i===4?dunGo(27,590,650,1):say(h.name==='mayor'?"The Mayor's house. No one answers.":"Lum knocks. No one answers.")});
 

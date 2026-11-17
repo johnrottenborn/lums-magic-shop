@@ -926,6 +926,20 @@ const CASES = {
     await g_(() => { const g = window.__g; g.lum.x = g.BVX + (g.BVBR.x0 + g.BVBR.x1) / 2; g.lum.y = g.BVY + g.BVBR.y - g.BVBR.h * .29; }); await wait(1200);
     await p.screenshot({ path: path.join(SHOTS, `breezevale-bridge-${vp}.png`) });
   },
+  async 'breezevale-merchant'(p) {
+    const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop', g_ = (f, a) => p.evaluate(f, a);
+    await g_(() => { const g = window.__g; g.startChapter2(); g.c2Skip(); g.WB10.st = 2; g.chPlaytestBreezeway(); g.MATS.foxtail = 1; g.BAG.push('foxtail'); g.MATS.seagem = 2; g.BAG.push('seagem'); g.enterBreezevale(); g.enterDun(25, 850, 640, 1); }); await wait(1200);
+    await g_(() => window.__g.NEAR.onInteract()); await wait(400);
+    await g_(() => { const g = window.__g; g.DLG.active = false; g.DLG.onEnd && g.DLG.onEnd(); }); await wait(400);
+    check(await g_(() => window.__g.CHOICE.on && window.__g.CHOICE.opts.length === 4), 'the Breezevale Merchant did not open his trade menu');
+    await p.screenshot({ path: path.join(SHOTS, `breezevale-merchant-${vp}.png`) });
+    const pots = await g_(() => window.__g.BAG.filter(x => x === 'potion').length);
+    await g_(() => window.__g.pickChoice(0)); await wait(700);
+    check(await g_(n => window.__g.BAG.filter(x => x === 'potion').length === n + 1 && !window.__g.MATS.foxtail, pots), 'trading a Fox Tail did not give a Healing Potion');
+    await g_(() => window.__g.pickChoice(2)); await wait(300);
+    check(await g_(() => window.__g.C2.potency && !window.__g.MATS.seagem && window.__g.healRoll({ heal: [5, 7] }) >= 5), 'two Sea Gems did not teach Healing Potion Potency');
+    await g_(() => { window.__g.DLG.active = false; window.__g.CHOICE.on = false; });
+  },
   async 'coastal-breezeway'(p) {
     const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop', g_ = (f, a) => p.evaluate(f, a);
     await g_(() => { const g = window.__g; g.startChapter2(); g.c2Skip(); g.HST.st = 7; g.enterGrove(true); }); await wait(600);

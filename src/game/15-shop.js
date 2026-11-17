@@ -12,7 +12,7 @@ const SHOPINT=[];let shopTalk=0,restTalk=false,shopDoor={x:0,y:52};
 const SHOPLUM={x:885,y:520,face:1,walking:false,ft:0,wait:3,tgt:null,talkFace:false};
 const SHOPSPOTS=[[720,468],[880,468],[1035,468]];
 const SHOPFX=[];
-const healRoll=it=>Array.isArray(it.heal)?it.heal[0]+Math.floor(Math.random()*(it.heal[1]-it.heal[0]+1)):it.heal;
+const healRoll=it=>(Array.isArray(it.heal)?it.heal[0]+Math.floor(Math.random()*(it.heal[1]-it.heal[0]+1)):it.heal)*(it===ITEMS.potion&&typeof C2!=='undefined'&&C2.potency?2:1);   /* Healing Potion Potency (Breezevale Merchant) doubles potions */
 function lumTalk(){if(CH===1){say(["The shop feels so quiet without Cosmic chattering away.","His apron is still hanging by the counter. He never once remembered to wear it.","The jars are all where they should be. Everything is, except him."][(shopTalk++)%3]);return;}if(NIGHT.on){say("The counter's empty. Master Lum is still asleep… I need to be quiet.");return;}SHOPLUM.walking=false;SHOPLUM.tgt=null;
   if(BAG.includes('blade')&&!restTalk){talk([['Lum',"Welcome back, Cosmic. So… how did it go with the slimes and slugs?"],
       ['Cosmic',"I've been chasing slimes and slugs all day, Master! Through the garden, under the well… places I never even knew were here!"],

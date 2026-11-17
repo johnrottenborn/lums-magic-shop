@@ -31,11 +31,22 @@ function pondInteract(px,py){if(CH===1){say("The koi are huddled at the very bot
 const CHOICE={on:false,q:'',opts:[],sel:0,hits:[]};
 function askChoice(q,opts){CHOICE.on=true;CHOICE.q=q;CHOICE.opts=opts;CHOICE.sel=0;}
 function pickChoice(i){const o=CHOICE.opts[i];CHOICE.on=false;CHOICE.until=performance.now()+400;sfxPage(.6);if(o)setTimeout(o[1],0);}
-function drawChoice(){if(!CHOICE.on)return;CHOICE.hits=[];ctx.save();ctx.fillStyle='rgba(10,20,26,.35)';ctx.fillRect(0,0,W,H);
+function drawChoice(){if(!CHOICE.on)return;if(CHOICE.opts.length>2){drawChoiceList();return;}CHOICE.hits=[];ctx.save();ctx.fillStyle='rgba(10,20,26,.35)';ctx.fillRect(0,0,W,H);
   const w=Math.min(W-40,300),h=130,x=(W-w)/2,y=H*.38;ctx.fillStyle='rgba(20,10,10,.3)';rr(x+2,y+4,w,h,16);ctx.fill();ctx.fillStyle='#f6ecd2';rr(x,y,w,h,16);ctx.fill();ctx.strokeStyle='#c49a4e';ctx.lineWidth=1.5;ctx.stroke();
   ctx.fillStyle='#4a3420';ctx.font='500 17px Alegreya, Georgia, serif';ctx.textAlign='center';ctx.fillText(CHOICE.q,W/2,y+40);
   CHOICE.opts.forEach(([lab],i)=>{const bw=(w-50)/2,bx=x+18+i*(bw+14),by=y+68,bh=40,sel=CHOICE.sel===i;const g=ctx.createLinearGradient(0,by,0,by+bh);g.addColorStop(0,i===0?'#e8b85a':'#b8a68a');g.addColorStop(1,i===0?'#b07a2a':'#8a7a62');ctx.fillStyle=g;rr(bx,by,bw,bh,12);ctx.fill();
     ctx.strokeStyle=sel?'#fff4d0':'#5a3a14';ctx.lineWidth=sel?2.5:1.5;ctx.stroke();ctx.fillStyle='#fffaf0';ctx.font='700 16px "Alegreya SC", Georgia, serif';ctx.fillText(lab,bx+bw/2,by+26);CHOICE.hits.push({x:bx,y:by,w:bw,h:bh,i});});ctx.restore();}
+/* a longer choice: one row per option (e.g. the Breezevale Merchant's trades); an option may carry [giveId, n, getId, note, off] to show the trade with icons */
+function drawChoiceList(){CHOICE.hits=[];const n=CHOICE.opts.length,w=Math.min(W-28,380),rh=56,h=74+n*(rh+8),x=(W-w)/2,y=Math.max(20,(H-h)/2);ctx.save();ctx.fillStyle='rgba(10,20,26,.45)';ctx.fillRect(0,0,W,H);
+  ctx.fillStyle='rgba(20,10,10,.3)';rr(x+2,y+4,w,h,16);ctx.fill();ctx.fillStyle='#f6ecd2';rr(x,y,w,h,16);ctx.fill();ctx.strokeStyle='#c49a4e';ctx.lineWidth=1.5;ctx.stroke();
+  ctx.fillStyle='#4a3420';ctx.font='700 17px "Alegreya SC", Georgia, serif';ctx.textAlign='center';ctx.fillText(CHOICE.q,W/2,y+38);
+  CHOICE.opts.forEach(([lab,,tr],i)=>{const bx=x+14,bw=w-28,by=y+56+i*(rh+8),sel=CHOICE.sel===i,off=tr&&tr[4];const g=ctx.createLinearGradient(0,by,0,by+rh);g.addColorStop(0,off?'#cfc4b0':tr?'#f0d9a0':'#b8a68a');g.addColorStop(1,off?'#b3a993':tr?'#d9b569':'#8a7a62');ctx.fillStyle=g;rr(bx,by,bw,rh,12);ctx.fill();
+    ctx.strokeStyle=sel?'#fff4d0':'#5a3a14';ctx.lineWidth=sel?3:1.5;ctx.stroke();
+    if(tr){const [give,cnt,get,note]=tr;ctx.globalAlpha=off?.55:1;drawIcon(ctx,give,bx+26,by+rh/2,32);ctx.fillStyle='#3b2a1c';ctx.font='700 13px "Alegreya SC", Georgia, serif';ctx.textAlign='left';ctx.fillText('\u00d7'+cnt,bx+44,by+rh/2+5);
+      ctx.font='700 18px Georgia, serif';ctx.fillText('\u2192',bx+70,by+rh/2+6);if(get)drawIcon(ctx,get,bx+108,by+rh/2,32);
+      ctx.fillStyle='#3b2a1c';ctx.font='700 15px "Alegreya SC", Georgia, serif';ctx.fillText(lab,bx+132,by+24);ctx.font='500 12px Alegreya, Georgia, serif';ctx.fillStyle='#6a5236';ctx.fillText(note||'',bx+132,by+42);ctx.globalAlpha=1;}
+    else{ctx.fillStyle='#fffaf0';ctx.font='700 16px "Alegreya SC", Georgia, serif';ctx.textAlign='center';ctx.fillText(lab,bx+bw/2,by+rh/2+6);}
+    CHOICE.hits.push({x:bx,y:by,w:bw,h:rh,i});});ctx.restore();}
 /* underwater life */
 const PKOI=[];for(let i=0;i<4;i++)PKOI.push({a:i*TAU/4+rnd(-.3,.3),r:rnd(150,260),cy:rnd(110,190),sp:rnd(.12,.2)*(i%2?1:-1),s:rnd(.8,1.2),c:['255,150,70','255,250,240','255,120,60','250,200,140'][i],ph:rnd(0,TAU)});
 const PBUBBLES=[];for(let i=0;i<34;i++)PBUBBLES.push({x:rnd(80,1300),y:rnd(0,768),sp:rnd(18,45),r:rnd(1.5,4.5),ph:rnd(0,TAU)});
