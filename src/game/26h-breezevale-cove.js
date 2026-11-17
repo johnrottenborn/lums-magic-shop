@@ -6,7 +6,7 @@
    Stranglethorn world, east of the Breezeway. Townsfolk still to come. */
 const BVX=BWX+5200,BVY=500,BVW=2950,BVH=2400,BVT={t:99};
 const BVC={x:1050,y:950,r:850},BVI={x:2450,y:850,r:350};   /* the town green, and the islet */
-const BVGATE={x:BVC.x,y:BVC.y+BVC.r+10},BVSOUTH={x:BVC.x,y:BVH-90},BVNORTH={x:BVC.x,y:BVC.y-BVC.r+70};
+const BVGATE={x:BVC.x,y:BVC.y+BVC.r+10},BVSOUTH={x:BVC.x,y:BVC.y+BVC.r-130},BVBOT=BVC.y+BVC.r+420,BVNORTH={x:BVC.x,y:BVC.y-BVC.r+70};
 /* the stone bridge north from the green over the sea toward the Sanctuary of Water (the designer's middle bridge, recoloured blue); its door is at the far end */
 const BVSBR={x:BVC.x,y1:BVC.y-BVC.r+125,w:300,h:614};BVSBR.y0=BVSBR.y1-BVSBR.h;   /* its foot rests on the edge of the cobbles */
 const BVTOP=BVSBR.y1-400;   /* the view stops with just the start of the bridge showing */
@@ -49,7 +49,7 @@ function bvFree(x,y){const lx=x-BVX,ly=y-BVY;
   if(lx>BVBR.x0+30&&lx<BVBR.x1-30)return Math.abs(ly-bvBridgeY(lx))<40;   /* over the bridge */
   if(lx>BVBR.x0-60&&lx<=BVBR.x0+30&&Math.abs(ly-BVBR.y)<30)return true;
   if(lx>=BVBR.x1-30&&lx<BVBR.x1+60&&Math.abs(ly-BVBR.y)<30)return true;
-  let ok=Math.hypot(lx-BVC.x,ly-BVC.y)<BVC.r-55||Math.hypot(lx-BVI.x,ly-BVI.y)<BVI.r-40||(Math.abs(lx-BVC.x)<BVROAD-25&&ly>BVC.y&&ly<BVH-40);
+  let ok=Math.hypot(lx-BVC.x,ly-BVC.y)<BVC.r-55||Math.hypot(lx-BVI.x,ly-BVI.y)<BVI.r-40||false;
   if(ly<BVNORTH.y-30)ok=false;
   if(Math.abs(lx-BVSBR.x)<36&&ly>BVSDOOR.y-12&&ly<BVSBR.y1)return true;   /* along the bridge deck, between its stone rails */
   return ok&&!bvSolid(lx,ly);}
@@ -78,7 +78,10 @@ function bvProps(P){const X=x=>x+BVX,Y=y=>y+BVY;
   P.push({t:'tree',img:'breeze_fountain',x:X(BVFOUNT.x),y:Y(BVFOUNT.y),w:BVFOUNT.w,flip:false,base:.95,solid:1});
   P.push({t:'tree',img:'breeze_gate2',x:X(BVGATE.x),y:Y(BVGATE.y-50),w:520,flip:false,base:.98,solid:1});   /* the designer's driftwood archway (no doors), its footing stones on the rim of the green */
   /* small boulders down both edges of the road, covering the seam where it meets the cliff faces */
-  for(let y=BVGATE.y+30,i=0;y<BVH+60;y+=95,i++)for(const side of [-1,1]){const k=i*2+(side>0);P.push({t:'tree',img:['crockegg','crockpile','crockegg','crockheap'][k%4],x:X(BVC.x+side*(BVROAD+10+BVH_(k,71)*10)),y:Y(y+BVH_(k,72)*30),w:40+BVH_(k,73)*22,flip:BVH_(k,74)<.5,base:.9});}
+  for(const side of [-1,1]){let y=BVGATE.y+15+BVH_(side,70)*40,i=0;while(y<BVBOT+120){const k=i*2+(side>0),r=BVH_(k,71),w=30+BVH_(k,73)**1.6*48;   /* uneven gaps, sizes and offsets so the rows don't read as rows */
+    P.push({t:'tree',img:['crockegg','crockpile','crockheap','crockegg','crockpile'][Math.floor(BVH_(k,75)*5)],x:X(BVC.x+side*(BVROAD+4+r*26)),y:Y(y),w,flip:BVH_(k,74)<.5,base:.9});
+    if(BVH_(k,76)<.4)P.push({t:'tree',img:BVH_(k,77)<.5?'crockegg':'crockpile',x:X(BVC.x+side*(BVROAD+w*.55+10+BVH_(k,78)*14)),y:Y(y+8+BVH_(k,79)*18),w:20+BVH_(k,80)*14,flip:BVH_(k,81)<.5,base:.9});   /* a pebble tucked beside some */
+    y+=45+w*.6+BVH_(k,72)*90;i++;}}
   /* grass and small flowers tucked along the gate's footings, hiding where they meet the cliff and the road */
   for(const [dx,dy,k] of [[-262,-40,'t'],[-232,-30,'f'],[-196,-36,'t'],[-112,-46,'t'],[-96,-34,'f'],[96,-34,'f'],[112,-46,'t'],[196,-36,'t'],[232,-30,'f'],[262,-40,'t'],[-82,-6,'t'],[82,-6,'t']])
     if(k==='t')P.push({t:'tuft',w:40,x:X(BVGATE.x+dx),y:Y(BVGATE.y+dy),n:6,h:26+Math.abs(dx)%7*2,hue:.4});
@@ -165,7 +168,7 @@ function drawBVGirl(o){const G=BVGIRL,talking=DLG.active&&G.talking,an=talking&&
   ctx.save();ctx.fillStyle='rgba(10,10,20,.25)';ctx.beginPath();ctx.ellipse(o.x,o.y,22,7,0,0,TAU);ctx.fill();ctx.restore();
   ctx.save();ctx.translate(o.x,0);ctx.scale(.86,1);ctx.translate(-o.x,0);c1Frame(ctx,'breeze_girl',an,0,o.x,o.y,BVFOLK_H,an==='side'&&lum.x>o.x,1,0);ctx.restore();if(!DLG.active)G.talking=0;}
 function bvGirlTalk(){BVGIRL.talking=1;lum.face=lum.x<BVX+BVGIRL.x?1:-1;talk([['Townsgirl',"Welcome to Breezevale Cove."],['Townsgirl',"The rain makes me so happy."]],false,()=>{BVGIRL.talking=0;});}
-function enterBreezevale(){SCENE='thorn';lum.x=BVX+BVSOUTH.x;lum.y=BVY+BVSOUTH.y-60;lum.face=1;lum.dir='up';lum.state='idle';lum.vx=lum.vy=0;cam.x=lum.x;cam.y=lum.y-200;THORN.t=99;BVT.t=0;}
+function enterBreezevale(){SCENE='thorn';lum.x=BVX+BVSOUTH.x;lum.y=BVY+BVSOUTH.y-50;lum.face=1;lum.dir='up';lum.state='idle';lum.vx=lum.vy=0;cam.x=lum.x;cam.y=lum.y-200;THORN.t=99;BVT.t=0;}
 /* playtest card: the story up to the morning after at Amroth's (Lum alone, Amroth stays home), then the Breezeway's east end */
 function chPlaytestBreezeway(){HST.st=7;HST.amrOut=1;if(typeof C2!=='undefined'){C2.joined=0;}if(PARTY_ORDER.includes('amroth'))PARTY_ORDER.splice(PARTY_ORDER.indexOf('amroth'),1);
   {const i=BAG.indexOf('baby');if(i>=0)BAG.splice(i,1);}hsGoal('Follow the coast east to Breezevale Cove');enterBWEast();BWT.t=0;}
