@@ -49,11 +49,11 @@ function bwProps(P){const X=x=>x+BWX,Y=y=>y+BWY;let k=0;
     if(r<.62){const [img,w]=HY[Math.floor(BH_(i,13)*(r<.1?4:3))];P.push({t:'tree',img,x,y:y+8,w:w*(.85+BH_(i,14)*.3),flip:BH_(i,15)<.5,base:.97});}
     else if(r<.82){const [img,w]=RK[Math.floor(BH_(i,16)*RK.length)];P.push({t:'tree',img,x,y:y+6,w:w*(.85+BH_(i,17)*.3),flip:BH_(i,18)<.5,base:.95});}}
   /* big rock formations over the cliff at the sharp bends (one over the cliff face, one down in the surf); Lum walks behind them */
-  const offPath=(x,y,w)=>{for(let k=0;k<60;k++){let near=null,nd=1e9;for(const fx of [-.42,-.2,0,.2,.42])for(const fy of [0,.28,.5]){const px=x+fx*w,py=y-fy*w;for(const [ax,ay] of BPATH_PTS){const d=Math.hypot(ax-px,ay-py);if(d<nd){nd=d;near=[ax,ay,px,py];}}}   /* its base and lower body, across its width */
-      if(nd>BW_OFF+70)break;const dx=near[2]-near[0],dy=near[3]-near[1],L=Math.hypot(dx,dy)||1;x+=dx/L*14;y+=dy/L*14;}return [x,y];};   /* nudge a rock's base off the path so it never blocks the way */
+  const offPath=(x,y,w)=>{for(let k=0;k<120;k++){let near=null,nd=1e9;for(const fx of [-.42,-.2,0,.2,.42])for(const fy of [0,.28,.5,.72,.9]){const px=x+fx*w*(1-fy*.5),py=y-fy*w;for(const [ax,ay] of BPATH_PTS){const d=Math.hypot(ax-px,ay-py);if(d<nd){nd=d;near=[ax,ay,px,py];}}}   /* its base and lower body, across its width */
+      if(nd>BW_OFF+30)break;const dx=near[2]-near[0],dy=near[3]-near[1],L=Math.hypot(dx,dy)||1;x+=dx/L*14;y+=dy/L*14;}return [x,y];};   /* nudge a rock's base off the path so it never blocks the way */
   for(const [x,y,ox,oy,i] of BBENDS){const w=[330,320,280][i%3]*(.95+BH_(i,31)*.25),o1=BW_OFF+150,o2=BW_OFF+290;
-    {const [px,py]=offPath(x+ox*o1,y+oy*o1+110,w*1.35);P.push({t:'tree',img:['crockspire','crockheap','crockpile'][i%3],x:px,y:py,w:w*1.35,flip:BH_(i,32)<.5,base:.9,solid:1});}
-    {const [px,py]=offPath(x+ox*o2+(BH_(i,33)-.5)*60,y+oy*o2+150,w*.95);P.push({t:'tree',img:['crockheap','crockpile','crockspire'][i%3],x:px,y:py,w:w*.95,flip:BH_(i,34)<.5,base:.9,solid:1});}}
+    {const sx=i===0?230:0;const [px,py]=offPath(x+ox*o1+sx,y+oy*o1+110,w*1.35);   /* the first bend's big formation sits further right, clear of the path that wraps round it */P.push({t:'tree',img:['crockspire','crockheap','crockpile'][i%3],x:px,y:py,w:w*1.35,flip:BH_(i,32)<.5,base:.9,solid:1});}
+    {const [px,py]=offPath(x+ox*o2+(BH_(i,33)-.5)*60+(i===0?200:0),y+oy*o2+150,w*.95);P.push({t:'tree',img:['crockheap','crockpile','crockspire'][i%3],x:px,y:py,w:w*.95,flip:BH_(i,34)<.5,base:.9,solid:1});}}
   /* small boulders along the sea edge of the path, always on the tight bends (where the cliff strip opens up) and here and there between */
   const SB=['crockegg','crockpile','crockheap'];for(let i=2;i<BPATH_PTS.length-3;i++){const [ax,ay]=BPATH_PTS[i],[bx,by]=BPATH_PTS[i+1],[cx,cy]=BPATH_PTS[i+2],dx=bx-ax,dy=by-ay,L=Math.hypot(dx,dy)||1,ox=-dy/L,oy=dx/L,turn=Math.abs(Math.atan2(dx*(cy-by)-dy*(cx-bx),dx*(cx-bx)+dy*(cy-by)));
     if(!(turn>.12&&i%4===0)&&!(i%10===0&&BH_(i,21)<.35))continue;const off=BW_OFF+4+BH_(i,22)*8,x=ax+ox*off,y=ay+oy*off;if(bpathDist(x,y)<BW_OFF+6||x-BWX<20)continue;
