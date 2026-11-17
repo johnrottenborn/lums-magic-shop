@@ -15,7 +15,7 @@ const GTREES=[
 ];
 const GLAKE=gp([[-200,1020],[60,1010],[220,1030],[340,1130],[500,1210],[640,1380],[700,1600],[690,1900],[300,1900],[-200,1900]]);   /* runs off the west and south edges of the map */
 /* the old path: north entrance to south exit, around the groves (worn and broken in places) */
-const GPATH_CTRL=gp([[650,60],[620,230],[470,300],[300,440],[245,640],[230,860],[300,990],[480,1050],[640,1180],[760,1330],[930,1400],[1060,1460],[1100,1600],[1040,1780]]).map(([x,y])=>[x+GROVEX,y+GROVEY]);
+const GPATH_CTRL=gp([[650,-320],[650,60],[620,230],[470,300],[300,440],[245,640],[230,860],[300,990],[480,1050],[640,1180],[760,1330],[930,1400],[1060,1460],[1100,1600],[1040,1780]]).map(([x,y])=>[x+GROVEX,y+GROVEY]);
 const GPATH_PTS=splinePts(GPATH_CTRL,20);let GPATHP=null;
 const GENTRY={x:650*1.2,y:90*1.2},GEXIT={x:1040*1.2,y:1700*1.2};
 const GH_=(a,b)=>hash(a,b,4417);
