@@ -40,7 +40,7 @@ function hsBabyTalk(){try{sfxBabyCry(.9);}catch(e){}
     ['Amroth',"I have never seen demons before. I believe Fokalur is behind this invasion."],['Alma',"Oh… look at his kind eyes."]],false,()=>{
       const i=BAG.indexOf('baby');if(i>=0)BAG.splice(i,1);ALMA.baby=1;   /* Alma takes the baby */
       setTimeout(()=>talk([['Alma',"I’ll care for him for now."],['Alma',"Lum, you must be exhausted. Please, rest upstairs. We can talk more in the morning."]],false,hsToRest),600);}),1100);}
-function hsToRest(){HST.st=3;WEVENT.on=false;HST.amrIn=1;AMR.x=700;AMR.y=640;AMR.dir='side';AMR.face=1;AMR.moving=0;
+function hsToRest(){HST.st=3;WEVENT.on=false;HST.amrIn=1;HST.almaGo=1;AMR.x=700;AMR.y=640;AMR.dir='side';AMR.face=1;AMR.moving=0;
   C2.joined=0;const k=PARTY_ORDER.indexOf('amroth');if(k>=0)PARTY_ORDER.splice(k,1);   /* Lum goes on alone from here */
   hsGoal('Rest upstairs');setupDun();}
 /* the loft bed */
@@ -71,6 +71,7 @@ function updateHomeStory(dt){HST.t+=dt;
   if(SCENE==='dun'&&DUN.room===21&&HST.st===2&&HST.enter===1&&!FADE.dir)hsEnterWalk(dt);
   if(SCENE==='dun'&&DUN.room===21&&HST.meet===1&&!DLG.active){if(almaWalk(lum.x+95,lum.y+2,70,dt)){ALMA.face=-1;ALMA.dir='side';lum.face=1;HST.meet=2;HST.heart=1;hsMeetTalk();}}
   if(SCENE==='dun'&&DUN.room===21&&HST.st===4)hsMorningTalk();
+  if(SCENE==='dun'&&DUN.room===21&&HST.st===3&&HST.almaGo&&!DLG.active){if(almaWalk(AMR.x+80,AMR.y+2,70,dt)){ALMA.face=-1;ALMA.dir='side';HST.almaGo=0;}}   /* Alma goes to stand beside Amroth */
   if(SCENE==='dun'&&DUN.room===21&&HST.st>=4&&ALMA.on&&!ALMA.moving){ALMA.dir='side';ALMA.face=lum.x<ALMA.x?-1:1;}   /* she stays by the fire and turns to follow Lum */
   if(HST.amrOut&&SCENE==='thorn'){const [x,y]=hsAmrPos();AMR.x=x;AMR.y=y;AMR.moving=0;AMR.dir='side';AMR.face=1;}   /* looking out over the water */
   if(HST.heart>0&&!DLG.active&&!HST.meet&&!HST.walk&&HST.st!==5)HST.heart=Math.max(0,HST.heart-dt);}
@@ -84,7 +85,11 @@ function drawHomeNight(){if(!hsNight())return;ctx.save();ctx.setTransform(DPR,0,
 THINT.push({get x(){return hsAmrPos()[0];},get y(){return hsAmrPos()[1]+10;},get reach(){return HST.amrOut&&HST.st>=6?95:0;},onInteract:()=>hsAmrTalk()});
 
 /* Alma teaches Poison Powder, once Lum carries Venomvine (talk to her in the cottage after the night) */
-function almaTalk(){if(HST.st===5){hsMorningAlma();return;}if(HST.st<6)return;if(!C2.venom&&(MATS.venomvine||0)>0){WEVENT.on=true;ALMA.face=lum.x<ALMA.x?-1:1;lum.face=-ALMA.face;
+/* before Lum goes up to bed: Alma and Amroth stand together over the baby */
+function hsBabyAdmire(){WEVENT.on=true;lum.state='idle';lum.vx=lum.vy=0;
+  talk([['Alma',"Look at him, Amroth. Such a sweet little face."],['Amroth',"And those eyes… I have never seen eyes so bright and kind."],
+    ['Alma',"He’s fast asleep now. You should be too, Lum. Go and rest upstairs."],['Amroth',"Rest well, Lum. We will be right here."]],false,()=>{WEVENT.on=false;});}
+function almaTalk(){if(HST.st===3){hsBabyAdmire();return;}if(HST.st===5){hsMorningAlma();return;}if(HST.st<6)return;if(!C2.venom&&(MATS.venomvine||0)>0){WEVENT.on=true;ALMA.face=lum.x<ALMA.x?-1:1;lum.face=-ALMA.face;
     talk([['Alma',"Is that Venomvine? Careful, its sap stings."],['Alma',"My sister taught me a trick with it when we were young. Grind the vine fine at a fire and it makes a powder that strikes, then leaves a poison behind."],
       ['Alma',"Here, let me show you."]],false,()=>{learnVenom();setTimeout(()=>talk([['Lum',"Poison Powder… Thank you, Alma!"],['Alma',"Feel free to mix it by the fire, right here."]],false,()=>{WEVENT.on=false;}),900);});return;}
   talk([['Alma',C2.venom?"Remember, Venomvine makes Poison Powder. Feel free to mix by the fire!":HST.st<7?"Amroth is outside by the pond. Go and speak with him.":"Safe travels, Lum. My sister will help you, I know it."]]);}

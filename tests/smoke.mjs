@@ -437,6 +437,13 @@ const CASES = {
     await talkAll(40);
     check(await g_(() => { const g = window.__g; return g.HST.st === 3 && !g.BAG.includes('baby') && g.ALMA.baby && !g.PARTY_ORDER.includes('amroth'); }), 'after the talk: Alma should hold the baby, Amroth leave the party, and Lum be told to rest');
     await p.screenshot({ path: path.join(SHOTS, `home-alma-baby-${vp}.png`) });
+    for (let i = 0; i < 30 && (await g_(() => window.__g.HST.almaGo)); i++) await wait(200);
+    check(await g_(() => { const g = window.__g; return Math.abs(g.ALMA.x - g.AMR.x - 80) < 4 && g.ALMA.face < 0; }), 'Alma did not go to stand beside Amroth');
+    await g_(() => { const g = window.__g; g.lum.x = g.ALMA.x + 10; g.lum.y = g.ALMA.y + 45; }); await wait(400);
+    await g_(() => window.__g.NEAR.onInteract()); await wait(400);
+    check(await g_(() => { const g = window.__g, l = g.DLG.active && g.DLG.lines; return l && l.some(x => /eyes/.test(x[1])) && l.some(x => /rest/i.test(x[1])); }), 'Alma and Amroth did not admire the baby and send Lum to rest');
+    await p.screenshot({ path: path.join(SHOTS, `home-baby-admire-${vp}.png`) });
+    await talkAll(10);
     await g_(() => window.__g.enterDun(22, 760, 745, 1)); await wait(1200);
     await g_(() => window.__g.NEAR.onInteract()); await wait(400);
     check(await g_(() => window.__g.CHOICE.on && /Rest/.test(window.__g.CHOICE.q)), 'the bed did not ask to rest');
