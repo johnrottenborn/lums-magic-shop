@@ -12,7 +12,20 @@ const BPATH_PTS=splinePts(BPATH_CTRL,16);let BPATHP=null,BSPURP=null;
 const BLAND=[...BPATH_PTS.map(([x,y])=>[x-BWX,y-BWY]),[BWW+300,-300],[BPATH_L[0][0]-200,-300],[BPATH_L[0][0]-200,BPATH_L[0][1]]];
 const BENTRY={x:1010*1.8,y:1110*1.8},BEAST={x:BWW-60,y:0};
 BEAST.y=(()=>{let b=null;for(const [x,y] of BPATH_PTS)if(!b||Math.abs(x-BWX-BEAST.x)<Math.abs(b[0]-BWX-BEAST.x))b=[x,y];return b[1]-BWY;})();
-const BARCHES=[[135,250,false],[375,250,true],[615,250,false]],BARCH_X1=780;   /* x, width, flipped */
+const BARCHES=[[135,250,false,'crown'],[375,250,true,'pillars'],[615,250,false,'left']],BARCH_X1=780;   /* x, width, flipped, how it has crumbled */
+/* the ruined archways: each is the designer's arch art clipped to what still stands (u,v across the image, 0..1), with fallen chunks of it lying about */
+const RUIN_CUT={crown:[[0,1],[0,0],[.44,0],[.48,.1],[.53,.16],[.57,.24],[.63,.2],[.67,.29],[.73,.22],[.79,.33],[.86,.27],[.92,.36],[1,.33],[1,1]],
+  pillars:[[0,1],[0,.47],[.07,.42],[.12,.35],[.19,.38],[.25,.31],[.31,.36],[.36,.44],[.39,.52],[.42,1],[.6,1],[.62,.6],[.66,.52],[.72,.47],[.78,.5],[.84,.42],[.9,.46],[.95,.4],[1,.47],[1,1]],
+  left:[[0,1],[0,.55],[.06,.5],[.11,.43],[.17,.46],[.22,.38],[.29,.41],[.34,.48],[.39,.56],[.42,1]]};
+/* fallen chunks: [source u0,v0,u1,v1, x offset and y offset (fractions of the arch width), turn, size] */
+const RUIN_RUBBLE={crown:[[.6,.05,.8,.22,.55,.06,.4,.55],[.82,.12,.96,.3,.72,.1,-.9,.45]],
+  pillars:[[.3,.04,.58,.2,.05,.1,.25,.6],[.62,.08,.8,.26,-.42,.14,-1.2,.42],[.78,.2,.95,.4,.5,.12,1.4,.42]],
+  left:[[.62,.3,.95,.55,.42,.08,1.5,.6],[.5,.05,.75,.22,.78,.14,-.5,.48],[.75,.55,.95,.75,.25,.16,.9,.36]]};
+function drawRuinArch(o){const im=IMG.ruins_arch;if(!ready(im))return;const w=o.w,h=w*im.naturalHeight/im.naturalWidth;ctx.save();ctx.translate(o.x,o.y);if(o.flip)ctx.scale(-1,1);
+  const P=RUIN_CUT[o.cut];if(P){ctx.beginPath();P.forEach(([u,v],i)=>{const x=-w/2+u*w,y=-h*.97+v*h;i?ctx.lineTo(x,y):ctx.moveTo(x,y);});ctx.closePath();ctx.clip();}
+  ctx.drawImage(im,-w/2,-h*.97,w,h);ctx.restore();}
+function drawRuinRubble(o){const im=IMG.ruins_arch;if(!ready(im))return;const [u0,v0,u1,v1]=o.src,iw=im.naturalWidth,ih=im.naturalHeight,sw=(u1-u0)*iw,sh=(v1-v0)*ih,k=o.w/sw;
+  ctx.save();ctx.translate(o.x,o.y);ctx.fillStyle='rgba(20,30,15,.28)';ctx.beginPath();ctx.ellipse(0,0,o.w*.55,o.w*.16,0,0,TAU);ctx.fill();ctx.rotate(o.rot);if(o.flip)ctx.scale(-1,1);ctx.drawImage(im,u0*iw,v0*ih,sw,sh,-sw*k/2,-sh*k*.8,sw*k,sh*k);ctx.restore();}
 const BW_OFF=66,BSPUR=300;   /* a short side path north from the hump up to the door back to Evergreen Grove */
 const bspurDist=(x,y)=>{const lx=x-BWX-BENTRY.x,ly=y-BWY;return Math.hypot(lx,ly<BENTRY.y-BSPUR?ly-(BENTRY.y-BSPUR):ly>BENTRY.y?ly-BENTRY.y:0);};
 const bwClear=(lx,ly,m)=>Math.abs(lx-BENTRY.x)<m&&ly<BENTRY.y+30;   /* nothing grows on the way up to the grove (trees and flowers line its edges) */   /* path centre to the top of the cliff strip */
@@ -49,7 +62,8 @@ function bwProps(P){const X=x=>x+BWX,Y=y=>y+BWY;let k=0;
     P.push({t:'tree',img,x:X(sx),y:Y(sy),w:w*(.6+BH_(k,34)*.6),flip:BH_(k,35)<.5,base:.9});}
   /* three ruined archways in a line just above the west end of the path: scenery only, Lum can't reach them */
   const ay=Math.min(...BARCHES.map(([ax])=>{let y=BPATH_PTS.reduce((b,p)=>Math.abs(p[0]-X(ax))<Math.abs(b[0]-X(ax))?p:b)[1];while(bpathDist(X(ax),y)<88)y-=4;return y;}));   /* one shared line */
-  for(const [ax,w,fl] of BARCHES)P.push({t:'tree',img:'ruins_arch',x:X(ax),y:ay,w,flip:fl,base:.97});}
+  for(const [ax,w,fl,cut] of BARCHES){P.push({t:'ruin',x:X(ax),y:ay,w,flip:fl,cut});
+    for(const [u0,v0,u1,v1,dx,dy,rot,sz] of RUIN_RUBBLE[cut]||[])P.push({t:'rubble',src:[u0,v0,u1,v1],x:X(ax)+dx*w*(fl?-1:1),y:ay-8+dy*w*.3,w:w*sz*.55,rot,flip:fl});}}
 /* ground: the sea everywhere off the land, the cliff edge bent along the path's south side, then the path */
 function drawBWGround(x0,y0,x1,y1){if(x1<BWX-300)return;if(!BPATHP)BPATHP=buildPath(BPATH_CTRL,162,5.3);
   ctx.save();ctx.translate(BWX,BWY);
