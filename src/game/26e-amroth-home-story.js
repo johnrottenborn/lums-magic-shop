@@ -12,7 +12,10 @@ function hsGoal(t){GOAL.tag='NEW TASK';GOAL.text=t;HINT.goalT=0;}
 function hsArrive(){if(HST.st||!C2.joined)return;HST.st=1;hsGoal('Go inside Amroth’s home');}
 function almaWalk(tx,ty,sp,dt){const dx=tx-ALMA.x,dy=ty-ALMA.y,d=Math.hypot(dx,dy);if(d<3){ALMA.x=tx;ALMA.y=ty;ALMA.moving=0;return true;}const m=Math.min(d,sp*dt);ALMA.x+=dx/d*m;ALMA.y+=dy/d*m;ALMA.ph+=m;ALMA.moving=1;
   if(Math.abs(dx)>Math.abs(dy)){ALMA.dir='side';ALMA.face=dx>0?1:-1;}else ALMA.dir=dy>0?'down':'up';return false;}
-function drawAlmaRoom(){if(!ALMA.on)return;const k=dunH(ALMA.y)/151,an=ALMA.moving?(ALMA.dir==='side'?'side':ALMA.dir):(ALMA.dir==='up'?'up':ALMA.dir==='side'?'side':'idle'),n=C1ATL.alma.rows[an][1],
+const ALMASEAT={x:1000,y:690,fx:986,fy:662};   /* the armchair by the fire: where she is spoken to, and where her feet rest */
+function drawAlmaSeated(){const k=dunH(ALMASEAT.fy)/151,talking=DLG.active&&DLG.lines&&DLG.lines[DLG.i||0]&&DLG.lines[DLG.i||0][0]==='Alma',near=Math.hypot(lum.x-ALMA.x,lum.y-ALMA.y)<230;
+  const fi=talking?0:near?1:3;c1Frame(ctx,'alma_sit','sitchair',fi,ALMASEAT.fx,ALMASEAT.fy,ALMA_H*240/250*k*1.1,false,1,0);}
+function drawAlmaRoom(){if(!ALMA.on)return;if(ALMA.sit){drawAlmaSeated();return;}const k=dunH(ALMA.y)/151,an=ALMA.moving?(ALMA.dir==='side'?'side':ALMA.dir):(ALMA.dir==='up'?'up':ALMA.dir==='side'?'side':'idle'),n=C1ATL.alma.rows[an][1],
     fi=ALMA.moving?Math.floor(ALMA.ph/16)%n:an==='side'?3:0;   /* standing still: one still frame, no stepping on the spot */
   ctx.save();ctx.translate(ALMA.x,ALMA.y);ctx.scale(k,k);ctx.fillStyle='rgba(10,10,20,.25)';ctx.beginPath();ctx.ellipse(0,2,28,8,0,0,TAU);ctx.fill();
   c1Frame(ctx,'alma',an,fi,0,0,ALMA_H,an==='side'&&ALMA.face<0,1,0);   /* her side rows face right */
@@ -44,7 +47,7 @@ function hsToRest(){HST.st=3;WEVENT.on=false;HST.amrIn=1;HST.almaGo=1;AMR.x=700;
   C2.joined=0;const k=PARTY_ORDER.indexOf('amroth');if(k>=0)PARTY_ORDER.splice(k,1);   /* Lum goes on alone from here */
   hsGoal('Rest upstairs');setupDun();}
 /* the loft bed */
-function hsRest(){if(HST.st!==3){say("A big bed under a patchwork quilt.");return;}WEVENT.on=true;goScene(()=>{HST.st=4;HST.amrIn=0;HST.amrOut=1;ALMA.on=1;ALMA.baby=0;[ALMA.x,ALMA.y]=HSPOS.alma;ALMA.face=-1;ALMA.dir='side';ALMA.moving=0;
+function hsRest(){if(HST.st!==3){say("A big bed under a patchwork quilt.");return;}WEVENT.on=true;goScene(()=>{HST.st=4;HST.amrIn=0;HST.amrOut=1;ALMA.on=1;ALMA.baby=0;ALMA.sit=1;ALMA.x=ALMASEAT.x;ALMA.y=ALMASEAT.y;ALMA.face=-1;ALMA.dir='side';ALMA.moving=0;
   for(const id of PARTY_ORDER)HEROES[id].hp=HEROES[id].maxHp;lum.x=900;lum.y=735;lum.face=1;lum.state='idle';WEVENT.on=false;GOAL.tag='';GOAL.text='';setupDun();
   setTimeout(()=>{hsGoal('Go downstairs');},1500);});}
 /* the morning: Alma waits downstairs */
@@ -72,7 +75,7 @@ function updateHomeStory(dt){HST.t+=dt;
   if(SCENE==='dun'&&DUN.room===21&&HST.meet===1&&!DLG.active){if(almaWalk(lum.x+95,lum.y+2,70,dt)){ALMA.face=-1;ALMA.dir='side';lum.face=1;HST.meet=2;HST.heart=1;hsMeetTalk();}}
   if(SCENE==='dun'&&DUN.room===21&&HST.st===4)hsMorningTalk();
   if(SCENE==='dun'&&DUN.room===21&&HST.st===3&&HST.almaGo&&!DLG.active){if(almaWalk(AMR.x+80,AMR.y+2,70,dt)){ALMA.face=-1;ALMA.dir='side';HST.almaGo=0;}}   /* Alma goes to stand beside Amroth */
-  if(SCENE==='dun'&&DUN.room===21&&HST.st>=4&&ALMA.on&&!ALMA.moving){ALMA.dir='side';ALMA.face=lum.x<ALMA.x?-1:1;}   /* she stays by the fire and turns to follow Lum */
+  if(SCENE==='dun'&&DUN.room===21&&HST.st>=4&&ALMA.on&&!ALMA.moving&&!ALMA.sit){ALMA.dir='side';ALMA.face=lum.x<ALMA.x?-1:1;}   /* she stays by the fire and turns to follow Lum */
   if(HST.amrOut&&SCENE==='thorn'){const [x,y]=hsAmrPos();AMR.x=x;AMR.y=y;AMR.moving=0;AMR.dir='side';AMR.face=1;}   /* looking out over the water */
   if(HST.heart>0&&!DLG.active&&!HST.meet&&!HST.walk&&HST.st!==5)HST.heart=Math.max(0,HST.heart-dt);}
 /* night over the home (screen space), with warm windows and door; the chimney smoke in world space */

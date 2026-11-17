@@ -452,7 +452,7 @@ const CASES = {
     await g_(() => window.__g.enterDun(21, 1120, 672, -1)); await wait(800);
     check(await g_(() => window.__g.HST.st === 5 && !window.__g.DLG.active), 'the morning talk started on its own instead of waiting for Lum to speak to Alma');
     const ax = await g_(() => window.__g.ALMA.x); await wait(600);
-    check(await g_(() => window.__g.ALMA.x) === ax, 'Alma moved in the morning instead of waiting by the fire');
+    check((await g_(() => window.__g.ALMA.x)) === ax && (await g_(() => window.__g.ALMA.sit)), 'Alma should sit in the armchair by the fire in the morning');
     await g_(() => { const g = window.__g; g.lum.x = g.ALMA.x + 10; g.lum.y = g.ALMA.y + 45; }); await wait(400);
     await g_(() => window.__g.NEAR.onInteract()); await wait(400);
     await talkAll(30);
