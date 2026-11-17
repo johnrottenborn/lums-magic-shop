@@ -813,7 +813,7 @@ const CASES = {
     await g_(() => window.__g.NEAR.onInteract()); await wait(1200);
     check(await g_(() => window.__g.SCENE === 'dun' && window.__g.DUNX.room === 21 && window.__g.dunFree(window.__g.lum.x, window.__g.lum.y)), 'the cottage door did not lead inside');
     await p.screenshot({ path: path.join(SHOTS, `amroth-cottage-inside-${vp}.png`) });
-    check(await g_(() => [[650, 636], [320, 604], [440, 604], [1000, 720], [1140, 700]].every(([x, y]) => window.__g.dunFree(x, y)) && ![[350, 720], [230, 680], [440, 700], [1000, 650]].some(([x, y]) => window.__g.dunFree(x, y))), 'the cottage floor or its furniture is wrong (behind the table is open; the table is solid)');
+    check(await g_(() => [[650, 636], [566, 618], [1000, 720], [1140, 700]].every(([x, y]) => window.__g.dunFree(x, y)) && ![[350, 720], [230, 680], [440, 700], [440, 604], [320, 604], [1000, 650]].some(([x, y]) => window.__g.dunFree(x, y))), 'the cottage floor or its furniture is wrong (behind the table is open; the table is solid)');
     await g_(() => { const g = window.__g; g.lum.x = 1150; g.lum.y = 700; }); await wait(500);
     await g_(() => window.__g.NEAR.onInteract()); await wait(1200);
     check(await g_(() => window.__g.DUNX.room === 22 && window.__g.dunFree(window.__g.lum.x, window.__g.lum.y)), 'the stairs did not lead up to the loft');

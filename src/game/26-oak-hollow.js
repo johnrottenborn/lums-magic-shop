@@ -32,7 +32,7 @@ const DROOMS={
   20:{name:'Worldbind Passage',dark:.38,floor:[[792,395],[935,395],[948,595],[1060,605],[1180,640],[1235,768],[565,768],[585,700],[605,625],[765,598]],
      light:[862,250,230]},
   /* Amroth's cottage (the designer's interiors). 21: the main room, front door on the left, spiral stair up on the right */
-  21:{name:'',dark:0,home:1,hk:1.3,floor:[[300,592],[705,592],[930,600],[1150,628],[1160,768],[606,768],[606,640],[470,622],[300,617]],   /* a narrow strip between the wall and the table's back edge runs left past the door to the back chair; the table itself is solid */
+  21:{name:'',dark:0,home:1,hk:1.3,floor:[[522,600],[705,594],[930,600],[1150,628],[1160,768],[606,768],[606,640],[522,632]],   /* the floor starts just right of the front door, so Lum never stands on the door itself; the table is solid */
      block:[{x0:598,y0:664,x1:705,y1:769},{x0:868,y0:590,x1:1120,y1:694}],
      fg:[{y:690,poly:[[120,650],[205,617],[315,609],[470,626],[612,645],[640,640],[700,636],[705,768],[120,768]]},   /* traced along the table top's back edge, so whoever walks behind it is hidden from the waist down */{y:688,poly:[[912,600],[1098,595],[1098,700],[905,700]]}]},
   /* 23: the basement workshop under the cottage (behind the bookshelf left of the fireplace; opened by a story event) */
@@ -83,7 +83,7 @@ function setupDun(){DUNINT.length=0;const r=DUN.room,D=(x,y,reach,fn)=>DUNINT.pu
     L(730,545,110,["The old wall again. The air is getting colder the deeper we go.","Water drips somewhere behind the stones."]);}
   if(r===19){D(422,205,70,()=>dunGo(18,1215,540,-1));DUNINT.push({x:840,y:580,reach:95,onInteract:()=>touchWBTorch('serpent',["A great stone serpent, coiled and ready to strike. Its green flame burns brighter now."])});
     L(330,700,95,["Another empty pedestal."]);D(1165,545,80,()=>dunGo(20,862,425,1));}
-  if(r===21){D(435,620,80,()=>goScene(leaveCottage));D(1172,662,70,()=>dunGo(22,1115,700,-1));
+  if(r===21){D(452,612,100,()=>goScene(leaveCottage));D(1172,662,70,()=>dunGo(22,1115,700,-1));
     DUNINT.push({x:820,y:612,reach:90,get fire(){return HST.st>=6;},onInteract:()=>{if(canLumMix()&&HST.st>=6)openMix();else say("A warm fire crackles in the hearth. A kettle hangs over the flames.");}});   /* Lum can mix at Alma's hearth in the morning */}
   if(r===21)DUNINT.push({get x(){return ALMA.x;},get y(){return ALMA.y+10;},get reach(){return ALMA.on&&(HST.st===3||HST.st>=5)&&!DLG.active&&!WEVENT.on?90:-1;},onInteract:almaTalk});   /* talk to Alma */
   if(r===21)DUNINT.push({get x(){return AMR.x;},get y(){return AMR.y+10;},get reach(){return HST.amrIn&&HST.st===3&&!DLG.active&&!WEVENT.on?90:-1;},onInteract:()=>hsBabyAdmire()});   /* Amroth, beside Alma, before Lum goes up to bed */
