@@ -126,6 +126,7 @@ function drawThornProp(o,alpha){if(o.t==='bvf'){drawBVFlower(o);return;}if(o.t==
   const w=(CH>=2&&o.img2?o.w2:o.w),h=w*im.naturalHeight/im.naturalWidth;ctx.save();ctx.globalAlpha=alpha;ctx.translate(o.x,o.y);if(o.flip)ctx.scale(-1,1);
   if(o.t==='rose'&&THORN.blooms){const tw=o.img==='rose_twin';THORN.blooms.push([o.x+(tw?w*.3*(o.flip?-1:1):0),o.y-h*(o.img==='rose_bud'?.9:tw?.86:.88)]);}
   const base=o.base||(o.t==='oak'?.99:o.t==='web'?.97:o.t==='tree'?.985:.94);
+  if(o.sx)ctx.scale(o.sx,1);   /* stretched sideways */
   if(o.img==='pier'){const k=w/im.naturalWidth,P_=(ix,iy)=>[-w/2+ix*k,-h*base+iy*k];ctx.beginPath();for(const [ix,iy] of [[0,0],[455,0],[455,120],[160,226],[0,196]])ctx.lineTo(...P_(ix,iy));ctx.clip();}   /* the pier's legs and braces sink below the water line */
   ctx.drawImage(im,-w/2,-h*base,w,h);ctx.restore();
   if(o.t==='oak'){ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,o.x-w*.32,o.y-h*.2,60,'120,230,220',.35+.12*Math.sin(T*2));ctx.restore();}

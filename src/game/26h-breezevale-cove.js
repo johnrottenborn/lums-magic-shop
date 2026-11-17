@@ -31,7 +31,7 @@ const BVCOB=(()=>{const F=BVFOUNT,ring=[];for(let a=0;a<=TAU+.01;a+=.2)ring.push
   return [ring,...BVHOUSES.slice(0,4).map(h=>to(h.x,h.y+40)),to(BVGATE.x,BVGATE.y-30),to(BVBR.x0+20,BVBR.y),to(BVNORTH.x,BVNORTH.y+30)].map(P=>smoothPath(P));})();
 function bvSolid(lx,ly){for(const h of BVHOUSES){const cy=h.y-h.w*.13;if(((lx-h.x)/(h.w*.43))**2+((ly-cy)/(h.w*.17))**2<1)return true;}
   if(((lx-BVFOUNT.x)/(BVFOUNT.w*.47))**2+((ly-BVFOUNT.y+BVFOUNT.w*.12)/(BVFOUNT.w*.2))**2<1)return true;
-  if(Math.abs(ly-BVGATE.y)<34&&Math.abs(lx-BVGATE.x)>74&&Math.abs(lx-BVGATE.x)<210)return true;   /* the gateposts and their stone footings */
+  if(Math.abs(ly-BVGATE.y+60)<34&&Math.abs(lx-BVGATE.x)>92&&Math.abs(lx-BVGATE.x)<250)return true;   /* the gateposts and their stone footings */
   if(((lx-BVGIRL.x)/30)**2+((ly-BVGIRL.y)/14)**2<1)return true;   /* the townsgirl */
   for(const [tx,ty] of BVTRUNKS)if(Math.abs(lx-tx)<32&&ly-ty<14&&ty-ly<22)return true;
   return false;}
@@ -70,7 +70,11 @@ function bvProps(P){const X=x=>x+BVX,Y=y=>y+BVY;
   for(const h of BVHOUSES)P.push({t:'tree',img:h.img,x:X(h.x),y:Y(h.y),w:h.w,flip:!!h.flip,base:.97,solid:1});
   P.push({t:'bvgirl',x:X(BVGIRL.x),y:Y(BVGIRL.y),w:80});
   P.push({t:'tree',img:'breeze_fountain',x:X(BVFOUNT.x),y:Y(BVFOUNT.y),w:BVFOUNT.w,flip:false,base:.95,solid:1});
-  P.push({t:'tree',img:'breeze_gate',x:X(BVGATE.x),y:Y(BVGATE.y+14),w:420,flip:false,base:.97,solid:1});
+  P.push({t:'tree',img:'breeze_gate',x:X(BVGATE.x),y:Y(BVGATE.y-50),w:420,sx:1.2,flip:false,base:.97,solid:1});   /* a little wider, its footing stones on the rim of the green */
+  /* grass and small flowers tucked along the gate's footings, hiding where they meet the cliff and the road */
+  for(const [dx,dy,k] of [[-262,-40,'t'],[-232,-30,'f'],[-196,-36,'t'],[-112,-46,'t'],[-96,-34,'f'],[96,-34,'f'],[112,-46,'t'],[196,-36,'t'],[232,-30,'f'],[262,-40,'t'],[-82,-6,'t'],[82,-6,'t']])
+    if(k==='t')P.push({t:'tuft',w:40,x:X(BVGATE.x+dx),y:Y(BVGATE.y+dy),n:6,h:26+Math.abs(dx)%7*2,hue:.4});
+    else P.push({t:'bvf',img:'hydrsmall',tint:['pink','blue','lilac'][Math.abs(dx)%3],x:X(BVGATE.x+dx),y:Y(BVGATE.y+dy),w:46,flip:dx<0});
   P.push({t:'tree',img:'breeze_bridge',x:X((BVBR.x0+BVBR.x1)/2),y:Y(BVBR.y+BVBR.h*.16),sy:Y(BVBR.y-BVBR.rise-60),w:BVBR.w,flip:false,base:1});   /* the whole bridge, behind Lum */
   for(const [dx,dy,img,w] of [[8,62,'crockpile',80],[60,84,'crockegg',46],[-40,78,'crockegg',42],[125,96,'crockegg',40],[190,84,'crockegg',44],[244,64,'crockpile',80],[290,82,'crockegg',42]])   /* small boulders in the water under the bridge, hiding where the shores drop away */
     P.push({t:'tree',img,x:X(BVBR.x0+dx),y:Y(BVBR.y+dy),w,flip:dx%2===0,base:.9});
