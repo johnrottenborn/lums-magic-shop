@@ -16,7 +16,8 @@ const bvDoorX=h=>h.x+(h.door-.5)*h.w*(h.flip?-1:1);
 function bvYard(h){const L=h.x-h.w*.45,R=h.x+h.w*.45,d=bvDoorX(h),y=h.y+8,up=h.y-h.w*.2,gap=80,out=[];
   out.push(d-L>gap+120?[[L-8,up],[L-14,y-30],[L+30,y],[d-gap,y]]:[[L-8,up],[L-14,y-30],[L+12,y]]);   /* a short side (door near the corner) only wraps the corner */
   out.push(R-d>gap+120?[[d+gap,y],[R-30,y],[R+14,y-30],[R+8,up]]:[[R-12,y],[R+14,y-30],[R+8,up]]);return out;}
-const BVFOUNT={x:1050,y:1010,w:380};
+const BVFOUNT={x:1050,y:990,w:760};
+const bvFP=(u,v)=>{const F=BVFOUNT,h=F.w*633/1100;return [BVX+F.x+(u-.5)*F.w,BVY+F.y-h*.95+v*h];};   /* a point on the fountain art (u,v across it) */
 const inBV=()=>lum.x>BVX-300;
 const BVH_=(a,b)=>hash(a,b,6271);
 /* the land outlines (region coords), each traced so the sea lies to the left of the way round: the green with the road down from its
@@ -30,7 +31,7 @@ const BVCOB=(()=>{const F=BVFOUNT,ring=[];for(let a=0;a<=TAU+.01;a+=.2)ring.push
   const to=(x,y)=>{const a=Math.atan2(y-(F.y-50),x-F.x);return [[F.x+Math.cos(a)*230,F.y-50+Math.sin(a)*135],[(F.x+x)/2+(BVH_(x,1)-.5)*40,(F.y-50+y)/2+(BVH_(y,2)-.5)*30],[x,y]];};
   return [ring,...BVHOUSES.slice(0,4).map(h=>to(h.x,h.y+40)),to(BVGATE.x,BVGATE.y-30),to(BVBR.x0+20,BVBR.y),to(BVNORTH.x,BVNORTH.y+30)].map(P=>smoothPath(P));})();
 function bvSolid(lx,ly){for(const h of BVHOUSES){const cy=h.y-h.w*.13;if(((lx-h.x)/(h.w*.43))**2+((ly-cy)/(h.w*.17))**2<1)return true;}
-  if(((lx-BVFOUNT.x)/(BVFOUNT.w*.47))**2+((ly-BVFOUNT.y+BVFOUNT.w*.12)/(BVFOUNT.w*.2))**2<1)return true;
+  if(((lx-BVFOUNT.x)/(BVFOUNT.w*.47))**2+((ly-BVFOUNT.y+BVFOUNT.w*.08)/(BVFOUNT.w*.11))**2<1)return true;
   if(Math.abs(ly-BVGATE.y+60)<34&&Math.abs(lx-BVGATE.x)>92&&Math.abs(lx-BVGATE.x)<250)return true;   /* the gateposts and their stone footings */
   if(((lx-BVGIRL.x)/30)**2+((ly-BVGIRL.y)/14)**2<1)return true;   /* the townsgirl */
   for(const [tx,ty] of BVTRUNKS)if(Math.abs(lx-tx)<32&&ly-ty<14&&ty-ly<22)return true;
@@ -86,7 +87,7 @@ function bvProps(P){const X=x=>x+BVX,Y=y=>y+BVY;
   {const h=BVHOUSES[4],tt=TINTS.shell2;let q=0;for(let a=0;a<TAU;a+=.32){for(const rr of [.62,.86]){q++;const lx=BVI.x+Math.cos(a+rr)*BVI.r*rr,ly=BVI.y+Math.sin(a+rr)*BVI.r*rr*.9+30;
       if(((lx-h.x)/(h.w*.47))**2+((ly-(h.y-h.w*.16))/(h.w*.22))**2<1)continue;if(bvIslePathDist(lx,ly)<70)continue;   /* not on the house, nor on the path from the bridge */
       P.push({t:'bvf',img:HY[q%3],tint:tt[q%2],x:X(lx),y:Y(ly),w:60+BVH_(q,31)*30,flip:q%2===0});}}}
-  for(let i=0;i<10;i++){const a=i/10*TAU+.3,lx=BVFOUNT.x+Math.cos(a)*290,ly=BVFOUNT.y-50+Math.sin(a)*175;if(Math.abs(Math.sin(a))>.85||Math.abs(Math.cos(a))>.93)continue;
+  for(let i=0;i<0;i++){const a=i/10*TAU+.3,lx=BVFOUNT.x+Math.cos(a)*290,ly=BVFOUNT.y-50+Math.sin(a)*175;if(Math.abs(Math.sin(a))>.85||Math.abs(Math.cos(a))>.93)continue;
     P.push({t:'bvf',img:HY[i%3],tint:['pink','blue','lilac','cream','coral'][i%5],x:X(lx),y:Y(ly),w:62+BVH_(i,9)*22,flip:i%2===0});}
   /* a ring of evergreens and shrubs round the rim of the green, leaving the gate, the bridge and the north way open */
   let k=0;for(let a=0;a<TAU;a+=.13){k++;const r=BVC.r-38-BVH_(k,11)*14,lx=BVC.x+Math.cos(a)*r,ly=BVC.y+Math.sin(a)*r;
@@ -134,10 +135,11 @@ function buildBVCobbles(){const K=.9,R=BVPAVE+30,ox=BVC.x-R,oy=BVC.y-R,S=R*2,c=d
   return [c,ox,oy,K];}
 /* the fountain plays: rings on its basin and a soft mist at the top jet */
 function drawBVFx(){if(!inBV()||SCENE!=='thorn')return;{const lx=lum.x-BVX;if(lx>BVBR.x0-20&&lx<BVBR.x1+20&&Math.abs(lum.y-BVY-bvBridgeY(lx))<45)lum.y=BVY+bvBridgeY(lx);}   /* on the bridge, Lum's feet follow the deck up and over the arch */const fx=BVX+BVFOUNT.x,fy=BVY+BVFOUNT.y,w=BVFOUNT.w;ctx.save();
-  for(let i=0;i<5;i++){const q=(T*.45+i/5)%1,a=i*1.3;ctx.strokeStyle=`rgba(235,245,250,${(.5*(1-q)).toFixed(3)})`;ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(fx+Math.cos(a)*w*.22,fy-w*.18+Math.sin(a)*w*.05,6+q*26,(6+q*26)*.35,0,0,TAU);ctx.stroke();}
-  drawGlow(ctx,fx,fy-w*.78,46+Math.sin(T*3)*6,'235,245,252',.35);
-  for(let i=0;i<14;i++){const q=(T*.7+i/14)%1,side=i%2?1:-1,sx=fx+side*(w*.05+q*w*.17),sy=fy-w*.74+q*w*.36+q*q*w*.18;ctx.fillStyle=`rgba(225,240,250,${(.55*(1-q)).toFixed(3)})`;ctx.beginPath();ctx.arc(sx,sy,2.2,0,TAU);ctx.fill();}   /* water arcing down from the top bowl */
-  for(let i=0;i<6;i++){const q=(T*.9+i/6)%1;ctx.globalAlpha=Math.sin(q*Math.PI)*.7;ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(fx+(BVH_(i,41)-.5)*w*.5,fy-w*.2+(BVH_(i,42)-.5)*w*.08,1.6,0,TAU);ctx.fill();}ctx.globalAlpha=1;   /* glints on the basin */
+  /* all of it kept tight to the art: rings on the lower pool, a little mist on the top jet, drops falling in the curtains, glints on the pool */
+  for(let i=0;i<6;i++){const q=(T*.45+i/6)%1,[px,py]=bvFP(.3+BVH_(i,61)*.5,.665+BVH_(i,62)*.04),r=3+q*w*.025;ctx.strokeStyle=`rgba(235,245,250,${(.45*(1-q)).toFixed(3)})`;ctx.lineWidth=1.6;ctx.beginPath();ctx.ellipse(px,py,r,r*.35,0,0,TAU);ctx.stroke();}
+  {const [jx,jy]=bvFP(.535,.06);drawGlow(ctx,jx,jy,w*.035+Math.sin(T*3)*3,'235,245,252',.3);}
+  for(let i=0;i<16;i++){const q=(T*.8+i/16)%1,lane=[.45,.49,.53,.57,.61][i%5],[sx,sy]=bvFP(lane+(BVH_(i,63)-.5)*.01,.32+q*.32);ctx.fillStyle=`rgba(230,244,252,${(.5*(1-q*.6)).toFixed(3)})`;ctx.beginPath();ctx.arc(sx,sy,1.8,0,TAU);ctx.fill();}   /* drops in the falling curtains */
+  for(let i=0;i<6;i++){const q=(T*.9+i/6)%1,[gx,gy]=bvFP(.3+BVH_(i,41)*.5,.665+BVH_(i,42)*.045);ctx.globalAlpha=Math.sin(q*Math.PI)*.7;ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(gx,gy,1.5,0,TAU);ctx.fill();}ctx.globalAlpha=1;   /* glints on the pool */
   /* chimney smoke */
   for(const h of BVHOUSES){if(!h.smoke)continue;const im=IMG[h.img];if(!ready(im))continue;const hh=h.w*im.naturalHeight/im.naturalWidth,cx=BVX+h.x+(h.smoke[0]-.5)*h.w*(h.flip?-1:1),cy=BVY+h.y-hh*.97+h.smoke[1]*hh;
     for(let i=0;i<7;i++){const q=(T*.16+i/7+h.x*.001)%1,r=10+q*34;ctx.fillStyle=`rgba(225,228,232,${(.36*(1-q)*Math.min(1,q*6)).toFixed(3)})`;ctx.beginPath();ctx.arc(cx+Math.sin(q*5+i)*8+q*40,cy-q*150,r,0,TAU);ctx.fill();}}
@@ -150,7 +152,7 @@ function drawBVFx(){if(!inBV()||SCENE!=='thorn')return;{const lx=lum.x-BVX;if(lx
     ctx.save();ctx.translate(b.x,b.y+beat*1.5);if(dir!==native)ctx.scale(-1,1);ctx.scale(1,.86+.14*beat);ctx.drawImage(im,-bw/2,-bh/2,bw,bh);ctx.restore();}}
 const BVBIRDS=[];
 /* a Breezevale townsgirl by the fountain */
-const BVGIRL={x:BVFOUNT.x-150,y:BVFOUNT.y+70,face:1,talking:0};
+const BVGIRL={x:BVFOUNT.x-130,y:BVFOUNT.y+60,face:1,talking:0};
 function drawBVGirl(o){const G=BVGIRL,talking=DLG.active&&G.talking,an=talking&&Math.abs(lum.x-(BVX+G.x))>30?'side':'down';
   ctx.save();ctx.fillStyle='rgba(10,10,20,.25)';ctx.beginPath();ctx.ellipse(o.x,o.y,22,7,0,0,TAU);ctx.fill();ctx.restore();
   c1Frame(ctx,'breeze_girl',an,an==='side'?0:0,o.x,o.y,96,an==='side'&&lum.x>o.x,1,0);if(!DLG.active)G.talking=0;}
@@ -166,6 +168,14 @@ function drawBVTitle(){if(!inBV()||BVT.t>=4.5||SCENE!=='thorn')return;BVT.t+=1/6
 /* the way back down to the Breezeway, the way north (the Sanctuary of Water, still to come), and the house doors (no one answers yet) */
 THINT.push({get x(){return BVX+BVSOUTH.x;},get y(){return BVY+BVSOUTH.y;},get reach(){return inBV()?80:-1;},door:true,onInteract:()=>goScene(enterBWEast)},
   {get x(){return BVX+BVNORTH.x;},get y(){return BVY+BVNORTH.y;},get reach(){return inBV()?85:-1;},door:true,onInteract:()=>say("The way to the Sanctuary of Water lies beyond.")});
-for(const h of BVHOUSES)THINT.push({x:BVX+bvDoorX(h),y:BVY+h.y+24,get reach(){return inBV()?78:-1;},onInteract:()=>say(h.name==='mayor'?"The Mayor's house. No one answers.":"Lum knocks. No one answers.")});
+/* the clam houses can be entered: a shop (bottom-left) and a sitting room (bottom-right); their townsfolk (lines still to settle with the designer) */
+const BVNPC=[{room:25,atlas:'breeze_boy',x:850,y:525,h:150,name:'Shopkeeper',lines:[["Welcome in! Have a look around."]]},
+  {room:26,atlas:'breeze_boy',x:1215,y:664,name:'Townsman',lines:[["Oh! Hello there. Come in out of the rain."]]},
+  {room:26,atlas:'breeze_girl',x:470,y:690,name:'Townswoman',lines:[["Would you like some tea? The kettle's still warm."]]}];
+function drawBVNpc(n){const k=dunH(n.y)/151,face=lum.x>n.x;ctx.save();ctx.fillStyle='rgba(10,10,20,.25)';ctx.beginPath();ctx.ellipse(n.x,n.y,22*k,7*k,0,0,TAU);ctx.fill();ctx.restore();
+  const talking=DLG.active&&DLG.lines&&DLG.lines[DLG.i||0]&&DLG.lines[DLG.i||0][0]===n.name,an=talking&&Math.abs(lum.x-n.x)>60?'side':'down';c1Frame(ctx,n.atlas,an,0,n.x,n.y,n.h||96*k,an==='side'&&face,1,0);}
+function bvNpcTalk(n){lum.face=lum.x<n.x?1:-1;talk(n.lines.map(l=>[n.name,l[0]]));}
+function leaveBVHouse(i){const h=BVHOUSES[i];SCENE='thorn';lum.x=BVX+bvDoorX(h);lum.y=BVY+h.y+60;lum.face=1;lum.dir='down';lum.state='idle';lum.vx=lum.vy=0;cam.x=lum.x;cam.y=lum.y;THORN.t=99;BVT.t=99;}
+for(const [i,h] of BVHOUSES.entries())THINT.push({x:BVX+bvDoorX(h),y:BVY+h.y+24,get reach(){return inBV()?78:-1;},door:i===2||i===3,onInteract:()=>i===2?dunGo(25,660,700,-1):i===3?dunGo(26,330,720,1):say(h.name==='mayor'?"The Mayor's house. No one answers.":"Lum knocks. No one answers.")});
 
 THINT.push({get x(){return BVX+BVGIRL.x;},get y(){return BVY+BVGIRL.y+10;},get reach(){return inBV()?85:-1;},onInteract:bvGirlTalk});

@@ -40,6 +40,13 @@ const DROOMS={
      block:[{x0:500,y0:486,x1:945,y1:696},{x0:660,y0:705,x1:905,y1:769},{x0:920,y0:600,x1:1060,y1:665}],
      fg:[{y:698,poly:[[500,470],[950,470],[950,700],[496,700]]},{y:769,poly:[[680,712],[905,712],[905,768],[680,768]]},{y:769,poly:[[118,592],[360,592],[360,768],[118,768]]}]},
   /* 24: the Ruins Overlook, off the west end of the Coastal Breezeway (the designer's painting): a stony path climbs to steps and a ring-walled lookout over the misty ruins */
+  /* 25: inside the bottom-left clam house in Breezevale Cove, a seaside shop (the designer's painting); the shopkeeper stands behind the counter */
+  25:{name:'',dark:0,home:1,hk:1.15,floor:[[300,595],[545,592],[560,566],[690,566],[690,610],[1012,610],[1018,592],[1150,592],[1180,604],[1150,628],[950,632],[950,742],[372,742],[368,640],[290,628]],
+     fg:[{y:612,poly:[[680,470],[1012,476],[1012,612],[680,612]]}]},   /* the counter, in front of whoever stands behind it */
+  /* 26: inside the bottom-right clam house, a cosy sitting room (the designer's painting) */
+  26:{name:'',dark:0,home:1,hk:1.3,floor:[[40,700],[110,670],[430,650],[480,608],[600,602],[680,628],[1040,626],[1100,604],[1150,642],[1330,652],[1290,684],[1255,768],[40,768]],
+     block:[{x0:555,y0:612,x1:852,y1:702},{x0:838,y0:640,x1:1142,y1:769},{x0:1255,y0:650,x1:1380,y1:769}],
+     fg:[{y:700,poly:[[828,545],[1145,545],[1145,768],[828,768]]},{y:690,poly:[[553,588],[852,588],[852,702],[553,702]]}]},   /* the armchair and the tea table */
   24:{name:'Ruins Overlook',dark:0,wide:1,hk:.62,floor:[[690,768],[700,705],[738,655],[768,603],[782,560],[780,512],[766,488],[756,450],[788,433],[880,431],[922,450],[914,480],[872,498],[860,560],[868,612],[880,664],[902,715],[922,768]]},
   /* 22: the loft, the bed under the thatch; the stair comes up on the right behind the rail */
   22:{name:'',dark:0,home:1,hk:1.9,floor:[[120,738],[460,730],[1050,726],[1050,612],[1185,612],[1185,768],[110,768]],
@@ -91,6 +98,8 @@ function setupDun(){DUNINT.length=0;const r=DUN.room,D=(x,y,reach,fn)=>DUNINT.pu
   if(r===21)DUNINT.push({get x(){return ALMA.x;},get y(){return ALMA.y+10;},get reach(){return ALMA.on&&(HST.st===3||HST.st>=5)&&!DLG.active&&!WEVENT.on?90:-1;},onInteract:almaTalk});   /* talk to Alma */
   if(r===21)DUNINT.push({get x(){return AMR.x;},get y(){return AMR.y+10;},get reach(){return HST.amrIn&&HST.st===3&&!DLG.active&&!WEVENT.on?90:-1;},onInteract:()=>hsBabyAdmire()});   /* Amroth, beside Alma, before Lum goes up to bed */
   if(r===21&&C2.basement)D(695,610,50,()=>dunGo(23,300,580,1));   /* the bookshelf door to the basement, once the story opens it */
+  if(r===25){D(660,742,100,()=>goScene(()=>leaveBVHouse(2)));for(const n of BVNPC)if(n.room===25)DUNINT.push({x:n.x,y:n.y+60,reach:110,onInteract:()=>bvNpcTalk(n)});}
+  if(r===26){D(330,758,100,()=>goScene(()=>leaveBVHouse(3)));for(const n of BVNPC)if(n.room===26)DUNINT.push({x:n.x,y:n.y+10,reach:95,onInteract:()=>bvNpcTalk(n)});}
   if(r===22){D(1160,728,70,()=>dunGo(21,1120,672,-1));DUNINT.push({x:760,y:738,reach:95,dynDoor:1,door:false,onInteract:hsBed});   /* the bed: '…' bubble, asks to rest */}
   if(r===23){D(258,560,70,()=>dunGo(21,680,640,1));}
   if(r===20&&WB10.chest)DUNINT.push({x:900,y:715,reach:85,onInteract:openWB10Chest});
@@ -163,6 +172,7 @@ function drawDun(){const R=DROOMS[DUN.room],im=IMG['dun'+DUN.room];if(!ready(im)
   const k=dunH(lum.y)/151,here=DFOES.filter(g=>g.room===DUN.room);{const L=here.map(g=>[g.y,()=>drawDFoe(g)]);
     L.push([lum.y,()=>{ctx.save();ctx.translate(lum.x,lum.y);ctx.scale(k,k);ctx.translate(-lum.x,-lum.y);drawLum();ctx.restore();}]);
     if(CH===1&&jakInParty()&&JAKF){const kj=dunH(JAKF.y)/151;L.push([JAKF.y-1,()=>{ctx.save();ctx.translate(JAKF.x,JAKF.y);ctx.scale(kj,kj);ctx.translate(-JAKF.x,-JAKF.y);drawJakOW();ctx.restore();}]);}   /* Spar comes down into the rooms with Lum */
+    for(const n of BVNPC)if(n.room===DUN.room)L.push([n.y,()=>drawBVNpc(n)]);
     if(DUN.room===21){L.push([ALMA.y,()=>{drawAlmaRoom();}]);if(HST.heart>0)L.push([9999,()=>drawHearts((lum.x+ALMA.x)/2,Math.min(lum.y,ALMA.y)-150*dunH(lum.y)/151)]);}
     if(CH>=2&&(C2.joined||(HST.amrIn&&DUN.room===21))){const ka=dunH(AMR.y)/151;L.push([AMR.y-1,()=>{ctx.save();ctx.translate(AMR.x,AMR.y);ctx.scale(ka,ka);ctx.translate(-AMR.x,-AMR.y);drawAmrOW(AMR,1);ctx.restore();}]);}
     if(DUN.room===7)L.push([614,()=>{const t=IMG.dun7_table;if(!ready(t))return;const hid=lum.y<614&&Math.abs(lum.x-945)<240;ctx.save();ctx.globalAlpha=hid?.62:1;ctx.drawImage(t,730,425);ctx.restore();}]);
