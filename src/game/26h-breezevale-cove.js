@@ -39,9 +39,9 @@ const BVTRUNKS=[];
 const BVISLEPATH=()=>{const h=BVHOUSES[4];return [[BVBR.x1-10,BVBR.y],[BVBR.x1+90,BVBR.y+40],[bvDoorX(h)-30,h.y+60],[bvDoorX(h),h.y+10],[bvDoorX(h),h.y-48]];};   /* right up under the door step */
 function bvIslePathDist(x,y){const P=BVISLEPATH();let b=1e9;for(let i=0;i<P.length-1;i++){const [ax,ay]=P[i],[bx,by]=P[i+1],dx=bx-ax,dy=by-ay,t=clamp(((x-ax)*dx+(y-ay)*dy)/(dx*dx+dy*dy||1),0,1);b=Math.min(b,Math.hypot(x-ax-dx*t,y-ay-dy*t));}return b;}
 /* where Lum may walk: the green, the road, the islet and over the bridge */
-function bvBridgeY(lx){const t=clamp((lx-BVBR.x0)/(BVBR.x1-BVBR.x0),0,1);return BVBR.y-BVBR.rise*Math.sin(Math.PI*t);}
+function bvBridgeY(lx){const t=clamp((lx-BVBR.x0)/(BVBR.x1-BVBR.x0),0,1);return BVBR.y-BVBR.h*(.02+.26*Math.sin(Math.PI*t)**.8);}   /* the middle of the deck, between the two handrails, all the way across */
 function bvFree(x,y){const lx=x-BVX,ly=y-BVY;
-  if(lx>BVBR.x0+30&&lx<BVBR.x1-30)return Math.abs(ly-bvBridgeY(lx))<30;   /* over the bridge */
+  if(lx>BVBR.x0+30&&lx<BVBR.x1-30)return Math.abs(ly-bvBridgeY(lx))<40;   /* over the bridge */
   if(lx>BVBR.x0-60&&lx<=BVBR.x0+30&&Math.abs(ly-BVBR.y)<30)return true;
   if(lx>=BVBR.x1-30&&lx<BVBR.x1+60&&Math.abs(ly-BVBR.y)<30)return true;
   let ok=Math.hypot(lx-BVC.x,ly-BVC.y)<BVC.r-55||Math.hypot(lx-BVI.x,ly-BVI.y)<BVI.r-40||(Math.abs(lx-BVC.x)<BVROAD-25&&ly>BVC.y&&ly<BVH-40);
@@ -72,6 +72,8 @@ function bvProps(P){const X=x=>x+BVX,Y=y=>y+BVY;
   P.push({t:'tree',img:'breeze_fountain',x:X(BVFOUNT.x),y:Y(BVFOUNT.y),w:BVFOUNT.w,flip:false,base:.95,solid:1});
   P.push({t:'tree',img:'breeze_gate',x:X(BVGATE.x),y:Y(BVGATE.y+14),w:420,flip:false,base:.97,solid:1});
   P.push({t:'tree',img:'breeze_bridge',x:X((BVBR.x0+BVBR.x1)/2),y:Y(BVBR.y+BVBR.h*.16),sy:Y(BVBR.y-BVBR.rise-60),w:BVBR.w,flip:false,base:1});   /* the whole bridge, behind Lum */
+  for(const [dx,dy,img,w] of [[8,62,'crockpile',80],[60,84,'crockegg',46],[-40,78,'crockegg',42],[125,96,'crockegg',40],[190,84,'crockegg',44],[244,64,'crockpile',80],[290,82,'crockegg',42]])   /* small boulders in the water under the bridge, hiding where the shores drop away */
+    P.push({t:'tree',img,x:X(BVBR.x0+dx),y:Y(BVBR.y+dy),w,flip:dx%2===0,base:.9});
   P.push({t:'bvbrf',x:X((BVBR.x0+BVBR.x1)/2),y:Y(BVBR.y+60),w:BVBR.w});   /* its front handrail and posts again, in front of her: she walks between the rails */
   /* hydrangeas at each doorstep, in that house's colours, and a few along the paths and round the fountain */
   const TINTS={shell:['blue','lilac'],mayor:['cream','white'],clam:['pink','coral'],clam2:['coral','pink'],shell2:['lilac','blue']},HY=['hydrsmall','hydrmid','hydrbig'];
@@ -84,7 +86,7 @@ function bvProps(P){const X=x=>x+BVX,Y=y=>y+BVY;
     P.push({t:'bvf',img:HY[i%3],tint:['pink','blue','lilac','cream','coral'][i%5],x:X(lx),y:Y(ly),w:62+BVH_(i,9)*22,flip:i%2===0});}
   /* a ring of evergreens and shrubs round the rim of the green, leaving the gate, the bridge and the north way open */
   let k=0;for(let a=0;a<TAU;a+=.13){k++;const r=BVC.r-38-BVH_(k,11)*14,lx=BVC.x+Math.cos(a)*r,ly=BVC.y+Math.sin(a)*r;
-    const near=(px,py,m)=>Math.hypot(lx-px,ly-py)<m;if(near(BVGATE.x,BVGATE.y,250)||near(BVBR.x0,BVBR.y,190)||near(BVNORTH.x,BVNORTH.y,180)||BVHOUSES.some(h=>near(h.x,h.y-h.w*.2,h.w*.62)))continue;
+    const near=(px,py,m)=>Math.hypot(lx-px,ly-py)<m;if(near(BVGATE.x,BVGATE.y,250)||near(BVBR.x0,BVBR.y,330)||near(BVNORTH.x,BVNORTH.y,180)||BVHOUSES.some(h=>near(h.x,h.y-h.w*.2,h.w*.62)))continue;
     if(BVH_(k,12)<.42){const [img,w]=HTREES[Math.floor(BVH_(k,13)*HTREES.length)];BVTRUNKS.push([lx,ly]);P.push({t:'tree',img,x:X(lx),y:Y(ly),w:w*(.7+BVH_(k,14)*.25),flip:BVH_(k,15)<.5,base:.95});}
     else{const kk=[1,3,10,5][Math.floor(BVH_(k,16)*4)];P.push({t:'shrub',k:kk,x:X(lx),y:Y(ly),s:SHR[kk].s*(.7+BVH_(k,17)*.3),flip:BVH_(k,18)<.5,ph:lx*.01,w:120});}}
   /* rocks where the cliff face fades out (left and right of the green and the islet), softening the turn of the shore */
@@ -127,7 +129,7 @@ function buildBVCobbles(){const K=.9,R=BVPAVE+30,ox=BVC.x-R,oy=BVC.y-R,S=R*2,c=d
   g.lineWidth=26;g.strokeStyle='rgba(84,92,58,.55)';g.beginPath();g.arc(BVC.x,BVC.y,BVPAVE,0,TAU);g.stroke();g.lineWidth=8;g.strokeStyle='rgba(60,66,44,.6)';g.stroke();   /* a mossy kerb where the paving meets the grass */
   return [c,ox,oy,K];}
 /* the fountain plays: rings on its basin and a soft mist at the top jet */
-function drawBVFx(){if(!inBV()||SCENE!=='thorn')return;const fx=BVX+BVFOUNT.x,fy=BVY+BVFOUNT.y,w=BVFOUNT.w;ctx.save();
+function drawBVFx(){if(!inBV()||SCENE!=='thorn')return;{const lx=lum.x-BVX;if(lx>BVBR.x0-20&&lx<BVBR.x1+20&&Math.abs(lum.y-BVY-bvBridgeY(lx))<45)lum.y=BVY+bvBridgeY(lx);}   /* on the bridge, Lum's feet follow the deck up and over the arch */const fx=BVX+BVFOUNT.x,fy=BVY+BVFOUNT.y,w=BVFOUNT.w;ctx.save();
   for(let i=0;i<5;i++){const q=(T*.45+i/5)%1,a=i*1.3;ctx.strokeStyle=`rgba(235,245,250,${(.5*(1-q)).toFixed(3)})`;ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(fx+Math.cos(a)*w*.22,fy-w*.18+Math.sin(a)*w*.05,6+q*26,(6+q*26)*.35,0,0,TAU);ctx.stroke();}
   drawGlow(ctx,fx,fy-w*.78,46+Math.sin(T*3)*6,'235,245,252',.35);
   for(let i=0;i<14;i++){const q=(T*.7+i/14)%1,side=i%2?1:-1,sx=fx+side*(w*.05+q*w*.17),sy=fy-w*.74+q*w*.36+q*q*w*.18;ctx.fillStyle=`rgba(225,240,250,${(.55*(1-q)).toFixed(3)})`;ctx.beginPath();ctx.arc(sx,sy,2.2,0,TAU);ctx.fill();}   /* water arcing down from the top bowl */
