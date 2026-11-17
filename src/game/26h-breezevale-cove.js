@@ -155,7 +155,7 @@ const BVBIRDS=[];
 const BVGIRL={x:BVFOUNT.x-130,y:BVFOUNT.y+60,face:1,talking:0};
 function drawBVGirl(o){const G=BVGIRL,talking=DLG.active&&G.talking,an=talking&&Math.abs(lum.x-(BVX+G.x))>30?'side':'down';
   ctx.save();ctx.fillStyle='rgba(10,10,20,.25)';ctx.beginPath();ctx.ellipse(o.x,o.y,22,7,0,0,TAU);ctx.fill();ctx.restore();
-  c1Frame(ctx,'breeze_girl',an,an==='side'?0:0,o.x,o.y,96,an==='side'&&lum.x>o.x,1,0);if(!DLG.active)G.talking=0;}
+  ctx.save();ctx.translate(o.x,0);ctx.scale(.86,1);ctx.translate(-o.x,0);c1Frame(ctx,'breeze_girl',an,0,o.x,o.y,BVFOLK_H,an==='side'&&lum.x>o.x,1,0);ctx.restore();if(!DLG.active)G.talking=0;}
 function bvGirlTalk(){BVGIRL.talking=1;lum.face=lum.x<BVX+BVGIRL.x?1:-1;talk([['Townsgirl',"Welcome to Breezevale Cove."],['Townsgirl',"The rain makes me so happy."]],false,()=>{BVGIRL.talking=0;});}
 function enterBreezevale(){SCENE='thorn';lum.x=BVX+BVSOUTH.x;lum.y=BVY+BVSOUTH.y-60;lum.face=1;lum.dir='up';lum.state='idle';lum.vx=lum.vy=0;cam.x=lum.x;cam.y=lum.y-200;THORN.t=99;BVT.t=0;}
 /* playtest card: the story up to the morning after at Amroth's (Lum alone, Amroth stays home), then the Breezeway's east end */
@@ -169,11 +169,12 @@ function drawBVTitle(){if(!inBV()||BVT.t>=4.5||SCENE!=='thorn')return;BVT.t+=1/6
 THINT.push({get x(){return BVX+BVSOUTH.x;},get y(){return BVY+BVSOUTH.y;},get reach(){return inBV()?80:-1;},door:true,onInteract:()=>goScene(enterBWEast)},
   {get x(){return BVX+BVNORTH.x;},get y(){return BVY+BVNORTH.y;},get reach(){return inBV()?85:-1;},door:true,onInteract:()=>say("The way to the Sanctuary of Water lies beyond.")});
 /* the clam houses can be entered: a shop (bottom-left) and a sitting room (bottom-right); their townsfolk (lines still to settle with the designer) */
+const BVFOLK_H=116;   /* Lum stands about 98 tall */
 const BVNPC=[{room:25,atlas:'breeze_boy',x:850,y:525,h:150,name:'Breezevale Merchant',lines:[["Welcome in! Have a look around."]]},
-  {room:26,atlas:'breeze_boy',x:1215,y:664,name:'Townsman',lines:[["Oh! Hello there. Come in out of the rain."]]},
+  {room:26,atlas:'breeze_boy',x:385,y:706,name:'Townsman',lines:[["Oh! Hello there. Come in out of the rain."]]},
   {room:26,atlas:'breeze_girl',x:470,y:690,name:'Townswoman',lines:[["Would you like some tea? The kettle's still warm."]]}];
 function drawBVNpc(n){const k=dunH(n.y)/151,face=lum.x>n.x;ctx.save();ctx.fillStyle='rgba(10,10,20,.25)';ctx.beginPath();ctx.ellipse(n.x,n.y,22*k,7*k,0,0,TAU);ctx.fill();ctx.restore();
-  const talking=DLG.active&&DLG.lines&&DLG.lines[DLG.i||0]&&DLG.lines[DLG.i||0][0]===n.name,an=talking&&Math.abs(lum.x-n.x)>60?'side':'down';c1Frame(ctx,n.atlas,an,0,n.x,n.y,n.h||96*k,an==='side'&&face,1,0);}
+  const talking=DLG.active&&DLG.lines&&DLG.lines[DLG.i||0]&&DLG.lines[DLG.i||0][0]===n.name,an=talking&&Math.abs(lum.x-n.x)>60?'side':'down';ctx.save();ctx.translate(n.x,0);ctx.scale(.86,1);ctx.translate(-n.x,0);c1Frame(ctx,n.atlas,an,0,n.x,n.y,n.h||BVFOLK_H*k,an==='side'&&face,1,0);ctx.restore();}   /* townsfolk: a little taller than Lum, slim */
 /* the Breezevale Merchant's trades */
 function bvTakeMat(id,n){MATS[id]-=n;if(MATS[id]<=0){MATS[id]=0;const i=BAG.indexOf(id);if(i>=0)BAG.splice(i,1);}}
 function bvMerchant(intro){const have=id=>MATS[id]||0,M=[['Fox Tail','foxtail',1,'potion','Healing Potion'],['Wisp Silk','wispsilk',1,'antidote','Antidote']];
