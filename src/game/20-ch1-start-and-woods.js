@@ -11,7 +11,7 @@ C1ATL.amroth={"cw":230,"ch":256,"rows":{"down":[0,1],"up":[1,2],"side":[2,6],"ru
 const AMR_H=137,AMR_BH=166;   /* same size beside Lum in and out of battle */
 C1ATL.alma={"cw":200,"ch":250,"rows":{"down":[0,6],"up":[1,5],"side":[2,4],"run":[3,6],"idle":[4,6]}}; // Alma (Amroth's wife, not in battle): down walk, up walk, side walk + run (these face RIGHT: flip for left), standing idle. Not placed in the game yet
 C1ATL.alma_sit={"cw":200,"ch":240,"rows":{"sitback":[0,5],"sitside":[1,3],"sitfloor":[2,6],"sitchair":[3,6]}}; // Alma sitting: from behind, side, cross-legged on the floor, on a seat (0 waves, 1 hand to chin, 2-5 hands on knees)
-C1ATL.luma=C1ATL.alma; // Sage Luma, Alma's much older sister (water temple, neighbouring town): Alma's frames recoloured, light blond hair and white robes. Not placed in the game yet
+C1ATL.luma=C1ATL.alma; // Sage Luma, Alma's much older sister (water temple, neighbouring town): Alma's frames recoloured, light blond hair and white robes. Stands in the Sanctuary of Water's altar chamber (room 31)
 C1ATL.breeze_girl={"cw":200,"ch":250,"rows":{"down":[0,6],"up":[1,5],"side":[2,4],"run":[3,6],"idle":[4,6]}}; // a Breezevale townsgirl (citizen, not in battle): down walk, up walk, side walk + run (face LEFT; flip for right), standing idle. For Breezevale Cove, not placed yet
 C1ATL.breeze_boy=C1ATL.breeze_girl; // a Breezevale townsboy (citizen, not in battle): same layout as the townsgirl. For Breezevale Cove, not placed yet
 C1ATL.spar={"cw": 261, "ch": 306, "rows": {"down": [0, 5], "up": [1, 5], "side": [2, 5], "bidle": [3, 4], "brun": [4, 5]}}; // Spar: down/up/side walks (side faces right), battle idle + run with his sword (run faces left)

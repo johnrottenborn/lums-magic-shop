@@ -6,7 +6,7 @@
    Stranglethorn world, east of the Breezeway. Townsfolk still to come. */
 const BVX=BWX+5200,BVY=500,BVW=2950,BVH=2400,BVT={t:99};
 const BVC={x:1050,y:950,r:850},BVI={x:2450,y:850,r:350};   /* the town green, and the islet */
-const BVGATE={x:BVC.x,y:BVC.y+BVC.r+10},BVSOUTH={x:BVC.x,y:BVC.y+BVC.r-130},BVBOT=BVC.y+BVC.r+420,BVNORTH={x:BVC.x,y:BVC.y-BVC.r+70};
+const BVGATE={x:BVC.x,y:BVC.y+BVC.r+10},BVSOUTH={x:BVC.x,y:BVC.y+BVC.r-58},BVBOT=BVC.y+BVC.r+420,BVNORTH={x:BVC.x,y:BVC.y-BVC.r+70};
 /* the stone bridge north from the green over the sea toward the Sanctuary of Water (the designer's middle bridge, recoloured blue); its door is at the far end */
 const BVSBR={x:BVC.x,y1:BVC.y-BVC.r+125,w:300,h:614};BVSBR.y0=BVSBR.y1-BVSBR.h;   /* its foot rests on the edge of the cobbles */
 const BVTOP=BVSBR.y1-400;   /* the view stops with just the start of the bridge showing */
@@ -168,7 +168,7 @@ function drawBVGirl(o){const G=BVGIRL,talking=DLG.active&&G.talking,an=talking&&
   ctx.save();ctx.fillStyle='rgba(10,10,20,.25)';ctx.beginPath();ctx.ellipse(o.x,o.y,22,7,0,0,TAU);ctx.fill();ctx.restore();
   ctx.save();ctx.translate(o.x,0);ctx.scale(.86,1);ctx.translate(-o.x,0);c1Frame(ctx,'breeze_girl',an,0,o.x,o.y,BVFOLK_H,an==='side'&&lum.x>o.x,1,0);ctx.restore();if(!DLG.active)G.talking=0;}
 function bvGirlTalk(){BVGIRL.talking=1;lum.face=lum.x<BVX+BVGIRL.x?1:-1;talk([['Townsgirl',"Welcome to Breezevale Cove."],['Townsgirl',"The rain makes me so happy."]],false,()=>{BVGIRL.talking=0;});}
-function enterBreezevale(){SCENE='thorn';lum.x=BVX+BVSOUTH.x;lum.y=BVY+BVSOUTH.y-50;lum.face=1;lum.dir='up';lum.state='idle';lum.vx=lum.vy=0;cam.x=lum.x;cam.y=lum.y-200;THORN.t=99;BVT.t=0;}
+function enterBreezevale(){SCENE='thorn';lum.x=BVX+BVSOUTH.x;lum.y=BVY+BVSOUTH.y-4;lum.face=1;lum.dir='up';lum.state='idleUp';lum.at=-1e9;lum.vx=lum.vy=0;cam.x=lum.x;cam.y=lum.y-200;THORN.t=99;BVT.t=0;}
 /* playtest card: the story up to the morning after at Amroth's (Lum alone, Amroth stays home), then the Breezeway's east end */
 function chPlaytestBreezeway(){HST.st=7;HST.amrOut=1;if(typeof C2!=='undefined'){C2.joined=0;}if(PARTY_ORDER.includes('amroth'))PARTY_ORDER.splice(PARTY_ORDER.indexOf('amroth'),1);
   {const i=BAG.indexOf('baby');if(i>=0)BAG.splice(i,1);}hsGoal('Follow the coast east to Breezevale Cove');enterBWEast();BWT.t=0;}
@@ -185,10 +185,11 @@ const BVNPC=[{room:25,atlas:'breeze_boy',x:850,y:525,h:150,name:'Breezevale Merc
   {room:26,atlas:'breeze_boy',x:115,y:708,name:'Townsman',lines:[["Oh! Hello there. Come in out of the rain."]]},
   {room:28,atlas:'breeze_boy',x:870,y:722,name:'Fisherman',lines:[["Mind the nets! Come warm yourself by the fire."]]},
   {room:28,atlas:'breeze_girl',x:965,y:730,name:'Fisherwoman',lines:[["The rain keeps the fish close to shore. A good season."]]},
+  {room:31,atlas:'luma',x:885,y:585,name:'Sage Luma',slim:1,idle:1,sc:.92,lines:[["…"]]},   /* Alma's older sister; her lines are still to come */
   {room:27,atlas:'jak2',x:960,y:700,name:'Jak',sc:1.35,slim:1,lines:[["…"]]},
   {room:26,atlas:'breeze_girl',x:205,y:694,name:'Townswoman',lines:[["Would you like some tea? The kettle's still warm."]]}];
 function drawBVNpc(n){const k=dunH(n.y)/151,face=lum.x>n.x;ctx.save();ctx.fillStyle='rgba(10,10,20,.25)';ctx.beginPath();ctx.ellipse(n.x,n.y,22*k,7*k,0,0,TAU);ctx.fill();ctx.restore();
-  const talking=DLG.active&&DLG.lines&&DLG.lines[DLG.i||0]&&DLG.lines[DLG.i||0][0]===n.name,an=talking&&Math.abs(lum.x-n.x)>60?'side':'down';ctx.save();ctx.translate(n.x,0);ctx.scale(n.slim?1:.86,1);ctx.translate(-n.x,0);c1Frame(ctx,n.atlas,an,0,n.x,n.y,n.h||BVFOLK_H*k*(n.sc||1),an==='side'&&face,1,0);ctx.restore();}   /* townsfolk: a little taller than Lum, slim */
+  const talking=DLG.active&&DLG.lines&&DLG.lines[DLG.i||0]&&DLG.lines[DLG.i||0][0]===n.name,an=talking&&Math.abs(lum.x-n.x)>60?'side':'down';ctx.save();ctx.translate(n.x,0);ctx.scale(n.slim?1:.86,1);ctx.translate(-n.x,0);c1Frame(ctx,n.atlas,an==='down'&&n.idle?'idle':an,0,n.x,n.y,n.h||BVFOLK_H*k*(n.sc||1),an==='side'&&face,1,0);ctx.restore();}   /* townsfolk: a little taller than Lum, slim */
 /* the Breezevale Merchant's trades */
 function bvTakeMat(id,n){MATS[id]-=n;if(MATS[id]<=0){MATS[id]=0;const i=BAG.indexOf(id);if(i>=0)BAG.splice(i,1);}}
 function bvMerchant(intro){const have=id=>MATS[id]||0,M=[['Fox Tail','foxtail',1,'potion','Healing Potion'],['Wisp Silk','wispsilk',1,'antidote','Antidote']];
