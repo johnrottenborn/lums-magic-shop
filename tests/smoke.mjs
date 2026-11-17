@@ -887,7 +887,7 @@ const CASES = {
   },
   async 'breeze-townsfolk-atlas'(p) {
     const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop';
-    const ok = await p.evaluate(() => { const g = window.__g, A = g.C1ATL.breeze_girl, im = g.IMG.breeze_girl, im2 = g.IMG.breeze_boy; if (!(g.IMG.breeze_fountain && g.IMG.breeze_fountain.naturalWidth) || !A || !g.C1ATL.breeze_boy || !im || !im.naturalWidth || !im2 || !im2.naturalWidth) return false;
+    const ok = await p.evaluate(() => { const g = window.__g, A = g.C1ATL.breeze_girl, im = g.IMG.breeze_girl, im2 = g.IMG.breeze_boy; if (!['breeze_fountain', 'breeze_clamhouse', 'breeze_shellhouse', 'breeze_mayorhouse'].every(n => g.IMG[n] && g.IMG[n].naturalWidth) || !A || !g.C1ATL.breeze_boy || !im || !im.naturalWidth || !im2 || !im2.naturalWidth) return false;
       const c = document.createElement('canvas'); c.width = 900; c.height = 300; const x = c.getContext('2d'); x.fillStyle = '#4a7a5a'; x.fillRect(0, 0, 900, 300);
       [['down', 0], ['up', 1], ['side', 2], ['run', 3], ['idle', 0]].forEach(([a, i], j) => { g.c1Frame(x, 'breeze_girl', a, i, 50 + j * 175, 270, 200, false, 1, 0); g.c1Frame(x, 'breeze_boy', a, i, 125 + j * 175, 270, 200, false, 1, 0); });
       c.id = 'bgshot'; c.style.cssText = 'position:fixed;left:0;top:0;width:900px;height:300px;z-index:99;max-width:100vw'; document.body.appendChild(c);
