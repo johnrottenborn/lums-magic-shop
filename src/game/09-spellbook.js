@@ -43,7 +43,7 @@ function drawDoll(c,MH,fx,fy,k){c.save();c.translate(fx,fy);c.scale(k,k);
   c.save();c.translate(0,-6);c.scale(1,.3);c.strokeStyle='rgba(90,120,190,.35)';c.lineWidth=2;c.beginPath();c.arc(0,0,74,0,TAU);c.stroke();c.lineWidth=1;c.beginPath();c.arc(0,0,62,0,TAU);c.stroke();c.rotate(T*.25);for(let q=0;q<12;q++){c.rotate(TAU/12);c.fillStyle='rgba(90,120,190,.4)';c.fillRect(64,-2,8,4);}c.restore();
   drawGlow(c,0,-90,90,'180,210,255',.18+.05*Math.sin(T*1.6));const b=Math.sin(T*2.2);c.scale(1-.004*b,1+.009*b);
   if(MH==='lum'&&ready(atlas)){const sp=.64,dw=FW*sp,dh=FH*sp;c.drawImage(atlas,37*FW,0,FW,FH,-dw/2,-dh*(274/280),dw,dh);}
-  else if(MH==='jak'){c1Frame(c,'jak','idle',0,JAKDX*196,0,196,false,1,0);}
+  else if(MH==='jak'){c1Frame(c,'jak2','down',0,0,0,190,false,1,0);}
   else if(MH==='spar'){c1Frame(c,'spar','bidle',0,0,0,200,false,1,0);}
   else if(MH==='amroth'){c1Frame(c,'amroth','down',0,0,0,196,false,1,0);}
   else if(ready(catlas)){const sp=.74,dw=CFW*sp,dh=CFH*sp,fr=bladeFr(16);c.translate(-dw/2,-dh*(264/270));c.drawImage(cosSheet(),fr*CFW,0,CFW,CFH,0,0,dw,dh);c.scale(sp,sp);if(PARTY[MH].head==='bucket')drawBucketHat(c,fr);}

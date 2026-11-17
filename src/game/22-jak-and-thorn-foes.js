@@ -16,8 +16,8 @@ function drawJakOW(){if(PC===MATE){if(PARTY_ORDER.includes('lum'))drawLumFollowe
 /* when Spar leads, Lum is the one following */
 function drawLumFollower(F){if(!F||!ready(atlas))return;const a=F.dir==='up'?LUM_ANIM.walkUp:F.dir==='down'?LUM_ANIM.walkDown:LUM_ANIM.walk,mv=F.moving,fr=mv?a.frames[Math.floor((F.ph||0)/14)%a.frames.length]:(F.dir==='up'?22:37),flip=F.dir==='side'&&F.face!==a.native;
   ctx.fillStyle='rgba(10,10,20,.25)';ctx.beginPath();ctx.ellipse(F.x,F.y+2,30,8,0,0,TAU);ctx.fill();ctx.save();ctx.translate(F.x,F.y+3);ctx.scale(LUMK,LUMK);if(flip)ctx.scale(-1,1);const dw=FW*SPR,dh=FH*SPR;ctx.drawImage(atlas,fr*FW,0,FW,FH,-dw/2,-dh*(274/280),dw,dh);ctx.restore();}
-function drawJakOW_(){if(!JAKF||CAPTURE.on)return;const H_=192,vert=JAKF.dir==='up'||JAKF.dir==='down',flip=vert?false:JAKF.face<0;ctx.fillStyle='rgba(10,10,20,.25)';ctx.beginPath();ctx.ellipse(JAKF.x,JAKF.y+2,34,8,0,0,TAU);ctx.fill();
-  c1Frame(ctx,'jak',vert?JAKF.dir:JAKF.moving?'walk':'idle',vert?(JAKF.moving?Math.floor(JAKF.ph/16)%5:0):JAKF.moving?Math.floor(JAKF.ph/16)%8:0,JAKF.x+JAKDX*H_*(flip?-1:1),JAKF.y+3,H_,flip,1,0);}
+function drawJakOW_(){if(!JAKF||CAPTURE.on)return;const vert=JAKF.dir==='up'||JAKF.dir==='down',an=vert?JAKF.dir:'side',n=C1ATL.jak2.rows[an][1];ctx.fillStyle='rgba(10,10,20,.25)';ctx.beginPath();ctx.ellipse(JAKF.x,JAKF.y+2,30,8,0,0,TAU);ctx.fill();
+  c1Frame(ctx,'jak2',an,JAKF.moving?Math.floor((JAKF.ph||0)/16)%n:0,JAKF.x,JAKF.y+3,JAK2_H,!vert&&JAKF.face<0,1,0);}   /* the new Jak; his side rows face right */
 /* Spar on the overworld: down / up / side walks (side faces right) */
 /* during the Fokalur scene in the clearing, Lum and Spar stand facing him */
 function fkFacing(){if(CH>=2&&SCENE==='thorn'&&(C2.on&&C2.st>=7)&&!LUMSTONE)return {x:AMR.x,y:AMR.y};return SCENE==='thorn'&&typeof FKS!=='undefined'&&FKS.st>=1&&FKS.st<7&&!C1.fkDone&&lum.x>CLR.x0?{x:FKS.cx,y:FKS.cy}:null;}

@@ -279,12 +279,22 @@ function drawBattleSpar(h){const S=bS(),B=BATTLE,x=h.x+h.ox,y=h.y+h.oy,me=B.hero
   bshadow(x,y+2,40*S,11*S,.35);ctx.save();ctx.translate(x,y+3);if(h.hurt>0)ctx.translate(Math.sin(h.hurt*60)*4,0);ctx.rotate(rot);if(guard){const b=Math.sin(T*1.6);ctx.scale(1-.005*b,1+.012*b);}
   c1Frame(ctx,'spar',an,fi,0,0,H_,flip,1,h.hurt>.3?1:0);ctx.restore();
   if(me&&ph==='sflame')drawFlames(ctx,x-66*S,y-143*S,40*S,1);/* a small flame burning at the tip of his raised sword */}
-function drawBattleJak(h){const S=bS(),B=BATTLE,x=h.x+h.ox,y=h.y+h.oy,me=B.heroes[B.cur]===h,ph=B.phase,t=B.t,H_=206*S;let an='idle',fi=0,flip=false;
-  if(h.ko){an='ko';fi=Math.min(3,Math.floor((h.koT||0)/.14));}else if(h.hurt>0){an='hurt';fi=Math.min(3,Math.floor((.5-h.hurt)/.1));}else if(me&&ph==='bonkRun'){an='run';fi=Math.floor(t*12)%5;}else if(me&&(ph==='bonkBack'||ph==='run'||ph==='fled')){an='run';fi=Math.floor(t*12)%5;flip=h.face<0||ph==='bonkBack';}
-  else if(me&&ph==='bonkWind'){an='chop';fi=Math.min(4,Math.floor(t/B.windD*5));}else if(me&&ph==='bonkHit'){an='swing';fi=Math.min(4,Math.floor(t/.08));}else if(me&&ph==='jbolt'){an='cast';fi=Math.min(7,Math.floor(t/.1));}
-  if(h.ko)h.koT=(h.koT||0)+1/60;else h.koT=0;ctx.save();ctx.translate(x,y+3);if(an==='idle'&&!h.ko){const b=Math.sin(T*2.1);ctx.scale(1-.004*b,1+.008*b);}
-  c1Frame(ctx,'jak',an,fi,JAKDX*H_*(flip?-1:1),0,H_,flip,1,h.hurt>.3?1:0);ctx.restore();
-  if(h.stuck&&!h.ko){}}
+/* the new Jak in battle, built from his walk and run frames (no battle sheet yet): he stands side-on facing the foes, runs in,
+   winds back and lunges with the axe (a white arc), casts with a lean and a glow, shakes when hit, and topples when knocked out */
+function drawBattleJak(h){const S=bS(),B=BATTLE,x=h.x+h.ox,y=h.y+h.oy,me=B.heroes[B.cur]===h,ph=B.phase,t=B.t,H_=JAK2_BH*S;let sh='jak2_atk',an='swing',fi=0,flip=false,rot=0,dx=0,slash=-1,glow=0,breathe=true;
+  if(h.ko){h.koT=(h.koT||0)+1/60;rot=-Math.min(1.35,h.koT*4);breathe=false;}else{h.koT=0;
+    if(me&&(ph==='bonkRun'||ph==='bonkBack'||ph==='run'||ph==='fled')){sh='jak2';an='run';fi=Math.floor(t*12)%6;flip=ph!=='bonkRun';breathe=false;}
+    else if(me&&ph==='bonkWind'){fi=Math.min(t/B.windD,1)<.5?1:2;breathe=false;}   /* raising the axe over his shoulder */
+    else if(me&&ph==='bonkHit'){fi=t<.12?4:5;dx=10*S*Math.min(1,t/.1);slash=t;breathe=false;}   /* down it comes */
+    else if(me&&ph==='jbolt'){sh='jak2';an='side';fi=0;rot=-.1;glow=Math.min(1,t*4);breathe=false;}}
+  ctx.save();ctx.translate(x+dx,y+3);if(h.hurt>0)ctx.translate(Math.sin(h.hurt*60)*5,0);ctx.rotate(rot);if(breathe){const b=Math.sin(T*2.1);ctx.scale(1-.004*b,1+.01*b);}
+  c1Frame(ctx,sh,an,fi,0,0,sh==='jak2_atk'?H_:H_,flip,h.ko?.85:1,h.hurt>.3?1:0);ctx.restore();
+  if(slash>=0&&slash<.3){const q=slash/.3;ctx.save();ctx.globalAlpha=.9*(1-q);ctx.strokeStyle='#fff';ctx.lineWidth=6*S*(1-q*.5);ctx.lineCap='round';ctx.beginPath();ctx.arc(x+dx+10*S,y-80*S,70*S,-1.4+q*.5,.9+q*.5);ctx.stroke();ctx.restore();}   /* the axe's arc */
+  if(glow>0)drawGlow(ctx,x+dx+52*S,y-80*S,(26+Math.sin(T*14)*4)*S,'190,220,255',.7*glow);}
+/* test hook: Jak's battle poses side by side (rest, wind-up, axe hit, cast, knocked out), as an image */
+function jakPoseSheet(){const B=BATTLE,o=document.createElement('canvas');o.width=900;o.height=280;const keep=ctx,save=[B.heroes,B.cur,B.phase,B.t,B.windD];ctx=o.getContext('2d');ctx.fillStyle='#3a5a48';ctx.fillRect(0,0,900,280);
+  try{[['heroMenu',0,0],['bonkWind',.1,0],['bonkWind',.4,0],['bonkHit',.05,0],['bonkHit',.2,0],['x',0,1]].forEach(([ph,t,ko],i)=>{const h={id:'jak',x:80+i*150,y:255,ox:0,oy:0,hurt:0,ko,koT:ko?1:0};B.heroes=[h];B.cur=0;B.phase=ph;B.t=t;B.windD=.5;drawBattleJak(h);});}
+  finally{ctx=keep;[B.heroes,B.cur,B.phase,B.t,B.windD]=save;}return o.toDataURL();}
 /* heroes without a KO animation (all but Jak) fade away when knocked out, and come back if revived */
 const KO_FADE=.9;
 function drawBattleHero(h){

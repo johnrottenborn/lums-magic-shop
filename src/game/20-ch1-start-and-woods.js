@@ -15,6 +15,9 @@ C1ATL.luma=C1ATL.alma; // Sage Luma, Alma's much older sister (water temple, nei
 C1ATL.breeze_girl={"cw":200,"ch":250,"rows":{"down":[0,6],"up":[1,5],"side":[2,4],"run":[3,6],"idle":[4,6]}}; // a Breezevale townsgirl (citizen, not in battle): down walk, up walk, side walk + run (face LEFT; flip for right), standing idle. For Breezevale Cove, not placed yet
 C1ATL.breeze_boy=C1ATL.breeze_girl; // a Breezevale townsboy (citizen, not in battle): same layout as the townsgirl. For Breezevale Cove, not placed yet
 C1ATL.spar={"cw": 261, "ch": 306, "rows": {"down": [0, 5], "up": [1, 5], "side": [2, 5], "bidle": [3, 4], "brun": [4, 5]}}; // Spar: down/up/side walks (side faces right), battle idle + run with his sword (run faces left)
+C1ATL.jak2={"cw":220,"ch":250,"rows":{"down":[0,6],"up":[1,5],"side":[2,4],"run":[3,6]}}; // the new Jak (designer's sheet): down/up walks, side walk and run (face RIGHT: flip for left). No battle frames yet: his battle moves are drawn from these
+C1ATL.jak2_atk={"cw":280,"ch":250,"rows":{"swingup":[0,7],"swing":[1,6],"swingdown":[2,6]}}; // Jak's axe swing seen from behind, side-on (faces RIGHT) and from the front; in battle the side row is used (frame 3's swoosh trail is skipped, a drawn arc stands in)
+const JAK2_H=150,JAK2_BH=178; // overworld / battle draw heights
 const SPAR_H=139,SPAR_BH=164; // overworld / battle draw heights (a head taller than Lum)
 function c1Frame(c,sh,anim,i,x,y,h,flip,alpha,flash){const im=IMG[sh],A=C1ATL[sh];if(!ready(im)||!A.rows[anim])return;const [r,n]=A.rows[anim];i=clamp(i|0,0,n-1);const k=h/A.ch;
   c.save();c.translate(x,y);if(flip)c.scale(-1,1);c.globalAlpha*=alpha;if(flash>0)c.filter='brightness(1.8)';c.drawImage(im,i*A.cw,r*A.ch,A.cw,A.ch,-A.cw*k/2,-A.ch*k*.985,A.cw*k,A.ch*k);c.filter='none';c.restore();}
