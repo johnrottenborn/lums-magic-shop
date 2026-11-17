@@ -66,7 +66,7 @@ function enterBreezeway(){SCENE='thorn';lum.x=BWX+BENTRY.x;lum.y=BWY+BENTRY.y-10
 function drawBWTitle(){if(!inBW()||BWT.t>=4.5||SCENE!=='thorn')return;BWT.t+=1/60;const a=Math.min(1,BWT.t*1.5,(4.5-BWT.t)*1.2);ctx.save();ctx.setTransform(DPR,0,0,DPR,0,0);ctx.globalAlpha=a;ctx.textAlign='center';
   ctx.fillStyle='rgba(20,16,12,.55)';ctx.fillRect(0,H*.3-40,W,80);ctx.fillStyle='#f6ecd8';ctx.font=`600 ${Math.round(Math.min(30,W/13))}px Georgia,serif`;ctx.fillText('Coastal Breezeway',W/2,H*.3+10);ctx.restore();}
 /* the way back up to Evergreen Grove and the road on to Breezevale Cove (east; map still to come). The archways are scenery only */
-THINT.push({get x(){return BWX+BENTRY.x;},get y(){return BWY+BENTRY.y-62;},get reach(){return inBW()?80:-1;},door:true,onInteract:()=>enterGrove(true)},
+THINT.push({get x(){return BWX+BENTRY.x;},get y(){return BWY+BENTRY.y-62;},get reach(){return inBW()?80:-1;},door:true,onInteract:()=>goScene(()=>enterGrove(true))},
   {get x(){return BWX+BWW-70;},get y(){return BWY+BEAST.y;},get reach(){return inBW()?80:-1;},door:true,onInteract:()=>say("Breezevale Cove lies ahead.")});
 /* the same foes as Evergreen Grove, out along the path */
 function addBWFoes(){if(THFOES.some(g=>g.bw))return;let id=5200;const dead=new Set(C1.thDead||[]),n=BPATH_PTS.length;

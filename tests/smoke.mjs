@@ -428,7 +428,7 @@ const CASES = {
     await g_(() => { const g = window.__g; g.lum.x = g.HOMEX + 1300; g.lum.y = g.HOMEY + 1060; }); await wait(1800);
     await p.screenshot({ path: path.join(SHOTS, `home-night-${vp}.png`) });
     await g_(() => { const g = window.__g; g.lum.x = g.HOMEX + 1365; g.lum.y = g.HOMEY + 965; }); await wait(500);
-    await g_(() => window.__g.NEAR.onInteract()); await wait(1600);
+    await g_(() => window.__g.NEAR.onInteract()); await wait(2600);
     check(await g_(() => window.__g.SCENE === 'dun' && window.__g.DUNX.room === 21 && window.__g.HST.st === 2), 'the night talk did not start inside');
     await wait(400); await p.screenshot({ path: path.join(SHOTS, `home-night-talk-${vp}.png`) });
     for (let i = 0; i < 12; i++) { await p.keyboard.press('Enter'); await wait(300); }
@@ -448,6 +448,8 @@ const CASES = {
     await g_(() => window.__g.NEAR.onInteract()); await wait(400);
     check(await g_(() => window.__g.CHOICE.on && /Rest/.test(window.__g.CHOICE.q)), 'the bed did not ask to rest');
     await g_(() => window.__g.pickChoice(0)); await wait(2500);
+    check(await g_(() => window.__g.FADEX.a === 1 && window.__g.FADEX.hold > 0 && window.__g.HST.st === 3), 'resting should hold a black screen while the lullaby plays');
+    for (let i = 0; i < 40 && !(await g_(() => window.__g.HST.st === 4)); i++) await wait(250);
     check(await g_(() => window.__g.HST.st === 4), 'resting in the loft bed did not bring the morning');
     await g_(() => window.__g.enterDun(21, 1120, 672, -1)); await wait(800);
     check(await g_(() => window.__g.HST.st === 5 && !window.__g.DLG.active), 'the morning talk started on its own instead of waiting for Lum to speak to Alma');

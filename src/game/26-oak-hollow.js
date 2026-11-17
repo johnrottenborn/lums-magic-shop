@@ -83,7 +83,7 @@ function setupDun(){DUNINT.length=0;const r=DUN.room,D=(x,y,reach,fn)=>DUNINT.pu
     L(730,545,110,["The old wall again. The air is getting colder the deeper we go.","Water drips somewhere behind the stones."]);}
   if(r===19){D(422,205,70,()=>dunGo(18,1215,540,-1));DUNINT.push({x:840,y:580,reach:95,onInteract:()=>touchWBTorch('serpent',["A great stone serpent, coiled and ready to strike. Its green flame burns brighter now."])});
     L(330,700,95,["Another empty pedestal."]);D(1165,545,80,()=>dunGo(20,862,425,1));}
-  if(r===21){D(435,620,80,()=>leaveCottage());D(1172,662,70,()=>dunGo(22,1115,700,-1));
+  if(r===21){D(435,620,80,()=>goScene(leaveCottage));D(1172,662,70,()=>dunGo(22,1115,700,-1));
     DUNINT.push({x:820,y:612,reach:90,get fire(){return HST.st>=6;},onInteract:()=>{if(canLumMix()&&HST.st>=6)openMix();else say("A warm fire crackles in the hearth. A kettle hangs over the flames.");}});   /* Lum can mix at Alma's hearth in the morning */}
   if(r===21)DUNINT.push({get x(){return ALMA.x;},get y(){return ALMA.y+10;},get reach(){return ALMA.on&&(HST.st===3||HST.st>=5)&&!DLG.active&&!WEVENT.on?90:-1;},onInteract:almaTalk});   /* talk to Alma */
   if(r===21)DUNINT.push({get x(){return AMR.x;},get y(){return AMR.y+10;},get reach(){return HST.amrIn&&HST.st===3&&!DLG.active&&!WEVENT.on?90:-1;},onInteract:()=>hsBabyAdmire()});   /* Amroth, beside Alma, before Lum goes up to bed */

@@ -6,7 +6,9 @@
 let SCENE='garden';const WCAM={x:330};const SHED_POS={x:530,y:560};let wellVisited=false;
 const FADE={a:0,dir:0,cb:null};
 function goScene(cb){if(FADE.dir)return;FADE.dir=1;FADE.cb=cb;}
-function updateFade(dt){if(FADE.dir===1){FADE.a=Math.min(1,FADE.a+dt/.6);if(FADE.a>=1){const cb=FADE.cb;FADE.cb=null;cb&&cb();FADE.dir=-1;if(typeof SAVEC!=='undefined')SAVEC.t=99;}}else if(FADE.dir===-1){FADE.a=Math.max(0,FADE.a-dt/.7);if(FADE.a<=0)FADE.dir=0;}}
+/* resting: fade to black, a short lullaby plays over the black screen, then cb runs (still black) and the scene fades back in */
+function restLullaby(cb){WEVENT.on=true;goScene(()=>{FADE.hold=playLullaby();FADE.after=()=>{cb&&cb();};});}
+function updateFade(dt){if(FADE.dir===1){FADE.a=Math.min(1,FADE.a+dt/.6);if(FADE.a>=1){const cb=FADE.cb;FADE.cb=null;cb&&cb();FADE.dir=-1;if(typeof SAVEC!=='undefined')SAVEC.t=99;}}else if(FADE.dir===-1){if(FADE.hold>0){FADE.hold-=dt;if(FADE.hold<=0&&FADE.after){const f=FADE.after;FADE.after=null;f();}return;}FADE.a=Math.max(0,FADE.a-dt/.7);if(FADE.a<=0)FADE.dir=0;}}
 function drawSceneFade(){if(FADE.a>0){ctx.fillStyle=FADE.white?`rgba(255,250,240,${FADE.a.toFixed(3)})`:`rgba(8,10,16,${FADE.a.toFixed(3)})`;ctx.fillRect(0,0,W,H);}}
 const wellH=y=>112+(clamp(y,480,768)-490)*.38;          // Cosmic's height at a given depth
 const WFLOOR=[[330,590],[420,508],[640,494],[950,503],[1005,560],[1110,618],[1240,660],[1300,768],[70,768],[150,700],[250,640]];

@@ -47,7 +47,7 @@ function hsToRest(){HST.st=3;WEVENT.on=false;HST.amrIn=1;HST.almaGo=1;AMR.x=700;
   C2.joined=0;const k=PARTY_ORDER.indexOf('amroth');if(k>=0)PARTY_ORDER.splice(k,1);   /* Lum goes on alone from here */
   hsGoal('Rest upstairs');setupDun();}
 /* the loft bed */
-function hsRest(){if(HST.st!==3){say("A big bed under a patchwork quilt.");return;}WEVENT.on=true;goScene(()=>{HST.st=4;HST.amrIn=0;HST.amrOut=1;ALMA.on=1;ALMA.baby=0;ALMA.sit=1;ALMA.x=ALMASEAT.x;ALMA.y=ALMASEAT.y;ALMA.face=-1;ALMA.dir='side';ALMA.moving=0;
+function hsRest(){if(HST.st!==3){say("A big bed under a patchwork quilt.");return;}restLullaby(()=>{HST.st=4;HST.amrIn=0;HST.amrOut=1;ALMA.on=1;ALMA.baby=0;ALMA.sit=1;ALMA.x=ALMASEAT.x;ALMA.y=ALMASEAT.y;ALMA.face=-1;ALMA.dir='side';ALMA.moving=0;
   for(const id of PARTY_ORDER)HEROES[id].hp=HEROES[id].maxHp;lum.x=900;lum.y=735;lum.face=1;lum.state='idle';WEVENT.on=false;GOAL.tag='';GOAL.text='';setupDun();
   setTimeout(()=>{hsGoal('Go downstairs');},1500);});}
 /* the morning: Alma waits downstairs */
@@ -101,4 +101,4 @@ function learnVenom(){if(C2.venom)return;C2.venom=1;POWDER_LIST.push(['venom','P
 
 /* the loft bed: ask first; resting passes the night and heals everyone */
 function hsBed(){if(HST.st<3){say("A big bed under a patchwork quilt.");return;}
-  askChoice("Rest until morning?",[["Rest",()=>{if(HST.st===3)hsRest();else{WEVENT.on=true;goScene(()=>{for(const id of PARTY_ORDER)HEROES[id].hp=HEROES[id].maxHp;lum.state='idle';WEVENT.on=false;setTimeout(()=>{TOAST.t=0;TOAST.name='Rested · HP restored';TOAST.id='potion';},300);});}}],["Not yet",()=>{}]]);}
+  askChoice("Rest until morning?",[["Rest",()=>{if(HST.st===3)hsRest();else{restLullaby(()=>{for(const id of PARTY_ORDER)HEROES[id].hp=HEROES[id].maxHp;lum.state='idle';WEVENT.on=false;setTimeout(()=>{TOAST.t=0;TOAST.name='Rested · HP restored';TOAST.id='potion';},300);});}}],["Not yet",()=>{}]]);}
