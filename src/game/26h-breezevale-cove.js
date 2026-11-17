@@ -169,7 +169,7 @@ function drawBVTitle(){if(!inBV()||BVT.t>=4.5||SCENE!=='thorn')return;BVT.t+=1/6
 THINT.push({get x(){return BVX+BVSOUTH.x;},get y(){return BVY+BVSOUTH.y;},get reach(){return inBV()?80:-1;},door:true,onInteract:()=>goScene(enterBWEast)},
   {get x(){return BVX+BVNORTH.x;},get y(){return BVY+BVNORTH.y;},get reach(){return inBV()?85:-1;},door:true,onInteract:()=>say("The way to the Sanctuary of Water lies beyond.")});
 /* the clam houses can be entered: a shop (bottom-left) and a sitting room (bottom-right); their townsfolk (lines still to settle with the designer) */
-const BVNPC=[{room:25,atlas:'breeze_boy',x:850,y:525,h:150,name:'Shopkeeper',lines:[["Welcome in! Have a look around."]]},
+const BVNPC=[{room:25,atlas:'breeze_boy',x:850,y:525,h:150,name:'Breezevale Merchant',lines:[["Welcome in! Have a look around."]]},
   {room:26,atlas:'breeze_boy',x:1215,y:664,name:'Townsman',lines:[["Oh! Hello there. Come in out of the rain."]]},
   {room:26,atlas:'breeze_girl',x:470,y:690,name:'Townswoman',lines:[["Would you like some tea? The kettle's still warm."]]}];
 function drawBVNpc(n){const k=dunH(n.y)/151,face=lum.x>n.x;ctx.save();ctx.fillStyle='rgba(10,10,20,.25)';ctx.beginPath();ctx.ellipse(n.x,n.y,22*k,7*k,0,0,TAU);ctx.fill();ctx.restore();
