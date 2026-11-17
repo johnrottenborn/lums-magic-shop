@@ -18,13 +18,22 @@ const GLAKE=gp([[-200,1020],[60,1010],[220,1030],[340,1130],[500,1210],[640,1380
 const GPATH_CTRL=gp([[650,60],[620,230],[470,300],[300,440],[245,640],[230,860],[300,990],[480,1050],[640,1180],[760,1330],[930,1400],[1060,1460],[1100,1600],[1040,1780]]).map(([x,y])=>[x+GROVEX,y+GROVEY]);
 const GPATH_PTS=splinePts(GPATH_CTRL,20);let GPATHP=null;
 const GENTRY={x:650*1.2,y:90*1.2},GEXIT={x:1040*1.2,y:1700*1.2};
+const GH_=(a,b)=>hash(a,b,4417);
+/* grassy clearings inside the bigger groves, left open to wander through */
+const GCLEAR=[[780,610,190],[500,960,150],[1090,930,190],[1520,1000,210],[1480,520,170],[990,1880,150]];
+/* the evergreens: worked out once (region coords) so the bushes can sit along the tree line and Lum walks between the trunks */
+const GTRUNKS=[],GSPOTS=[];
+{let k=0;for(let gy=60;gy<GH;gy+=95)for(let gx=20;gx<GW;gx+=105){k++;const lx=gx+(GH_(k,71)-.5)*60,ly=gy+(GH_(k,72)-.5)*50;
+  if(!GTREES.some(T=>inPoly(lx,ly,T))||inPoly(lx,ly,GLAKE)||GH_(k,76)<.5||GCLEAR.some(([cx,cy,r])=>Math.hypot(lx-cx,(ly-cy)*1.2)<r))continue;   /* thinned out, with clearings */
+  let clear=true;for(let up=0;up<=400&&clear;up+=40)if(gpathDist(lx+GROVEX,ly-up+GROVEY)<(up?110:150)||Math.hypot(lx-GENTRY.x,ly-up-GENTRY.y)<260)clear=false;if(!clear)continue;   /* the old path and the way in stay in view */
+  const [img,w]=HTREES[Math.floor(GH_(k,73)*HTREES.length)];GTRUNKS.push([lx,ly]);GSPOTS.push({lx,ly,img,w:w*(.75+GH_(k,74)*.35),flip:GH_(k,75)<.5});}}
+const nearTree=(lx,ly)=>{let b=1e9;for(const [tx,ty] of GTRUNKS)b=Math.min(b,Math.hypot(lx-tx,(ly-ty)*1.4));return b;};
 /* berry bushes and the new Venomvine (a dark, thorny vine bush) to forage */
 const GFORAGE=[[320,560,6],[380,1000,0],[700,1250,4],[1050,1380,6],[480,330,0],[760,780,4],[1080,1100,0],[300,1000,'venom'],[880,1300,'venom'],[560,300,'venom']]
   .map(([x,y,k])=>({x:x*1.2+GROVEX,y:y*1.2+GROVEY,k:k==='venom'?11:k,venom:k==='venom',id:k==='venom'?'venomvine':FORAGE_MAP[k],n:2,picked:0}));
-for(const f of GFORAGE){if(gpathDist(f.x,f.y)>=105&&!inPoly(f.x-GROVEX,f.y-GROVEY,GLAKE))continue;let best=null;for(let r=10;r<300&&!best;r+=10)for(let a=0;a<TAU;a+=TAU/24){const x=f.x+Math.cos(a)*r,y=f.y+Math.sin(a)*r,d=gpathDist(x,y);if(d<105||d>145||inPoly(x-GROVEX,y-GROVEY,GLAKE))continue;best=[x,y];break;}if(best)[f.x,f.y]=best;}   /* beside the old path, never on it */
+for(const f of GFORAGE){let best=null;for(let r=0;r<420&&!best;r+=12)for(let a=0;a<TAU;a+=TAU/24){const x=f.x+Math.cos(a)*r,y=f.y+Math.sin(a)*r,lx=x-GROVEX,ly=y-GROVEY,d=gpathDist(x,y),nt=nearTree(lx,ly);if(d<100||nt<60||nt>125||inPoly(lx,ly,GLAKE)||lx<60||lx>GW-60||ly<170||ly>GH-170)continue;best=[x,y];break;}if(best)[f.x,f.y]=best;}   /* along the tree line, never on the path */
 const inGrove=()=>lum.x>GROVEX-300;
-const GTRUNKS=[];   /* tree roots (region coords): Lum walks the grass between them */
-const GH_=(a,b)=>hash(a,b,4417);
+
 function gpathDist(x,y){let best=1e9;for(let i=0;i<GPATH_PTS.length-1;i++){const [ax,ay]=GPATH_PTS[i],[bx,by]=GPATH_PTS[i+1],dx=bx-ax,dy=by-ay,t=clamp(((x-ax)*dx+(y-ay)*dy)/(dx*dx+dy*dy||1),0,1);best=Math.min(best,Math.hypot(x-ax-dx*t,y-ay-dy*t));}return best;}
 function groveFree(x,y){const lx=x-GROVEX,ly=y-GROVEY;
   if(ly<120&&Math.abs(lx-GENTRY.x)<70&&ly>40)return true;   /* the north entrance */
@@ -36,15 +45,11 @@ function groveFree(x,y){const lx=x-GROVEX,ly=y-GROVEY;
   return true;}
 /* evergreens filling every grove, flowers on the open ground, stones along the old path */
 function groveProps(P){const X=x=>x+GROVEX,Y=y=>y+GROVEY;let k=0;
-  for(let gy=60;gy<GH;gy+=95)for(let gx=20;gx<GW;gx+=105){k++;const lx=gx+(GH_(k,71)-.5)*60,ly=gy+(GH_(k,72)-.5)*50;
-    if(!GTREES.some(T=>inPoly(lx,ly,T))||inPoly(lx,ly,GLAKE)||GH_(k,76)<.4)continue;   /* thinned out, so there is room to wander */
-    let clear=true;for(let up=0;up<=400&&clear;up+=40)if(gpathDist(X(lx),Y(ly-up))<(up?110:150)||Math.hypot(lx-GENTRY.x,ly-up-GENTRY.y)<260)clear=false;if(!clear)continue;   /* the old path and the way in stay in view */
-    const [img,w]=HTREES[Math.floor(GH_(k,73)*HTREES.length)];GTRUNKS.push([lx,ly]);
-    P.push({t:'tree',img,x:X(lx),y:Y(ly),w:w*(.75+GH_(k,74)*.35),flip:GH_(k,75)<.5,base:.95});}
+  for(const t of GSPOTS)P.push({t:'tree',img:t.img,x:X(t.lx),y:Y(t.ly),w:t.w,flip:t.flip,base:.95});
   /* trees beyond the map edge so it never looks bare */
   for(let gy=0;gy<GH+200;gy+=160){if(!inPoly(-60,gy,GLAKE))P.push({t:'tree',img:'hfir',x:X(-60),y:Y(gy),w:260,flip:false,base:.95});P.push({t:'tree',img:'hbig',x:X(GW+70),y:Y(gy),w:380,flip:true,base:.95});}
   const KINDS=['lavender','rose','delph','magic','mint'];let q=0;
-  for(let i=0;i<150;i++){const lx=60+GH_(i,81)*(GW-120),ly=160+GH_(i,82)*(GH-360);if(!groveFree(X(lx),Y(ly))||gpathDist(X(lx),Y(ly))<50)continue;q++;
+  for(let i=0;i<260;i++){const lx=60+GH_(i,81)*(GW-120),ly=160+GH_(i,82)*(GH-360);if(!groveFree(X(lx),Y(ly))||gpathDist(X(lx),Y(ly))<90||nearTree(lx,ly)>140)continue;q++;   /* along the tree line; the open grass stays clear */
     const n=1+Math.floor(GH_(i,83)*3);for(let j=0;j<n;j++)P.push({t:'plant',w:70,kind:KINDS[Math.floor(GH_(i,84)*KINDS.length)],i:Math.floor(GH_(i+j,85)*4),x:X(lx+j*22-20),y:Y(ly+(j%2)*10),s:.8+GH_(i+j,86)*.4,flip:GH_(i+j,87)<.5,ph:GH_(i+j,88)*TAU});}
   for(const f of GFORAGE)P.push({t:'shrub',k:f.k,x:f.x,y:f.y,s:SHR[f.k].s*.85,flip:f.x%2<1,ph:f.x*.01,venom:f.venom});}
 /* ground: the worn path, broken into patches, and the lake */
