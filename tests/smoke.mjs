@@ -897,6 +897,20 @@ const CASES = {
     const stole = await p.evaluate(() => { const g = window.__g, rnd = Math.random; g.PARTY.lum.charm = 'foxtotem'; const b = g.MATS.slimeparts || 0; Math.random = () => 0.1; g.foxRingSteal({ type: 'slime', x: 0, y: 0 }); Math.random = rnd; return (g.MATS.slimeparts || 0) - b; });
     check(stole === 1, 'the Carved Fox Totem did not steal on a successful roll');
   },
+  async 'coastal-breezeway'(p) {
+    const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop', g_ = (f, a) => p.evaluate(f, a);
+    await g_(() => { const g = window.__g; g.startChapter2(); g.c2Skip(); g.HST.st = 7; g.enterGrove(true); }); await wait(600);
+    const ex = await g_(() => { const g = window.__g, d = g.THINTS().filter(o => o.door && o.reach > 0).map(o => [o, Math.hypot(o.x - g.lum.x, o.y - g.lum.y)]).sort((a, b) => a[1] - b[1])[0]; g.lum.x = d[0].x; g.lum.y = d[0].y + 30; return true; }); await wait(500);
+    await g_(() => window.__g.NEAR.onInteract()); await wait(800);
+    check(await g_(() => window.__g.inBW() && window.__g.bwFree(window.__g.lum.x, window.__g.lum.y)), 'the grove\'s south exit did not lead onto the Coastal Breezeway path');
+    check(await g_(() => { const g = window.__g; return !g.bwFree(g.lum.x, g.lum.y + 220) && !g.bwFree(g.lum.x, g.lum.y - 220); }), 'Lum can walk off the cliff-top path');
+    await wait(4500); await p.screenshot({ path: path.join(SHOTS, `breezeway-arrive-${vp}.png`) });
+    for (const f of [0.02, 0.98]) {
+      await g_(f => { const g = window.__g; for (const q of g.THFOES || []) q.calm = 99; const P = g.BPATH_PTS[Math.floor(f * g.BPATH_PTS.length)]; g.lum.x = P[0]; g.lum.y = P[1]; }, f); await wait(900);
+      check(await g_(() => !!(window.__g.NEAR && window.__g.NEAR.door)), 'no door emote at the end of the Coastal Breezeway (' + f + ')');
+    }
+    await p.screenshot({ path: path.join(SHOTS, `breezeway-east-${vp}.png`) });
+  },
   async 'breeze-townsfolk-atlas'(p) {
     const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop';
     const ok = await p.evaluate(() => { const g = window.__g, A = g.C1ATL.breeze_girl, im = g.IMG.breeze_girl, im2 = g.IMG.breeze_boy; if (!['breeze_fountain', 'breeze_clamhouse', 'breeze_shellhouse', 'breeze_mayorhouse'].every(n => g.IMG[n] && g.IMG[n].naturalWidth) || !A || !g.C1ATL.breeze_boy || !im || !im.naturalWidth || !im2 || !im2.naturalWidth) return false;

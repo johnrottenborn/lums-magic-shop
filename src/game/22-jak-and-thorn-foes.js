@@ -123,7 +123,7 @@ function addGroveFoes(){if(typeof GROVEX==='undefined'||THFOES.some(g=>g.grove))
   for(const [lx,ly,kind,pack] of [[520,700,'ffox',1],[300,1150,'gwisp',1],[1030,1150,'ffox',2],[640,1320,'gwisp',2],[1000,580,'gwisp',1],[880,1700,'ffox',1],[420,1720,'gwisp',1],[690,1560,'nymph',1],[380,1020,'nymph',1]]   /* nymphs by the lake */){
     const x=GROVEX+lx,y=GROVEY+ly,myid=id++;if(dead.has(myid)||!groveFree(x,y))continue;
     THFOES.push({kind,grove:1,scene:'thorn',x,y,hx:x,hy:y,tx:x,ty:y,cx:x-TCW/2,cy:y-TCH/2,s:1,pack,calm:1,dead:0,t:rnd(0,4),ph:rnd(0,TAU),face:-1,id:myid,bl:0});}}
-function updateThornFoes(dt){addGroveFoes();const ok=!DLG.active&&!WEVENT.on&&!MENU.open&&!FADE.dir&&!BATTLE.on&&!BATTLE.pending&&!CHOICE.on;
+function updateThornFoes(dt){addGroveFoes();addBWFoes();const ok=!DLG.active&&!WEVENT.on&&!MENU.open&&!FADE.dir&&!BATTLE.on&&!BATTLE.pending&&!CHOICE.on;
   for(const g of THFOES){g.t+=dt;g.ph+=dt;g.calm=Math.max(0,g.calm-dt);const dx=lum.x-g.x,dy=lum.y-g.y,d=Math.hypot(dx,dy);
     if(g.kind==='flora'){g.bl=clamp(g.bl+(d<230?dt*1.4:-dt*.6),0,1);if(ok&&!g.calm&&d<72&&lum.bumpT<=0)startEncounter(g,'ambush');continue;}
     let sp=g.kind==='rslime'?40:g.kind==='spider'||g.kind==='nymph'?58:72,tx=g.tx,ty=g.ty;g.chase=ok&&!g.calm&&d<190;
@@ -155,7 +155,7 @@ function drawThorn(){const vw=W/zoom,vh=H/zoom,x0=cam.x-vw/2-60,y0=cam.y-vh/2-60
   // fallen petals and a darker rim outside the maze
   ctx.fillStyle='rgba(10,8,12,.55)';if(x0<0)ctx.fillRect(x0,y0,-x0,y1-y0);if(x1>TW_&&CH<2)ctx.fillRect(TW_,y0,x1-TW_,y1-y0);if(y0<0)ctx.fillRect(x0,y0,x1-x0,-y0);
   for(const d of THORN.decals||[]){const im=IMG[d.n];if(!ready(im))continue;const h=d.w*im.naturalHeight/im.naturalWidth;if(d.x+d.w/2<x0||d.x-d.w/2>x1||d.y+h/2<y0||d.y-h/2>y1)continue;ctx.save();ctx.translate(d.x,d.y);if(d.flip)ctx.scale(-1,1);ctx.drawImage(im,-d.w/2,-h/2,d.w,h);ctx.restore();}
-  drawClrPath(x0,x1);drawHomeGround(x0,y0,x1,y1);drawGroveGround(x0,y0,x1,y1);if(CH===1&&FKS.chaos)drawFkChaos(false);if(CH>=2){drawClrScorch(x0,y0,x1,y1);drawAshMound();}
+  drawClrPath(x0,x1);drawHomeGround(x0,y0,x1,y1);drawGroveGround(x0,y0,x1,y1);drawBWGround(x0,y0,x1,y1);if(CH===1&&FKS.chaos)drawFkChaos(false);if(CH>=2){drawClrScorch(x0,y0,x1,y1);drawAshMound();}
   drawCellarMouth();
   for(const f of THORN.flowers)if(f.x>x0-30&&f.x<x1+30&&f.y>y0-30&&f.y<y1)drawRedFlowers(f.x,f.y,f.s,f.seed);
   const L=[];for(const o of THORN.props){const ow=o.w||160;if(o.x>x0-ow/2-40&&o.x<x1+ow/2+40&&o.y>y0-20&&o.y<y1+ow*1.4)L.push([o.sy??o.y,o]);}L.push([lum.y,null]);L.sort((a,b)=>a[0]-b[0]);

@@ -40,7 +40,7 @@ const nearTree=(lx,ly)=>{let b=1e9;for(const [tx,ty] of GTRUNKS)b=Math.min(b,Mat
 const GFORAGE=[[320,560,6],[380,1000,0],[700,1250,4],[1050,1380,6],[480,330,0],[760,780,4],[1080,1100,0],[300,1000,'venom'],[880,1300,'venom'],[560,300,'venom']]
   .map(([x,y,k])=>({x:x*1.2+GROVEX,y:y*1.2+GROVEY,k:k==='venom'?11:k,venom:k==='venom',id:k==='venom'?'venomvine':FORAGE_MAP[k],n:2,picked:0}));
 for(const f of GFORAGE){let best=null;for(let r=0;r<420&&!best;r+=12)for(let a=0;a<TAU;a+=TAU/24){const x=f.x+Math.cos(a)*r,y=f.y+Math.sin(a)*r,lx=x-GROVEX,ly=y-GROVEY,d=gpathDist(x,y),nt=nearTree(lx,ly);if(d<100||nt<60||nt>125||inPoly(lx,ly,GLAKE)||lx<60||lx>GW-60||ly<170||ly>GH-170)continue;best=[x,y];break;}if(best)[f.x,f.y]=best;}   /* along the tree line, never on the path */
-const inGrove=()=>lum.x>GROVEX-300;
+const inGrove=()=>lum.x>GROVEX-300&&lum.x<GROVEX+2700;   /* (the Coastal Breezeway lies further east) */
 
 function gpathDist(x,y){let best=1e9;for(let i=0;i<GPATH_PTS.length-1;i++){const [ax,ay]=GPATH_PTS[i],[bx,by]=GPATH_PTS[i+1],dx=bx-ax,dy=by-ay,t=clamp(((x-ax)*dx+(y-ay)*dy)/(dx*dx+dy*dy||1),0,1);best=Math.min(best,Math.hypot(x-ax-dx*t,y-ay-dy*t));}return best;}
 function groveFree(x,y){const lx=x-GROVEX,ly=y-GROVEY;
@@ -80,6 +80,6 @@ function drawGroveTitle(){if(!inGrove()||GVT.t>=4.5||SCENE!=='thorn')return;GVT.
   ctx.fillStyle='rgba(20,16,12,.55)';ctx.fillRect(0,H*.3-40,W,80);ctx.fillStyle='#f6ecd8';ctx.font=`600 ${Math.round(Math.min(30,W/13))}px Georgia,serif`;ctx.fillText('Evergreen Grove',W/2,H*.3+10);ctx.restore();}
 /* the north entrance (back to Amroth's home) and the south exit (the Coastal Path, map still to come) */
 THINT.push({get x(){return GROVEX+GENTRY.x;},get y(){return GROVEY+GENTRY.y-30;},get reach(){return inGrove()?80:0;},door:true,onInteract:()=>enterHomeFromGrove()},
-  {get x(){return GROVEX+GEXIT.x;},get y(){return GROVEY+GEXIT.y+20;},get reach(){return inGrove()?80:0;},door:true,onInteract:()=>say("The Coastal Path lies ahead.")});
+  {get x(){return GROVEX+GEXIT.x;},get y(){return GROVEY+GEXIT.y+20;},get reach(){return inGrove()?80:0;},door:true,onInteract:()=>enterBreezeway()});
 for(const f of GFORAGE)THINT.push({x:f.x,y:f.y,get reach(){return inGrove()?76:0},forage:f,onInteract:()=>pickForage(f)});
 function enterHomeFromGrove(){SCENE='thorn';lum.x=HOMEX+HOME.gate.x;lum.y=HOMEY+HH-70;lum.face=1;lum.dir='up';lum.state='idle';lum.vx=lum.vy=0;cam.x=lum.x;cam.y=lum.y-200;THORN.t=99;}
