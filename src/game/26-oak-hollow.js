@@ -66,7 +66,7 @@ const DROOMS={
      fg:[{y:562,poly:[[470,526],[500,520],[520,514],[540,510],[560,510],[580,516],[600,526],[620,538],[648,543],[648,566],[470,562]]},{y:600,poly:[[728,560],[760,553],[790,548],[810,544],[870,545],[900,548],[930,556],[960,566],[995,576],[995,602],[728,602]]}]},   /* their front rails */
   /* 31: the Sanctuary's altar chamber (the designer's painting), at the top of the hall's grand stair: a crystal altar on a round mosaic floor under a stained-glass water maiden; Sage Luma is here */
   31:{name:'',dark:0,wide:1,hk:1.2,hd:.35,floor:[[400,768],[405,700],[412,640],[425,585],[448,540],[478,508],[560,500],[820,500],[905,508],[935,540],[955,585],[965,640],[975,700],[990,768]],
-     block:[{x0:540,y0:470,x1:835,y1:598}],
+     block:[{x0:540,y0:470,x1:835,y1:598},{x:688,y:620,rx:34,ry:16}],   /* the altar; Sage Luma */
      fg:[{y:598,poly:[[538,395],[835,395],[838,598],[538,598]]}]},   /* the altar, in front of whoever walks behind it */
   /* 22: the loft, the bed under the thatch; the stair comes up on the right behind the rail */
   22:{name:'',dark:0,home:1,hk:1.9,floor:[[120,738],[460,730],[1050,726],[1050,612],[1185,612],[1185,768],[110,768]],
@@ -124,7 +124,7 @@ function setupDun(){DUNINT.length=0;const r=DUN.room,D=(x,y,reach,fn)=>DUNINT.pu
   if(r===26){D(330,758,100,()=>goScene(()=>leaveBVHouse(3)));DUNINT.push({x:540,y:612,reach:95,fire:true,onInteract:()=>{if(canLumMix())openMix();else say("A little iron stove, warm and ticking.");}});   /* the stove: Lum can mix here */for(const n of BVNPC)if(n.room===26)DUNINT.push({x:n.x,y:n.y+10,reach:95,onInteract:()=>bvNpcTalk(n)});}
   if(r===29){D(690,750,90,()=>goScene(leaveSanctuary));D(700,592,95,()=>dunGo(30,470,725,1));}
   if(r===30){D(470,748,95,()=>dunGo(29,700,612,1));D(814,360,40,()=>dunGo(31,690,728,1));}   /* the far door at the top of the stair, to the altar chamber */
-  if(r===31){D(690,752,95,()=>dunGo(30,812,372,1));for(const n of BVNPC)if(n.room===31)DUNINT.push({x:n.x,y:n.y+10,reach:100,onInteract:()=>bvNpcTalk(n)});}
+  if(r===31){D(690,755,70,()=>dunGo(30,812,372,1));for(const n of BVNPC)if(n.room===31)DUNINT.push({x:n.x,y:n.y+10,reach:100,onInteract:()=>bvNpcTalk(n)});}
   if(r===28){D(190,650,95,()=>goScene(()=>leaveBVHouse(0)));for(const n of BVNPC)if(n.room===28)DUNINT.push({x:n.x,y:n.y+10,reach:95,onInteract:()=>bvNpcTalk(n)});
     DUNINT.push({x:905,y:585,reach:110,fire:true,onInteract:()=>{if(canLumMix())openMix();else say("A warm fire crackles under the kettle.");}});}   /* the hearth: Lum can mix here */
   if(r===27){D(590,612,90,()=>goScene(()=>leaveBVHouse(4)));for(const n of BVNPC)if(n.room===27)DUNINT.push({x:n.x,y:n.y+10,reach:100,onInteract:()=>bvNpcTalk(n)});

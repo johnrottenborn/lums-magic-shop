@@ -943,7 +943,7 @@ const CASES = {
     check(await g_(() => window.__g.dunFree(780, 440) && !!(window.__g.NEAR && window.__g.NEAR.door)), 'the grand stair should be walkable up to the far door');
     await g_(() => window.__g.NEAR.onInteract()); await wait(1500);
     check(await g_(() => window.__g.DUN.room === 31), 'the door at the top of the stair did not lead to the altar chamber (room 31)');
-    await g_(() => { const g = window.__g; g.lum.x = 820; g.lum.y = 600; }); await wait(600);
+    await g_(() => { const g = window.__g; g.lum.x = 690; g.lum.y = 665; }); await wait(600);
     await g_(() => window.__g.NEAR.onInteract()); await wait(600);
     check(await g_(() => window.__g.DLG.active && window.__g.DLG.lines[0][0] === 'Sage Luma'), 'Sage Luma should be in the altar chamber and talk');
     await p.screenshot({ path: path.join(SHOTS, `sanctuary-altar-${vp}.png`) });

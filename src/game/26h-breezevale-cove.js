@@ -185,11 +185,11 @@ const BVNPC=[{room:25,atlas:'breeze_boy',x:850,y:525,h:150,name:'Breezevale Merc
   {room:26,atlas:'breeze_boy',x:115,y:708,name:'Townsman',lines:[["Oh! Hello there. Come in out of the rain."]]},
   {room:28,atlas:'breeze_boy',x:870,y:722,name:'Fisherman',lines:[["Mind the nets! Come warm yourself by the fire."]]},
   {room:28,atlas:'breeze_girl',x:965,y:730,name:'Fisherwoman',lines:[["The rain keeps the fish close to shore. A good season."]]},
-  {room:31,atlas:'luma',x:885,y:585,name:'Sage Luma',slim:1,idle:1,sc:.92,lines:[["…"]]},   /* Alma's older sister; her lines are still to come */
+  {room:31,atlas:'luma',x:688,y:618,name:'Sage Luma',slim:1,idle:1,back:1,sc:.92,lines:[["…"]]},   /* Alma's older sister; her lines are still to come */
   {room:27,atlas:'jak2',x:960,y:700,name:'Jak',sc:1.35,slim:1,lines:[["…"]]},
   {room:26,atlas:'breeze_girl',x:205,y:694,name:'Townswoman',lines:[["Would you like some tea? The kettle's still warm."]]}];
 function drawBVNpc(n){const k=dunH(n.y)/151,face=lum.x>n.x;ctx.save();ctx.fillStyle='rgba(10,10,20,.25)';ctx.beginPath();ctx.ellipse(n.x,n.y,22*k,7*k,0,0,TAU);ctx.fill();ctx.restore();
-  const talking=DLG.active&&DLG.lines&&DLG.lines[DLG.i||0]&&DLG.lines[DLG.i||0][0]===n.name,an=talking&&Math.abs(lum.x-n.x)>60?'side':'down';ctx.save();ctx.translate(n.x,0);ctx.scale(n.slim?1:.86,1);ctx.translate(-n.x,0);c1Frame(ctx,n.atlas,an==='down'&&n.idle?'idle':an,0,n.x,n.y,n.h||BVFOLK_H*k*(n.sc||1),an==='side'&&face,1,0);ctx.restore();}   /* townsfolk: a little taller than Lum, slim */
+  const talking=DLG.active&&DLG.lines&&DLG.lines[DLG.i||0]&&DLG.lines[DLG.i||0][0]===n.name,an=talking&&Math.abs(lum.x-n.x)>60?'side':talking&&n.back&&lum.y<n.y?'up':n.back&&!talking?'up':'down';   /* back: stands facing north, turns to Lum when she speaks with her */ctx.save();ctx.translate(n.x,0);ctx.scale(n.slim?1:.86,1);ctx.translate(-n.x,0);c1Frame(ctx,n.atlas,an==='down'&&n.idle?'idle':an,0,n.x,n.y,n.h||BVFOLK_H*k*(n.sc||1),an==='side'&&face,1,0);ctx.restore();}   /* townsfolk: a little taller than Lum, slim */
 /* the Breezevale Merchant's trades */
 function bvTakeMat(id,n){MATS[id]-=n;if(MATS[id]<=0){MATS[id]=0;const i=BAG.indexOf(id);if(i>=0)BAG.splice(i,1);}}
 function bvMerchant(intro){const have=id=>MATS[id]||0,M=[['Fox Tail','foxtail',1,'potion','Healing Potion'],['Wisp Silk','wispsilk',1,'antidote','Antidote']];
@@ -198,7 +198,7 @@ function bvMerchant(intro){const have=id=>MATS[id]||0,M=[['Fox Tail','foxtail',1
     bvTakeMat('seagem',2);C2.potency=1;sfxItem&&sfxItem();talk([['Breezevale Merchant',"Steep the herbs in sea-water by moonlight, and stir it three times the other way. That's all there is to it!"],['Lum',"My Healing Potions will heal twice as much now!"]],false,()=>bvMerchant());},['seagem',2,'potion','Potions heal 2\u00d7 \u00b7 you have '+have('seagem'),have('seagem')<2]]);
   opts.push(['Leave',()=>{}]);
   const go=()=>askChoice('Breezevale Merchant \u00b7 Trades',opts);if(intro)talk([['Breezevale Merchant',"Welcome in! I don't take coin, only trades. Have a look."]],false,go);else go();}
-function bvNpcTalk(n){if(n.name==='Breezevale Merchant'){lum.face=lum.x<n.x?1:-1;bvMerchant(true);return;}lum.face=lum.x<n.x?1:-1;talk(n.lines.map(l=>[n.name,l[0]]));}
+function bvNpcTalk(n){if(n.name==='Breezevale Merchant'){lum.face=lum.x<n.x?1:-1;bvMerchant(true);return;}lum.face=lum.x<n.x?1:-1;if(n.back&&lum.y>n.y&&Math.abs(lum.x-n.x)<=60){lum.state='idleUp';lum.at=-1e9;}talk(n.lines.map(l=>[n.name,l[0]]));}   /* Lum looks up at whoever stands just above her */
 function leaveSanctuary(){SCENE='thorn';lum.x=BVX+BVSDOOR.x;lum.y=BVY+BVSDOOR.y+30;lum.face=1;lum.dir='down';lum.state='idle';lum.vx=lum.vy=0;cam.x=lum.x;cam.y=lum.y;THORN.t=99;BVT.t=99;}   /* back out of the Sanctuary onto the blue bridge */
 function leaveBVHouse(i){const h=BVHOUSES[i];SCENE='thorn';lum.x=BVX+bvDoorX(h);lum.y=BVY+h.y+60;lum.face=1;lum.dir='down';lum.state='idle';lum.vx=lum.vy=0;cam.x=lum.x;cam.y=lum.y;THORN.t=99;BVT.t=99;}
 for(const [i,h] of BVHOUSES.entries())THINT.push({x:BVX+bvDoorX(h),y:BVY+h.y+24,get reach(){return inBV()?78:-1;},door:i>=2||i===0,onInteract:()=>i===0?dunGo(28,240,660,1):i===2?dunGo(25,470,690,1):i===3?dunGo(26,330,720,1):i===4?dunGo(27,590,650,1):say(h.name==='mayor'?"The Mayor's house. No one answers.":"Lum knocks. No one answers.")});
