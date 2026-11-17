@@ -33,7 +33,7 @@ const DROOMS={
      light:[862,250,230]},
   /* Amroth's cottage (the designer's interiors). 21: the main room, front door on the left, spiral stair up on the right */
   21:{name:'',dark:0,home:1,hk:1.3,floor:[[300,592],[705,592],[930,600],[1150,628],[1160,768],[606,768],[606,640],[470,622],[300,617]],   /* a narrow strip between the wall and the table's back edge runs left past the door to the back chair; the table itself is solid */
-     block:[{x0:598,y0:664,x1:705,y1:769},{x0:910,y0:598,x1:1098,y1:692}],
+     block:[{x0:598,y0:664,x1:705,y1:769},{x0:868,y0:590,x1:1120,y1:694}],
      fg:[{y:690,poly:[[120,650],[205,617],[315,609],[470,626],[612,645],[640,640],[700,636],[705,768],[120,768]]},   /* traced along the table top's back edge, so whoever walks behind it is hidden from the waist down */{y:688,poly:[[912,600],[1098,595],[1098,700],[905,700]]}]},
   /* 23: the basement workshop under the cottage (behind the bookshelf left of the fireplace; opened by a story event) */
   23:{name:'',dark:0,home:1,hk:1.25,floor:[[140,522],[470,512],[1000,555],[1195,600],[1245,640],[1245,768],[350,768],[350,600],[140,575]],
