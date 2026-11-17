@@ -905,6 +905,8 @@ const CASES = {
     check(await g_(() => window.__g.inBW() && window.__g.bwFree(window.__g.lum.x, window.__g.lum.y)), 'the grove\'s south exit did not lead onto the Coastal Breezeway path');
     check(await g_(() => { const g = window.__g; return !g.bwFree(g.lum.x, g.lum.y + 220) && !g.bwFree(g.lum.x, g.lum.y - 220); }), 'Lum can walk off the cliff-top path');
     await wait(4500); await p.screenshot({ path: path.join(SHOTS, `breezeway-arrive-${vp}.png`) });
+    check(await g_(() => window.__g.BWSPL.length > 0), 'no surf splashes along the Coastal Breezeway');
+    check(await g_(() => window.__g.SEAB.length === 3), 'no white seabirds over the Coastal Breezeway');
     /* the west end: the archways above the path are scenery (no door), and the view starts at the map's west edge with the path running off it */
     await g_(() => { const g = window.__g; for (const q of g.THFOES || []) q.calm = 99; let x = g.BWX + 30; const P = g.BPATH_PTS.reduce((b, p) => Math.abs(p[0] - x) < Math.abs(b[0] - x) ? p : b); g.lum.x = x; g.lum.y = P[1]; }); await wait(1500);
     check(await g_(() => window.__g.bwFree(window.__g.lum.x, window.__g.lum.y) && !(window.__g.NEAR && window.__g.NEAR.door)), 'the west end of the Coastal Breezeway has a door, or Lum cannot stand there');
@@ -913,6 +915,9 @@ const CASES = {
     await g_(() => { const g = window.__g, P = g.BPATH_PTS[Math.floor(0.98 * g.BPATH_PTS.length)]; g.lum.x = P[0]; g.lum.y = P[1]; }); await wait(900);
     check(await g_(() => !!(window.__g.NEAR && window.__g.NEAR.door)), 'no door emote at the east end of the Coastal Breezeway');
     await p.screenshot({ path: path.join(SHOTS, `breezeway-east-${vp}.png`) });
+    /* splashes and a seabird in view, for a look at the effects */
+    await g_(() => { const g = window.__g, b = g.SEAB[0]; b.alive = true; b.t = 0; b.x = g.cam.x - 60; b.y = g.cam.y - 40; b.vx = 100; b.spr = [2, 1]; }); await wait(250);
+    await p.screenshot({ path: path.join(SHOTS, `breezeway-fx-${vp}.png`) });
   },
   async 'breeze-townsfolk-atlas'(p) {
     const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop';
