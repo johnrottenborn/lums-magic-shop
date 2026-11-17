@@ -13,7 +13,7 @@ const BVTOP=BVSBR.y1-400;   /* the view stops with just the start of the bridge 
 const BVSDOOR={x:BVSBR.x,y:BVSBR.y1-150};   /* the way on, a little way along the bridge */
 const BVBR={x0:1880,x1:2130,y:850,w:270};BVBR.h=BVBR.w*346/700;BVBR.rise=BVBR.h*.29;   /* the bridge: deck ends at y, the deck (between the two handrails) rises in the middle */
 /* door: where the front door is across the art (0..1, unflipped); smoke: the chimney top (u,v of the art), if it has one */
-const BVHOUSES=[{img:'breeze_shellhouse',x:503,y:650,w:351,name:'shell',flip:true,noR:1,door:.34,smoke:[.28,.19]},{img:'breeze_mayorhouse',x:1350,y:620,w:790,name:'mayor',noL:1,door:.58,smoke:[.55,.17]},
+const BVHOUSES=[{img:'breeze_shellhouse',x:560,y:650,w:465,name:'shell',flip:true,noR:1,door:.34,smoke:[.28,.19]},{img:'breeze_mayorhouse',x:1350,y:620,w:790,name:'mayor',noL:1,door:.58,smoke:[.55,.17]},
   {img:'breeze_clamhouse',x:590,y:1370,w:600,name:'clam',door:.86},{img:'breeze_clamhouse',x:1510,y:1370,w:600,name:'clam2',flip:true,door:.86},{img:'breeze_shellhouse',x:2495,y:875,w:620,name:'shell2',door:.36,smoke:[.28,.19]}];
 const bvDoorX=h=>h.x+(h.door-.5)*h.w*(h.flip?-1:1);
 /* a house's yard: two curves of grass, from up each side of the house, round its front corners, to either side of the door */
@@ -177,11 +177,11 @@ THINT.push({get x(){return BVX+BVSOUTH.x;},get y(){return BVY+BVSOUTH.y;},get re
 /* the clam houses can be entered: a shop (bottom-left) and a sitting room (bottom-right); their townsfolk (lines still to settle with the designer) */
 const BVFOLK_H=116;   /* Lum stands about 98 tall */
 const BVNPC=[{room:25,atlas:'breeze_boy',x:850,y:525,h:150,name:'Breezevale Merchant',lines:[["Welcome in! Have a look around."]]},
-  {room:26,atlas:'breeze_boy',x:1250,y:668,name:'Townsman',lines:[["Oh! Hello there. Come in out of the rain."]]},
+  {room:26,atlas:'breeze_boy',x:115,y:708,name:'Townsman',lines:[["Oh! Hello there. Come in out of the rain."]]},
   {room:28,atlas:'breeze_boy',x:870,y:722,name:'Fisherman',lines:[["Mind the nets! Come warm yourself by the fire."]]},
   {room:28,atlas:'breeze_girl',x:965,y:730,name:'Fisherwoman',lines:[["The rain keeps the fish close to shore. A good season."]]},
   {room:27,atlas:'jak2',x:960,y:700,name:'Jak',sc:1.35,slim:1,lines:[["…"]]},
-  {room:26,atlas:'breeze_girl',x:1172,y:660,name:'Townswoman',lines:[["Would you like some tea? The kettle's still warm."]]}];
+  {room:26,atlas:'breeze_girl',x:205,y:694,name:'Townswoman',lines:[["Would you like some tea? The kettle's still warm."]]}];
 function drawBVNpc(n){const k=dunH(n.y)/151,face=lum.x>n.x;ctx.save();ctx.fillStyle='rgba(10,10,20,.25)';ctx.beginPath();ctx.ellipse(n.x,n.y,22*k,7*k,0,0,TAU);ctx.fill();ctx.restore();
   const talking=DLG.active&&DLG.lines&&DLG.lines[DLG.i||0]&&DLG.lines[DLG.i||0][0]===n.name,an=talking&&Math.abs(lum.x-n.x)>60?'side':'down';ctx.save();ctx.translate(n.x,0);ctx.scale(n.slim?1:.86,1);ctx.translate(-n.x,0);c1Frame(ctx,n.atlas,an,0,n.x,n.y,n.h||BVFOLK_H*k*(n.sc||1),an==='side'&&face,1,0);ctx.restore();}   /* townsfolk: a little taller than Lum, slim */
 /* the Breezevale Merchant's trades */
