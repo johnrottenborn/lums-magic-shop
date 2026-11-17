@@ -967,8 +967,8 @@ const CASES = {
     const pots = await g_(() => window.__g.BAG.filter(x => x === 'potion').length);
     await g_(() => window.__g.pickChoice(0)); await wait(700);
     check(await g_(n => window.__g.BAG.filter(x => x === 'potion').length === n + 1 && !window.__g.MATS.foxtail, pots), 'trading a Fox Tail did not give a Healing Potion');
-    await g_(() => window.__g.pickChoice(2)); await wait(300);
-    check(await g_(() => window.__g.C2.potency && !window.__g.MATS.seagem && window.__g.healRoll({ heal: [5, 7] }) >= 5), 'two Sea Gems did not teach Healing Potion Potency');
+    await wait(400); await g_(() => window.__g.pickChoice(2)); await wait(700);
+    check(await g_(() => window.__g.BAG.includes('seabait') && !window.__g.MATS.seagem && !window.__g.C2.potency), 'two Sea Gems did not trade for Sea Bait');
     await g_(() => { window.__g.DLG.active = false; window.__g.CHOICE.on = false; });
   },
   async 'coastal-breezeway'(p) {
