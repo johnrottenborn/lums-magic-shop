@@ -7,7 +7,7 @@
 const BVX=BWX+5200,BVY=500,BVW=2400,BVH=2000,BVT={t:99};
 const BVC={x:1000,y:850,r:600},BVI={x:2030,y:800,r:200};   /* the town green, and the islet */
 const BVGATE={x:BVC.x,y:BVC.y+BVC.r+10},BVSOUTH={x:BVC.x,y:BVH-90},BVNORTH={x:BVC.x,y:BVC.y-BVC.r+70};
-const BVBR={x0:1585,x1:1835,y:800,w:270};BVBR.h=BVBR.w*346/700;BVBR.rise=BVBR.h*.41;   /* the bridge: deck ends at y, the arch rises in the middle */
+const BVBR={x0:1585,x1:1835,y:800,w:270};BVBR.h=BVBR.w*346/700;BVBR.rise=BVBR.h*.29;   /* the bridge: deck ends at y, the deck (between the two handrails) rises in the middle */
 const BVHOUSES=[{img:'breeze_shellhouse',x:725,y:610,w:340,name:'shell'},{img:'breeze_mayorhouse',x:1290,y:600,w:460,name:'mayor'},
   {img:'breeze_clamhouse',x:700,y:1140,w:350,name:'clam'},{img:'breeze_clamhouse',x:1310,y:1140,w:350,name:'clam2',flip:true},{img:'breeze_shellhouse',x:2030,y:850,w:300,name:'shell2',flip:true}];
 const BVFOUNT={x:1000,y:930,w:380};
@@ -49,13 +49,20 @@ function bvTinted(img,k){const key=img+'|'+k;if(BVTINT[key])return BVTINT[key];c
       let R=M[0]*r+M[1]*gg+M[2]*b,G=M[3]*r+M[4]*gg+M[5]*b,B=M[6]*r+M[7]*gg+M[8]*b;const L=.3*R+.59*G+.11*B;R=L+(R-L)*T_[1];G=L+(G-L)*T_[1];B=L+(B-L)*T_[1];
       R+=(255-R)*T_[2];G+=(255-G)*T_[2];B+=(255-B)*T_[2];p[i]=R;p[i+1]=G;p[i+2]=B;}g.putImageData(d,0,0);}catch(e){}
   return BVTINT[key]=c;}
+/* the bridge's front handrail and its posts (image px of the 700-wide art), redrawn over Lum */
+function drawBVBridgeFront(o){const im=IMG.breeze_bridge;if(!ready(im))return;const k=o.w/im.naturalWidth,h=im.naturalHeight*k,x0=o.x-o.w/2,y0=o.y-60+BVBR.h*.16-h;
+  const top=x=>47+90*((x-350)/290)**2;ctx.save();ctx.beginPath();
+  ctx.moveTo(x0+0*k,y0+(top(0)-4)*k);for(let x=10;x<=700;x+=10)ctx.lineTo(x0+x*k,y0+(top(x)-4)*k);for(let x=700;x>=0;x-=10)ctx.lineTo(x0+x*k,y0+(top(x)+17)*k);ctx.closePath();
+  for(const [a,b] of [[0,34],[166,186],[338,360],[512,534],[666,700]])ctx.rect(x0+a*k,y0+(top((a+b)/2)-2)*k,(b-a)*k,(232-top((a+b)/2))*k);
+  ctx.clip('nonzero');ctx.drawImage(im,x0,y0,o.w,h);ctx.restore();}
 function drawBVFlower(o){const im=bvTinted(o.img,o.tint);if(!im)return;const w=o.w,h=w*im.height/im.width;ctx.save();ctx.translate(o.x,o.y);if(o.flip)ctx.scale(-1,1);
   ctx.fillStyle='rgba(20,30,15,.22)';ctx.beginPath();ctx.ellipse(0,0,w*.36,w*.1,0,0,TAU);ctx.fill();ctx.drawImage(im,-w/2,-h*.96,w,h);ctx.restore();}
 function bvProps(P){const X=x=>x+BVX,Y=y=>y+BVY;
   for(const h of BVHOUSES)P.push({t:'tree',img:h.img,x:X(h.x),y:Y(h.y),w:h.w,flip:!!h.flip,base:.97,solid:1});
   P.push({t:'tree',img:'breeze_fountain',x:X(BVFOUNT.x),y:Y(BVFOUNT.y),w:BVFOUNT.w,flip:false,base:.95,solid:1});
   P.push({t:'tree',img:'breeze_gate',x:X(BVGATE.x),y:Y(BVGATE.y+14),w:420,flip:false,base:.97,solid:1});
-  P.push({t:'tree',img:'breeze_bridge',x:X((BVBR.x0+BVBR.x1)/2),y:Y(BVBR.y+BVBR.h*.16),sy:Y(BVBR.y-BVBR.rise-40),w:BVBR.w,flip:false,base:1});   /* sorted behind Lum while she crosses */
+  P.push({t:'tree',img:'breeze_bridge',x:X((BVBR.x0+BVBR.x1)/2),y:Y(BVBR.y+BVBR.h*.16),sy:Y(BVBR.y-BVBR.rise-60),w:BVBR.w,flip:false,base:1});   /* the whole bridge, behind Lum */
+  P.push({t:'bvbrf',x:X((BVBR.x0+BVBR.x1)/2),y:Y(BVBR.y+60),w:BVBR.w});   /* its front handrail and posts again, in front of her: she walks between the rails */
   /* hydrangeas at each doorstep, in that house's colours, and a few along the paths and round the fountain */
   const TINTS={shell:['blue','lilac'],mayor:['cream','white'],clam:['pink','coral'],clam2:['coral','pink'],shell2:['lilac','blue']},HY=['hydrsmall','hydrmid','hydrbig'];
   for(const h of BVHOUSES){const tt=TINTS[h.name];for(let j=0;j<4;j++){const side=j<2?-1:1,lx=h.x+side*(h.w*.3+(j%2)*58)+(BVH_(j,h.x)-.5)*16,ly=h.y+20+(j%2)*26;
@@ -67,6 +74,10 @@ function bvProps(P){const X=x=>x+BVX,Y=y=>y+BVY;
     const near=(px,py,m)=>Math.hypot(lx-px,ly-py)<m;if(near(BVGATE.x,BVGATE.y,250)||near(BVBR.x0,BVBR.y,190)||near(BVNORTH.x,BVNORTH.y,180)||BVHOUSES.some(h=>near(h.x,h.y-h.w*.2,h.w*.62)))continue;
     if(BVH_(k,12)<.42){const [img,w]=HTREES[Math.floor(BVH_(k,13)*HTREES.length)];BVTRUNKS.push([lx,ly]);P.push({t:'tree',img,x:X(lx),y:Y(ly),w:w*(.7+BVH_(k,14)*.25),flip:BVH_(k,15)<.5,base:.95});}
     else{const kk=[1,3,10,5][Math.floor(BVH_(k,16)*4)];P.push({t:'shrub',k:kk,x:X(lx),y:Y(ly),s:SHR[kk].s*(.7+BVH_(k,17)*.3),flip:BVH_(k,18)<.5,ph:lx*.01,w:120});}}
+  /* rocks where the cliff face fades out (left and right of the green and the islet), softening the turn of the shore */
+  for(const [C,r0,sc] of [[BVC,BVC.r,1],[BVI,BVI.r,.7]])for(const side of [-1,1])for(const [da,dr,img,w] of [[0,40,'crockheap',200],[.13,70,'crockpile',150],[-.12,30,'crockegg',90]]){
+    const a=side>0?.24+da:Math.PI-.24-da,lx=C.x+Math.cos(a)*(r0+dr*sc),ly=C.y+Math.sin(a)*(r0+dr*sc);if(Math.abs(lx-(BVBR.x0+BVBR.x1)/2)<200&&Math.abs(ly-BVBR.y)<200)continue;
+    P.push({t:'tree',img,x:X(lx),y:Y(ly+40*sc),w:w*sc,flip:side<0,base:.9});}
   /* rocks on the cliffs either side of the road down from the gate, and a few out in the sea */
   for(const [lx,ly,img,w] of [[790,1640,'crockheap',180],[1220,1680,'crockpile',160],[780,1900,'crockpile',150],[1230,1940,'crockheap',190],[200,1600,'crockspire',240],[1800,1550,'crockheap',220],[2250,1300,'crockspire',210],[180,300,'crockheap',200],[1750,250,'crockspire',220],[2300,500,'crockpile',170]])
     P.push({t:'tree',img,x:X(lx),y:Y(ly),w,flip:lx%2<1,base:.9});}
@@ -88,10 +99,14 @@ function drawBVGround(x0,y0,x1,y1){if(x1<BVX-300)return;
   if(!BVCOBCV&&ready(IMG.cobble_strip))BVCOBCV=buildBVCobbles();
   if(BVCOBCV){const [cv,ox,oy,K]=BVCOBCV;ctx.drawImage(cv,BVX+ox,BVY+oy,cv.width/K,cv.height/K);}}
 /* the cobbled paths, laid once onto their own canvas (a mossy bed, then the designer's cobble strip twice side by side) */
-function buildBVCobbles(){const K=.7,ox=BVC.x-BVC.r-40,oy=BVC.y-BVC.r-40,S=(BVC.r+40)*2,c=document.createElement('canvas');c.width=Math.ceil(S*K);c.height=Math.ceil(S*K);const g=c.getContext('2d');
-  g.setTransform(K,0,0,K,-ox*K,-oy*K);g.lineCap=g.lineJoin='round';g.strokeStyle='rgba(84,92,58,.45)';g.lineWidth=200;
-  for(const sm of BVCOB){g.beginPath();sm.forEach((p,i)=>i?g.lineTo(p.x,p.y):g.moveTo(p.x,p.y));g.stroke();}
-  for(const sm of BVCOB)for(const off of [-36,36]){const sh=sm.map(p=>({...p,x:p.x-p.ty*off,y:p.y+p.tx*off}));drawStrip(g,IMG.cobble_strip,sh,false);}
+const BVPAVE=BVC.r-150;   /* the paved square: everything inside this radius is cobbled, with a ring of grass beyond it */
+function buildBVCobbles(){const K=.9,R=BVPAVE+30,ox=BVC.x-R,oy=BVC.y-R,S=R*2,c=document.createElement('canvas');c.width=Math.ceil(S*K);c.height=Math.ceil(S*K);const g=c.getContext('2d');
+  g.setTransform(K,0,0,K,-ox*K,-oy*K);
+  g.fillStyle='#8f8b78';g.beginPath();g.arc(BVC.x,BVC.y,BVPAVE,0,TAU);g.fill();   /* a stone-grey bed, so nothing green shows between the rows */
+  g.save();g.beginPath();g.arc(BVC.x,BVC.y,BVPAVE,0,TAU);g.clip();
+  for(let y=BVC.y-BVPAVE-40,row=0;y<BVC.y+BVPAVE+40;y+=COB_W*.8,row++){const sh=row%2?37:0,sm=smoothPath([[BVC.x-BVPAVE-80-sh,y],[BVC.x+BVPAVE+80,y]]);drawStrip(g,IMG.cobble_strip,sm,false);}   /* rows of the designer's cobbles, overlapping, every other row shifted */
+  g.restore();
+  g.lineWidth=26;g.strokeStyle='rgba(84,92,58,.55)';g.beginPath();g.arc(BVC.x,BVC.y,BVPAVE,0,TAU);g.stroke();g.lineWidth=8;g.strokeStyle='rgba(60,66,44,.6)';g.stroke();   /* a mossy kerb where the paving meets the grass */
   return [c,ox,oy,K];}
 /* the fountain plays: rings on its basin and a soft mist at the top jet */
 function drawBVFx(){if(!inBV()||SCENE!=='thorn')return;const fx=BVX+BVFOUNT.x,fy=BVY+BVFOUNT.y,w=BVFOUNT.w;ctx.save();
