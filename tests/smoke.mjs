@@ -942,6 +942,20 @@ const CASES = {
     await p.screenshot({ path: path.join(SHOTS, `chapter-select-open-${vp}.png`) });
     check(await p.evaluate(() => { const g = window.__g; g.chselPick(1); return g.CHSEL.confirm === 1; }), 'Chapter 1 stayed locked after finishing the Prologue');
   },
+  async 'ch2-lose-respawn'(p) {
+    // losing a battle in Chapter 2 wakes Lum at the way into the area she was in, never back in Chapter 1's Stranglethorn
+    const g_ = (f, a) => p.evaluate(f, a);
+    await g_(() => { const g = window.__g; g.startChapter2(); g.c2Skip(); g.HST.st = 7; }); await wait(800);
+    for (const [where, enter, inside] of [['grove', 'g.enterGrove(false)', 'g.lum.x > g.GROVEX - 300 && g.lum.x < g.GROVEX + 2700'], ['breezeway', 'g.enterBreezeway()', 'g.inBW()'], ['worldbind', 'g.enterDun(12, 200, 560, 1)', 'g.SCENE === "dun" && g.DUNX.room === 12']]) {
+      await g_(src => { const g = window.__g; new Function('g', src)(g); }, enter); await wait(900);
+      const sc = await g_(() => window.__g.SCENE);
+      await g_(sc => { const g = window.__g; g.lum.x += 30; g.BATTLE.phase = ''; g.startEncounter({ kind: 'ffox', scene: sc, x: g.lum.x + 100, y: g.lum.y, s: 1, pack: 1, calm: 0 }, 'normal'); }, sc);
+      for (let i = 0; i < 50; i++) { await wait(150); if (await g_(() => window.__g.BATTLE.phase) === 'heroMenu') break; }
+      await g_(() => window.__g.endBattle('lose')); await wait(2600);
+      check(await g_(src => { const g = window.__g; return g.CH === 2 && !g.BATTLE.on && new Function('g', 'return ' + src)(g) && g.HEROES.lum.hp === g.HEROES.lum.maxHp; }, inside), 'losing a battle in the ' + where + ' did not wake Lum back in the ' + where + ' ' + await g_(() => { const g = window.__g; return JSON.stringify({ x: g.lum.x | 0, bw: g.BWX, gx: g.GROVEX, sc: g.SCENE, b: g.BATTLE.on, hp: g.HEROES.lum.hp, ch: g.CH, k: g.BATTLE.foes && g.BATTLE.foes.map(f => f.kind), ph: g.BATTLE.phase, fd: g.FADEX.dir, fa: g.FADEX.a, ho: g.FADEX.hold }); }));
+      await g_(() => { const g = window.__g; if (g.DLG.active) g.DLG.active = false; });
+    }
+  },
   async 'battle-ko-fade'(p) {
     await startCh1(p);
     await p.evaluate(() => window.__g.startEncounter({ kind: 'spider', scene: 'dun', x: 0, y: 0, s: 1, pack: 1, calm: 0 }, 'normal'));

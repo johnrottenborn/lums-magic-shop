@@ -103,6 +103,14 @@ function drawAmrOW(F,alpha){if(!F||alpha<=0)return;drawnAmr.n++;const an=F.dir==
   ctx.save();ctx.translate(F.x,0);ctx.scale(.88,1);ctx.translate(-F.x,0);   /* same slim build as in battle */
   c1Frame(ctx,'amroth',an,an==='side'||an==='up'?fi:0,F.x,F.y+bob,AMR_H,an==='side'&&F.face>0,alpha,0);ctx.restore();}
 /* through the gatehouse arch: the first room of the Worldbind Passage (room 11 of the root-room engine in 26), arriving at the top of the stairs */
+/* after a lost battle in Chapter 2: everyone is healed and Lum wakes at the way into the area she was in (never back in Chapter 1's Stranglethorn) */
+function ch2Respawn(){for(const id of PARTY_ORDER)HEROES[id].hp=HEROES[id].maxHp;const calm=a=>{for(const f_ of a||[])f_.calm=4;};calm(THFOES);calm(DFOES);
+  if(SCENE==='dun'){const e=DUN.entry||[11,238,250,1];enterDun(...e);}
+  else if(inBW()){enterBreezeway();BWT.t=99;}
+  else if(inGrove()){enterGrove(false);GVT.t=99;}
+  else if(inHome()){enterHome();HOME.t=99;}
+  else{SCENE='thorn';lum.x=CLR.x0+190;lum.y=CLR.cy;lum.face=1;lum.vx=lum.vy=0;lum.state='idle';cam.x=lum.x+120;cam.y=lum.y-50;}
+  if(typeof resetAmrFollow==='function')resetAmrFollow();}
 function enterWorldbind(){enterDun(11,238,250,1);
   /* first time in: the baby cries, and Amroth talks as they start down the stairs */
   if(!C2.wbSeen){C2.wbSeen=1;setTimeout(()=>{try{sfxBabyCry(.8);}catch(e){}},700);
