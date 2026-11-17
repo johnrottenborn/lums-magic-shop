@@ -907,10 +907,10 @@ const CASES = {
     check(await g_(() => window.__g.inBV() && window.__g.bvFree(window.__g.lum.x, window.__g.lum.y)), 'the Breezeway\'s east door did not lead into Breezevale Cove');
     await wait(3500); await p.screenshot({ path: path.join(SHOTS, `breezevale-arrive-${vp}.png`) });
     check(await g_(() => { const g = window.__g, X = g.BVX, Y = g.BVY, f = (x, y) => g.bvFree(X + x, Y + y);
-      return f(1500, 2200) && f(1500, 1750) && f(2760, 1250 - g.BVBR.rise) && f(3250, 1420) && !f(1500, 1420) && !f(400, 1450) && !f(2760, 1450); }), 'Breezevale\'s walkable ground is wrong (green, bridge and islet open; fountain and sea solid)');
-    await g_(() => { const g = window.__g; g.lum.x = g.BVX + 1500; g.lum.y = g.BVY + 1720; }); await wait(1500);
+      const B = g.BVBR, mx = (B.x0 + B.x1) / 2; return f(1000, 1400) && f(1000, 1150) && f(mx, B.y - B.rise) && f(2030, 930) && !f(1000, 900) && !f(200, 850) && !f(mx, B.y + 150); }), 'Breezevale\'s walkable ground is wrong (green, bridge and islet open; fountain and sea solid)');
+    await g_(() => { const g = window.__g; g.lum.x = g.BVX + 1000; g.lum.y = g.BVY + 1100; }); await wait(1500);
     await p.screenshot({ path: path.join(SHOTS, `breezevale-fountain-${vp}.png`) });
-    await g_(() => { const g = window.__g; g.lum.x = g.BVX + 2760; g.lum.y = g.BVY + 1250 - g.BVBR.rise; }); await wait(1200);
+    await g_(() => { const g = window.__g; g.lum.x = g.BVX + (g.BVBR.x0 + g.BVBR.x1) / 2; g.lum.y = g.BVY + g.BVBR.y - g.BVBR.rise; }); await wait(1200);
     await p.screenshot({ path: path.join(SHOTS, `breezevale-bridge-${vp}.png`) });
   },
   async 'coastal-breezeway'(p) {
