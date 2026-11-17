@@ -989,6 +989,20 @@ const CASES = {
     check(await g_(() => { const g = window.__g; return Math.hypot(g.JK2.x - g.lum.x, g.JK2.y - g.lum.y) < 140; }), 'Jak should follow Lum');
     await p.screenshot({ path: path.join(SHOTS, `jak-joins-${vp}.png`) });
   },
+  async 'ruins-secret-way'(p) {
+    const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop', g_ = (f, a) => p.evaluate(f, a);
+    const end = async () => { for (let i = 0; i < 8; i++) { if (!await g_(() => window.__g.DLG.active)) break; await g_(() => { const g = window.__g; g.DLG.active = false; g.DLG.onEnd && g.DLG.onEnd(); }); await wait(300); } };
+    await g_(() => { const g = window.__g; g.startChapter2(); g.c2Skip(); g.WB10.st = 2; g.chPlaytestBreezeway(); g.leaveOverlook(); window.__noFoes = setInterval(() => g.THFOES.forEach(f => f.dead = 1), 50); }); await wait(600);
+    check(await g_(() => { const g = window.__g; return !g.bwFree(g.BWX + g.BRUIN.x, g.BWY + g.BRUIN.ay - 100); }), 'the way north through the archway should be shut before Jak shows it');
+    await g_(() => { const g = window.__g; g.C2.jak = 1; g.PARTY_ORDER.includes('jak') || g.PARTY_ORDER.push('jak'); g.lum.x = g.BWX + g.BRUIN.x + 40; }); await wait(700);
+    check(await g_(() => window.__g.DLG.active && window.__g.DLG.lines[0][0] === 'Jak' && /secret way/.test(window.__g.DLG.lines[0][1])), 'Jak should stop Lum by the archway');
+    await end();
+    check(await g_(() => { const g = window.__g; return g.C2.ruinWay && g.bwFree(g.BWX + g.BRUIN.x, g.BWY + g.BRUIN.ay - 100) && g.bwFree(g.BWX + g.BRUIN.x, g.BWY + g.BRUIN.ey + 20); }), 'after Jak shows it, Lum should be able to walk north through the archway');
+    await g_(() => { const g = window.__g; g.lum.x = g.BWX + g.BRUIN.x; g.lum.y = g.BWY + g.BRUIN.ey + 14; }); await wait(900);
+    check(await g_(() => !!(window.__g.NEAR && window.__g.NEAR.door)), 'the hidden entrance should have a door');
+    await p.screenshot({ path: path.join(SHOTS, `ruins-entrance-${vp}.png`) });
+    await g_(() => clearInterval(window.__noFoes));
+  },
   async 'breezevale-merchant'(p) {
     const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop', g_ = (f, a) => p.evaluate(f, a);
     await g_(() => { const g = window.__g; g.startChapter2(); g.c2Skip(); g.WB10.st = 2; g.chPlaytestBreezeway(); g.MATS.foxtail = 1; g.BAG.push('foxtail'); g.MATS.seagem = 2; g.BAG.push('seagem'); g.enterBreezevale(); g.enterDun(25, 850, 640, 1); }); await wait(1200);

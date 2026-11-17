@@ -13,6 +13,8 @@ const BLAND=[...BPATH_PTS.map(([x,y])=>[x-BWX,y-BWY]),[BWW+300,-300],[BPATH_L[0]
 const BENTRY={x:1010*1.8,y:1110*1.8},BEAST={x:BWW-60,y:0};
 BEAST.y=(()=>{let b=null;for(const [x,y] of BPATH_PTS)if(!b||Math.abs(x-BWX-BEAST.x)<Math.abs(b[0]-BWX-BEAST.x))b=[x,y];return b[1]-BWY;})();
 const BARCHES=[[135,250,false,'crown'],[375,250,true,'pillars'],[615,250,false,'left']],BARCH_X1=780;   /* x, width, flipped, how it has crumbled */
+/* the secret way to the old ruins: once Jak has shown Lum (C2.ruinWay), she can walk straight north through the first archway's opening to a sunken entrance hidden in the trees */
+const BRUIN={x:151,ay:0,ey:0};
 /* the ruined archways: each is the designer's arch art clipped to what still stands (u,v across the image, 0..1), with fallen chunks of it lying about */
 const RUIN_CUT={crown:[[0,1],[0,0],[.44,0],[.48,.1],[.53,.16],[.57,.24],[.63,.2],[.67,.29],[.73,.22],[.79,.33],[.86,.27],[.92,.36],[1,.33],[1,1]],
   pillars:[[0,1],[0,.47],[.07,.42],[.12,.35],[.19,.38],[.25,.31],[.31,.36],[.36,.44],[.39,.52],[.42,1],[.6,1],[.62,.6],[.66,.52],[.72,.47],[.78,.5],[.84,.42],[.9,.46],[.95,.4],[1,.47],[1,1]],
@@ -36,11 +38,13 @@ const BBENDS=[];{const P=BPATH_PTS,n=P.length,c=[];for(let i=10;i<n-10;i++){cons
 const BH_=(a,b)=>hash(a,b,5153);
 function bpathDist(x,y){let best=1e9;for(let i=0;i<BPATH_PTS.length-1;i++){const [ax,ay]=BPATH_PTS[i],[bx,by]=BPATH_PTS[i+1],dx=bx-ax,dy=by-ay,t=clamp(((x-ax)*dx+(y-ay)*dy)/(dx*dx+dy*dy||1),0,1);best=Math.min(best,Math.hypot(x-ax-dx*t,y-ay-dy*t));}return best;}
 /* the path only, from the west edge of the view to the east edge */
-function bwFree(x,y){const lx=x-BWX;if(lx<24||lx>BWW-20)return false;return bpathDist(x,y)<78||bspurDist(x,y)<44;}
+function bwFree(x,y){const lx=x-BWX;if(lx<24||lx>BWW-20)return false;return bpathDist(x,y)<78||bspurDist(x,y)<44||(typeof C2!=='undefined'&&C2.ruinWay&&Math.abs(lx-BRUIN.x)<26&&y-BWY>BRUIN.ey+8&&y-BWY<BRUIN.ay+40);}
+function bwRuinY(){if(BRUIN.ay)return;BRUIN.ay=Math.min(...BARCHES.map(([ax])=>{let y=BPATH_PTS.reduce((b,p)=>Math.abs(p[0]-BWX-ax)<Math.abs(b[0]-BWX-ax)?p:b)[1];while(bpathDist(BWX+ax,y)<88)y-=4;return y-BWY;}));BRUIN.ey=BRUIN.ay-560;}
 /* evergreens filling the land, hydrangeas along the path's north side, rocks along the path and sea stacks out in the water */
-function bwProps(P){const X=x=>x+BWX,Y=y=>y+BWY;let k=0;
+function bwProps(P){const X=x=>x+BWX,Y=y=>y+BWY;let k=0;bwRuinY();
+  P.push({t:'tree',img:'ruins_entrance',x:X(BRUIN.x+76),y:Y(BRUIN.ey),w:420,flip:true,base:.95});   /* the designer's sunken entrance (mirrored so it stays on the map), its tunnel mouth at the top of the secret way */
   for(let gy=-140;gy<BWH;gy+=92)for(let gx=-60;gx<BWW+80;gx+=100){k++;const lx=gx+(BH_(k,1)-.5)*56,ly=gy+(BH_(k,2)-.5)*44;
-    if(!inPoly(lx,ly,BLAND)||BH_(k,3)<.2||bwClear(lx,ly,150))continue;let clear=true;for(let up=0;up<=380&&clear;up+=38)if(bpathDist(X(lx),Y(ly-up))<(up?150:190))clear=false;if(!clear)continue;   /* the path stays in view */
+    if(!inPoly(lx,ly,BLAND)||BH_(k,3)<.2||bwClear(lx,ly,150)||(Math.abs(lx-BRUIN.x)<105&&ly<BRUIN.ay&&ly>BRUIN.ey-40)||(Math.abs(lx-BRUIN.x-76)<250&&ly>BRUIN.ey-120&&ly<BRUIN.ey+300))continue;let clear=true;for(let up=0;up<=380&&clear;up+=38)if(bpathDist(X(lx),Y(ly-up))<(up?150:190))clear=false;if(!clear)continue;   /* the path stays in view */
     const [img,w]=HTREES[Math.floor(BH_(k,4)*HTREES.length)];P.push({t:'tree',img,x:X(lx),y:Y(ly),w:w*(.72+BH_(k,5)*.32),flip:BH_(k,6)<.5,base:.95});}
   /* hydrangeas and boulders on the land side of the path */
   const HY=[['hydrsmall',120],['hydrmid',150],['hydrbig',175],['hydrtree',250]],RK=[['crockpile',110],['crockegg',70],['crockheap',120]];
@@ -118,7 +122,7 @@ function bwSurfPts(){const out=[],D=BW_OFF+276;for(let i=0;i<BPATH_PTS.length-1;
 function seabirdImg(idx){if(SEAB_IMG[idx])return SEAB_IMG[idx];const im=IMG['bird'+idx];if(!ready(im))return null;const c=document.createElement('canvas');c.width=im.naturalWidth;c.height=im.naturalHeight;const g=c.getContext('2d');g.drawImage(im,0,0);
   try{const d=g.getImageData(0,0,c.width,c.height),p=d.data;for(let i=0;i<p.length;i+=4){const v=(p[i]*.3+p[i+1]*.59+p[i+2]*.11)/255,o=255-(1-v)*150;p[i]=o-6;p[i+1]=o-2;p[i+2]=o;}g.putImageData(d,0,0);}catch(e){g.globalCompositeOperation='source-atop';g.fillStyle='rgba(248,250,252,.8)';g.fillRect(0,0,c.width,c.height);}
   return SEAB_IMG[idx]=c;}
-function drawBWFx(){if(!inBW()||SCENE!=='thorn')return;const dt=1/60,vw=W/zoom,vh=H/zoom,x0=cam.x-vw/2-40,x1=cam.x+vw/2+40,y0=cam.y-vh/2-40,y1=cam.y+vh/2+40;
+function drawBWFx(){if(!inBW()||SCENE!=='thorn')return;bwRuinY();if(typeof jak2In==='function'&&jak2In()&&!C2.ruinWay&&!DLG.active&&!FADE.dir&&!WEVENT.on&&Math.abs(lum.x-BWX-BRUIN.x)<70&&lum.y-BWY>BRUIN.ay){C2.ruinWay=1;lum.vx=lum.vy=0;lum.state='idle';talk([['Jak',"As promised… the secret way is through that old stone archway."]],false,()=>hsGoal('Take the secret way north through the old stone archway'));}   /* Jak stops Lum by the first archway */const dt=1/60,vw=W/zoom,vh=H/zoom,x0=cam.x-vw/2-40,x1=cam.x+vw/2+40,y0=cam.y-vh/2-40,y1=cam.y+vh/2+40;
   if(!BWSURF)BWSURF=bwSurfPts();
   for(const [x,y] of BWSURF){if(x<x0||x>x1||y<y0||y>y1||Math.random()>.01)continue;const sx=x+rnd(-14,14),sy=y+rnd(-6,6),n=3+(Math.random()*4|0);   /* a little burst of spray and a foam ring */
     BWSPL.push({k:'ring',x:sx,y:sy,t:0,life:1.1});for(let j=0;j<n;j++)BWSPL.push({k:'drop',x:sx+rnd(-6,6),y:sy,z:0,vx:rnd(-55,55),vz:rnd(130,210),t:0,life:rnd(.7,1.05),r:rnd(3.2,5.4)});}
@@ -148,3 +152,5 @@ function drawOverlookMist(front){const dt=1/60;ctx.save();
   else for(let i=0;i<6;i++){const sp=10+hash(i,11,611)*14,x=((hash(i,12,611)*1600+T*sp)%1800)-200,y=560+hash(i,13,611)*200,r=110+hash(i,14,611)*120;   /* thin wisps drifting over the lookout, in front of Lum */
     ctx.globalAlpha=.16+.08*Math.sin(T*.4+i*2);drawGlow(ctx,x,y,r,'236,240,244',.5);}
   ctx.restore();}
+
+THINT.push({get x(){return BWX+BRUIN.x;},get y(){return BWY+BRUIN.ey+12;},get reach(){return inBW()&&typeof C2!=='undefined'&&C2.ruinWay?75:-1;},door:true,onInteract:()=>say("The tunnel leads down into the dark…")});   /* the way into the underground ruins (room 1 art still to come) */
