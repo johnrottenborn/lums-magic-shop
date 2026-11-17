@@ -4,12 +4,12 @@
    bridge east over the water to a raised islet with the second shell house. The Breezevale gate at the south, a road down to the
    way back to the Breezeway; north, the way on to the Sanctuary of Water (still to come). Built as another region of the
    Stranglethorn world, east of the Breezeway. Townsfolk still to come. */
-const BVX=BWX+5200,BVY=500,BVW=2400,BVH=2000,BVT={t:99};
-const BVC={x:1000,y:850,r:600},BVI={x:2030,y:800,r:200};   /* the town green, and the islet */
+const BVX=BWX+5200,BVY=500,BVW=2650,BVH=2100,BVT={t:99};
+const BVC={x:1000,y:850,r:700},BVI={x:2190,y:800,r:285};   /* the town green, and the islet */
 const BVGATE={x:BVC.x,y:BVC.y+BVC.r+10},BVSOUTH={x:BVC.x,y:BVH-90},BVNORTH={x:BVC.x,y:BVC.y-BVC.r+70};
-const BVBR={x0:1585,x1:1835,y:800,w:270};BVBR.h=BVBR.w*346/700;BVBR.rise=BVBR.h*.29;   /* the bridge: deck ends at y, the deck (between the two handrails) rises in the middle */
-const BVHOUSES=[{img:'breeze_shellhouse',x:725,y:610,w:340,name:'shell'},{img:'breeze_mayorhouse',x:1290,y:600,w:460,name:'mayor'},
-  {img:'breeze_clamhouse',x:700,y:1140,w:350,name:'clam'},{img:'breeze_clamhouse',x:1310,y:1140,w:350,name:'clam2',flip:true},{img:'breeze_shellhouse',x:2030,y:850,w:300,name:'shell2',flip:true}];
+const BVBR={x0:1680,x1:1930,y:800,w:270};BVBR.h=BVBR.w*346/700;BVBR.rise=BVBR.h*.29;   /* the bridge: deck ends at y, the deck (between the two handrails) rises in the middle */
+const BVHOUSES=[{img:'breeze_shellhouse',x:660,y:640,w:510,name:'shell',flip:true},{img:'breeze_mayorhouse',x:1335,y:620,w:690,name:'mayor'},
+  {img:'breeze_clamhouse',x:610,y:1250,w:525,name:'clam'},{img:'breeze_clamhouse',x:1395,y:1250,w:525,name:'clam2',flip:true},{img:'breeze_shellhouse',x:2190,y:880,w:450,name:'shell2'}];
 const BVFOUNT={x:1000,y:930,w:380};
 const inBV=()=>lum.x>BVX-300;
 const BVH_=(a,b)=>hash(a,b,6271);
@@ -70,7 +70,7 @@ function bvProps(P){const X=x=>x+BVX,Y=y=>y+BVY;
   for(let i=0;i<10;i++){const a=i/10*TAU+.3,lx=BVFOUNT.x+Math.cos(a)*290,ly=BVFOUNT.y-50+Math.sin(a)*175;if(Math.abs(Math.sin(a))>.85||Math.abs(Math.cos(a))>.93)continue;
     P.push({t:'bvf',img:HY[i%3],tint:['pink','blue','lilac','cream','coral'][i%5],x:X(lx),y:Y(ly),w:62+BVH_(i,9)*22,flip:i%2===0});}
   /* a ring of evergreens and shrubs round the rim of the green, leaving the gate, the bridge and the north way open */
-  let k=0;for(let a=0;a<TAU;a+=.13){k++;const r=BVC.r-80-BVH_(k,11)*40,lx=BVC.x+Math.cos(a)*r,ly=BVC.y+Math.sin(a)*r;
+  let k=0;for(let a=0;a<TAU;a+=.13){k++;const r=BVC.r-38-BVH_(k,11)*14,lx=BVC.x+Math.cos(a)*r,ly=BVC.y+Math.sin(a)*r;
     const near=(px,py,m)=>Math.hypot(lx-px,ly-py)<m;if(near(BVGATE.x,BVGATE.y,250)||near(BVBR.x0,BVBR.y,190)||near(BVNORTH.x,BVNORTH.y,180)||BVHOUSES.some(h=>near(h.x,h.y-h.w*.2,h.w*.62)))continue;
     if(BVH_(k,12)<.42){const [img,w]=HTREES[Math.floor(BVH_(k,13)*HTREES.length)];BVTRUNKS.push([lx,ly]);P.push({t:'tree',img,x:X(lx),y:Y(ly),w:w*(.7+BVH_(k,14)*.25),flip:BVH_(k,15)<.5,base:.95});}
     else{const kk=[1,3,10,5][Math.floor(BVH_(k,16)*4)];P.push({t:'shrub',k:kk,x:X(lx),y:Y(ly),s:SHR[kk].s*(.7+BVH_(k,17)*.3),flip:BVH_(k,18)<.5,ph:lx*.01,w:120});}}
@@ -91,7 +91,6 @@ function drawBVGround(x0,y0,x1,y1){if(x1<BVX-300)return;
   ctx.save();ctx.translate(BVX,BVY);
   const poly=P=>{P.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y));ctx.closePath();};
   ctx.beginPath();ctx.rect(-400,-400,BVW+800,BVH+800);poly(BVLAND);poly(BVISLE);ctx.fillStyle=waterPattern(ctx,'water_tile',.6)||'#2f5f78';ctx.fill('evenodd');   /* the designer's water art */
-  for(const P of [BVLAND,BVISLE]){ctx.beginPath();poly(P);ctx.lineJoin='round';ctx.strokeStyle='rgba(235,245,250,.45)';ctx.lineWidth=18;ctx.stroke();ctx.strokeStyle='#6b5639';ctx.lineWidth=9;ctx.stroke();}   /* a low earthy bank with a line of surf where the far shore meets the sea */
   drawBVStrip(BVLAND);drawBVStrip([...BVISLE,BVISLE[0]]);
   ctx.restore();
   if(!BVROADP)BVROADP=buildPath([[BVGATE.x,BVGATE.y-40],[BVGATE.x,BVGATE.y+200],[BVGATE.x-8,BVH-150],[BVGATE.x,BVH+300]].map(([x,y])=>[x+BVX,y+BVY]),150,6.1);
@@ -99,7 +98,7 @@ function drawBVGround(x0,y0,x1,y1){if(x1<BVX-300)return;
   if(!BVCOBCV&&ready(IMG.cobble_strip))BVCOBCV=buildBVCobbles();
   if(BVCOBCV){const [cv,ox,oy,K]=BVCOBCV;ctx.drawImage(cv,BVX+ox,BVY+oy,cv.width/K,cv.height/K);}}
 /* the cobbled paths, laid once onto their own canvas (a mossy bed, then the designer's cobble strip twice side by side) */
-const BVPAVE=BVC.r-150;   /* the paved square: everything inside this radius is cobbled, with a ring of grass beyond it */
+const BVPAVE=BVC.r-75;   /* the paved square: everything inside this radius is cobbled, with a ring of grass beyond it */
 function buildBVCobbles(){const K=.9,R=BVPAVE+30,ox=BVC.x-R,oy=BVC.y-R,S=R*2,c=document.createElement('canvas');c.width=Math.ceil(S*K);c.height=Math.ceil(S*K);const g=c.getContext('2d');
   g.setTransform(K,0,0,K,-ox*K,-oy*K);
   g.fillStyle='#8f8b78';g.beginPath();g.arc(BVC.x,BVC.y,BVPAVE,0,TAU);g.fill();   /* a stone-grey bed, so nothing green shows between the rows */
