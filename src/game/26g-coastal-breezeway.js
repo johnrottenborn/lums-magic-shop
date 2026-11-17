@@ -30,6 +30,9 @@ const BW_OFF=66,BSPUR=300;   /* a short side path north from the hump up to the 
 const bspurDist=(x,y)=>{const lx=x-BWX-BENTRY.x,ly=y-BWY;return Math.hypot(lx,ly<BENTRY.y-BSPUR?ly-(BENTRY.y-BSPUR):ly>BENTRY.y?ly-BENTRY.y:0);};
 const bwClear=(lx,ly,m)=>Math.abs(lx-BENTRY.x)<m&&ly<BENTRY.y+30;   /* nothing grows on the way up to the grove (trees and flowers line its edges) */   /* path centre to the top of the cliff strip */
 const inBW=()=>lum.x>BWX-300;
+/* sharp bends in the path: the cliff strip fans out or folds there and leaves a seam, so a big rock formation covers each one */
+const BBENDS=[];{const P=BPATH_PTS,n=P.length,c=[];for(let i=10;i<n-10;i++){const [ax,ay]=P[i-10],[bx,by]=P[i],[cx,cy]=P[i+10];let t=Math.atan2(cy-by,cx-bx)-Math.atan2(by-ay,bx-ax);while(t>Math.PI)t-=TAU;while(t<-Math.PI)t+=TAU;if(Math.abs(t)>.38)c.push([Math.abs(t),i]);}
+  c.sort((a,b)=>b[0]-a[0]);for(const [,i] of c){const [bx,by]=P[i],[ax,ay]=P[i-4],[cx,cy]=P[i+4],dx=cx-ax,dy=cy-ay,L=Math.hypot(dx,dy)||1;if(bx-BWX<120||BBENDS.some(q=>Math.hypot(q[0]-bx,q[1]-by)<330))continue;BBENDS.push([bx,by,-dy/L,dx/L,BBENDS.length]);}}
 const BH_=(a,b)=>hash(a,b,5153);
 function bpathDist(x,y){let best=1e9;for(let i=0;i<BPATH_PTS.length-1;i++){const [ax,ay]=BPATH_PTS[i],[bx,by]=BPATH_PTS[i+1],dx=bx-ax,dy=by-ay,t=clamp(((x-ax)*dx+(y-ay)*dy)/(dx*dx+dy*dy||1),0,1);best=Math.min(best,Math.hypot(x-ax-dx*t,y-ay-dy*t));}return best;}
 /* the path only, from the west edge of the view to the east edge */
@@ -45,6 +48,10 @@ function bwProps(P){const X=x=>x+BWX,Y=y=>y+BWY;let k=0;
     const r=BH_(i,11),off=120+BH_(i,12)*40,x=ax+nx*off,y=ay+ny*off;if(bpathDist(x,y)<112||!inPoly(x-BWX,y-BWY,BLAND)||x-BWX<BARCH_X1||bwClear(x-BWX,y-BWY,190))continue;   /* keep clear of the ruined archways */
     if(r<.62){const [img,w]=HY[Math.floor(BH_(i,13)*(r<.1?4:3))];P.push({t:'tree',img,x,y:y+8,w:w*(.85+BH_(i,14)*.3),flip:BH_(i,15)<.5,base:.97});}
     else if(r<.82){const [img,w]=RK[Math.floor(BH_(i,16)*RK.length)];P.push({t:'tree',img,x,y:y+6,w:w*(.85+BH_(i,17)*.3),flip:BH_(i,18)<.5,base:.95});}}
+  /* big rock formations over the cliff at the sharp bends (one over the cliff face, one down in the surf); Lum walks behind them */
+  for(const [x,y,ox,oy,i] of BBENDS){const w=[330,320,280][i%3]*(.95+BH_(i,31)*.25),o1=BW_OFF+150,o2=BW_OFF+290;
+    P.push({t:'tree',img:['crockspire','crockheap','crockpile'][i%3],x:x+ox*o1,y:y+oy*o1+110,w:w*1.35,flip:BH_(i,32)<.5,base:.9,solid:1});
+    P.push({t:'tree',img:['crockheap','crockpile','crockspire'][i%3],x:x+ox*o2+(BH_(i,33)-.5)*60,y:y+oy*o2+150,w:w*.95,flip:BH_(i,34)<.5,base:.9,solid:1});}
   /* small boulders along the sea edge of the path, always on the tight bends (where the cliff strip opens up) and here and there between */
   const SB=['crockegg','crockpile','crockheap'];for(let i=2;i<BPATH_PTS.length-3;i++){const [ax,ay]=BPATH_PTS[i],[bx,by]=BPATH_PTS[i+1],[cx,cy]=BPATH_PTS[i+2],dx=bx-ax,dy=by-ay,L=Math.hypot(dx,dy)||1,ox=-dy/L,oy=dx/L,turn=Math.abs(Math.atan2(dx*(cy-by)-dy*(cx-bx),dx*(cx-bx)+dy*(cy-by)));
     if(!(turn>.12&&i%4===0)&&!(i%10===0&&BH_(i,21)<.35))continue;const off=BW_OFF+4+BH_(i,22)*8,x=ax+ox*off,y=ay+oy*off;if(bpathDist(x,y)<BW_OFF+6||x-BWX<20)continue;
