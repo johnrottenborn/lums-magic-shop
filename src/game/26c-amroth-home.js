@@ -5,7 +5,7 @@
    Stand-in art until the designer's arrives: the mountain is 'worldbind_cliff', the gatehouse is 'outpost';
    the pond is painted in code and there is no fishing pier yet. */
 const HOMEX=CPATH.xt+3300,HOMEY=500,HW=1900,HH=1700;
-const HOME={t:99,pier:{x:1400,y:1330,w:300},arch:{x:523,y:470},gate:{x:300,y:1505},cot:{x:1457,y:940,w:460,door:-92},pond:{x:1520,y:1290,rx:230,ry:105},yard:{x:1400,y:1130,rx:400,ry:270}};
+const HOME={t:99,pier:{x:1400,y:1330,w:300},arch:{x:523,y:470},gate:{x:300,y:1505},cot:{x:1457,y:940,w:460,door:-92},pond:{x:1580,y:1330,rx:300,ry:140},pond2:{x:1330,y:1285,rx:150,ry:82},yard:{x:1400,y:1130,rx:400,ry:270}};
 const HPATH_CTRL=[[523,440],[540,620],[470,800],[420,980],[560,1150],[820,1235],[1080,1195],[1250,1080],[1335,1028],[1362,985],[1365,950],[1365,925]]   /* runs right up under the front step */.map(([x,y])=>[x+HOMEX,y+HOMEY]);
 const HPATH_PTS=splinePts(HPATH_CTRL,20);let HPATHP=null;
 /* a second path branches off and winds south-southwest to the far gatehouse (the way to the coast) */
@@ -19,14 +19,19 @@ function hpathDist(x,y){let best=1e9;for(const PTS of [HPATH_PTS,HPATH2_PTS])for
 const PIERIMG=[455,343];
 function pierPt(ix,iy){const P=HOME.pier,k=P.w/PIERIMG[0];return [P.x-P.w/2+ix*k,P.y-PIERIMG[1]*k+iy*k];}
 const PIERDECK=[[8,168],[165,200],[440,100],[290,66]].map(([x,y])=>pierPt(x,y));
+const HTRUNKS=[];   /* tree roots (region coords): the grass is walkable, the trunks are not */
 const inEll=(lx,ly,e,k=1)=>((lx-e.x)/(e.rx*k))**2+((ly-e.y)/(e.ry*k))**2<1;
 function homeFree(x,y){const lx=x-HOMEX,ly=y-HOMEY;if(lx<30||lx>HW-30||ly<400||ly>HH-10)return false;
   {const G=HOME.gate;if(lx>G.x-165&&lx<G.x+265&&ly>G.y-130&&ly<G.y+6&&(Math.abs(lx-G.x)>44||(HST.st<4&&ly>G.y-70)))return false;}   /* the far gatehouse: through the arch only, once the gate is up */
   if(ly>HH-120&&Math.abs(lx-HOME.gate.x)<70)return true;   /* the path runs on to the south edge */
   if(inPoly(lx,ly,PIERDECK))return true;   /* out on the pier */
-  if(inEll(lx,ly,HOME.pond,1.05))return false;
+  if(inEll(lx,ly,HOME.pond,1.05)||inEll(lx,ly,HOME.pond2,1.05))return false;
   if(lx>HOME.cot.x-215&&lx<HOME.cot.x+225&&ly>HOME.cot.y-160&&ly<HOME.cot.y-6)return false;
-  return hpathDist(x,y)<62||inEll(lx,ly,{x:HOME.arch.x,y:HOME.arch.y+70,rx:150,ry:90})||inEll(lx,ly,{x:HOME.gate.x,y:HOME.gate.y+70,rx:150,ry:90})||inEll(lx,ly,HOME.yard);}
+  if(hpathDist(x,y)<62)return true;
+  if(inEll(lx,ly,{x:HOME.arch.x,y:HOME.arch.y+70,rx:150,ry:90}))return true;
+  if(ly<HOME.arch.y+40)return false;   /* the mountain face */
+  for(const [tx,ty] of HTRUNKS)if(Math.abs(lx-tx)<34&&ly-ty<14&&ty-ly<22)return false;   /* walk among the trees, not through their trunks */
+  return true;}
 /* the region's scenery, added to Stranglethorn's prop list (21) */
 /* the designer's lush green evergreens for Amroth's home: a slim fir, a great tall one, a twisted little one */
 const HTREES=[['hfir',240],['hbig',400],['hfir',260],['htwist',250],['hfir',230],['hbig',380],['htwist',240]];
@@ -34,8 +39,12 @@ function homeProps(P,PN){const X=x=>x+HOMEX,Y=y=>y+HOMEY,H_=(a,b)=>hash(a,b,971)
   P.push({t:'tree',img:'worldbind_cliff',x:X(620),y:Y(440),w:2500,flip:false,solid:1},{t:'tree',img:'worldbind_cliff',x:X(1480),y:Y(420),w:2400,flip:true,solid:1});
   P.push({t:'tree',img:'outpost_open',x:X(HOME.gate.x+52),y:Y(HOME.gate.y+8),sy:Y(HOME.gate.y-40),w:430,flip:false,solid:1});   /* the far gatehouse, bottom left (stand-in art) */
   P.push({t:'tree',img:'pier',x:X(HOME.pier.x),y:Y(HOME.pier.y),sy:Y(HOME.pier.y-190),w:HOME.pier.w,flip:false,solid:1});   /* drawn before anyone standing on its deck */
-  for(let i=0;i<22;i++){const lx=470+H_(i,61)*360,ly=1330+H_(i,62)*400;if(hpathDist(X(lx),Y(ly))<120||inEll(lx,ly,HOME.yard,1.05)||inEll(lx,ly,HOME.pond,1.3))continue;   /* thicker woods right of the far gatehouse */
-    const [img,w]=HTREES[Math.floor(H_(i,63)*HTREES.length)];P.push({t:'tree',img,x:X(lx),y:Y(ly),w:w*(.8+H_(i,64)*.3),flip:H_(i,65)<.5,base:.95});}
+  for(let i=0;i<22;i++){const lx=(i%2?520:20)+H_(i,61)*(i%2?320:170),ly=1330+H_(i,62)*400;if(hpathDist(X(lx),Y(ly))<300||hpathDist(X(lx),Y(ly-200))<180||(Math.abs(lx-HOME.gate.x)<240&&ly>HOME.gate.y-280)||inEll(lx,ly,HOME.yard,1.05)||inEll(lx,ly,HOME.pond,1.3))continue;   /* thicker woods right of the far gatehouse */
+    const [img,w]=HTREES[Math.floor(H_(i,63)*HTREES.length)];HTRUNKS.push([lx,ly]);P.push({t:'tree',img,x:X(lx),y:Y(ly),w:w*(.8+H_(i,64)*.3),flip:H_(i,65)<.5,base:.95});}
+  /* willows and long grass around the pond, softening its edge */
+  {const p=HOME.pond,q=HOME.pond2;for(const [wx,wy,s_,f] of [[p.x+p.rx+10,p.y+p.ry*.55,.4,1],[p.x+p.rx*.35,p.y+p.ry+170,.36,0],[q.x-q.rx-40,q.y+q.ry+120,.38,0],[p.x+p.rx+20,p.y-p.ry-30,.34,1]])P.push({t:'willow',w:340,x:X(wx),y:Y(wy),s:s_,flip:!!f,ph:wx*.01});
+    for(let i=0;i<70;i++){const e=i<14?HOME.pond2:p,a=H_(i,91)*TAU,r=1.02+H_(i,92)*.14,gx=e.x+Math.cos(a)*e.rx*r,gy=e.y+Math.sin(a)*e.ry*r;if(inEll(gx,gy,p,.99)||inEll(gx,gy,HOME.pond2,.99)||inPoly(gx,gy,PIERDECK)||hpathDist(X(gx),Y(gy))<60)continue;
+      P.push({t:'tuft',w:40,x:X(gx),y:Y(gy),n:5+Math.floor(H_(i,93)*4),h:26+H_(i,94)*22,hue:H_(i,95)});}}
   for(const f of HFORAGE)P.push({t:'shrub',k:f.k,x:f.x,y:f.y,s:SHR[f.k].s*.85,flip:f.x%2<1,ph:f.x*.01});
   P.push({t:'gatebars',x:X(HOME.gate.x),y:Y(HOME.gate.y+9),w:120});
   P.push({t:'tree',img:'outpost',x:X(HOME.arch.x+52),y:Y(HOME.arch.y+8),sy:Y(HOME.arch.y-40),w:430,flip:false,solid:1});
@@ -43,8 +52,8 @@ function homeProps(P,PN){const X=x=>x+HOMEX,Y=y=>y+HOMEY,H_=(a,b)=>hash(a,b,971)
   // dense firs everywhere the path, the yard and the gatehouse apron are not
   let k=0;for(let gy=470;gy<HH+160;gy+=125)for(let gx=-40;gx<HW+80;gx+=140){k++;const lx=gx+(H_(k,1)-.5)*90,ly=gy+(H_(k,2)-.5)*70,x=X(lx),y=Y(ly);
     // a tree's crown rises well above its roots, so keep the whole column above it clear of the path, the yard and the gatehouse
-    let hit=false;for(let up=0;up<=460&&!hit;up+=40){const yy=ly-up;if((up<=230&&hpathDist(x,Y(yy))<(up?95:150))||inEll(lx,yy,HOME.yard,up?1:1.12)||inEll(lx,yy,HOME.pond,1.25)||inEll(lx,yy,{x:HOME.arch.x,y:HOME.arch.y,rx:280,ry:150})||inEll(lx,yy,{x:HOME.gate.x,y:HOME.gate.y,rx:280,ry:150}))hit=true;}if(hit)continue;
-    const [img,w]=HTREES[Math.floor(H_(k,3)*HTREES.length)];P.push({t:'tree',img,x,y,w:w*(.8+H_(k,4)*.3),flip:H_(k,5)<.5,base:.95});}
+    let hit=false;for(let up=0;up<=460&&!hit;up+=40){const yy=ly-up;if(hpathDist(x,Y(yy))<(up?(up<=230?95:120):150)||inEll(lx,yy,HOME.yard,up?1:1.12)||inEll(lx,yy,HOME.pond,1.25)||inEll(lx,yy,{x:HOME.arch.x,y:HOME.arch.y,rx:280,ry:150})||inEll(lx,yy,{x:HOME.gate.x,y:HOME.gate.y,rx:280,ry:150}))hit=true;}if(hit)continue;
+    const [img,w]=HTREES[Math.floor(H_(k,3)*HTREES.length)];HTRUNKS.push([lx,ly]);P.push({t:'tree',img,x,y,w:w*(.8+H_(k,4)*.3),flip:H_(k,5)<.5,base:.95});}
   // flowers from Lum's garden (the painted lavender, roses, delphiniums and magic blooms): beds along the cottage front and sides,
   // and drifts around the roots of the firs nearest the cottage so no bare roots show
   const C=HOME.cot,KINDS=['lavender','rose','delph','magic','lavender','rose','mint'],fl=[];let q=0;
@@ -60,13 +69,15 @@ function homeProps(P,PN){const X=x=>x+HOMEX,Y=y=>y+HOMEY,H_=(a,b)=>hash(a,b,971)
   for(let i=0;i<9;i++){const p=HPATH_PTS[Math.floor(i/9*HPATH_PTS.length)],sd=i%2?1:-1;P.push({t:'tree',img:'rock'+(1+i%4),x:p[0]+sd*(95+H_(i,7)*30),y:p[1]+H_(i,8)*20,w:70+H_(i,9)*40,flip:H_(i,10)<.5});}}
 /* ground pass: the winding path and the pond */
 function drawHomeGround(x0,y0,x1,y1){if(x1<HOMEX-300)return;if(!HPATHP)HPATHP=buildPath(HPATH_CTRL,125,8.2);if(!HPATH2P)HPATH2P=buildPath(HPATH2_CTRL,110,8.2);drawPath(HPATH2P,x0,x1);drawPath(HPATHP,x0,x1);
-  const p=HOME.pond,cx=p.x+HOMEX,cy=p.y+HOMEY;ctx.save();
-  ctx.fillStyle='rgba(58,44,30,.55)';ctx.beginPath();ctx.ellipse(cx,cy+6,p.rx+22,p.ry+16,0,0,TAU);ctx.fill();
-  ctx.fillStyle=waterPattern(ctx,'water_tile',.5)||'#3c6a78';ctx.beginPath();ctx.ellipse(cx,cy,p.rx,p.ry,0,0,TAU);ctx.fill();   /* the designer's water art */
-  {const g=ctx.createRadialGradient(cx,cy,p.rx*.4,cx,cy,p.rx*1.02);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,'rgba(10,30,40,.35)');ctx.fillStyle=g;ctx.beginPath();ctx.ellipse(cx,cy,p.rx,p.ry,0,0,TAU);ctx.fill();}
-  ctx.clip();ctx.strokeStyle='rgba(220,240,245,.35)';ctx.lineWidth=1.4;for(let i=0;i<14;i++){const q=(T*.5+hash(i,1,973))%1,rx=cx+(hash(i,2,973)-.5)*p.rx*1.6,ry=cy+(hash(i,3,973)-.5)*p.ry*1.5,r=4+q*22;ctx.globalAlpha=1-q;ctx.beginPath();ctx.ellipse(rx,ry,r,r*.4,0,0,TAU);ctx.stroke();}
-  ctx.globalAlpha=1;ctx.fillStyle='rgba(255,255,255,.12)';ctx.beginPath();ctx.ellipse(cx-p.rx*.3,cy-p.ry*.4,p.rx*.35,p.ry*.18,-.1,0,TAU);ctx.fill();ctx.restore();
-  ctx.save();ctx.strokeStyle='rgba(40,30,20,.6)';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(cx,cy,p.rx,p.ry,0,0,TAU);ctx.stroke();ctx.restore();}
+  const p=HOME.pond,cx=p.x+HOMEX,cy=p.y+HOMEY,q=HOME.pond2,qx=q.x+HOMEX,qy=q.y+HOMEY;
+  const both=(grow=0,dy=0)=>{ctx.beginPath();ctx.ellipse(cx,cy+dy,p.rx+grow,p.ry+grow*.75,0,0,TAU);ctx.moveTo(qx+q.rx+grow,qy+dy);ctx.ellipse(qx,qy+dy,q.rx+grow,q.ry+grow*.75,0,0,TAU);};
+  ctx.save();ctx.fillStyle='rgba(58,44,30,.55)';both(22,6);ctx.fill('nonzero');
+  ctx.strokeStyle='rgba(40,30,20,.6)';ctx.lineWidth=4;both();ctx.stroke();   /* the shore line; the water below covers its inner half and the seam */
+  ctx.fillStyle=waterPattern(ctx,'water_tile',.5)||'#3c6a78';both();ctx.fill('nonzero');   /* the designer's water art */
+  both();ctx.clip('nonzero');
+  {const g=ctx.createRadialGradient(cx-80,cy-10,p.rx*.35,cx-80,cy-10,p.rx*1.25);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,'rgba(10,30,40,.35)');ctx.fillStyle=g;ctx.fillRect(qx-q.rx-20,cy-p.ry-40,p.rx*2+400,p.ry*2+80);}
+  ctx.strokeStyle='rgba(220,240,245,.35)';ctx.lineWidth=1.4;for(let i=0;i<18;i++){const t_=(T*.5+hash(i,1,973))%1,rx=cx-120+(hash(i,2,973)-.5)*p.rx*2,ry=cy+(hash(i,3,973)-.5)*p.ry*1.5,r=4+t_*22;ctx.globalAlpha=1-t_;ctx.beginPath();ctx.ellipse(rx,ry,r,r*.4,0,0,TAU);ctx.stroke();}
+  ctx.globalAlpha=1;ctx.fillStyle='rgba(255,255,255,.12)';ctx.beginPath();ctx.ellipse(cx-p.rx*.1,cy-p.ry*.45,p.rx*.35,p.ry*.16,-.1,0,TAU);ctx.fill();ctx.restore();}
 /* interactions: the gatehouse arch back into the passage, the cottage door, the pond */
 function homeInts(){const X=x=>x+HOMEX,Y=y=>y+HOMEY;return [
   {x:X(HOME.arch.x),y:Y(HOME.arch.y+30),get reach(){return inHome()?85:0},door:true,onInteract:()=>dunGo(20,900,690,1)},

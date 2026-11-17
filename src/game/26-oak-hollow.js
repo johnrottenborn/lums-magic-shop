@@ -84,7 +84,7 @@ function setupDun(){DUNINT.length=0;const r=DUN.room,D=(x,y,reach,fn)=>DUNINT.pu
   if(r===19){D(422,205,70,()=>dunGo(18,1215,540,-1));DUNINT.push({x:840,y:580,reach:95,onInteract:()=>touchWBTorch('serpent',["A great stone serpent, coiled and ready to strike. Its green flame burns brighter now."])});
     L(330,700,95,["Another empty pedestal."]);D(1165,545,80,()=>dunGo(20,862,425,1));}
   if(r===21){D(435,620,80,()=>leaveCottage());D(1172,662,70,()=>dunGo(22,1115,700,-1));
-    DUNINT.push({x:820,y:612,reach:90,onInteract:()=>{if(canLumMix()&&HST.st>=6)openMix();else say("A warm fire crackles in the hearth. A kettle hangs over the flames.");}});   /* Lum can mix at Alma's hearth in the morning */}
+    DUNINT.push({x:820,y:612,reach:90,get fire(){return HST.st>=6;},onInteract:()=>{if(canLumMix()&&HST.st>=6)openMix();else say("A warm fire crackles in the hearth. A kettle hangs over the flames.");}});   /* Lum can mix at Alma's hearth in the morning */}
   if(r===21)DUNINT.push({get x(){return ALMA.x;},get y(){return ALMA.y+10;},get reach(){return ALMA.on&&HST.st>=6&&!DLG.active?90:0;},onInteract:almaTalk});   /* talk to Alma */
   if(r===21&&C2.basement)D(695,610,50,()=>dunGo(23,300,580,1));   /* the bookshelf door to the basement, once the story opens it */
   if(r===22){D(1160,728,70,()=>dunGo(21,1120,672,-1));DUNINT.push({x:760,y:738,reach:95,dynDoor:1,door:false,onInteract:hsBed});   /* the bed: '…' bubble, asks to rest */}
@@ -139,9 +139,9 @@ function drawDFoe(g){const k=dunH(g.y)/151,bob=Math.sin(g.ph*3)*8;if(g.kind==='b
 function enterDun(room,x,y,face){const prevRoom=SCENE==='dun'?DUN.room:0;buildDFoes();SCENE='dun';DUN.room=room;if(room>=6)C1['seen'+room]=1;lum.x=x??560;lum.y=y??640;lum.face=face||1;lum.vx=lum.vy=0;lum.state='idle';WCAM.x=lum.x;WTITLE.t=(prevRoom>=11&&room>=11)||DROOMS[room].home?99:0;setupDun();   /* the area title shows once, on entering the Worldbind Passage, not between its rooms */
   if(room===1&&!C1.dunSeen){C1.dunSeen=1;setTimeout(()=>talk([['Lum',"Cosmic? …Cosmic!"]]),900);}
   if(room===5)DUN.eyes=EYES5.map(()=>({b:rnd(0,6),t:0}));}
-function drawDun(){const R=DROOMS[DUN.room],im=IMG['dun'+DUN.room];if(!ready(im))return;const [rz]=roomView();
+function drawDun(){const R=DROOMS[DUN.room],im=IMG['dun'+DUN.room];if(!ready(im))return;const [rz,roy]=roomView();
   ctx.setTransform(DPR,0,0,DPR,0,0);ctx.fillStyle='#07080c';ctx.fillRect(0,0,W,H);
-  const qk=DUN.room===20&&WB10.st?WB10.q:DUN.room>=15&&DUN.room<=20?WB5.q:[0,0];ctx.setTransform(DPR*rz,0,0,DPR*rz,DPR*(W/2-WCAM.x*rz+qk[0]),DPR*qk[1]);ctx.drawImage(im,0,0,1375,768);   /* room 5 trembles */
+  const qk=DUN.room===20&&WB10.st?WB10.q:DUN.room>=15&&DUN.room<=20?WB5.q:[0,0];ctx.setTransform(DPR*rz,0,0,DPR*rz,DPR*(W/2-WCAM.x*rz+qk[0]),DPR*(qk[1]+roy));ctx.drawImage(im,0,0,1375,768);   /* room 5 trembles */
   if(DUN.room===20){drawWB10Rubble();drawWB10Glow();}
   if((DUN.room===14&&!BO.R&&BO.a<1)||(DUN.room===18&&!WB8.R)){const g=ctx.createLinearGradient(780,0,1180,0);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,'rgba(0,0,0,.94)');ctx.fillStyle=g;ctx.fillRect(780,-500,2600,1800);}
   if(DUN.room===14&&BO.a>0){ctx.fillStyle=`rgba(0,0,0,${BO.a})`;ctx.fillRect(-2000,-500,5375,1800);}

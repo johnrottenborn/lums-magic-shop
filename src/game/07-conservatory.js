@@ -80,6 +80,7 @@ function drawWellRoom(){const im=IMG.wellroom;if(!ready(im))return;const rz=H/76
     ctx.fillStyle='#e9f4ff';ctx.font='700 26px "Alegreya SC", Georgia, serif';ctx.fillText('The Runic Conservatory',W/2,H*.3+10);ctx.restore();}}
 function drawSparkPart(o,q){const a=1-q,y=o.y-o.z,tw=.6+.4*Math.sin(T*30+o.x);if(o.star){const r=o.s*(q<.15?q/.15:1);ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,o.x,y,o.s*4.5,o.col,a*.7);ctx.restore();ctx.save();ctx.translate(o.x,y);ctx.rotate(o.rot+q*6);ctx.globalAlpha=Math.min(1,a*1.4)*tw;ctx.fillStyle='#ffe58a';ctx.strokeStyle='rgba(170,110,20,.85)';ctx.lineWidth=.8;starPath(ctx,r);ctx.fill();ctx.stroke();ctx.fillStyle='#fffbe6';starPath(ctx,r*.42);ctx.fill();ctx.restore();return;}ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,o.x,y,o.s*4,o.col,a*.75);ctx.restore();ctx.fillStyle=`rgba(255,250,225,${(a*tw).toFixed(3)})`;ctx.beginPath();ctx.arc(o.x,y,o.s*.55,0,TAU);ctx.fill();}
 function drawPartWell(o){const q=o.life/o.max;if(o.type==='fiz'&&o.col){drawSparkPart(o,q);return;}if(o.type==='fiz'){const a=1-q;drawGlow(ctx,o.x,o.y-o.z,o.s*3,'170,220,255',a*.6);}else if(o.type==='puff'){drawGlow(ctx,o.x,o.y-o.z,o.s,'200,200,210',.35*(1-q));}}
-const SHOPZ=.82;function roomView(){const rz=H/768*(SCENE==='shop'?SHOPZ:1);return [rz,SCENE==='shop'?H-768*rz:0];}
+const SHOPZ=.82;function roomView(){if(SCENE==='dun'&&DROOMS[DUN.room]&&DROOMS[DUN.room].home){const rz=Math.min(H/768,W/1375);return [rz,Math.max(0,(H-768*rz)/2)];}   /* the cottage: the whole room in view */
+  const rz=H/768*(SCENE==='shop'?SHOPZ:1);return [rz,SCENE==='shop'?H-768*rz:0];}
 function wellToScreen(wx,wy){const [rz,oy]=roomView();return [(wx-WCAM.x)*rz+W/2,wy*rz+oy];}
 
