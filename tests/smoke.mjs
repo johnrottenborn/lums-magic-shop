@@ -915,7 +915,7 @@ const CASES = {
     check(await g_(() => { const l = window.__g.DLG.active && window.__g.DLG.lines; return l && /Welcome to Breezevale Cove/.test(l[0][1]) && /rain makes me so happy/.test(l[1][1]); }), 'the townsgirl by the fountain did not greet Lum');
     await p.screenshot({ path: path.join(SHOTS, `breezevale-townsgirl-${vp}.png`) });
     await g_(() => { window.__g.DLG.active = false; });
-    for (const [i, room, who] of [[2, 25, 'Breezevale Merchant'], [3, 26, 'Townsman'], [4, 27, null]]) {
+    for (const [i, room, who] of [[2, 25, 'Breezevale Merchant'], [3, 26, 'Townsman'], [4, 27, null], [0, 28, 'Fisherman']]) {
       await g_(i => { const g = window.__g, t = g.THINTS().find(o => o.door && Math.abs(o.y - (g.BVY + g.BVHOUSES[i].y + 24)) < 2 && o.reach > 0 && Math.abs(o.x - g.BVX - g.BVHOUSES[i].x) < g.BVHOUSES[i].w / 2); g.lum.x = t.x; g.lum.y = t.y + 20; }, i); await wait(500);
       await g_(() => window.__g.NEAR.onInteract()); await wait(1300);
       check(await g_(r => window.__g.SCENE === 'dun' && window.__g.DUNX.room === r, room), 'a clam house door did not lead inside (room ' + room + ')');

@@ -51,6 +51,10 @@ const DROOMS={
   27:{name:'',dark:0,home:1,hk:1.4,floor:[[240,722],[480,702],[500,640],[540,604],[650,600],[760,612],[1180,630],[1215,660],[1205,742],[110,742]],
      block:[{x0:20,y0:640,x1:245,y1:769},{x0:230,y0:612,x1:482,y1:692},{x0:792,y0:612,x1:1152,y1:680},{x0:1210,y0:600,x1:1380,y1:769}],
      fg:[{y:672,poly:[[790,495],[1152,495],[1152,680],[790,680]]}]},   /* the dining table and chairs */
+  /* 28: inside the top-left shell house (the designer's painting): a fisher's home, table, hearth, bed; the door is on the left wall */
+  28:{name:'',dark:0,home:1,hk:1.35,floor:[[150,622],[300,598],[480,566],[820,560],[1040,566],[1050,640],[1035,768],[340,768],[200,700],[150,680]],
+     block:[{x0:470,y0:540,x1:815,y1:690},{x0:1040,y0:470,x1:1380,y1:769},{x0:0,y0:640,x1:150,y1:769},{x0:130,y0:680,x1:340,y1:769}],
+     fg:[{y:688,poly:[[415,470],[815,470],[815,690],[415,690]]}]},   /* the table and chairs */
   24:{name:'Ruins Overlook',dark:0,wide:1,hk:.62,floor:[[690,768],[700,705],[738,655],[768,603],[782,560],[780,512],[766,488],[756,450],[788,433],[880,431],[922,450],[914,480],[872,498],[860,560],[868,612],[880,664],[902,715],[922,768]]},
   /* 22: the loft, the bed under the thatch; the stair comes up on the right behind the rail */
   22:{name:'',dark:0,home:1,hk:1.9,floor:[[120,738],[460,730],[1050,726],[1050,612],[1185,612],[1185,768],[110,768]],
@@ -104,6 +108,8 @@ function setupDun(){DUNINT.length=0;const r=DUN.room,D=(x,y,reach,fn)=>DUNINT.pu
   if(r===21&&C2.basement)D(695,610,50,()=>dunGo(23,300,580,1));   /* the bookshelf door to the basement, once the story opens it */
   if(r===25){D(445,728,95,()=>goScene(()=>leaveBVHouse(2)));for(const n of BVNPC)if(n.room===25)DUNINT.push({x:n.x,y:n.y+60,reach:110,onInteract:()=>bvNpcTalk(n)});}
   if(r===26){D(330,758,100,()=>goScene(()=>leaveBVHouse(3)));DUNINT.push({x:540,y:612,reach:95,fire:true,onInteract:()=>{if(canLumMix())openMix();else say("A little iron stove, warm and ticking.");}});   /* the stove: Lum can mix here */for(const n of BVNPC)if(n.room===26)DUNINT.push({x:n.x,y:n.y+10,reach:95,onInteract:()=>bvNpcTalk(n)});}
+  if(r===28){D(190,650,95,()=>goScene(()=>leaveBVHouse(0)));for(const n of BVNPC)if(n.room===28)DUNINT.push({x:n.x,y:n.y+10,reach:95,onInteract:()=>bvNpcTalk(n)});
+    DUNINT.push({x:905,y:585,reach:110,fire:true,onInteract:()=>{if(canLumMix())openMix();else say("A warm fire crackles under the kettle.");}});}   /* the hearth: Lum can mix here */
   if(r===27){D(590,612,90,()=>goScene(()=>leaveBVHouse(4)));for(const n of BVNPC)if(n.room===27)DUNINT.push({x:n.x,y:n.y+10,reach:100,onInteract:()=>bvNpcTalk(n)});
     DUNINT.push({x:330,y:640,reach:110,fire:true,onInteract:()=>{if(canLumMix())openMix();else say("A warm fire crackles in the hearth.");}});}   /* the hearth: Lum can mix here */
   if(r===22){D(1160,728,70,()=>dunGo(21,1120,672,-1));DUNINT.push({x:760,y:738,reach:95,dynDoor:1,door:false,onInteract:hsBed});   /* the bed: '…' bubble, asks to rest */}
