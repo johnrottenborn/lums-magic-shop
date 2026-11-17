@@ -143,6 +143,7 @@ function enterDun(room,x,y,face){const prevRoom=SCENE==='dun'?DUN.room:0;buildDF
 function drawDun(){const R=DROOMS[DUN.room],im=IMG['dun'+DUN.room];if(!ready(im))return;const [rz,roy]=roomView();
   ctx.setTransform(DPR,0,0,DPR,0,0);ctx.fillStyle='#07080c';ctx.fillRect(0,0,W,H);
   const qk=DUN.room===20&&WB10.st?WB10.q:DUN.room>=15&&DUN.room<=20?WB5.q:[0,0];ctx.setTransform(DPR*rz,0,0,DPR*rz,DPR*(W/2-WCAM.x*rz+qk[0]),DPR*(qk[1]+roy));ctx.drawImage(im,0,0,1375,768);   /* room 5 trembles */
+  if(DUN.room>=21&&DUN.room<=22&&HST.st<4&&ready(IMG['dun'+DUN.room+'_night']))ctx.drawImage(IMG['dun'+DUN.room+'_night'],0,0,1375,768);   /* night outside the cottage windows until Lum has slept */
   if(DUN.room===20){drawWB10Rubble();drawWB10Glow();}
   if((DUN.room===14&&!BO.R&&BO.a<1)||(DUN.room===18&&!WB8.R)){const g=ctx.createLinearGradient(780,0,1180,0);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,'rgba(0,0,0,.94)');ctx.fillStyle=g;ctx.fillRect(780,-500,2600,1800);}
   if(DUN.room===14&&BO.a>0){ctx.fillStyle=`rgba(0,0,0,${BO.a})`;ctx.fillRect(-2000,-500,5375,1800);}
