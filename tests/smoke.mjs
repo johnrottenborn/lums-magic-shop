@@ -510,12 +510,12 @@ const CASES = {
     check(await g_(() => window.__g.lum.x < window.__g.GROVEX - 300), 'the north entrance did not lead back to Amroth\'s home');
   },
   async 'ch2-home-shortcut'(p) {
-    // chapter select: the playtest card under Chapter 2 starts at the passage exit with Lum and Amroth
+    // chapter select: the playtest card under Chapter 2 starts on the Coastal Breezeway, by the way on to Breezevale Cove
     const g_ = f => p.evaluate(f);
     await g_(() => window.__g.openChapterSelect()); await wait(1200);
     await g_(() => { const g = window.__g; g.CHSEL.confirm = g.CHAPTERS.findIndex(c => c.id === 'ch2home'); }); await wait(300);
     await g_(() => window.__g.CHSEL.hits.slice(-2)[0].act()); await wait(2500);
-    check(await g_(() => { const g = window.__g; return g.SCENE === 'thorn' && g.lum.x > g.HOMEX - 200 && g.PARTY_ORDER.includes('amroth') && g.C2.joined && g.HST.st === 1; }), 'the Amroth\'s Home shortcut did not start at the passage exit with Amroth');
+    check(await g_(() => { const g = window.__g; return g.SCENE === 'thorn' && g.inBW() && !g.PARTY_ORDER.includes('amroth') && g.HST.st === 7 && g.NEAR && g.NEAR.door; }), 'the Chapter 2 playtest card did not start on the Coastal Breezeway by the door to Breezevale Cove');
   },
   async 'worldbind-passage'(p) {
     // the gatehouse door leads to the first room of the Worldbind Passage: arrive at the top of the stairs, walk down, and the door back works
@@ -898,6 +898,20 @@ const CASES = {
     check(r.k5 === 'foxtotem' && r.k4 === 'foxpendant' && r.k3 === 'foxtails' && r.k2 === null, 'wrong keepsake charms: ' + JSON.stringify(r));
     const stole = await p.evaluate(() => { const g = window.__g, rnd = Math.random; g.PARTY.lum.charm = 'foxtotem'; const b = g.MATS.slimeparts || 0; Math.random = () => 0.1; g.foxRingSteal({ type: 'slime', x: 0, y: 0 }); Math.random = rnd; return (g.MATS.slimeparts || 0) - b; });
     check(stole === 1, 'the Carved Fox Totem did not steal on a successful roll');
+  },
+  async 'breezevale-cove'(p) {
+    const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop', g_ = (f, a) => p.evaluate(f, a);
+    await g_(() => { const g = window.__g; g.startChapter2(); g.c2Skip(); g.WB10.st = 2; g.chPlaytestBreezeway(); }); await wait(900);
+    check(await g_(() => window.__g.inBW() && !!(window.__g.NEAR && window.__g.NEAR.door)), 'the playtest card should start by the Breezeway\'s door to Breezevale Cove');
+    await g_(() => window.__g.NEAR.onInteract()); await wait(1500);
+    check(await g_(() => window.__g.inBV() && window.__g.bvFree(window.__g.lum.x, window.__g.lum.y)), 'the Breezeway\'s east door did not lead into Breezevale Cove');
+    await wait(3500); await p.screenshot({ path: path.join(SHOTS, `breezevale-arrive-${vp}.png`) });
+    check(await g_(() => { const g = window.__g, X = g.BVX, Y = g.BVY, f = (x, y) => g.bvFree(X + x, Y + y);
+      return f(1500, 2200) && f(1500, 1750) && f(2760, 1250 - g.BVBR.rise) && f(3250, 1420) && !f(1500, 1420) && !f(400, 1450) && !f(2760, 1450); }), 'Breezevale\'s walkable ground is wrong (green, bridge and islet open; fountain and sea solid)');
+    await g_(() => { const g = window.__g; g.lum.x = g.BVX + 1500; g.lum.y = g.BVY + 1720; }); await wait(1500);
+    await p.screenshot({ path: path.join(SHOTS, `breezevale-fountain-${vp}.png`) });
+    await g_(() => { const g = window.__g; g.lum.x = g.BVX + 2760; g.lum.y = g.BVY + 1250 - g.BVBR.rise; }); await wait(1200);
+    await p.screenshot({ path: path.join(SHOTS, `breezevale-bridge-${vp}.png`) });
   },
   async 'coastal-breezeway'(p) {
     const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop', g_ = (f, a) => p.evaluate(f, a);

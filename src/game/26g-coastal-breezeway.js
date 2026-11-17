@@ -29,7 +29,7 @@ function drawRuinRubble(o){const im=IMG.ruins_arch;if(!ready(im))return;const [u
 const BW_OFF=66,BSPUR=300;   /* a short side path north from the hump up to the door back to Evergreen Grove */
 const bspurDist=(x,y)=>{const lx=x-BWX-BENTRY.x,ly=y-BWY;return Math.hypot(lx,ly<BENTRY.y-BSPUR?ly-(BENTRY.y-BSPUR):ly>BENTRY.y?ly-BENTRY.y:0);};
 const bwClear=(lx,ly,m)=>Math.abs(lx-BENTRY.x)<m&&ly<BENTRY.y+30;   /* nothing grows on the way up to the grove (trees and flowers line its edges) */   /* path centre to the top of the cliff strip */
-const inBW=()=>lum.x>BWX-300;
+const inBW=()=>lum.x>BWX-300&&lum.x<BWX+5000;   /* (Breezevale Cove lies further east) */
 /* sharp bends in the path: the cliff strip fans out or folds there and leaves a seam, so a big rock formation covers each one */
 const BBENDS=[];{const P=BPATH_PTS,n=P.length,c=[];for(let i=10;i<n-10;i++){const [ax,ay]=P[i-10],[bx,by]=P[i],[cx,cy]=P[i+10];let t=Math.atan2(cy-by,cx-bx)-Math.atan2(by-ay,bx-ax);while(t>Math.PI)t-=TAU;while(t<-Math.PI)t+=TAU;if(Math.abs(t)>.38)c.push([Math.abs(t),i]);}
   c.sort((a,b)=>b[0]-a[0]);for(const [,i] of c){const [bx,by]=P[i],[ax,ay]=P[i-4],[cx,cy]=P[i+4],dx=cx-ax,dy=cy-ay,L=Math.hypot(dx,dy)||1;if(bx-BWX<120||BBENDS.some(q=>Math.hypot(q[0]-bx,q[1]-by)<330))continue;BBENDS.push([bx,by,-dy/L,dx/L,BBENDS.length]);}}
@@ -97,7 +97,7 @@ function drawBWTitle(){if(!inBW()||BWT.t>=4.5||SCENE!=='thorn')return;BWT.t+=1/6
   ctx.fillStyle='rgba(20,16,12,.55)';ctx.fillRect(0,H*.3-40,W,80);ctx.fillStyle='#f6ecd8';ctx.font=`600 ${Math.round(Math.min(30,W/13))}px Georgia,serif`;ctx.fillText('Coastal Breezeway',W/2,H*.3+10);ctx.restore();}
 /* the way back up to Evergreen Grove and the road on to Breezevale Cove (east; map still to come). The archways are scenery only */
 THINT.push({get x(){return BWX+BENTRY.x;},get y(){return BWY+BENTRY.y-BSPUR;},get reach(){return inBW()?80:-1;},door:true,onInteract:()=>goScene(()=>enterGrove(true))},
-  {get x(){return BWX+BWW-70;},get y(){return BWY+BEAST.y;},get reach(){return inBW()?80:-1;},door:true,onInteract:()=>say("Breezevale Cove lies ahead.")});
+  {get x(){return BWX+BWW-70;},get y(){return BWY+BEAST.y;},get reach(){return inBW()?80:-1;},door:true,onInteract:()=>goScene(enterBreezevale)});
 /* the west end of the path leads out to the Ruins Overlook (room 24) and back */
 const bwWestY=()=>BPATH_PTS.reduce((b,p)=>Math.abs(p[0]-BWX-50)<Math.abs(b[0]-BWX-50)?p:b)[1];
 THINT.push({get x(){return BWX+46;},get y(){return bwWestY()-20;},get reach(){return inBW()&&lum.x<BWX+220?80:-1;},door:true,onInteract:()=>dunGo(24,806,705,1)});

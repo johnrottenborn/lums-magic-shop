@@ -169,7 +169,7 @@ function drawSay(){
   else if(cos.bubble>0&&!cos.hidden){bubbleAt(cos.x,cos.y-150,cos.bubbleText,null,Math.min(1,cos.bubble*3,(2.4-cos.bubble)*6),true);}}
 function rr(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();}
 function drawUI(){if(!WATERBUILT&&creekCv&&ready(IMG.water_tile)&&ready(IMG.water_rocks)){WATERBUILT=true;buildCreek(riverR);buildPond(Math.min(1.6,riverR*1.2));}   /* repaint the water once its art has loaded */
-  drawHomeSky();drawUIinner();drawC1IntroUI();drawC1Title();drawC2UI();drawHomeTitle();drawGroveTitle();drawBWTitle();drawMix();drawChoice();drawSceneFade();drawWipe();}
+  drawHomeSky();drawUIinner();drawC1IntroUI();drawC1Title();drawC2UI();drawHomeTitle();drawGroveTitle();drawBWTitle();drawBVTitle();drawMix();drawChoice();drawSceneFade();drawWipe();}
 let menuLast=performance.now();
 function drawUIinner(){const _n=performance.now(),_dt=Math.min(.05,(_n-menuLast)/1000);menuLast=_n;drawIntroOverlay();drawSoundBtn();if(INTRO.on&&!INTRO.talking)return;if(!INTRO.on&&!WEV.end&&!C1RES.t){ctx.save();UI_FADE=INTRO.ui;drawUI_();drawBookBtn();drawToast();ctx.restore();UI_FADE=1;drawMenu(_dt);}if(INTRO.on&&INTRO.talking){drawSay();}}
 let UI_FADE=1;
