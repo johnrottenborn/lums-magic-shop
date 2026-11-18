@@ -1016,6 +1016,20 @@ const CASES = {
     check(await g_(() => window.__g.SCENE === 'thorn' && window.__g.inBW()), 'the steps in ruins room 1 did not lead back up to the Breezeway');
     await g_(() => clearInterval(window.__noFoes));
   },
+  async 'hidden-grove'(p) {
+    const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop';
+    await p.evaluate(() => { const g = window.__g; g.startChapter2(); g.c2Skip(); g.WB10.st = 2; g.chPlaytestBreezeway(); g.enterGrove(); g.THFOES.forEach(f => f.calm = 99); g.lum.x = g.GROVEX + 1650; g.lum.y = g.GROVEY + 170; }); await wait(700);
+    await p.screenshot({ path: `tests/screenshots/${vp}-grove-hidden-door.png` });
+    check(await p.evaluate(() => !!(window.__g.NEAR && window.__g.NEAR.door)), 'there should be a door in Evergreen Grove\'s top-right corner');
+    await p.evaluate(() => window.__g.NEAR.onInteract()); await wait(1800);
+    check(await p.evaluate(() => window.__g.SCENE === 'dun' && window.__g.DUN.room === 39), 'the corner door should lead to the Hidden Grove (room 39)');
+    await p.screenshot({ path: `tests/screenshots/${vp}-hidden-grove.png` });
+    await p.evaluate(() => { const g = window.__g; g.lum.x = 900; g.lum.y = 560; }); await wait(600);
+    await p.screenshot({ path: `tests/screenshots/${vp}-hidden-grove-back.png` });
+    await p.evaluate(() => { const g = window.__g; g.lum.x = 720; g.lum.y = 735; }); await wait(500);
+    await p.evaluate(() => window.__g.NEAR.onInteract()); await wait(1800);
+    check(await p.evaluate(() => window.__g.SCENE === 'thorn' && Math.abs(window.__g.lum.x - window.__g.GROVEX - 1650) < 40), 'the Hidden Grove\'s door should lead back to the corner of Evergreen Grove');
+  },
   async 'mixing-amounts'(p) {
     const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop';
     await p.evaluate(() => { const g = window.__g; g.startChapter2(); g.c2Skip(); g.WB10.st = 2; g.chPlaytestBreezeway(); g.enterBreezevale(); g.enterDun(28, 600, 700, 1); }); await wait(800);

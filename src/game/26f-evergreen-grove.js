@@ -80,6 +80,9 @@ function drawGroveTitle(){if(!inGrove()||GVT.t>=4.5||SCENE!=='thorn')return;GVT.
   ctx.fillStyle='rgba(20,16,12,.55)';ctx.fillRect(0,H*.3-40,W,80);ctx.fillStyle='#f6ecd8';ctx.font=`600 ${Math.round(Math.min(30,W/13))}px Georgia,serif`;ctx.fillText('Evergreen Grove',W/2,H*.3+10);ctx.restore();}
 /* the north entrance (back to Amroth's home) and the south exit (the Coastal Path, map still to come) */
 THINT.push({get x(){return GROVEX+GENTRY.x;},get y(){return GROVEY+GENTRY.y-30;},get reach(){return inGrove()?80:0;},door:true,onInteract:()=>goScene(enterHomeFromGrove)},
-  {get x(){return GROVEX+GEXIT.x;},get y(){return GROVEY+GEXIT.y+20;},get reach(){return inGrove()?80:0;},door:true,onInteract:()=>goScene(enterBreezeway)});
+  {get x(){return GROVEX+GEXIT.x;},get y(){return GROVEY+GEXIT.y+20;},get reach(){return inGrove()?80:0;},door:true,onInteract:()=>goScene(enterBreezeway)},
+  {get x(){return GROVEX+GHIDDEN.x;},get y(){return GROVEY+GHIDDEN.y;},get reach(){return inGrove()?80:0;},door:true,onInteract:()=>dunGo(39,720,712,1)});   /* the way into the Hidden Grove, top-right corner */
+const GHIDDEN={x:1650,y:122};
+function leaveHiddenGrove(){SCENE='thorn';lum.x=GROVEX+GHIDDEN.x;lum.y=GROVEY+GHIDDEN.y+55;lum.face=1;lum.dir='down';lum.state='idle';lum.vx=lum.vy=0;cam.x=lum.x;cam.y=lum.y;THORN.t=99;GVT.t=99;}
 for(const f of GFORAGE)THINT.push({x:f.x,y:f.y,get reach(){return inGrove()?76:0},forage:f,onInteract:()=>pickForage(f)});
 function enterHomeFromGrove(){SCENE='thorn';lum.x=HOMEX+HOME.gate.x;lum.y=HOMEY+HH-70;lum.face=1;lum.dir='up';lum.state='idle';lum.vx=lum.vy=0;cam.x=lum.x;cam.y=lum.y-200;THORN.t=99;}
