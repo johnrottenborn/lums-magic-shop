@@ -8,11 +8,11 @@ const inIS=()=>lum.x>ISX-300;
 const IS_TOP=330,IS_ARCHY=500;   /* the mountain's foot; the line of the archways (nothing walkable behind them) */
 const ISLAND=(()=>{const P=[[170,IS_TOP]];for(let a=Math.PI;a>=0;a-=.05){const w=1+.035*Math.sin(a*7)+.025*Math.sin(a*13+1);P.push([1400+Math.cos(a)*1250*w,IS_TOP+Math.sin(a)*1560*w]);}P.push([2630,IS_TOP]);return P.reverse();})();   /* the shore: round on the sea sides, flat against the mountain */
 const ISH_=(i,s)=>{const x=Math.sin(i*127.1+s*311.7)*43758.5453;return x-Math.floor(x);};
-const IS_FONT={x:1400,y:1110,w:310},IS_CHAPEL={x:560,y:1060,w:560},IS_ENT={x:2240,y:IS_FONT.y,k:.52,ax:400,ay:1520},IS_GODDESS={x:1900,y:960,w:170};   /* the font is the centre of the map; the entrance painting is anchored at the foot of its stairs, level with the font */
+const IS_FONT={x:1400,y:1110,w:310},IS_CHAPEL={x:560,y:1060,w:560},IS_ENT={x:2310,y:880,k:.52,ax:400,ay:1520},IS_GODDESS={x:1690,y:1010,w:170},IS_SEAM={x:1985,y:960,w:470};   /* the font is the centre of the map; the entrance painting (top-right corner) is anchored at the foot of its stairs; a big broken arch hides its left edge */
 const IS_STATUES=[[1000,800,.42,-.04],[1250,730,.3,.02],[1520,730,.55,-.02],[1790,800,.36,.05]];   /* x, y, how much has broken off the top, lean */
 const IS_FALLEN={x:1330,y:1720,len:600};
 const IS_DOOR={x:IS_ENT.x,y:IS_ENT.y-4};   /* the foot of the entrance stairs: the way back down to the underground ruins */
-const IS_BOULDERS=(()=>{const B=[];for(let i=2;i<ISLAND.length-2;i+=1){const [x,y]=ISLAND[i];if(y<IS_TOP+120||(x>1960&&y<1250))continue;const dx=x-1400,dy=y-IS_TOP,L=Math.hypot(dx,dy)||1;for(const o of [10,85])B.push([x+dx/L*o+(ISH_(i,o)-.5)*40,y+dy/L*o*.6,90+ISH_(i,o+1)*80]);}for(let i=0;i<70;i++){const x=-200+ISH_(i,50)*(ISW+400),y=IS_TOP+150+ISH_(i,51)*(ISH-IS_TOP+200);if(inPoly(x,y,ISLAND))continue;B.push([x,y,80+ISH_(i,52)*110]);}return B;})();   /* boulders heaped all round the edge (no sea round the island) */
+const IS_BOULDERS=(()=>{const B=[];for(let i=2;i<ISLAND.length-2;i+=1){const [x,y]=ISLAND[i];if(y<IS_TOP+120||(x>1980&&y<1000))continue;const dx=x-1400,dy=y-IS_TOP,L=Math.hypot(dx,dy)||1;for(const o of [10,85])B.push([x+dx/L*o+(ISH_(i,o)-.5)*40,y+dy/L*o*.6,90+ISH_(i,o+1)*80]);}for(let i=0;i<70;i++){const x=-200+ISH_(i,50)*(ISW+400),y=IS_TOP+150+ISH_(i,51)*(ISH-IS_TOP+200);if(inPoly(x,y,ISLAND))continue;B.push([x,y,80+ISH_(i,52)*110]);}return B;})();   /* boulders heaped all round the edge (no sea round the island) */
 /* ---- the blue wash (and, for plants, dead grey-brown) baked into each image once ---- */
 const ISTINT={};
 function isTint(src,mode){const key=src+'|'+(mode||'');if(ISTINT[key])return ISTINT[key];const im=IMG[src];if(!ready(im))return null;
@@ -28,6 +28,7 @@ function isSolid(lx,ly){
   if(rect(C.x-C.w*.47,C.y-230,C.x+C.w*.47,C.y-6))return true;
   if(rect(E.x-E.ax*E.k+60,E.y-800,E.x+(1206-E.ax)*E.k,E.y-14))return true;
   if(ell(F.x,F.y-60,F.w*.47,70))return true;
+  {const A=IS_SEAM;if(rect(A.x-A.w*.5,A.y-30,A.x-A.w*.08,A.y-4)||rect(A.x+A.w*.1,A.y-30,A.x+A.w*.5,A.y-4))return true;}   /* the big arch's two pillars */
   if(ell(IS_GODDESS.x,IS_GODDESS.y-10,IS_GODDESS.w*.42,22))return true;
   for(const [x,y] of IS_STATUES)if(ell(x,y-10,62,22))return true;
   if(rect(IS_FALLEN.x-IS_FALLEN.len*.5,IS_FALLEN.y-58,IS_FALLEN.x+IS_FALLEN.len*.5+90,IS_FALLEN.y+8))return true;
@@ -44,6 +45,7 @@ function isProps(P){const X=x=>x+ISX,Y=y=>y+ISY;
     for(const [u0,v0,u1,v1,dx,dy,rot,sz] of RUIN_RUBBLE[cut]||[])P.push({t:'isrub',src:[u0,v0,u1,v1],x:X(x)+dx*250*(i%2?-1:1),y:Y(y)+30+dy*80,w:250*sz*.55,rot});}
   P.push({t:'isp',img:'isle_chapel',x:X(IS_CHAPEL.x),y:Y(IS_CHAPEL.y),w:IS_CHAPEL.w});
   P.push({t:'isent',x:X(IS_ENT.x),y:Y(IS_ENT.y),w:700});
+  P.push({t:'isarch',x:X(IS_SEAM.x),y:Y(IS_SEAM.y),w:IS_SEAM.w,flip:false,cut:'pillars',opaque:1});
   P.push({t:'isp',img:'isle_font',x:X(IS_FONT.x),y:Y(IS_FONT.y),w:IS_FONT.w});
   P.push({t:'isp',img:'isle_goddess',x:X(IS_GODDESS.x),y:Y(IS_GODDESS.y),w:IS_GODDESS.w});
     for(const [x,y,cut,lean] of IS_STATUES){P.push({t:'isbroken',x:X(x),y:Y(y),w:150,cut,lean});P.push({t:'isshard',x:X(x)+(lean>0?70:-70),y:Y(y)+40,w:150,cut,rot:lean>0?1.25:-1.3});}   /* each broken statue, its fallen top beside it */
@@ -58,7 +60,7 @@ function drawISProp(o){const S=o.t;
   if(S==='isp'){const im=isTint(o.img,o.mode);if(!im)return;const w=o.w,h=w*im.height/im.width;ctx.save();ctx.translate(o.x,o.y);if(o.shadow){ctx.fillStyle='rgba(15,20,35,.25)';ctx.beginPath();ctx.ellipse(0,0,w*.4,w*.12,0,0,TAU);ctx.fill();}if(o.flip)ctx.scale(-1,1);ctx.drawImage(im,-w/2,-h*.97,w,h);ctx.restore();return;}
   if(S==='isarch'){const im=isTint('ruins_arch','ghost');if(!im)return;const w=o.w,h=w*im.height/im.width,P=RUIN_CUT[o.cut];   /* ethereal: see-through, glowing, shimmering */
     ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,o.x,o.y-h*.5,w*.75,'170,195,255',.07+.03*Math.sin(T*1.3+o.x));ctx.restore();
-    for(const [al,dx,comp] of [[.8,0,'source-over'],[.2,Math.sin(T*1.7+o.x*.01)*3,'lighter']]){ctx.save();ctx.translate(o.x+dx,o.y);if(o.flip)ctx.scale(-1,1);ctx.globalCompositeOperation=comp;ctx.globalAlpha=al;
+    for(const [al,dx,comp] of [[o.opaque?1:.8,0,'source-over'],[.2,Math.sin(T*1.7+o.x*.01)*3,'lighter']]){ctx.save();ctx.translate(o.x+dx,o.y);if(o.flip)ctx.scale(-1,1);ctx.globalCompositeOperation=comp;ctx.globalAlpha=al;
       if(P){ctx.beginPath();P.forEach(([u,v],i)=>{const x=-w/2+u*w,y=-h*.97+v*h;i?ctx.lineTo(x,y):ctx.moveTo(x,y);});ctx.closePath();ctx.clip();}ctx.drawImage(im,-w/2,-h*.97,w,h);ctx.restore();}return;}
   if(S==='isrub'){const im=isTint('ruins_arch','ghost');if(!im)return;const [u0,v0,u1,v1]=o.src,iw=im.width,ih=im.height,sw=(u1-u0)*iw,sh=(v1-v0)*ih,k=o.w/sw;
     ctx.save();ctx.translate(o.x,o.y);ctx.fillStyle='rgba(15,20,35,.25)';ctx.beginPath();ctx.ellipse(0,0,o.w*.55,o.w*.16,0,0,TAU);ctx.fill();ctx.rotate(o.rot);ctx.globalAlpha=.75;ctx.drawImage(im,u0*iw,v0*ih,sw,sh,-sw*k/2,-sh*k*.8,sw*k,sh*k);ctx.restore();return;}
@@ -78,10 +80,6 @@ function buildISGround(){const K=.6,c=document.createElement('canvas');c.width=M
   const poly=()=>{g.beginPath();ISLAND.forEach(([x,y],i)=>i?g.lineTo(x,y):g.moveTo(x,y));g.closePath();};
   poly();g.fillStyle='#7f7d72';g.fill();g.save();poly();g.clip();
   for(let y=IS_TOP-40,row=0;y<ISH;y+=COB_W*.8,row++){const sh=row%2?37:0;drawStrip(g,IMG.cobble_strip,smoothPath([[-80-sh,y],[ISW+80,y]]),false);}   /* the designer's cobbles in overlapping rows */
-  {const F=IS_FONT,ends=[[F.x,IS_ARCHY-20],[F.x,1900],[150,F.y],[IS_ENT.x,F.y]];   /* darker cobbled lines running due north, south, west and east from the font; the east one to the foot of the entrance stairs */
-    for(const [ex,ey] of ends){g.save();g.globalCompositeOperation='multiply';g.lineCap='butt';g.beginPath();g.moveTo(F.x,F.y-40);g.lineTo(ex,ey);g.lineWidth=150;g.strokeStyle='rgb(168,162,170)';g.stroke();g.restore();
-      g.save();g.beginPath();g.moveTo(F.x,F.y-40);g.lineTo(ex,ey);g.lineWidth=158;g.strokeStyle='rgba(40,40,46,.45)';g.setLineDash([]);g.globalCompositeOperation='source-over';g.lineWidth=4;
-      const vx=ex-F.x,vy=ey-F.y+40,L=Math.hypot(vx,vy),nx=-vy/L*75,ny=vx/L*75;for(const sg of [1,-1]){g.beginPath();g.moveTo(F.x+nx*sg,F.y-40+ny*sg);g.lineTo(ex+nx*sg,ey+ny*sg);g.stroke();}g.restore();}}
   for(let i=0;i<40;i++){const x=200+ISH_(i,20)*2400,y=IS_TOP+80+ISH_(i,21)*1500,r=24+ISH_(i,22)*60;g.save();g.translate(x,y);g.scale(1,.55);g.rotate(ISH_(i,23)*3);   /* broken patches: cobbles gone, bare earth and dead grass showing */
     g.fillStyle='rgba(98,88,70,.6)';g.beginPath();for(let j=0;j<10;j++){const a=j/10*TAU,rr=r*(.7+ISH_(i*10+j,24)*.5);j?g.lineTo(Math.cos(a)*rr,Math.sin(a)*rr):g.moveTo(Math.cos(a)*rr,Math.sin(a)*rr);}g.closePath();g.fill();
     g.strokeStyle='rgba(140,128,96,.6)';g.lineWidth=2;for(let j=0;j<8;j++){const a=ISH_(i*8+j,25)*TAU,rr=r*ISH_(i*8+j,26)*.8,bx=Math.cos(a)*rr,by=Math.sin(a)*rr;g.beginPath();g.moveTo(bx,by);g.lineTo(bx+3,by-12);g.moveTo(bx,by);g.lineTo(bx-4,by-9);g.stroke();}g.restore();}
@@ -103,7 +101,11 @@ function drawISFx(){if(!inIS()||SCENE!=='thorn')return;
   ctx.save();ctx.globalCompositeOperation='multiply';ctx.fillStyle='rgb(142,150,170)';ctx.fillRect(cam.x-3000,cam.y-3000,6000,6000);ctx.restore();   /* the whole island in a cool blue cast */
   ctx.save();for(let i=0;i<34;i++){const sp=8+ISH_(i,30)*14,x=ISX+((ISH_(i,31)*ISW+T*sp)%(ISW+800))-400,y=ISY+IS_TOP+ISH_(i,32)*1700+Math.sin(T*.2+i)*30,r=220+ISH_(i,33)*260;
     const gr=ctx.createRadialGradient(x,y,0,x,y,r);gr.addColorStop(0,'rgba(228,234,242,.12)');gr.addColorStop(1,'rgba(236,242,250,0)');ctx.fillStyle=gr;ctx.beginPath();ctx.ellipse(x,y,r,r*.5,0,0,TAU);ctx.fill();}
-  const lx=lum.x,ly=lum.y-50,gr=ctx.createRadialGradient(lx,ly,230,lx,ly,900);gr.addColorStop(0,'rgba(232,238,246,0)');gr.addColorStop(.5,'rgba(226,232,240,.14)');gr.addColorStop(1,'rgba(226,232,240,.45)');
+  {const cx=ISX+1400,cy=ISY+1110,br=Math.sin(T*.45)*70+Math.sin(T*.23+1)*40;   /* very dense fog round the edge of the map, breathing in and out */
+    ctx.save();ctx.translate(cx,cy);ctx.scale(1,.66);const fg=ctx.createRadialGradient(0,0,1060+br,0,0,1480+br);fg.addColorStop(0,'rgba(226,232,240,0)');fg.addColorStop(.35,'rgba(226,232,240,.55)');fg.addColorStop(.7,'rgba(226,232,240,.9)');fg.addColorStop(1,'rgba(228,234,242,.98)');
+    ctx.fillStyle=fg;ctx.fillRect(-4000,-5000,8000,10000);ctx.restore();
+    for(let i=0;i<22;i++){const a=i/22*TAU+T*.02,rr=(1330+br+Math.sin(T*.5+i)*60),x=cx+Math.cos(a)*rr,y=cy+Math.sin(a)*rr*.66,r=300+ISH_(i,60)*200,g2=ctx.createRadialGradient(x,y,0,x,y,r);g2.addColorStop(0,'rgba(232,238,246,.5)');g2.addColorStop(1,'rgba(232,238,246,0)');ctx.fillStyle=g2;ctx.beginPath();ctx.ellipse(x,y,r,r*.6,0,0,TAU);ctx.fill();}}   /* rolling banks along the edge */
+  const lx=lum.x,ly=lum.y-50,gr=ctx.createRadialGradient(lx,ly,230,lx,ly,900);gr.addColorStop(0,'rgba(232,238,246,0)');gr.addColorStop(.5,'rgba(226,232,240,.08)');gr.addColorStop(1,'rgba(226,232,240,.25)');
   ctx.fillStyle=gr;ctx.fillRect(lx-3000,ly-3000,6000,6000);ctx.restore();}
 function drawISTitle(){if(!inIS()||IST.t>=4.5||SCENE!=='thorn')return;IST.t+=1/60;const a=Math.min(1,IST.t*1.5,(4.5-IST.t)*1.2);ctx.save();ctx.setTransform(DPR,0,0,DPR,0,0);ctx.globalAlpha=a;ctx.textAlign='center';
   ctx.font='700 30px "Alegreya SC", Georgia, serif';ctx.fillStyle='rgba(10,14,24,.55)';ctx.fillText('Island Ruins',W/2+2,H*.2+2);ctx.fillStyle='#eef3fb';ctx.fillText('Island Ruins',W/2,H*.2);ctx.restore();}
