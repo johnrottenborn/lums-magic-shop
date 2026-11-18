@@ -185,7 +185,7 @@ const BVNPC=[{room:25,atlas:'breeze_boy',x:850,y:525,name:'Breezevale Merchant',
   {room:26,atlas:'breeze_boy',x:115,y:708,name:'Townsman',lines:[["Oh! Hello there. Come in out of the rain."]],pre:[["Sage Luma? She lives at the Sanctuary of Water, across the stone bridge north of town."]]},
   {room:28,atlas:'breeze_boy',x:870,y:722,name:'Fisherman',lines:[["Mind the nets! Come warm yourself by the fire."]],pre:[["Someone saw a long, fish-like creature in the water just outside town."],["The big fish eats the little ones, you know."]]},
   {room:28,atlas:'breeze_girl',x:965,y:730,name:'Fisherwoman',lines:[["The rain keeps the fish close to shore. A good season."]],pre:[["Breezevale is a lovely little town. Good fishing, and such views of the sea."]]},
-  {room:31,atlas:'luma',x:688,y:618,name:'Sage Luma',slim:1,idle:1,back:1,sc:.92,lines:[["…"]]},   /* Alma's older sister; her lines are still to come */
+  {room:31,atlas:'luma',x:688,y:618,name:'Sage Luma',slim:1,idle:1,back:1,sc:.92,lines:[]},   /* Alma's older sister; she talks in lumaTalk */
   {room:27,atlas:'jak2',x:960,y:700,name:'Jak',sc:.97,slim:1,gone:()=>jak2In(),lines:[["…"]]},   /* until he joins Lum */
   {room:26,atlas:'breeze_girl',x:205,y:694,name:'Townswoman',lines:[["Would you like some tea? The kettle's still warm."]],pre:[["Listen to that rain. So calming… perfect sleeping weather."],["It's been raining a whole week now!"]]}];
 function drawBVNpc(n){const k=dunH(n.y)/151,face=lum.x>n.x;ctx.save();ctx.fillStyle='rgba(10,10,20,.25)';ctx.beginPath();ctx.ellipse(n.x,n.y,22*k,7*k,0,0,TAU);ctx.fill();ctx.restore();
@@ -197,7 +197,7 @@ function bvMerchant(intro){const have=id=>MATS[id]||0,M=[['Fox Tail','foxtail',1
   /* Healing Potion Potency (C2.potency, healRoll) is kept for later; the Sea Gems now buy Sea Bait */
   opts.push(['Leave',()=>{}]);
   const go=()=>askChoice('Breezevale Merchant \u00b7 Trades',opts);if(intro)talk([['Breezevale Merchant',"Welcome in! I don't take coin, only trades. Have a look."]],false,go);else go();}
-function bvNpcTalk(n){if(n.name==='Jak'){lum.face=lum.x<n.x?1:-1;jakTalk();return;}if(n.name==='Breezevale Merchant'){lum.face=lum.x<n.x?1:-1;bvMerchant(true);return;}lum.face=lum.x<n.x?1:-1;if(n.back&&lum.y>n.y&&Math.abs(lum.x-n.x)<=60){lum.state='idleUp';lum.at=-1e9;}if(n.name==='Sage Luma')C2.lumaMet=1;talk([...n.lines,...(!C2.lumaMet&&n.pre?n.pre:[])].map(l=>[n.name,l[0]]));}   /* pre: what the townsfolk say until Lum has met Sage Luma */   /* Lum looks up at whoever stands just above her */
+function bvNpcTalk(n){if(n.name==='Jak'){lum.face=lum.x<n.x?1:-1;jakTalk();return;}if(n.name==='Breezevale Merchant'){lum.face=lum.x<n.x?1:-1;bvMerchant(true);return;}lum.face=lum.x<n.x?1:-1;if(n.back&&lum.y>n.y&&Math.abs(lum.x-n.x)<=60){lum.state='idleUp';lum.at=-1e9;}if(n.name==='Sage Luma'){lumaTalk();return;}talk([...n.lines,...(!C2.lumaMet&&n.pre?n.pre:[])].map(l=>[n.name,l[0]]));}   /* pre: what the townsfolk say until Lum has met Sage Luma */   /* Lum looks up at whoever stands just above her */
 /* the Sea Snake under the east bridge: from the middle of the deck Lum sees movement below; with Sea Bait she can drop it in, and the snake rises and attacks */
 const BVSNK={t:-1,x:0,y:0};
 function bvBridgeMid(){const mx=(BVBR.x0+BVBR.x1)/2;return [mx,bvBridgeY(mx)];}
@@ -231,6 +231,11 @@ function updateJak2Follow(dt){if(!jak2In()||(SCENE!=='thorn'&&SCENE!=='dun'))ret
   if(Math.abs(dy)>Math.abs(dx)*1.2)JK2.dir=dy>0?'down':'up';else{JK2.dir='side';JK2.face=dx<0?-1:1;}}
 function drawJak2OW(){if(CAPTURE.on)return;const vert=JK2.dir==='up'||JK2.dir==='down',an=vert?JK2.dir:'side',n=C1ATL.jak2.rows[an][1];ctx.fillStyle='rgba(10,10,20,.25)';ctx.beginPath();ctx.ellipse(JK2.x,JK2.y+2,30,8,0,0,TAU);ctx.fill();
   c1Frame(ctx,'jak2',an,JK2.moving?Math.floor(JK2.ph/16)%n:0,JK2.x,JK2.y+3,JAK2_H,!vert&&JK2.face<0,1,0);}   /* his side rows face right */
+/* Sage Luma in the Sanctuary's altar chamber: she knew Lum would come; the ruins to the west hold someone who can tell her about Fokalur */
+function lumaTalk(){if(C2.lumaMet){talk([['Sage Luma',"Seek the ruins to the west, Lum… and do not go alone."]]);return;}
+  talk([['Sage Luma',"Ah… Lum. I knew you would visit one day. I have been waiting for you."],['Lum',"I've traveled far to ask you about Fokalur."],['Sage Luma',"Fokalur… Yes. I remember…"],
+    ['Sage Luma',"To learn more about Fokalur, visit the ruins to the west."],['Sage Luma',"The old temple is in complete ruins… but not completely uninhabited."],['Sage Luma',"There is someone who may still be there. They will help you understand more about Fokalur."],
+    ['Sage Luma',"But there is no longer a way to the ruins. They are cut off from the land by rough waters."],['Sage Luma',"Do not go alone…"]],false,()=>{C2.lumaMet=1;hsGoal('Find a way to the ruins to the west');});}
 function leaveSanctuary(){SCENE='thorn';lum.x=BVX+BVSDOOR.x;lum.y=BVY+BVSDOOR.y+30;lum.face=1;lum.dir='down';lum.state='idle';lum.vx=lum.vy=0;cam.x=lum.x;cam.y=lum.y;THORN.t=99;BVT.t=99;}   /* back out of the Sanctuary onto the blue bridge */
 function leaveBVHouse(i){const h=BVHOUSES[i];SCENE='thorn';lum.x=BVX+bvDoorX(h);lum.y=BVY+h.y+60;lum.face=1;lum.dir='down';lum.state='idle';lum.vx=lum.vy=0;cam.x=lum.x;cam.y=lum.y;THORN.t=99;BVT.t=99;}
 for(const [i,h] of BVHOUSES.entries())THINT.push({x:BVX+bvDoorX(h),y:BVY+h.y+24,get reach(){return inBV()?78:-1;},door:i>=2||i===0,onInteract:()=>i===0?dunGo(28,240,660,1):i===2?dunGo(25,470,690,1):i===3?dunGo(26,330,720,1):i===4?dunGo(27,590,650,1):say(h.name==='mayor'?"The Mayor's house. No one answers.":"Lum knocks. No one answers.")});
