@@ -793,7 +793,7 @@ const CASES = {
     await wait(1200); await p.screenshot({ path: path.join(SHOTS, `worldbind-room10-chest-${vp}.png`) });
     await g_(() => { const g = window.__g; g.lum.x = g.WB10.chest.x + 40; g.lum.y = g.WB10.chest.y + 40; }); await wait(500);
     await g_(() => window.__g.NEAR.onInteract()); await wait(600);
-    check(await g_(() => window.__g.BAG.includes('serpentarmor') && !window.__g.WB10.chest), 'the chest did not give the Serpent Armor and disappear');
+    check(await g_(() => window.__g.BAG.includes('serpentarmor') && !window.__g.WB10.chest), 'the chest did not give the Serpent Tunic and disappear');
     await g_(() => { const g = window.__g; g.lum.x = 857; g.lum.y = 625; }); await wait(300);
     check(await g_(() => window.__g.WB5.fall.length === 0), 'room 10 is still shaking after the cave-in');
     check(await g_(() => window.__g.WB10.st >= 2 && !window.__g.dunFree(857, 500) && !window.__g.DUNINTS().some(d => d.door && d.y < 450)), 'the way back up is not blocked after the cave-in');
