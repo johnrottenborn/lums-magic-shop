@@ -155,3 +155,12 @@ function drawOverlookMist(front){const dt=1/60;ctx.save();
 
 THINT.push({get x(){return BWX+BRUIN.x;},get y(){return BWY+BRUIN.ey+12;},get reach(){return inBW()&&typeof C2!=='undefined'&&C2.ruinWay?75:-1;},door:true,onInteract:()=>dunGo(32,340,590,1)});   /* the way down into the underground ruins */
 function leaveRuins(){SCENE='thorn';lum.x=BWX+BRUIN.x;lum.y=BWY+BRUIN.ey+34;lum.face=1;lum.dir='down';lum.state='idle';lum.vx=lum.vy=0;cam.x=lum.x;cam.y=lum.y;THORN.t=99;BWT.t=99;}   /* back up the steps to the sunken entrance */
+
+/* underground ruins room 6: the old explorer's skeleton holds the Serpentskin Pouch; trying to leave wakes the Wraith Lord */
+const RL6={t:-1,x:735,y:640};
+function ruinsSkeleton(){if(C2.serpentPouch){say("An old explorer… they never made it out.");return;}C2.serpentPouch=1;sfxPage&&sfxPage(.8);giveItem('serpentpouch');}
+function ruinsLeave6(){if(C2.wraithBeat){dunGo(36,690,532,1);return;}if(RL6.t>=0)return;RL6.t=0;WEVENT.on=true;lum.vx=lum.vy=0;lum.state='idle';lum.face=-1;try{sfxGhost();sfxEerie&&sfxEerie();}catch(e){}
+  setTimeout(()=>talk([['???',"Leaving so soon…?"]],false,()=>{WEVENT.on=false;startEncounter({kind:'glord',scene:'dun',x:RL6.x,y:RL6.y,face:-1,s:1,pack:1,calm:0,boss:1,noFlee:1,
+    onWin:()=>{C2.wraithBeat=1;RL6.t=-1;setTimeout(()=>talk([['Lum',"It's gone… The air feels lighter already."]]),900);}},'normal');}),1500);}
+function drawRL6(){if(RL6.t<0||SCENE!=='dun'||DUN.room!==37||(BATTLE.on&&!CAPTURE.on))return;RL6.t+=1/60;const im=IMG.ghost_lord;if(!ready(im))return;const u=Math.min(1,RL6.t/1.4),h=470,w=h*im.width/im.height,y=RL6.y+Math.sin(RL6.t*1.3)*8;   /* it materialises out of the dark over the pool */
+  ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,RL6.x,y-h*.5,h*.55,'190,200,255',.18*u);ctx.restore();ctx.save();ctx.globalAlpha=.72*u*u;ctx.drawImage(im,RL6.x-w*.55,y-h,w,h);ctx.restore();}

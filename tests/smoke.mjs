@@ -1065,6 +1065,17 @@ const CASES = {
     await p.screenshot({ path: path.join(SHOTS, `ruins-room6-${vp}.png`) });
     await g_(() => { window.__g.DLG.active = false; window.__g.C2.potency = 0; });
   },
+  async 'wraith-lord'(p) {
+    const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop', g_ = (f, a) => p.evaluate(f, a);
+    await g_(() => { const g = window.__g; g.startChapter2(); g.c2Skip(); g.WB10.st = 2; g.chPlaytestBreezeway(); g.C2.serpentPouch = 0; g.C2.wraithBeat = 0; g.enterDun(37, 880, 660, 1); }); await wait(900);
+    await g_(() => window.__g.ruinsSkeleton()); await wait(300);
+    check(await g_(() => window.__g.BAG.includes('serpentpouch')), 'the skeleton in room 6 should give the Serpentskin Pouch');
+    await g_(() => window.__g.ruinsLeave6()); await wait(1800);
+    check(await g_(() => window.__g.DLG.active && /Leaving so soon/.test(window.__g.DLG.lines[0][1])), 'trying to leave room 6 should wake the big ghost');
+    await g_(() => { const g = window.__g; g.DLG.active = false; g.DLG.onEnd && g.DLG.onEnd(); }); await wait(2500);
+    check(await g_(() => window.__g.BATTLE.on && window.__g.BATTLE.foes[0].type === 'glord'), 'the big ghost should attack');
+    await p.screenshot({ path: path.join(SHOTS, `wraith-lord-${vp}.png`) });
+  },
   async 'breezevale-merchant'(p) {
     const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop', g_ = (f, a) => p.evaluate(f, a);
     await g_(() => { const g = window.__g; g.startChapter2(); g.c2Skip(); g.WB10.st = 2; g.chPlaytestBreezeway(); g.MATS.foxtail = 1; g.BAG.push('foxtail'); g.MATS.seagem = 2; g.BAG.push('seagem'); g.enterBreezevale(); g.enterDun(25, 850, 640, 1); }); await wait(1200);

@@ -188,6 +188,12 @@ function drawBattleGhost(f){const S=bS(),B=BATTLE,me=B.foes[B.foeI]===f,x=f.x+f.
   ctx.save();ctx.globalAlpha=al*.72;c1Frame(ctx,'ghost',an,fi,x+(f.hit>0?Math.sin(f.hit*50)*4:0),y,h,true,al*.72,f.hit>0?Math.min(1,f.hit*3):0);ctx.restore();
   ctx.save();ctx.globalCompositeOperation='lighter';ctx.globalAlpha=al*.18;c1Frame(ctx,'ghost',an,fi,x+Math.sin(T*3)*3*S,y,h*1.02,true,al*.18,0);ctx.restore();   /* a faint shimmering double */
   if(me&&B.phase==='foeLeap'&&B.t>B.leapD-.15){ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,x,y-h*.5,h*.6,'220,225,255',.35);ctx.restore();}}
+/* the Wraith Lord (room 6 of the underground ruins): the designer's art in the ghosts' pale colours, about three ghosts tall, see-through and glowing; it teleports like them */
+function drawBattleGhostLord(f){const S=bS(),B=BATTLE,x=f.x+f.ox,h=Math.min(250*S*2.5,H*.66,f.y-40*S,W*.6*1.05),y=f.y+f.oy-10*S+Math.sin(T*1.3+f.ph)*10*S,im=IMG.ghost_lord;let al=ghostAlpha(f);if(f.dead)al*=Math.max(0,1-f.dead/1.2);if(al<=0||!ready(im))return;const w=h*im.width/im.height;
+  bshadow(f.x+f.ox,f.y+f.oy,h*.12,h*.025,.2*al);ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,x,y-h*.5,h*.5,'190,200,255',(.14+.05*Math.sin(T*2+f.ph))*al);ctx.restore();
+  ctx.save();ctx.globalAlpha=al*.74;ctx.translate(x+(f.hit>0?Math.sin(f.hit*50)*5:0),y);ctx.drawImage(im,-w*.55,-h,w,h);if(f.hit>0){ctx.globalCompositeOperation='lighter';ctx.globalAlpha=Math.min(1,f.hit*3)*.5*al;ctx.drawImage(im,-w*.55,-h,w,h);}ctx.restore();
+  ctx.save();ctx.globalCompositeOperation='lighter';ctx.globalAlpha=al*.15;ctx.drawImage(im,x-w*.55+Math.sin(T*2.6)*4*S,y-h*1.01,w,h*1.01);ctx.restore();
+  if(B.foes[B.foeI]===f&&B.phase==='foeLeap'&&B.t>B.leapD-.15){ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,x,y-h*.5,h*.55,'220,225,255',.35);ctx.restore();}}
 function drawBattleSnake(f){const S=bS(),x=f.x+f.ox,y=f.y+f.oy,h=Math.min(320*S,W*.56)*(f.s||1),im=IMG.seasnake;let al=1;if(f.dead){al=Math.max(0,1-f.dead/.7);if(al<=0)return;}   /* the Sea Snake (the designer's art, facing left), swaying up out of a ring of water */
   bshadow(x,y,h*.24,h*.05,.3*al);if(!ready(im))return;const w=h*im.width/im.height,sw=Math.sin(T*1.5+f.ph);
   ctx.save();ctx.strokeStyle=`rgba(200,230,250,${(.35*al).toFixed(3)})`;ctx.lineWidth=2*S;for(let i=0;i<2;i++){const q=(T*.6+i/2)%1;ctx.globalAlpha=1-q;ctx.beginPath();ctx.ellipse(x,y,h*(.12+q*.18),h*(.03+q*.04),0,0,TAU);ctx.stroke();}ctx.restore();
