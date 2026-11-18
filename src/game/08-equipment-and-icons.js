@@ -23,7 +23,7 @@ const ITEMS={
   lumpouch:{name:"Lum's Powder Pouch",slot:'main',stats:{atk:1},desc:"A sealed leather pouch packed with Lum's handmade powders. Sparkdust for striking, and a few rarer blends for tricky foes."},
   lumrobe:{name:"Starry Shop Cape",slot:'chest',stats:{def:1},desc:"Lum's favorite cape, dusted with embroidered moons and stars. She claims it's just for keeping warm."},
   serpentarmor:{name:'Serpent Tunic',slot:'chest',stats:{def:2},desc:"A tunic sewn with green serpent scales, from a hidden chest beneath the serpent gate. Light enough for Lum to wear. (Placeholder stats.)"},
-  serpentcharm:{name:'Serpent Charm',slot:'charm',stats:{mag:1},desc:"A serpent's fang on a braided cord, found glinting in the stream of the Hidden Grove. (Placeholder: +1 MAG.)"},
+  serpentcharm:{name:'Serpent Charm',slot:'charm',stats:{atk:1,spd:1},desc:"A little stone serpent, coiled and moss-flecked, found glinting in the stream of the Hidden Grove. +1 ATK +1 SPD, and attacks have a 50% chance to poison."},
   demonstone:{name:'Demon Stone',kind:'key',desc:"A warm red stone torn from the Demon Brute in the Worldbind Passage. A slitted eye seems to turn inside it, watching."},
   wbboots:{name:'Snake Slippers',slot:'boots',stats:{def:1,spd:1},desc:"Soft slippers of shed snakeskin from the Breezevale Merchant, traded for a Demon Stone. They make no sound at all."},
   foxboots:{name:'Vixenstep Boots',slot:'boots',stats:{def:1,spd:2},desc:"Light as a fox's step, dropped by the Elder Vixen in the watching dark. +1 DEF, +2 SPD."},

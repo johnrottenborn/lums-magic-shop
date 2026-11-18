@@ -1035,6 +1035,12 @@ const CASES = {
     await p.evaluate(() => { const g = window.__g; g.lum.x = 720; g.lum.y = 735; }); await wait(500);
     await p.evaluate(() => window.__g.NEAR.onInteract()); await wait(1800);
     check(await p.evaluate(() => window.__g.SCENE === 'thorn' && Math.abs(window.__g.lum.x - window.__g.GROVEX - 1650) < 40), 'the Hidden Grove\'s door should lead back to the corner of Evergreen Grove');
+    // the Serpent Charm: +1 ATK +1 SPD, and the wearer's hits poison about half the time
+    const sc = await p.evaluate(async () => { const g = window.__g, before = g.heroStats('lum'); g.PARTY.lum.charm = 'serpentcharm'; const after = g.heroStats('lum');
+      g.startEncounter({ kind: 'ffox', pack: 1, s: 1, x: g.lum.x + 60, y: g.lum.y }, 'normal'); await new Promise(r => setTimeout(r, 3500));
+      const B = g.BATTLE, f = B.foes[0]; B.cur = B.heroes.findIndex(h => h.id === 'lum'); let n = 0; for (let i = 0; i < 40; i++) { f.hp = 99; f.poison = 0; g.hurtFoe(f, 1); if (f.poison > 0) n++; }
+      f.hp = 0; B.phase = 'win'; return { atk: after.atk - before.atk, spd: after.spd - before.spd, n }; });
+    check(sc.atk === 1 && sc.spd === 1 && sc.n > 8 && sc.n < 32, 'the Serpent Charm should give +1 ATK +1 SPD and poison about half the time (got ' + JSON.stringify(sc) + ')');
   },
   async 'mixing-amounts'(p) {
     const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop';
