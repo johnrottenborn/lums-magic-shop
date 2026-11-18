@@ -32,7 +32,7 @@ Live at https://lums-magic-shop.vercel.app. Story and lore: `docs/story.md`. Mak
 | 20-ch1-start-and-woods | Chapter 1 start (`C1` state), sprite atlases (`C1ATL`, `c1Frame`), the woods the morning after, boot prints |
 | 21-stranglethorn | Stranglethorn maze (`TMZ`), fog and atmosphere (red falling leaves only up to the Worldbind Passage, none from Amroth's home on), spiders and webs, the lantern-less gate view |
 | 22-jak-and-thorn-foes | Jak (resting, follower, joining), roaming Stranglethorn foes, the Broodmother boss |
-| 23-battle-kit | powders (`POWDERS`), weaknesses (`WEAKTO`), foe special moves, hit effects, battle drawing for new foes |
+| 23-battle-kit | powders (`POWDERS`; icons `POWICON` from the designer's powder sheet icon13: Sparkdust starry pouch, Frostbloom frost pile, Thornbane thorny mortar, Moonmint moon bowl, Poison green bowl; the rest saved for later), weaknesses (`WEAKTO`), foe special moves, hit effects, battle drawing for new foes |
 | 24-vane-hut-and-mixing | Vane's hut and mixing at the fire |
 | 25-ch1-opening-and-foraging | Chapter 1 opening cutscene, foraging, ingredients |
 | 26-oak-hollow | the five-room root dungeon under the old oak |

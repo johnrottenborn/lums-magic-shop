@@ -1,7 +1,7 @@
 /* ---------- Lum's battle kit: powders ---------- */
 const POWDERS={frost:3,thorn:3,moon:3,venom:0};
 const POWDER_LIST=[['spark','Sparkdust','Damage · unlimited',null],['frost','Frostbloom Powder','Freezes · enemy may lose a turn','frost'],['thorn','Thornbane Powder','Weakens enemy attacks','thorn'],['moon','Moonmint Powder','Calms · strong vs undead','moon']];
-const POWICON={spark:'icon4_sun_bottle',frost:'icon3_frost_bowl',thorn:'icon_pouch_rose',moon:'icon3_pastel_powders',venom:'icon_pouch_seal'};
+const POWICON={spark:'icon13_pouch_stars',frost:'icon13_pile_frost',thorn:'icon13_mortar_herb',moon:'icon13_bowl_moon',venom:'icon13_bowl_green'};   /* the designer's powder sheet (icon13); the rest of it is saved for later */
 function drawPowderIcon(c,id,x,y,z){const im=IMG[POWICON[id]];if(ready(im)){c.drawImage(im,x-z/2,y-z/2,z,z);return true;}return false;}
 const PCOL={spark:'255,230,140',frost:'170,225,255',thorn:'170,220,120',moon:'200,170,255',venom:'150,220,90'};
 const WEAKTO={nymph:'spark',ffox:'thorn',gwisp:'frost',demon:'frost',bdemon:'frost',brute:'frost',rslime:'frost',rvixen:'thorn',bigspider:'thorn',slime:'frost',jelly:'frost',fslime:'frost',slug:'frost',slugking:'frost',wisp:'frost',flora:'frost',spider:'thorn',vixen:'thorn',bigvixen:'thorn',bat:'spark',mimic:'spark',rskel:'moon',reaper:'moon',skel:'moon'};
