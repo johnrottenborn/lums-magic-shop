@@ -171,3 +171,18 @@ function ruinsSkeleton(){if(C2.serpentPouch){say("An old explorer… they never 
 function ruinsLeave6(){dunGo(36,690,532,1);}   /* the only way out */
 function drawRL6(){if(RL6.t<0||SCENE!=='dun'||DUN.room!==37||(BATTLE.on&&!CAPTURE.on))return;RL6.t+=1/60;const im=IMG.ghost_lord;if(!ready(im))return;const u=Math.min(1,RL6.t/1.4),h=470,w=h*im.width/im.height,y=RL6.y+Math.sin(RL6.t*1.3)*8;   /* it materialises out of the dark over the pool */
   ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,RL6.x,y-h*.5,h*.55,'190,200,255',.18*u);ctx.restore();ctx.save();ctx.globalAlpha=.72*u*u;ctx.drawImage(im,RL6.x-w*.55,y-h,w,h);ctx.restore();}
+
+/* the serpent pool (room 40, off ruins room 1): a dead end; Jak offers to throw a stone in, and a ghostly sea serpent rises (twice the Breezevale serpent) and drops a Muddy Object (clean it in the satchel to find a key) */
+const GSN={t:-1,w0:0},GSPOOL={x:712,y:640};
+function serpentPool(){lum.state='idleUp';lum.at=-1e9;if(C2.gsnakeBeat||!jak2In()){say("It's a dead end.");return;}
+  talk([['Lum',"It's a dead end."],['Jak',"Should I throw a stone?"]],false,()=>setTimeout(()=>askChoice('Throw a stone?',[['Yes',gsThrow],['No',()=>{}]]),200));}
+function gsThrow(){GSN.t=0;GSN.w0=performance.now();WEVENT.on=true;lum.vx=lum.vy=0;
+  setTimeout(()=>{sfxSplash&&sfxSplash();},550);setTimeout(()=>{sfxSplash&&sfxSplash();try{sfxGhost();}catch(e){}},1150);
+  setTimeout(()=>{GSN.t=-1;WEVENT.on=false;startEncounter({kind:'gsnake',scene:'dun',s:1,x:GSPOOL.x,y:GSPOOL.y,pack:1,calm:0,onWin:()=>{C2.gsnakeBeat=1;}},'normal');},2500);}
+function drawGSRise(){const t=(performance.now()-GSN.w0)/1000,P=GSPOOL;
+  if(t<.55){const u=t/.55;ctx.fillStyle='#7a7a72';ctx.beginPath();ctx.arc(JK2.x+(P.x-JK2.x)*u,JK2.y-90+(P.y-JK2.y+90)*u-Math.sin(u*Math.PI)*90,5,0,TAU);ctx.fill();}   /* Jak's stone arcs into the water */
+  const rings=(t0,big)=>{if(t<t0)return;const q=t-t0;for(let i=0;i<3;i++){const r=(q*1.2+i*.25);if(r>1.2)continue;ctx.strokeStyle=`rgba(225,240,250,${(.6*(1-r/1.2)).toFixed(3)})`;ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(P.x,P.y,big*(10+r*50),big*(3+r*14),0,0,TAU);ctx.stroke();}};
+  rings(.55,1);rings(1.15,1.5);
+  const im=IMG.seasnake_ghost;if(t>1.15&&ready(im)){const u=clamp((t-1.15)/.9,0,1),e=1-(1-u)**3,h=250,w=h*im.width/im.height;
+    ctx.save();ctx.beginPath();ctx.rect(P.x-w,P.y-h*1.4,w*2,h*1.4+4);ctx.clip();ctx.globalAlpha=.7;ctx.translate(P.x,P.y+h*(1-e)*.95);ctx.rotate(Math.sin(t*3)*.04);ctx.drawImage(im,-w*.5,-h,w,h);ctx.globalCompositeOperation='lighter';ctx.globalAlpha=.18;ctx.drawImage(im,-w*.5,-h,w,h);ctx.restore();
+    ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,P.x,P.y-h*.5*e,h*.5,'190,200,255',.14*e);ctx.restore();}}

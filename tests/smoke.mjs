@@ -1051,6 +1051,33 @@ const CASES = {
       f.hp = 0; B.phase = 'win'; return { atk: after.atk - before.atk, spd: after.spd - before.spd, n }; });
     check(sc.atk === 1 && sc.spd === 1 && sc.n > 8 && sc.n < 32, 'the Serpent Charm should give +1 ATK +1 SPD and poison about half the time (got ' + JSON.stringify(sc) + ')');
   },
+  async 'serpent-pool'(p) {
+    const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop', g_ = (f, a) => p.evaluate(f, a);
+    await g_(() => { const g = window.__g; g.startChapter2(); g.c2Skip(); g.WB10.st = 2; g.chPlaytestIsle(); window.__calmT = setInterval(() => g.DFOES.forEach(f => { f.calm = 99; f.x = -999; }), 30); }); await wait(800);
+    await g_(() => { const g = window.__g; g.enterDun(32, 935, 525, 1); }); await wait(900);
+    await g_(() => window.__g.NEAR.onInteract()); await wait(1600);
+    check(await g_(() => window.__g.DUN.room === 40), 'the small arch at the end of the tunnel should lead to the serpent pool (room 40)');
+    await p.screenshot({ path: path.join(SHOTS, `serpent-pool-${vp}.png`) });
+    await g_(() => { const g = window.__g; g.lum.x = 700; g.lum.y = 705; }); await wait(500);
+    await g_(() => window.__g.NEAR.onInteract()); await wait(400);
+    check(await g_(() => { const L = window.__g.DLG.lines.map(l => l.join(':')).join('|'); return window.__g.DLG.active && /dead end/.test(L) && /Jak:Should I throw a stone/.test(L); }), 'Lum should say it is a dead end and Jak offer to throw a stone');
+    for (let i = 0; i < 4 && await g_(() => window.__g.DLG.active); i++) { await p.keyboard.press('Enter'); await wait(350); }
+    await wait(400); check(await g_(() => window.__g.CHOICE.on), 'Jak should ask whether to throw a stone');
+    await g_(() => window.__g.pickChoice(0)); await wait(1900);
+    await p.screenshot({ path: path.join(SHOTS, `serpent-pool-rise-${vp}.png`) });
+    await wait(2600);
+    check(await g_(() => window.__g.BATTLE.on && window.__g.BATTLE.foes[0].type === 'gsnake' && window.__g.FOE_TYPES.gsnake.hp === 60 && window.__g.FOE_TYPES.gsnake.atk === 10), 'the stone should bring up the Ghost Serpent (twice the sea serpent)');
+    await p.screenshot({ path: path.join(SHOTS, `serpent-pool-battle-${vp}.png`) });
+    await g_(() => { const B = window.__g.BATTLE; for (const f of B.foes) f.hp = 0; B.phase = 'win'; B.t = 0; B.rewarded = 0; }); await wait(1500);
+    for (let i = 0; i < 20 && await g_(() => window.__g.BATTLE.on); i++) { await p.keyboard.press('Space'); await wait(300); }
+    await wait(800);
+    check(await g_(() => window.__g.C2.gsnakeBeat && window.__g.BAG.includes('muddyobj')), 'the Ghost Serpent should drop a Muddy Object');
+    // cleaning it in the satchel reveals a key
+    await g_(() => window.__g.ITEMS.muddyobj.onAct()); await wait(400);
+    check(await g_(() => !window.__g.BAG.includes('muddyobj') && window.__g.BAG.includes('oldkey')), 'cleaning the Muddy Object should reveal a key');
+    await g_(() => { window.__g.DLG.active = false; window.__g.serpentPool(); }); await wait(300);
+    check(await g_(() => window.__g.DLG.active && /dead end/.test(window.__g.DLG.lines[0][1]) && window.__g.DLG.lines.length === 1), 'after the serpent is beaten the pool is just a dead end');
+  },
   async 'mixing-amounts'(p) {
     const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop';
     await p.evaluate(() => { const g = window.__g; g.startChapter2(); g.c2Skip(); g.WB10.st = 2; g.chPlaytestBreezeway(); g.enterBreezevale(); g.enterDun(28, 600, 700, 1); }); await wait(800);
