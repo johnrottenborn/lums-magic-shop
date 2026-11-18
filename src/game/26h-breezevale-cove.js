@@ -13,7 +13,7 @@ const BVTOP=BVSBR.y1-400;   /* the view stops with just the start of the bridge 
 const BVSDOOR={x:BVSBR.x,y:BVSBR.y1-150};   /* the way on, a little way along the bridge */
 const BVBR={x0:1880,x1:2130,y:850,w:270};BVBR.h=BVBR.w*346/700;BVBR.rise=BVBR.h*.29;   /* the bridge: deck ends at y, the deck (between the two handrails) rises in the middle */
 /* door: where the front door is across the art (0..1, unflipped); smoke: the chimney top (u,v of the art), if it has one */
-const BVHOUSES=[{img:'breeze_shellhouse',x:560,y:650,w:465,name:'shell',flip:true,noR:1,door:.34,smoke:[.28,.19]},{img:'breeze_mayorhouse',x:1350,y:620,w:790,name:'mayor',noL:1,door:.58,smoke:[.55,.17]},
+const BVHOUSES=[{img:'breeze_shellhouse',x:560,y:650,w:465,name:'shell',flip:true,noR:1,door:.34,smoke:[.28,.19]},{img:'breeze_shellhouse',x:1420,y:620,w:620,name:'mayor',door:.36,smoke:[.28,.19]},
   {img:'breeze_clamhouse',x:590,y:1370,w:600,name:'clam',door:.86},{img:'breeze_clamhouse',x:1510,y:1370,w:600,name:'clam2',flip:true,door:.86},{img:'breeze_shellhouse',x:2495,y:875,w:620,name:'shell2',door:.36,smoke:[.28,.19]}];
 const bvDoorX=h=>h.x+(h.door-.5)*h.w*(h.flip?-1:1);
 /* a house's yard: two curves of grass, from up each side of the house, round its front corners, to either side of the door */
@@ -34,7 +34,7 @@ const BVISLE=(()=>{const P=[];for(let a=Math.PI/2;a>-Math.PI*1.5;a-=.06)P.push([
 const BVCOB=(()=>{const F=BVFOUNT,ring=[];for(let a=0;a<=TAU+.01;a+=.2)ring.push([F.x+Math.cos(a)*230,F.y-50+Math.sin(a)*135]);
   const to=(x,y)=>{const a=Math.atan2(y-(F.y-50),x-F.x);return [[F.x+Math.cos(a)*230,F.y-50+Math.sin(a)*135],[(F.x+x)/2+(BVH_(x,1)-.5)*40,(F.y-50+y)/2+(BVH_(y,2)-.5)*30],[x,y]];};
   return [ring,...BVHOUSES.slice(0,4).map(h=>to(h.x,h.y+40)),to(BVGATE.x,BVGATE.y-30),to(BVBR.x0+20,BVBR.y),to(BVNORTH.x,BVNORTH.y+30)].map(P=>smoothPath(P));})();
-function bvSolid(lx,ly){for(const h of BVHOUSES){if(Math.abs(lx-h.x)<h.w*.47&&ly<h.y-6&&ly>h.y-Math.min(h.w*.36,150))return true;}   /* the whole footprint of each house, porches included */
+function bvSolid(lx,ly){for(const h of BVHOUSES){const im=IMG[h.img],hh=ready(im)?h.w*im.naturalHeight/im.naturalWidth:h.w*.8;if(Math.abs(lx-h.x)<h.w*.47&&ly<h.y-6&&ly>h.y-hh*.85)return true;}   /* the whole house, so Lum can't slip in behind it and vanish under the roof */   /* the whole footprint of each house, porches included */
   if(((lx-BVFOUNT.x)/(BVFOUNT.w*.47))**2+((ly-BVFOUNT.y+BVFOUNT.w*.08)/(BVFOUNT.w*.11))**2<1)return true;
   if(Math.abs(ly-BVGATE.y+60)<34&&Math.abs(lx-BVGATE.x)>128&&Math.abs(lx-BVGATE.x)<262)return true;   /* the gateposts and their stone footings */
   if(((lx-BVGIRL.x)/30)**2+((ly-BVGIRL.y)/14)**2<1)return true;   /* the townsgirl */
@@ -238,6 +238,6 @@ function lumaTalk(){if(C2.lumaMet){talk([['Sage Luma',"Seek the ruins to the wes
     ['Sage Luma',"But there is no longer a way to the ruins. They are cut off from the land by rough waters."],['Sage Luma',"Do not go alone…"],['Sage Luma',"Promise me, Lum. The ruins are no place to explore by yourself. Find someone to go with you."]],false,()=>{C2.lumaMet=1;hsGoal('Find a way to the ruins to the west');});}
 function leaveSanctuary(){SCENE='thorn';lum.x=BVX+BVSDOOR.x;lum.y=BVY+BVSDOOR.y+30;lum.face=1;lum.dir='down';lum.state='idle';lum.vx=lum.vy=0;cam.x=lum.x;cam.y=lum.y;THORN.t=99;BVT.t=99;}   /* back out of the Sanctuary onto the blue bridge */
 function leaveBVHouse(i){const h=BVHOUSES[i];SCENE='thorn';lum.x=BVX+bvDoorX(h);lum.y=BVY+h.y+60;lum.face=1;lum.dir='down';lum.state='idle';lum.vx=lum.vy=0;cam.x=lum.x;cam.y=lum.y;THORN.t=99;BVT.t=99;}
-for(const [i,h] of BVHOUSES.entries())THINT.push({x:BVX+bvDoorX(h),y:BVY+h.y+24,get reach(){return inBV()?78:-1;},door:i>=2||i===0,onInteract:()=>i===0?dunGo(28,240,660,1):i===2?dunGo(25,470,690,1):i===3?dunGo(26,330,720,1):i===4?dunGo(27,590,650,1):say(h.name==='mayor'?"The Mayor's house. No one answers.":"Lum knocks. No one answers.")});
+for(const [i,h] of BVHOUSES.entries())THINT.push({x:BVX+bvDoorX(h),y:BVY+h.y+24,get reach(){return inBV()?78:-1;},door:i>=2||i===0,onInteract:()=>i===0?dunGo(28,240,660,1):i===2?dunGo(25,470,690,1):i===3?dunGo(26,330,720,1):i===4?dunGo(27,590,650,1):say("Lum knocks. No one answers.")});
 
 THINT.push({get x(){return BVX+BVGIRL.x;},get y(){return BVY+BVGIRL.y+10;},get reach(){return inBV()?85:-1;},onInteract:bvGirlTalk});

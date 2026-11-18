@@ -56,7 +56,7 @@ const NOTE=n=>440*Math.pow(2,(n-69)/12);
 const PROG=[[50,[62,66,69,73]],[47,[59,62,66,69]],[43,[55,59,62,66]],[45,[57,61,64,69]],[50,[62,66,69,74]],[54,[57,61,66,69]],[43,[55,59,64,67]],[45,[57,61,64,67]]];
 const MEL=[[78,-1,81,-1,78,76,-1,74],[76,-1,-1,74,73,-1,71,-1],[74,-1,79,-1,78,-1,74,-1],[76,-1,73,-1,69,-1,-1,-1],[78,-1,81,83,81,-1,78,-1],[76,-1,78,-1,73,-1,-1,-1],[74,76,79,-1,78,76,74,-1],[73,-1,76,-1,74,-1,-1,-1]];
 const ARP=[0,1,2,3,2,1,2,1],EIGHTH=60/64/2;
-function scheduleMusic(){if(SND.lullUntil&&SND.ctx.currentTime<SND.lullUntil){SND.nextNote=SND.lullUntil+.3;return;}if(BMUS.on){scheduleBattleMusic();return;}if(NIGHT.on){SND.nextNote=SND.ctx.currentTime+.1;return;}if(SCENE==='dun'&&DUN.room>=11&&DUN.room<=20){scheduleWorldbindMusic();return;}if(SCENE==='dun'&&DUN.room===24){scheduleOverlookMusic();return;}if(CH>0&&(SCENE==='woods'||SCENE==='dun'||SCENE==='thorn'||SCENE==='thgate')){scheduleWoodsMusic();return;}SND.wStep=0;const c=SND.ctx;while(SND.nextNote<c.currentTime+.25){const t=SND.nextNote,s=SND.step,bar=Math.floor(s/8)%PROG.length,e=s%8,[root,ch]=PROG[bar],section=Math.floor(s/64)%4;
+function scheduleMusic(){if(SND.lullUntil&&SND.ctx.currentTime<SND.lullUntil){SND.nextNote=SND.lullUntil+.3;return;}if(BMUS.on){scheduleBattleMusic();return;}if(NIGHT.on){SND.nextNote=SND.ctx.currentTime+.1;return;}if(SCENE==='dun'&&DUN.room>=11&&DUN.room<=20){scheduleWorldbindMusic();return;}if(SCENE==='dun'&&DUN.room===24){scheduleOverlookMusic();return;}if((SCENE==='thorn'&&typeof inBV==='function'&&inBV())||(SCENE==='dun'&&DUN.room>=25&&DUN.room<=28)){scheduleBreezevaleMusic();return;}if(CH>0&&(SCENE==='woods'||SCENE==='dun'||SCENE==='thorn'||SCENE==='thgate')){scheduleWoodsMusic();return;}SND.wStep=0;const c=SND.ctx;while(SND.nextNote<c.currentTime+.25){const t=SND.nextNote,s=SND.step,bar=Math.floor(s/8)%PROG.length,e=s%8,[root,ch]=PROG[bar],section=Math.floor(s/64)%4;
     if(e===0){pluck(t,NOTE(root-12),.22,2.6,SND.music,0,.5);pad(t,ch.slice(0,3).map(NOTE),EIGHTH*8+.4,.012);}
     if(e===4)pluck(t,NOTE(root),.12,1.8,SND.music,0,.5);
     pluck(t+(Math.random()-.5)*.012,NOTE(ch[ARP[e]]),.07+(e===0?.03:0),1.6,SND.music,(ARP[e]-1.5)*.25,.7);
@@ -172,6 +172,16 @@ function scheduleOverlookMusic(){const c=SND.ctx,BAR=9;if(!SND.ovNext||SND.ovNex
       lfo.frequency.value=.13;lg.gain.value=260;lfo.connect(lg);lg.connect(f.frequency);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.03,t+BAR*.5);g.gain.linearRampToValueAtTime(0,t+BAR+1.5);o.connect(f);f.connect(g);g.connect(SND.music);o.start(t);lfo.start(t);o.stop(t+BAR+2);lfo.stop(t+BAR+2);}
     if(b%3===2){const o=c.createOscillator(),g=c.createGain(),v=c.createOscillator(),vg=c.createGain();o.type='sine';o.frequency.setValueAtTime(NOTE(ch[2]+12),t+3);o.frequency.exponentialRampToValueAtTime(NOTE(ch[2]+6),t+7.5);   /* a far-off voice */
       v.frequency.value=5;vg.gain.value=6;v.connect(vg);vg.connect(o.frequency);g.gain.setValueAtTime(0,t+3);g.gain.linearRampToValueAtTime(.02,t+4.5);g.gain.linearRampToValueAtTime(0,t+8);o.connect(g);g.connect(SND.music);o.start(t+3);v.start(t+3);o.stop(t+8.2);v.stop(t+8.2);}}}
+/* ---------- Breezevale Cove: melancholy. A slow sea waltz in D minor: a plucked harp-like melody over rolling arpeggios and a soft pad,
+   phrases that rise and sigh back down, and now and then a distant bell like a buoy out on the water ---------- */
+const BVPROG=[[38,[50,53,57]],[34,[46,50,53]],[36,[48,52,55]],[33,[45,49,52]],[38,[50,53,57]],[43,[55,58,62]],[34,[46,50,53]],[33,[45,49,52]]];
+const BVMEL=[[69,67,65],[65,64,62],[64,65,67],[64,null,61],[62,64,65],[67,65,62],[65,64,62],[61,null,null]];   /* one note per beat; null rests */
+function scheduleBreezevaleMusic(){const c=SND.ctx,BEAT=.86,BAR=BEAT*3;if(!SND.bvNext||SND.bvNext<c.currentTime-1)SND.bvNext=c.currentTime+.2;
+  while(SND.bvNext<c.currentTime+.6){const t=SND.bvNext,b=SND.bvBar||0,i=b%BVPROG.length,[root,ch]=BVPROG[i],round=Math.floor(b/BVPROG.length)%2;SND.bvBar=b+1;SND.bvNext=t+BAR;
+    pad(t,[NOTE(root),NOTE(root+12)],BAR+.6,.012);pad(t+.1,ch.map(NOTE),BAR+.4,.006);   /* the low tide */
+    for(let k=0;k<3;k++){pluck(t+k*BEAT,NOTE(root+12),.05,1.4,SND.music,-.35);pluck(t+k*BEAT+BEAT*.5,NOTE(ch[(k+1)%3]),.03,1.1,SND.music,.3,.7);}   /* rolling waltz arpeggio */
+    BVMEL[i].forEach((n,k)=>{if(n==null)return;pluck(t+k*BEAT+(k===1?.04:0),NOTE(round?n+12:n),round?.055:.075,2.6,SND.music,.1,1.1);});   /* the melody, an octave up the second time round */
+    if(i===7)bell(t+BEAT*1.5,NOTE(81),.03,6,SND.music,.6);   /* a far buoy bell at the end of each phrase */}}
 /* a gull's cry: a quick bright yelp that falls, twice */
 /* crumbling rock: a gritty slide of grit, then a scatter of stones clattering down (Worldbind quakes) */
 function sfxCrumble(v=1){if(!SND.ready)return;const t=SND.ctx.currentTime,out=SND.sfxVerb||SND.sfx;noiseHit(t,1.4,'bandpass',900,1.2,.12*v,out,300);noiseHit(t+.1,1.1,'highpass',2400,.7,.05*v,SND.sfx);
