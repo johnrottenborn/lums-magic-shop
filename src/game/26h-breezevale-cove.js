@@ -182,12 +182,12 @@ THINT.push({get x(){return BVX+BVSOUTH.x;},get y(){return BVY+BVSOUTH.y;},get re
 /* the clam houses can be entered: a shop (bottom-left) and a sitting room (bottom-right); their townsfolk (lines still to settle with the designer) */
 const BVFOLK_H=158;   /* Lum stands about 98 tall; the townsfolk are about a head taller */
 const BVNPC=[{room:25,atlas:'breeze_boy',x:850,y:525,name:'Breezevale Merchant',lines:[["Welcome in! Have a look around."]]},
-  {room:26,atlas:'breeze_boy',x:115,y:708,name:'Townsman',lines:[["Oh! Hello there. Come in out of the rain."]]},
-  {room:28,atlas:'breeze_boy',x:870,y:722,name:'Fisherman',lines:[["Mind the nets! Come warm yourself by the fire."]]},
-  {room:28,atlas:'breeze_girl',x:965,y:730,name:'Fisherwoman',lines:[["The rain keeps the fish close to shore. A good season."]]},
+  {room:26,atlas:'breeze_boy',x:115,y:708,name:'Townsman',lines:[["Oh! Hello there. Come in out of the rain."]],pre:[["Sage Luma? She lives at the Sanctuary of Water, across the stone bridge north of town."]]},
+  {room:28,atlas:'breeze_boy',x:870,y:722,name:'Fisherman',lines:[["Mind the nets! Come warm yourself by the fire."]],pre:[["Someone saw a long, fish-like creature in the water just outside town."],["The big fish eats the little ones, you know."]]},
+  {room:28,atlas:'breeze_girl',x:965,y:730,name:'Fisherwoman',lines:[["The rain keeps the fish close to shore. A good season."]],pre:[["Breezevale is a lovely little town. Good fishing, and such views of the sea."]]},
   {room:31,atlas:'luma',x:688,y:618,name:'Sage Luma',slim:1,idle:1,back:1,sc:.92,lines:[["…"]]},   /* Alma's older sister; her lines are still to come */
   {room:27,atlas:'jak2',x:960,y:700,name:'Jak',sc:.97,slim:1,gone:()=>jak2In(),lines:[["…"]]},   /* until he joins Lum */
-  {room:26,atlas:'breeze_girl',x:205,y:694,name:'Townswoman',lines:[["Would you like some tea? The kettle's still warm."]]}];
+  {room:26,atlas:'breeze_girl',x:205,y:694,name:'Townswoman',lines:[["Would you like some tea? The kettle's still warm."]],pre:[["Listen to that rain. So calming… perfect sleeping weather."],["It's been raining a whole week now!"]]}];
 function drawBVNpc(n){const k=dunH(n.y)/151,face=lum.x>n.x;ctx.save();ctx.fillStyle='rgba(10,10,20,.25)';ctx.beginPath();ctx.ellipse(n.x,n.y,22*k,7*k,0,0,TAU);ctx.fill();ctx.restore();
   const talking=DLG.active&&DLG.lines&&DLG.lines[DLG.i||0]&&DLG.lines[DLG.i||0][0]===n.name,an=talking&&Math.abs(lum.x-n.x)>60?'side':talking&&n.back&&lum.y<n.y?'up':n.back&&!talking?'up':'down';   /* back: stands facing north, turns to Lum when she speaks with her */ctx.save();ctx.translate(n.x,0);ctx.scale(n.slim?1:.86,1);ctx.translate(-n.x,0);c1Frame(ctx,n.atlas,an==='down'&&n.idle?'idle':an,0,n.x,n.y,n.h||BVFOLK_H*k*(n.sc||1),an==='side'&&face,1,0);ctx.restore();}   /* townsfolk: a little taller than Lum, slim */
 /* the Breezevale Merchant's trades */
@@ -197,7 +197,7 @@ function bvMerchant(intro){const have=id=>MATS[id]||0,M=[['Fox Tail','foxtail',1
   /* Healing Potion Potency (C2.potency, healRoll) is kept for later; the Sea Gems now buy Sea Bait */
   opts.push(['Leave',()=>{}]);
   const go=()=>askChoice('Breezevale Merchant \u00b7 Trades',opts);if(intro)talk([['Breezevale Merchant',"Welcome in! I don't take coin, only trades. Have a look."]],false,go);else go();}
-function bvNpcTalk(n){if(n.name==='Jak'){lum.face=lum.x<n.x?1:-1;jakTalk();return;}if(n.name==='Breezevale Merchant'){lum.face=lum.x<n.x?1:-1;bvMerchant(true);return;}lum.face=lum.x<n.x?1:-1;if(n.back&&lum.y>n.y&&Math.abs(lum.x-n.x)<=60){lum.state='idleUp';lum.at=-1e9;}talk(n.lines.map(l=>[n.name,l[0]]));}   /* Lum looks up at whoever stands just above her */
+function bvNpcTalk(n){if(n.name==='Jak'){lum.face=lum.x<n.x?1:-1;jakTalk();return;}if(n.name==='Breezevale Merchant'){lum.face=lum.x<n.x?1:-1;bvMerchant(true);return;}lum.face=lum.x<n.x?1:-1;if(n.back&&lum.y>n.y&&Math.abs(lum.x-n.x)<=60){lum.state='idleUp';lum.at=-1e9;}if(n.name==='Sage Luma')C2.lumaMet=1;talk([...n.lines,...(!C2.lumaMet&&n.pre?n.pre:[])].map(l=>[n.name,l[0]]));}   /* pre: what the townsfolk say until Lum has met Sage Luma */   /* Lum looks up at whoever stands just above her */
 /* the Sea Snake under the east bridge: from the middle of the deck Lum sees movement below; with Sea Bait she can drop it in, and the snake rises and attacks */
 const BVSNK={t:-1,x:0,y:0};
 function bvBridgeMid(){const mx=(BVBR.x0+BVBR.x1)/2;return [mx,bvBridgeY(mx)];}

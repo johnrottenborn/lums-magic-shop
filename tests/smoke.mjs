@@ -1010,6 +1010,16 @@ const CASES = {
     check(await g_(() => window.__g.SCENE === 'thorn' && window.__g.inBW()), 'the steps in ruins room 1 did not lead back up to the Breezeway');
     await g_(() => clearInterval(window.__noFoes));
   },
+  async 'breezevale-gossip'(p) {
+    const g_ = (f, a) => p.evaluate(f, a);
+    await g_(() => { const g = window.__g; g.startChapter2(); g.c2Skip(); g.WB10.st = 2; g.chPlaytestBreezeway(); g.C2.lumaMet = 0; g.enterBreezevale(); g.enterDun(26, 330, 720, 1); }); await wait(1000);
+    const said = who => g_(who => { const g = window.__g, n = g.BVNPC.find(n => n.name === who); g.DLG.active = false; g.lum.x = n.x + 40; g.lum.y = n.y + 60; return new Promise(r => setTimeout(() => { g.NEAR.onInteract(); r(g.DLG.lines.map(l => l[1]).join(' ')); }, 400)); }, who);
+    check(/Sanctuary of Water/.test(await said('Townsman')), 'before Lum meets Sage Luma the Townsman should say where she lives');
+    check(/whole week/.test(await said('Townswoman')), 'the Townswoman should talk about the week of rain');
+    await g_(() => { const g = window.__g; g.DLG.active = false; g.C2.lumaMet = 1; }); await wait(200);
+    check(!/Sanctuary of Water/.test(await said('Townsman')), 'after meeting Sage Luma the Townsman should drop the line about where she lives');
+    await g_(() => { window.__g.DLG.active = false; window.__g.C2.lumaMet = 0; });
+  },
   async 'breezevale-merchant'(p) {
     const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop', g_ = (f, a) => p.evaluate(f, a);
     await g_(() => { const g = window.__g; g.startChapter2(); g.c2Skip(); g.WB10.st = 2; g.chPlaytestBreezeway(); g.MATS.foxtail = 1; g.BAG.push('foxtail'); g.MATS.seagem = 2; g.BAG.push('seagem'); g.enterBreezevale(); g.enterDun(25, 850, 640, 1); }); await wait(1200);
