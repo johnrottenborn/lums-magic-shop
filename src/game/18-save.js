@@ -47,7 +47,7 @@ function applySave(d){if(d.ch===2&&d.c2){applySaveC2(d);return;}if(d.ch===1){app
   Object.assign(WEV,d.wev||{});
   if(d.night&&d.night.on){NIGHT.on=true;BED.night=1;BED.sleeping=true;BED.cosAwake=true;BED.slept=true;
     if(d.night.cut){NIGHT.cut=true;addHedgeDoor();for(let i=ESTATE.length-1;i>=0;i--){const o=ESTATE[i];if((o.t==='shrub'||o.t==='img')&&Math.abs(o.x-20)<135&&o.y>1575&&o.y<1720)ESTATE.splice(i,1);}}
-    NIGHT.nudged=d.night.nudged||0;if(d.night.rain){NIGHT.rain=true;setTimeout(()=>{NIGHT.rainSrc=null;startRain();},600);}}
+    NIGHT.nudged=d.night.nudged||0;if(d.night.rain){NIGHT.rain=true;setTimeout(restartRain,600);}}
   if(d.shopDoor)shopDoor=d.shopDoor;if(d.pondReturn)pondReturn=d.pondReturn;
   const sc=d.scene||'garden';
   if(sc==='well')enterWell();else if(sc==='study')enterStudy();else if(sc==='shed')enterShed();else if(sc==='pond')enterPond();else if(sc==='shop')enterShop();else if(sc==='bed')enterBedroom();

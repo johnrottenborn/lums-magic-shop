@@ -38,6 +38,8 @@ function drawRain(dt){if(!NIGHT.rain)return;ctx.save();ctx.setTransform(DPR,0,0,
 const RAIN_VOL=.075,RAIN_VOL_BATTLE=.035;
 function startRain(){NIGHT.rain=true;if(!SND.ready||NIGHT.rainSrc)return;const c=SND.ctx,s=c.createBufferSource();s.buffer=SND.white;s.loop=true;const f=c.createBiquadFilter();f.type='bandpass';f.frequency.value=1600;f.Q.value=.5;
   const lp=c.createBiquadFilter();lp.type='lowpass';lp.frequency.value=5200;const g=c.createGain();g.gain.setValueAtTime(0,c.currentTime);g.gain.linearRampToValueAtTime(SCENE==='dun'&&DUN.room>=11&&DUN.room<21?0:SCENE==='dun'&&DUN.room>=21?RAIN_VOL*.35:BATTLE.on?RAIN_VOL_BATTLE:RAIN_VOL,c.currentTime+2.5);NIGHT.rainB=null;s.connect(f);f.connect(lp);lp.connect(g);g.connect(SND.amb);s.start();NIGHT.rainSrc=s;NIGHT.rainG=g;NIGHT.rainB=false;}
+/* start the rain afresh: the old loop is stopped first, or it would keep playing on its own, out of reach of rainVol (that is how rain was heard inside the Worldbind) */
+function restartRain(){if(NIGHT.rainSrc){try{NIGHT.rainSrc.stop();}catch(e){}}NIGHT.rainSrc=null;NIGHT.rainG=null;startRain();}
 /* rain is quieter during battles */
 /* rain is quieter in battle and silent deep inside the mountain (the Worldbind Passage, rooms 11+) */
 /* from Chapter 2 on it is always raining outdoors (part of the story): Amroth's home, Evergreen Grove, the coast, Breezevale Cove */

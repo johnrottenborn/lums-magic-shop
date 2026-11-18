@@ -24,7 +24,7 @@ function startChapter2(){audioInit();c1Reset();CH=2;HERO='lum';PC='lum';
   Object.assign(AMR,{x:CPATH.xt+3,y:CPATH.ytop+10,face:1,dir:'down',moving:0,ph:0,a:0});
   WEVENT.on=true;FADE.a=0;FADE.dir=0;}
 function c2NarrNext(){if(C2.narr<0)return;if(C2.na<.6)return;C2.narr++;C2.na=0;if(C2.narr>=C2NARR.length){C2.narr=-1;c2BeginGate();}}
-function c2BeginGate(){C2.st=1;C2.t=0;C2.cam={x:CPATH.xt,y:CPATH.ytop+180};cam.x=C2.cam.x;cam.y=C2.cam.y;NIGHT.rain=true;NIGHT.rainSrc=null;startRain();C2.fadeIn=1;}
+function c2BeginGate(){C2.st=1;C2.t=0;C2.cam={x:CPATH.xt,y:CPATH.ytop+180};cam.x=C2.cam.x;cam.y=C2.cam.y;NIGHT.rain=true;restartRain();C2.fadeIn=1;}
 function c2Talk(lines,next){talk(lines,false,()=>{C2.st=next;C2.t=0;C2.w=0;});C2.st=-1;}
 /* walk Amroth toward a point; returns true on arrival */
 function amrWalk(tx,ty,sp,dt){const dx=tx-AMR.x,dy=ty-AMR.y,d=Math.hypot(dx,dy);if(d<3){AMR.x=tx;AMR.y=ty;AMR.moving=0;return true;}const m=Math.min(d,sp*dt);AMR.x+=dx/d*m;AMR.y+=dy/d*m;AMR.ph+=m;AMR.moving=1;
