@@ -11,6 +11,7 @@ const ISH_=(i,s)=>{const x=Math.sin(i*127.1+s*311.7)*43758.5453;return x-Math.fl
 const IS_FONT={x:1400,y:1110,w:310},IS_CHAPEL={x:560,y:1060,w:560},IS_ENT={x:2310,y:880,k:.52,ax:400,ay:1520},IS_GODDESS={x:1690,y:1010,w:170},IS_SEAM={x:1985,y:960,w:470};   /* the font is the centre of the map; the entrance painting (top-right corner) is anchored at the foot of its stairs; a big broken arch hides its left edge */
 const IS_STATUES=[[1000,800,.42,-.04],[1250,730,.3,.02],[1520,730,.55,-.02],[1790,800,.36,.05]];   /* x, y, how much has broken off the top, lean */
 const IS_FALLEN={x:1330,y:1720,len:600};
+const IS_LOWARCH=(()=>{const A=[];let i=0;for(let x=330;x<=2470;x+=190,i++){if(Math.abs(x-IS_FALLEN.x)<380)continue;const y=IS_TOP+1560*Math.sqrt(Math.max(0,1-((x-1400)/1250)**2))-290;A.push([x,y,['pillars','left','crown','left','pillars'][i%5],i%2===1]);}return A;})();   /* broken gateways following the south edge (a gap round the fallen goddess) */
 const IS_DOOR={x:IS_ENT.x,y:IS_ENT.y-4};   /* the foot of the entrance stairs: the way back down to the underground ruins */
 const IS_BOULDERS=(()=>{const B=[];for(let i=2;i<ISLAND.length-2;i+=1){const [x,y]=ISLAND[i];if(y<IS_TOP+120||(x>1980&&y<1000))continue;const dx=x-1400,dy=y-IS_TOP,L=Math.hypot(dx,dy)||1;for(const o of [10,85])B.push([x+dx/L*o+(ISH_(i,o)-.5)*40,y+dy/L*o*.6,90+ISH_(i,o+1)*80]);}for(let i=0;i<70;i++){const x=-200+ISH_(i,50)*(ISW+400),y=IS_TOP+150+ISH_(i,51)*(ISH-IS_TOP+200);if(inPoly(x,y,ISLAND))continue;B.push([x,y,80+ISH_(i,52)*110]);}return B;})();   /* boulders heaped all round the edge (no sea round the island) */
 /* ---- the blue wash (and, for plants, dead grey-brown) baked into each image once ---- */
@@ -29,8 +30,8 @@ function isSolid(lx,ly){
   if(rect(E.x-E.ax*E.k+60,E.y-800,E.x+(1206-E.ax)*E.k,E.y-14))return true;
   if(ell(F.x,F.y-60,F.w*.47,70))return true;
   {const A=IS_SEAM;if(rect(A.x-A.w*.5,A.y-30,A.x-A.w*.08,A.y-4)||rect(A.x+A.w*.1,A.y-30,A.x+A.w*.5,A.y-4))return true;}   /* the big arch's two pillars */
-  if(ell(IS_GODDESS.x,IS_GODDESS.y-10,IS_GODDESS.w*.42,22))return true;
   for(const [x,y] of IS_STATUES)if(ell(x,y-10,62,22))return true;
+  for(const [x,y] of IS_LOWARCH)if(rect(x-150,y-30,x+150,y-4))return true;
   if(rect(IS_FALLEN.x-IS_FALLEN.len*.5,IS_FALLEN.y-58,IS_FALLEN.x+IS_FALLEN.len*.5+90,IS_FALLEN.y+8))return true;
   for(const [x,y,w] of IS_BOULDERS)if(ell(x,y-8,w*.42,w*.16))return true;
   return false;}
@@ -40,21 +41,21 @@ function isFree(x,y){const lx=x-ISX,ly=y-ISY;if(ly<IS_ARCHY+10)return false;
   return !isSolid(lx,ly);}
 /* ---- scenery ---- */
 function isProps(P){const X=x=>x+ISX,Y=y=>y+ISY;
-  for(let i=0,n=8;i<n;i++){const t=i/(n-1),x=620+t*1260,y=IS_ARCHY-30*Math.sin(Math.PI*t),cut=['crown','pillars','left','crown','left','pillars','crown','left'][i];   /* the broken gateways along the top, in a gentle curve */
+  for(let i=0,n=11;i<n;i++){const t=i/(n-1),x=280+t*1600,y=IS_ARCHY-30*Math.sin(Math.PI*t),cut=['crown','pillars','left','crown','left','pillars','crown','left','pillars','crown','left'][i];   /* the broken gateways along the top, in a gentle curve */
     P.push({t:'isarch',x:X(x),y:Y(y),w:300,flip:i%2===1,cut});
     for(const [u0,v0,u1,v1,dx,dy,rot,sz] of RUIN_RUBBLE[cut]||[])P.push({t:'isrub',src:[u0,v0,u1,v1],x:X(x)+dx*250*(i%2?-1:1),y:Y(y)+30+dy*80,w:250*sz*.55,rot});}
+  for(const [x,y,cut,fl] of IS_LOWARCH){P.push({t:'isarch',x:X(x),y:Y(y),w:300,flip:fl,cut});   /* more broken gateways along the bottom */
+    for(const [u0,v0,u1,v1,dx,dy,rot,sz] of RUIN_RUBBLE[cut]||[])P.push({t:'isrub',src:[u0,v0,u1,v1],x:X(x)+dx*250*(fl?-1:1),y:Y(y)-20-dy*60,w:250*sz*.55,rot});}
   P.push({t:'isp',img:'isle_chapel',x:X(IS_CHAPEL.x),y:Y(IS_CHAPEL.y),w:IS_CHAPEL.w});
   P.push({t:'isent',x:X(IS_ENT.x),y:Y(IS_ENT.y),w:700});
   P.push({t:'isarch',x:X(IS_SEAM.x),y:Y(IS_SEAM.y),w:IS_SEAM.w,flip:false,cut:'pillars',opaque:1});
   P.push({t:'isp',img:'isle_font',x:X(IS_FONT.x),y:Y(IS_FONT.y),w:IS_FONT.w});
-  P.push({t:'isp',img:'isle_goddess',x:X(IS_GODDESS.x),y:Y(IS_GODDESS.y),w:IS_GODDESS.w});
-    for(const [x,y,cut,lean] of IS_STATUES){P.push({t:'isbroken',x:X(x),y:Y(y),w:150,cut,lean});P.push({t:'isshard',x:X(x)+(lean>0?70:-70),y:Y(y)+40,w:150,cut,rot:lean>0?1.25:-1.3});}   /* each broken statue, its fallen top beside it */
+    for(const [x,y,cut,lean] of IS_STATUES){P.push({t:'isbroken',x:X(x),y:Y(y),w:150,cut,lean});}   /* the broken statues */
   P.push({t:'isfallen',x:X(IS_FALLEN.x),y:Y(IS_FALLEN.y),len:IS_FALLEN.len,w:IS_FALLEN.len});
   for(const [x,y,w] of IS_BOULDERS)P.push({t:'isp',img:['crockegg','crockpile','crockheap'][Math.floor(ISH_(x,1)*3)],mode:'rock',x:X(x),y:Y(y),w,flip:ISH_(x,2)<.5,shadow:1});
-  for(let i=0;i<46;i++){const x=300+ISH_(i,3)*2200,y=600+ISH_(i,4)*1250;if(!isFree(X(x),Y(y)))continue;const big=ISH_(i,5)<.3;   /* dead plants and rubble through the ruins */
-    if(i%3===0)P.push({t:'isrub',src:[[.6,.05,.8,.22],[.3,.04,.58,.2],[.62,.3,.95,.55],[.78,.2,.95,.4]][i%4],x:X(x),y:Y(y),w:60+ISH_(i,6)*50,rot:(ISH_(i,7)-.5)*3});
-    else P.push({t:'isp',img:'shrub'+Math.floor(ISH_(i,8)*12),mode:'dead',x:X(x),y:Y(y),w:big?120:70+ISH_(i,9)*30,flip:ISH_(i,10)<.5,shadow:1});}
-  for(let i=0;i<16;i++){const a=ISH_(i,11)*Math.PI,x=1400+Math.cos(a)*1150,y=IS_TOP+Math.sin(a)*1450;P.push({t:'isp',img:'shrub'+Math.floor(ISH_(i,12)*12),mode:'dead',x:X(x),y:Y(y),w:90,flip:i%2===0});}}   /* dead scrub along the shore */
+  for(let i=0;i<46;i++){const x=300+ISH_(i,3)*2200,y=600+ISH_(i,4)*1250;if(i%2||!isFree(X(x),Y(y)))continue;   /* rubble through the ruins */
+    P.push({t:'isrub',src:[[.6,.05,.8,.22],[.3,.04,.58,.2],[.62,.3,.95,.55],[.78,.2,.95,.4]][i%4],x:X(x),y:Y(y),w:60+ISH_(i,6)*50,rot:(ISH_(i,7)-.5)*3});}
+}
 function drawISProp(o){const S=o.t;
   if(S==='isent'){const im=isTint('isle_entrance');if(!im)return;const E=IS_ENT;ctx.drawImage(im,o.x-E.ax*E.k,o.y-E.ay*E.k,im.width*E.k,im.height*E.k);return;}   /* the designer's painting of the entrance, all but its sky */
   if(S==='isp'){const im=isTint(o.img,o.mode);if(!im)return;const w=o.w,h=w*im.height/im.width;ctx.save();ctx.translate(o.x,o.y);if(o.shadow){ctx.fillStyle='rgba(15,20,35,.25)';ctx.beginPath();ctx.ellipse(0,0,w*.4,w*.12,0,0,TAU);ctx.fill();}if(o.flip)ctx.scale(-1,1);ctx.drawImage(im,-w/2,-h*.97,w,h);ctx.restore();return;}
