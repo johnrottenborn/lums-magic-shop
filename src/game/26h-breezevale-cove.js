@@ -21,6 +21,7 @@ function bvYard(h){const L=h.x-h.w*.45,R=h.x+h.w*.45,d=bvDoorX(h),y=h.y+8,up=h.y
   if(!h.noL)out.push(d-L>gap+120?[[L-8,up],[L-14,y-30],[L+30,y],[d-gap,y]]:[[L-8,up],[L-14,y-30],[L+12,y]]);   /* a short side (door near the corner) only wraps the corner */
   if(!h.noR)out.push(R-d>gap+120?[[d+gap,y],[R-30,y],[R+14,y-30],[R+8,up]]:[[R-12,y],[R+14,y-30],[R+8,up]]);return out;}
 const BVFOUNT={x:1050,y:990,w:760};
+const BVFOUNT_ROWS=[[.40,.48,.28,.79],[.48,.68,.217,.851],[.68,.88,0,1],[.88,.93,0,.92],[.93,.98,.16,.84]];
 const bvFP=(u,v)=>{const F=BVFOUNT,h=F.w*633/1100;return [BVX+F.x+(u-.5)*F.w,BVY+F.y-h*.95+v*h];};   /* a point on the fountain art (u,v across it) */
 const inBV=()=>lum.x>BVX-300&&lum.x<ISX-300;
 const BVH_=(a,b)=>hash(a,b,6271);
@@ -34,8 +35,9 @@ const BVISLE=(()=>{const P=[];for(let a=Math.PI/2;a>-Math.PI*1.5;a-=.06)P.push([
 const BVCOB=(()=>{const F=BVFOUNT,ring=[];for(let a=0;a<=TAU+.01;a+=.2)ring.push([F.x+Math.cos(a)*230,F.y-50+Math.sin(a)*135]);
   const to=(x,y)=>{const a=Math.atan2(y-(F.y-50),x-F.x);return [[F.x+Math.cos(a)*230,F.y-50+Math.sin(a)*135],[(F.x+x)/2+(BVH_(x,1)-.5)*40,(F.y-50+y)/2+(BVH_(y,2)-.5)*30],[x,y]];};
   return [ring,...BVHOUSES.slice(0,4).map(h=>to(h.x,h.y+40)),to(BVGATE.x,BVGATE.y-30),to(BVBR.x0+20,BVBR.y),to(BVNORTH.x,BVNORTH.y+30)].map(P=>smoothPath(P));})();
-function bvSolid(lx,ly){for(const h of BVHOUSES){const im=IMG[h.img],hh=ready(im)?h.w*im.naturalHeight/im.naturalWidth:h.w*.8;if(Math.abs(lx-h.x)<h.w*.47&&ly<h.y-6&&ly>h.y-hh*.85)return true;}   /* the whole house, so Lum can't slip in behind it and vanish under the roof */   /* the whole footprint of each house, porches included */
-  if(((lx-BVFOUNT.x)/(BVFOUNT.w*.47))**2+((ly-BVFOUNT.y+BVFOUNT.w*.08)/(BVFOUNT.w*.11))**2<1)return true;
+function bvSolid(lx,ly){for(const h of BVHOUSES){const im=IMG[h.img],hh=ready(im)?h.w*im.naturalHeight/im.naturalWidth:h.w*.8;if(Math.abs(lx-h.x)<h.w*.45&&ly<h.y+16&&ly>h.y-hh*.6)return true;}   /* the house's ground, from its front step back to where the roof rises: in front Lum can't overlap the walls, behind it she stays visible above the roof line */   /* the whole footprint of each house, porches included */
+  {const fh=BVFOUNT.w*633/1100,r=(ly-BVFOUNT.y)/fh+.95,u=(lx-BVFOUNT.x)/BVFOUNT.w+.5;   /* the basin, tier by tier, traced from the art's outline (row r, column u of the picture) */
+   for(const [r0,r1,u0,u1] of BVFOUNT_ROWS)if(r>=r0&&r<r1&&u>u0-.02&&u<u1+.02)return true;}
   if(Math.abs(ly-BVGATE.y+60)<34&&Math.abs(lx-BVGATE.x)>128&&Math.abs(lx-BVGATE.x)<262)return true;   /* the gateposts and their stone footings */
   if(((lx-BVGIRL.x)/30)**2+((ly-BVGIRL.y)/14)**2<1)return true;   /* the townsgirl */
   for(const [tx,ty] of BVTRUNKS)if(Math.abs(lx-tx)<32&&ly-ty<14&&ty-ly<22)return true;
