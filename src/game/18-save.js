@@ -34,7 +34,7 @@ function applySaveC2(d){const s=d.c2||{};startChapter2();c2Skip();SAVEC.finished
   if(C2.venom){C2.venom=0;learnVenom(true);}NIGHT.rain=true;
   if(d.scene==='dun')enterDun(d.dunRoom||11,d.x,d.y,d.face||1);else{SCENE='thorn';THORN.t=99;}
   lum.x=d.x;lum.y=d.y;lum.face=d.face||1;lum.state='idle';lum.vx=lum.vy=0;cam.x=lum.x;cam.y=lum.y-50;WCAM.x=lum.x;
-  GVT.t=99;BWT.t=99;BVT.t=99;   /* no area title on a continued game */
+  GVT.t=99;BWT.t=99;BVT.t=99;IST.t=99;   /* no area title on a continued game */
   if(C2.joined)resetAmrFollow();if(C2.jak)resetJak2Follow();
   GOAL.tag='TASK';GOAL.text=(d.goal&&d.goal.text)||'';HINT.goalT=0;}
 function applySave(d){if(d.ch===2&&d.c2){applySaveC2(d);return;}if(d.ch===1){applySaveC1(d);return;}const f=d.f||{};if(d.stats)Object.assign(STATS,d.stats,{found:Object.assign({},d.stats.found||{})});

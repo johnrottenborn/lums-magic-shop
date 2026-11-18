@@ -1076,6 +1076,18 @@ const CASES = {
     check(await g_(() => window.__g.BATTLE.on && window.__g.BATTLE.foes[0].type === 'glord'), 'the big ghost should attack');
     await p.screenshot({ path: path.join(SHOTS, `wraith-lord-${vp}.png`) });
   },
+  async 'island-ruins'(p) {
+    const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop', g_ = (f, a) => p.evaluate(f, a);
+    await g_(() => { const g = window.__g; g.startChapter2(); g.c2Skip(); g.WB10.st = 2; g.chPlaytestIsle(); }); await wait(900);
+    check(await g_(() => { const g = window.__g; return g.SCENE === 'dun' && g.DUN.room === 36 && g.jak2In(); }), 'the Island Ruins playtest should start in underground ruins room 5 with Jak');
+    await g_(() => { const g = window.__g; g.lum.x = 412; g.lum.y = 575; }); await wait(600);
+    await g_(() => window.__g.NEAR.onInteract()); await wait(1800);
+    check(await g_(() => { const g = window.__g; return g.SCENE === 'thorn' && g.inIS() && g.isFree(g.lum.x, g.lum.y); }), 'the stairs in room 5 should lead up to the Island Ruins');
+    await wait(1500); await p.screenshot({ path: path.join(SHOTS, `island-ruins-${vp}.png`) });
+    await g_(() => { const g = window.__g; g.lum.x = g.ISX + g.IS_DOOR.x; g.lum.y = g.ISY + g.IS_DOOR.y + 20; }); await wait(600);
+    await g_(() => window.__g.NEAR.onInteract()); await wait(1500);
+    check(await g_(() => window.__g.SCENE === 'dun' && window.__g.DUN.room === 36), 'the island entrance should lead back down to room 5');
+  },
   async 'breezevale-merchant'(p) {
     const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop', g_ = (f, a) => p.evaluate(f, a);
     await g_(() => { const g = window.__g; g.startChapter2(); g.c2Skip(); g.WB10.st = 2; g.chPlaytestBreezeway(); g.MATS.foxtail = 1; g.BAG.push('foxtail'); g.MATS.seagem = 2; g.BAG.push('seagem'); g.enterBreezevale(); g.enterDun(25, 850, 640, 1); }); await wait(1200);

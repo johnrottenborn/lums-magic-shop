@@ -141,7 +141,7 @@ function setupDun(){DUNINT.length=0;const r=DUN.room,D=(x,y,reach,fn)=>DUNINT.pu
   if(r===32&&!C2.ruinsIn){C2.ruinsIn=1;hsGoal('Explore the underground ruins');}
   if(r===32){D(318,566,75,()=>goScene(leaveRuins));D(840,508,55,()=>dunGo(33,660,730,1));}   /* the steps back up; the way on to room 2 */
   if(r===37){RL6.t=-1;D(740,738,75,ruinsLeave6);DUNINT.push({x:905,y:640,reach:80,onInteract:ruinsSkeleton});}   /* the only way out (the Wraith Lord rises the first time Lum tries it); the old explorer's skeleton */
-  if(r===36){D(660,738,80,()=>dunGo(35,728,525,1));D(412,560,55,()=>say("Stairs climb up toward the island ruins…"));D(690,518,45,()=>dunGo(37,740,712,1));}   /* back to the long hall; the stairs up to the island ruins (still to come); the gap to room 6 */
+  if(r===36){D(660,738,80,()=>dunGo(35,728,525,1));D(412,560,55,()=>goScene(enterIsland));D(690,518,45,()=>dunGo(37,740,712,1));}   /* back to the long hall; the stairs up to the island ruins (still to come); the gap to room 6 */
   if(r===35){D(660,738,80,()=>dunGo(34,650,530,1));D(728,512,45,()=>dunGo(36,660,712,1));}   /* back to the crypt; the tunnel at the far end to room 5 */
   if(r===34){D(660,738,80,()=>dunGo(33,470,560,1));D(650,516,50,()=>dunGo(35,660,712,1));D(1100,535,55,()=>say("A dark archway…"));}   /* back to the hydra room; the passage ahead to room 4; the right arch (where it leads is still to come) */
   if(r===33){D(660,758,80,()=>dunGo(32,840,525,-1));D(470,540,55,()=>dunGo(34,660,712,1));DUNINT.push({x:770,y:618,reach:85,onInteract:ruinsBook});}   /* back to the tunnel; the doorway to room 3; the old book on the altar */

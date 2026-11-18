@@ -22,7 +22,7 @@ function bvYard(h){const L=h.x-h.w*.45,R=h.x+h.w*.45,d=bvDoorX(h),y=h.y+8,up=h.y
   if(!h.noR)out.push(R-d>gap+120?[[d+gap,y],[R-30,y],[R+14,y-30],[R+8,up]]:[[R-12,y],[R+14,y-30],[R+8,up]]);return out;}
 const BVFOUNT={x:1050,y:990,w:760};
 const bvFP=(u,v)=>{const F=BVFOUNT,h=F.w*633/1100;return [BVX+F.x+(u-.5)*F.w,BVY+F.y-h*.95+v*h];};   /* a point on the fountain art (u,v across it) */
-const inBV=()=>lum.x>BVX-300;
+const inBV=()=>lum.x>BVX-300&&lum.x<ISX-300;
 const BVH_=(a,b)=>hash(a,b,6271);
 /* the land outlines (region coords), each traced so the sea lies to the left of the way round: the green with the road down from its
    south edge, and the islet */
