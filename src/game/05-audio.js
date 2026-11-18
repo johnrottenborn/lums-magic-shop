@@ -173,6 +173,10 @@ function scheduleOverlookMusic(){const c=SND.ctx,BAR=9;if(!SND.ovNext||SND.ovNex
     if(b%3===2){const o=c.createOscillator(),g=c.createGain(),v=c.createOscillator(),vg=c.createGain();o.type='sine';o.frequency.setValueAtTime(NOTE(ch[2]+12),t+3);o.frequency.exponentialRampToValueAtTime(NOTE(ch[2]+6),t+7.5);   /* a far-off voice */
       v.frequency.value=5;vg.gain.value=6;v.connect(vg);vg.connect(o.frequency);g.gain.setValueAtTime(0,t+3);g.gain.linearRampToValueAtTime(.02,t+4.5);g.gain.linearRampToValueAtTime(0,t+8);o.connect(g);g.connect(SND.music);o.start(t+3);v.start(t+3);o.stop(t+8.2);v.stop(t+8.2);}}}
 /* a gull's cry: a quick bright yelp that falls, twice */
+/* crumbling rock: a gritty slide of grit, then a scatter of stones clattering down (Worldbind quakes) */
+function sfxCrumble(v=1){if(!SND.ready)return;const t=SND.ctx.currentTime,out=SND.sfxVerb||SND.sfx;noiseHit(t,1.4,'bandpass',900,1.2,.12*v,out,300);noiseHit(t+.1,1.1,'highpass',2400,.7,.05*v,SND.sfx);
+  for(let i=0;i<9;i++){const d=.08+Math.random()*1.2;noiseHit(t+d,.05+Math.random()*.06,'bandpass',500+Math.random()*1600,4,(.08+Math.random()*.12)*v,out);}}
+function sfxPebble(){if(!SND.ready)return;const t=SND.ctx.currentTime;noiseHit(t,.05+Math.random()*.05,'bandpass',700+Math.random()*1400,5,.05+Math.random()*.05,SND.sfx);}
 function sfxGhost(){if(!SND.ready)return;try{const c=SND.ctx,t=c.currentTime,o=c.createOscillator(),g=c.createGain();o.type='sine';o.frequency.setValueAtTime(880,t);o.frequency.exponentialRampToValueAtTime(220,t+.35);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.12,t+.03);g.gain.exponentialRampToValueAtTime(.0001,t+.4);o.connect(g);g.connect(SND.master||c.destination);o.start(t);o.stop(t+.45);}catch(e){}}   /* the ghost blinks in */
 function sfxGull(){if(!SND.ready||!SND.on)return;const c=SND.ctx,t0=c.currentTime,pn=panNode(Math.random()-.5);pn.connect(SND.sfx||SND.master||SND.music);
   for(let k=0;k<2+(Math.random()<.5?1:0);k++){const t=t0+k*.28,o=c.createOscillator(),g=c.createGain(),f=c.createBiquadFilter();o.type='sawtooth';f.type='bandpass';f.frequency.value=2200;f.Q.value=3;

@@ -52,10 +52,10 @@ function runLine(){RUNLINE++;setTimeout(()=>talk([RUNLINE%2?['Lum',"There’s to
 function wbQuake(dt){
   /* the mountain shakes: a constant tremor with heavier jolts, a low rumble, dust and pebbles from the ceiling */
   const hard=WB8.intense&&(DUN.room===18||DUN.room===19);   /* after room 8's mini boss the collapse worsens in rooms 8 and 9 */
-  WB5.rumT-=dt;if(WB5.rumT<=0){WB5.rumT=hard?rnd(1.6,2.8):rnd(3.5,5.5);WB5.jolt=hard?.9:.6;try{sfxRumble(hard?2.2:1.8,hard?.7:.45);}catch(e){}}WB5.jolt=Math.max(0,(WB5.jolt||0)-dt);
+  WB5.rumT-=dt;if(WB5.rumT<=0){WB5.rumT=hard?rnd(1.6,2.8):rnd(3.5,5.5);WB5.jolt=hard?.9:.6;try{sfxRumble(hard?2.2:1.8,hard?.7:.45);sfxCrumble(hard?1.2:.8);}catch(e){}}WB5.jolt=Math.max(0,(WB5.jolt||0)-dt);
   const amp=(hard?2.6:1.2)+WB5.jolt*(hard?11:7);WB5.q=[rnd(-amp,amp),rnd(-amp,amp)*.7];
   if(Math.random()<dt*(WB5.jolt>0?28:9)*(hard?2.2:1))WB5.fall.push({x:rnd(180,1250),y:rnd(-20,140),vy:rnd(40,90),g:rnd(500,700),ground:rnd(430,760),rock:Math.random()<.35,s:rnd(2,5),t:0,land:0,rot:rnd(0,TAU)});
-  for(const p of WB5.fall){if(p.land){p.land+=dt;continue;}p.vy+=p.g*dt*(p.rock?1:.25);p.y+=p.vy*dt;p.rot+=dt*4;if(p.y>=p.ground){p.y=p.ground;p.land=.001;}}
+  for(const p of WB5.fall){if(p.land){p.land+=dt;continue;}p.vy+=p.g*dt*(p.rock?1:.25);p.y+=p.vy*dt;p.rot+=dt*4;if(p.y>=p.ground){p.y=p.ground;p.land=.001;if(p.rock&&Math.random()<.5)try{sfxPebble();}catch(e){}}}
   for(let i=WB5.fall.length-1;i>=0;i--)if(WB5.fall[i].land>(WB5.fall[i].rock?1.6:.5))WB5.fall.splice(i,1);}
 function updateWB5Room(dt){
   /* Lum's path through the room, for the demons to follow down the stairs */
