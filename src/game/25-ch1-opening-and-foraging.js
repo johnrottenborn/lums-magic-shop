@@ -74,7 +74,7 @@ function drawForageIcon(c,id,x,y,s){c.save();c.translate(x,y);c.lineJoin='round'
   c.restore();}
 
 /* ---------- satchel: ingredients list ---------- */
-const ING_ORDER=['duskberry','dewberry','emberberry','moonleaf','slimeparts','thornsprig','boneparts'];
+const ING_ORDER=['duskberry','dewberry','emberberry','moonleaf','slimeparts','thornsprig','boneparts','venomvine'];
 function ingUse(id){const r=RECIPES.filter(r=>r.need[id]);return r.length?'for '+r.map(r=>r.name.replace(' Powder','')).join(', '):'';}
 function drawIngTab(c,px,pw,y0,y1){const x=px+18,w=pw-36;
   // the one rule of Lum's Magic Mixing
@@ -82,7 +82,7 @@ function drawIngTab(c,px,pw,y0,y1){const x=px+18,w=pw-36;
   c.textAlign='left';c.fillStyle='#4a3420';c.font='700 14px "Alegreya SC", Georgia, serif';c.fillText("Lum's Magic Mixing",x+46,y0+24);
   c.font='italic 12.5px Alegreya, Georgia, serif';c.fillStyle='#6a5030';c.fillText('Stand by any fire or heat source.',x+46,y0+42);
   const top=y0+66,cw=(w-8)/2,rh=Math.min(46,(y1-top)/4);
-  ING_ORDER.forEach((id,i)=>{const n=MATS[id]||0,cx=x+(i%2)*(cw+8),cy=top+Math.floor(i/2)*rh;c.globalAlpha=n?1:.45;c.fillStyle='rgba(120,86,40,.08)';rr(cx,cy,cw,rh-5,8);c.fill();drawIcon(c,id,cx+18,cy+(rh-5)/2,26);
+  ING_ORDER.filter(id=>id!=='venomvine'||CH>=2).forEach((id,i)=>{const n=MATS[id]||0,cx=x+(i%2)*(cw+8),cy=top+Math.floor(i/2)*rh;c.globalAlpha=n?1:.45;c.fillStyle='rgba(120,86,40,.08)';rr(cx,cy,cw,rh-5,8);c.fill();drawIcon(c,id,cx+18,cy+(rh-5)/2,26);
     c.textAlign='left';c.fillStyle='#4a3420';c.font='700 12.5px "Alegreya SC", Georgia, serif';c.fillText(ITEMS[id].name,cx+36,cy+16);
     c.font='italic 10.5px Alegreya, Georgia, serif';c.fillStyle='#7a6040';c.fillText(ingUse(id),cx+36,cy+30);
     c.textAlign='right';c.font='700 13px "Alegreya SC", Georgia, serif';c.fillStyle='#6a4a28';c.fillText('×'+n,cx+cw-8,cy+30);c.globalAlpha=1;});

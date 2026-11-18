@@ -74,7 +74,8 @@ function drawCharPage(c,x,y,w,h,MH,prev){const col=HCOL[MH]||'#5a3d22',H_=HEROES
     c.textAlign='right';c.fillStyle='#3b2a1c';c.font='700 24px "Alegreya SC", Georgia, serif';c.fillText(st[k]+(d||0),tx+tw_-8,yy+(d?28:36));
     if(d){c.font='700 13px "Alegreya SC", Georgia, serif';c.fillStyle=d>0?'#3f7a2e':'#a8402e';c.fillText((d>0?'+':'')+d,tx+tw_-8,yy+46);}});
   yy+=th+30;if(CH>0&&HCOMBO[MH]){c.textAlign='left';c.font='700 15px "Alegreya SC", Georgia, serif';c.fillStyle='#4a3420';c.fillText('Combo · '+HCOMBO[MH],x+18,yy);const n=comboOf(MH);for(let i=0;i<COMBO_MAX;i++)drawStar5(c,x+w-27-(COMBO_MAX-1-i)*22,yy-5,9,i<n);}}
-function bagVis(MH){const VIS=[],seen={};BAG.forEach((b,i)=>{if(MH!=='cosmic'&&!(ITEMS[b]&&ITEMS[b].kind!=='mat'))return;if(seen[b]!==undefined)return;seen[b]=i;VIS.push(i);});return VIS;}
+/* the satchel grid: everything but mixing ingredients (those have their own tab); trade goods like Fox Tail, Wisp Silk and Sea Gems show here with their count */
+function bagVis(MH){const VIS=[],seen={};BAG.forEach((b,i)=>{if(MH!=='cosmic'&&!(ITEMS[b]&&(ITEMS[b].kind!=='mat'||!ING_ORDER.includes(b))))return;if(seen[b]!==undefined)return;seen[b]=i;VIS.push(i);});return VIS;}
 function drawBagPage(c,x,y,w,h,MH){const col=HCOL[MH]||'#7a4f9a',showIng=MH!=='cosmic',tb=showIng?(MENU.tab||'bag'):'bag';
   const ty=y+22;let tx=x+18;c.font='700 16px "Alegreya SC", Georgia, serif';
   for(const [k,l] of (showIng?[['bag',`Satchel  ${satchelSlots()}/8`],['ing','Ingredients']]:[['bag','Satchel']])){const tw2=c.measureText(l).width+34,on=tb===k;
