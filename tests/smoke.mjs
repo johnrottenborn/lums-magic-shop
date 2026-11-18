@@ -1001,6 +1001,12 @@ const CASES = {
     await g_(() => { const g = window.__g; g.lum.x = g.BWX + g.BRUIN.x; g.lum.y = g.BWY + g.BRUIN.ey + 14; }); await wait(900);
     check(await g_(() => !!(window.__g.NEAR && window.__g.NEAR.door)), 'the hidden entrance should have a door');
     await p.screenshot({ path: path.join(SHOTS, `ruins-entrance-${vp}.png`) });
+    await g_(() => window.__g.NEAR.onInteract()); await wait(1500);
+    check(await g_(() => window.__g.SCENE === 'dun' && window.__g.DUN.room === 32 && window.__g.dunFree(window.__g.lum.x, window.__g.lum.y)), 'the hidden entrance did not lead down to underground ruins room 1 (room 32)');
+    await p.screenshot({ path: path.join(SHOTS, `ruins-room1-${vp}.png`) });
+    check(await g_(() => window.__g.dunFree(840, 515) && window.__g.dunFree(700, 700)), 'the ruins tunnel floor should be walkable to the far end');
+    await g_(() => window.__g.NEAR.onInteract()); await wait(1500);
+    check(await g_(() => window.__g.SCENE === 'thorn' && window.__g.inBW()), 'the steps in ruins room 1 did not lead back up to the Breezeway');
     await g_(() => clearInterval(window.__noFoes));
   },
   async 'breezevale-merchant'(p) {

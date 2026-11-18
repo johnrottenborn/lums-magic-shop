@@ -68,6 +68,8 @@ const DROOMS={
   31:{name:'',dark:0,wide:1,hk:1.2,hd:.35,floor:[[400,768],[405,700],[412,640],[425,585],[448,540],[478,508],[560,500],[820,500],[905,508],[935,540],[955,585],[965,640],[975,700],[990,768]],
      block:[{x0:540,y0:470,x1:835,y1:598},{x:688,y:620,rx:34,ry:16}],   /* the altar; Sage Luma */
      fg:[{y:598,poly:[[538,395],[835,395],[838,598],[538,598]]}]},   /* the altar, in front of whoever walks behind it */
+  /* 32: underground ruins room 1 (the designer's painting), down the sunken entrance off the Breezeway's secret way: Lum comes in at the steps on the left; a vaulted tunnel runs on to the next room */
+  32:{name:'',dark:0,wide:1,hk:.95,hp:.0047,floor:[[350,725],[345,690],[320,640],[300,600],[292,565],[330,548],[420,560],[500,600],[560,578],[650,548],[720,518],[780,503],[900,503],[960,528],[1010,578],[1050,640],[1075,725]]},
   /* 22: the loft, the bed under the thatch; the stair comes up on the right behind the rail */
   22:{name:'',dark:0,home:1,hk:1.9,floor:[[120,738],[460,730],[1050,726],[1050,612],[1185,612],[1185,768],[110,768]],
      block:[{x0:440,y0:430,x1:1052,y1:724}]},   /* the serpent gate (above): arrive in the lit stairwell behind the carved archway (back to room 19), walk down through it; the way on is in the foreground */
@@ -125,6 +127,7 @@ function setupDun(){DUNINT.length=0;const r=DUN.room,D=(x,y,reach,fn)=>DUNINT.pu
   if(r===29){D(690,750,90,()=>goScene(leaveSanctuary));D(700,592,95,()=>dunGo(30,470,725,1));}
   if(r===30){D(470,748,95,()=>dunGo(29,700,612,1));D(814,360,40,()=>dunGo(31,690,728,1));}   /* the far door at the top of the stair, to the altar chamber */
   if(r===31){D(690,755,70,()=>dunGo(30,812,372,1));for(const n of BVNPC)if(n.room===31)DUNINT.push({x:n.x,y:n.y+10,reach:100,onInteract:()=>bvNpcTalk(n)});}
+  if(r===32){D(318,566,75,()=>goScene(leaveRuins));D(840,508,55,()=>say("The tunnel runs on into the dark…"));}   /* the steps back up; the way on (room 2 art still to come) */
   if(r===28){D(190,650,95,()=>goScene(()=>leaveBVHouse(0)));for(const n of BVNPC)if(n.room===28)DUNINT.push({x:n.x,y:n.y+10,reach:95,onInteract:()=>bvNpcTalk(n)});
     DUNINT.push({x:905,y:585,reach:110,fire:true,onInteract:()=>{if(canLumMix())openMix();else say("A warm fire crackles under the kettle.");}});}   /* the hearth: Lum can mix here */
   if(r===27){D(590,612,90,()=>goScene(()=>leaveBVHouse(4)));for(const n of BVNPC)if(n.room===27)DUNINT.push({x:n.x,y:n.y+10,get reach(){return n.gone&&n.gone()?-1:100;},onInteract:()=>bvNpcTalk(n)});
@@ -179,7 +182,7 @@ function drawDFoe(g){const k=dunH(g.y)/151,bob=Math.sin(g.ph*3)*8;if(g.kind==='b
     ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,g.x,g.y-h*.4,h*.5,'255,170,90',.08+.03*Math.sin(g.ph*2));ctx.restore();return;}ctx.fillStyle='rgba(0,0,0,.25)';ctx.beginPath();ctx.ellipse(g.x,g.y,26*k,6*k,0,0,TAU);ctx.fill();
   c1Frame(ctx,'bat','fly',Math.floor(g.ph*9)%3,g.x,g.y-110*k-bob,90*k,g.face>0,1,0);}
 function enterDun(room,x,y,face){DUN.entry=[room,x,y,face];   /* where Lum came in: Chapter 2 sends her back here after a lost battle */
-  const prevRoom=SCENE==='dun'?DUN.room:0;buildDFoes();SCENE='dun';DUN.room=room;if(room>=6)C1['seen'+room]=1;lum.x=x??560;lum.y=y??640;lum.face=face||1;lum.vx=lum.vy=0;lum.state='idle';WCAM.x=lum.x;WTITLE.t=(prevRoom>=11&&room>=11)||DROOMS[room].home?99:0;setupDun();   /* the area title shows once, on entering the Worldbind Passage, not between its rooms */
+  const prevRoom=SCENE==='dun'?DUN.room:0;buildDFoes();SCENE='dun';DUN.room=room;if(room>=6)C1['seen'+room]=1;lum.x=x??560;lum.y=y??640;lum.face=face||1;lum.vx=lum.vy=0;lum.state='idle';WCAM.x=lum.x;WTITLE.t=(prevRoom>=11&&room>=11)||DROOMS[room].home||!DROOMS[room].name?99:0;   /* no empty title band for unnamed rooms */setupDun();   /* the area title shows once, on entering the Worldbind Passage, not between its rooms */
   if(room===1&&!C1.dunSeen){C1.dunSeen=1;setTimeout(()=>talk([['Lum',"Cosmic? …Cosmic!"]]),900);}
   if(room===5)DUN.eyes=EYES5.map(()=>({b:rnd(0,6),t:0}));}
 function drawDun(){const R=DROOMS[DUN.room],im=IMG['dun'+DUN.room];if(!ready(im))return;const [rz,roy]=roomView();

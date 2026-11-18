@@ -153,4 +153,5 @@ function drawOverlookMist(front){const dt=1/60;ctx.save();
     ctx.globalAlpha=.16+.08*Math.sin(T*.4+i*2);drawGlow(ctx,x,y,r,'236,240,244',.5);}
   ctx.restore();}
 
-THINT.push({get x(){return BWX+BRUIN.x;},get y(){return BWY+BRUIN.ey+12;},get reach(){return inBW()&&typeof C2!=='undefined'&&C2.ruinWay?75:-1;},door:true,onInteract:()=>say("The tunnel leads down into the dark…")});   /* the way into the underground ruins (room 1 art still to come) */
+THINT.push({get x(){return BWX+BRUIN.x;},get y(){return BWY+BRUIN.ey+12;},get reach(){return inBW()&&typeof C2!=='undefined'&&C2.ruinWay?75:-1;},door:true,onInteract:()=>dunGo(32,340,590,1)});   /* the way down into the underground ruins */
+function leaveRuins(){SCENE='thorn';lum.x=BWX+BRUIN.x;lum.y=BWY+BRUIN.ey+34;lum.face=1;lum.dir='down';lum.state='idle';lum.vx=lum.vy=0;cam.x=lum.x;cam.y=lum.y;THORN.t=99;BWT.t=99;}   /* back up the steps to the sunken entrance */
