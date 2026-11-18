@@ -151,7 +151,7 @@ function setupDun(){DUNINT.length=0;const r=DUN.room,D=(x,y,reach,fn)=>DUNINT.pu
   if(r===35){D(660,738,80,()=>dunGo(34,650,530,1));D(728,512,45,()=>dunGo(36,660,712,1));}   /* back to the crypt; the tunnel at the far end to room 5 */
   if(r===34){D(660,738,80,()=>dunGo(33,470,560,1));D(650,516,50,()=>dunGo(35,660,712,1));D(1100,535,55,()=>say("A dark archway…"));}   /* back to the hydra room; the passage ahead to room 4; the right arch (where it leads is still to come) */
   if(r===33){D(660,758,80,()=>dunGo(32,840,525,-1));D(470,540,55,()=>dunGo(34,660,712,1));DUNINT.push({x:770,y:618,reach:85,onInteract:ruinsBook});}   /* back to the tunnel; the doorway to room 3; the old book on the altar */
-  if(r===39)D(720,752,90,()=>goScene(leaveHiddenGrove));   /* the way back to Evergreen Grove */
+  if(r===39){D(720,752,90,()=>goScene(leaveHiddenGrove));DUNINT.push({x:660,y:566,reach:85,onInteract:hiddenStream});}   /* the way back to Evergreen Grove; the stream, where the Serpent Charm glints */
   if(r===38){D(690,752,90,()=>goScene(()=>leaveBVHouse(1)));for(const n of BVNPC)if(n.room===38)DUNINT.push({x:n.x,y:575,reach:110,onInteract:()=>bvNpcTalk(n)});DUNINT.push({x:300,y:612,reach:110,fire:true,onInteract:()=>{if(canLumMix())openMix();else say("A big fire roars in the stone hearth.");}});}   /* the way out at the front; the hearth: Lum can mix here */
   if(r===28){D(190,650,95,()=>goScene(()=>leaveBVHouse(0)));for(const n of BVNPC)if(n.room===28)DUNINT.push({x:n.x,y:n.y+10,reach:95,onInteract:()=>bvNpcTalk(n)});
     DUNINT.push({x:905,y:585,reach:110,fire:true,onInteract:()=>{if(canLumMix())openMix();else say("A warm fire crackles under the kettle.");}});}   /* the hearth: Lum can mix here */

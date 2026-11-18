@@ -83,6 +83,8 @@ THINT.push({get x(){return GROVEX+GENTRY.x;},get y(){return GROVEY+GENTRY.y-30;}
   {get x(){return GROVEX+GEXIT.x;},get y(){return GROVEY+GEXIT.y+20;},get reach(){return inGrove()?80:0;},door:true,onInteract:()=>goScene(enterBreezeway)},
   {get x(){return GROVEX+GHIDDEN.x;},get y(){return GROVEY+GHIDDEN.y;},get reach(){return inGrove()?80:0;},door:true,onInteract:()=>dunGo(39,720,712,1)});   /* the way into the Hidden Grove, top-right corner */
 const GHIDDEN={x:1650,y:122};
+/* the Hidden Grove's stream: something shiny in the water, the Serpent Charm (once) */
+function hiddenStream(){if(C2.serpentCharm){say("The stream babbles over the stones.");return;}C2.serpentCharm=1;talk([['Lum',"Something shiny is glinting in the water…"]],false,()=>{sfxPage&&sfxPage(.8);giveItem('serpentcharm');});}
 function leaveHiddenGrove(){SCENE='thorn';lum.x=GROVEX+GHIDDEN.x;lum.y=GROVEY+GHIDDEN.y+55;lum.face=1;lum.dir='down';lum.state='idle';lum.vx=lum.vy=0;cam.x=lum.x;cam.y=lum.y;THORN.t=99;GVT.t=99;}
 for(const f of GFORAGE)THINT.push({x:f.x,y:f.y,get reach(){return inGrove()?76:0},forage:f,onInteract:()=>pickForage(f)});
 function enterHomeFromGrove(){SCENE='thorn';lum.x=HOMEX+HOME.gate.x;lum.y=HOMEY+HH-70;lum.face=1;lum.dir='up';lum.state='idle';lum.vx=lum.vy=0;cam.x=lum.x;cam.y=lum.y-200;THORN.t=99;}

@@ -1026,6 +1026,12 @@ const CASES = {
     await p.screenshot({ path: `tests/screenshots/${vp}-hidden-grove.png` });
     await p.evaluate(() => { const g = window.__g; g.lum.x = 900; g.lum.y = 560; }); await wait(600);
     await p.screenshot({ path: `tests/screenshots/${vp}-hidden-grove-back.png` });
+    await p.evaluate(() => { const g = window.__g; g.C2.serpentCharm = 0; g.lum.x = 660; g.lum.y = 590; }); await wait(500);
+    await p.evaluate(() => window.__g.NEAR.onInteract()); await wait(400);
+    check(await p.evaluate(() => window.__g.DLG.active && /shiny/.test(window.__g.DLG.lines[0][1])), 'Lum should spot something shiny in the stream');
+    for (let i = 0; i < 4 && await p.evaluate(() => window.__g.DLG.active); i++) { await p.keyboard.press('Enter'); await wait(350); }
+    await wait(400); check(await p.evaluate(() => window.__g.BAG.includes('serpentcharm') && window.__g.C2.serpentCharm), 'the stream should give the Serpent Charm');
+    await p.screenshot({ path: `tests/screenshots/${vp}-hidden-grove-charm.png` });
     await p.evaluate(() => { const g = window.__g; g.lum.x = 720; g.lum.y = 735; }); await wait(500);
     await p.evaluate(() => window.__g.NEAR.onInteract()); await wait(1800);
     check(await p.evaluate(() => window.__g.SCENE === 'thorn' && Math.abs(window.__g.lum.x - window.__g.GROVEX - 1650) < 40), 'the Hidden Grove\'s door should lead back to the corner of Evergreen Grove');
