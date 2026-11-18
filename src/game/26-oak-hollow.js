@@ -70,6 +70,10 @@ const DROOMS={
      fg:[{y:598,poly:[[538,395],[835,395],[838,598],[538,598]]}]},   /* the altar, in front of whoever walks behind it */
   /* 32: underground ruins room 1 (the designer's painting), down the sunken entrance off the Breezeway's secret way: Lum comes in at the steps on the left; a vaulted tunnel runs on to the next room */
   32:{name:'',dark:0,wide:1,hk:.95,hp:.0047,floor:[[350,725],[345,690],[320,640],[300,600],[292,565],[330,548],[420,560],[500,600],[560,578],[650,548],[720,518],[780,503],[900,503],[960,528],[1010,578],[1050,640],[1075,725]]},
+  /* 33: underground ruins room 2 (the designer's painting): a five-headed hydra statue under a shaft of light, an altar with a cauldron and old books in front of it; the doorway on the left leads to room 3 */
+  33:{name:'',dark:0,wide:1,hk:1.15,floor:[[410,705],[340,650],[325,575],[400,548],[470,530],[520,545],[530,610],[965,610],[975,560],[1000,545],[1020,600],[1000,640],[945,640],[905,700],[955,740],[380,740]]},
+  /* 34: underground ruins room 3 (the designer's painting): a vaulted crypt of pillars, a trickle of water across the floor; a doorway straight ahead and a dark arch on the right */
+  34:{name:'',dark:0,wide:1,hk:1.05,hp:.0042,floor:[[420,740],[470,680],[460,640],[480,580],[540,540],[580,512],[720,512],[800,540],[870,575],[990,560],[1050,530],[1150,530],[1150,560],[1010,600],[990,640],[930,700],[880,740]]},
   /* 22: the loft, the bed under the thatch; the stair comes up on the right behind the rail */
   22:{name:'',dark:0,home:1,hk:1.9,floor:[[120,738],[460,730],[1050,726],[1050,612],[1185,612],[1185,768],[110,768]],
      block:[{x0:440,y0:430,x1:1052,y1:724}]},   /* the serpent gate (above): arrive in the lit stairwell behind the carved archway (back to room 19), walk down through it; the way on is in the foreground */
@@ -128,7 +132,9 @@ function setupDun(){DUNINT.length=0;const r=DUN.room,D=(x,y,reach,fn)=>DUNINT.pu
   if(r===30){D(470,748,95,()=>dunGo(29,700,612,1));D(814,360,40,()=>dunGo(31,690,728,1));}   /* the far door at the top of the stair, to the altar chamber */
   if(r===31){D(690,755,70,()=>dunGo(30,812,372,1));for(const n of BVNPC)if(n.room===31)DUNINT.push({x:n.x,y:n.y+10,reach:100,onInteract:()=>bvNpcTalk(n)});}
   if(r===32&&!C2.ruinsIn){C2.ruinsIn=1;hsGoal('Explore the underground ruins');}
-  if(r===32){D(318,566,75,()=>goScene(leaveRuins));D(840,508,55,()=>say("The tunnel runs on into the dark…"));}   /* the steps back up; the way on (room 2 art still to come) */
+  if(r===32){D(318,566,75,()=>goScene(leaveRuins));D(840,508,55,()=>dunGo(33,660,730,1));}   /* the steps back up; the way on to room 2 */
+  if(r===34){D(660,738,80,()=>dunGo(33,470,560,1));D(650,516,50,()=>say("The passage runs on into the dark…"));D(1100,535,55,()=>say("A dark archway…"));}   /* back to the hydra room; the way on ahead and the right arch (where they lead is still to come) */
+  if(r===33){D(660,758,80,()=>dunGo(32,840,525,-1));D(470,540,55,()=>dunGo(34,660,712,1));DUNINT.push({x:770,y:618,reach:85,onInteract:ruinsBook});}   /* back to the tunnel; the doorway to room 3; the old book on the altar */
   if(r===28){D(190,650,95,()=>goScene(()=>leaveBVHouse(0)));for(const n of BVNPC)if(n.room===28)DUNINT.push({x:n.x,y:n.y+10,reach:95,onInteract:()=>bvNpcTalk(n)});
     DUNINT.push({x:905,y:585,reach:110,fire:true,onInteract:()=>{if(canLumMix())openMix();else say("A warm fire crackles under the kettle.");}});}   /* the hearth: Lum can mix here */
   if(r===27){D(590,612,90,()=>goScene(()=>leaveBVHouse(4)));for(const n of BVNPC)if(n.room===27)DUNINT.push({x:n.x,y:n.y+10,get reach(){return n.gone&&n.gone()?-1:100;},onInteract:()=>bvNpcTalk(n)});

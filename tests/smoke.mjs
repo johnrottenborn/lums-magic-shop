@@ -1037,11 +1037,20 @@ const CASES = {
     check(await g_(() => { const g = window.__g; return g.CH === 2 && g.SCENE === 'dun' && g.DUN.room === 27 && g.C2.jak && g.C2.lumaMet && g.PARTY_ORDER.includes('jak') && g.MATS.foxtail === 3; }), 'Chapter 2 should save and continue where Lum was, with Jak, Sage Luma met and the satchel');
   },
   async 'learn-potency'(p) {
-    const g_ = (f, a) => p.evaluate(f, a);
-    await g_(() => { const g = window.__g; g.startChapter2(); g.c2Skip(); g.WB10.st = 2; g.chPlaytestBreezeway(); g.C2.potency = 0; g.enterDun(32, 340, 590, 1); g.ruinsBook(); }); await wait(400);
+    const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop', g_ = (f, a) => p.evaluate(f, a);
+    await g_(() => { const g = window.__g; g.startChapter2(); g.c2Skip(); g.WB10.st = 2; g.chPlaytestBreezeway(); g.C2.potency = 0; g.DFOES.forEach(f => f.calm = 99); g.enterDun(32, 840, 515, 1); }); await wait(600);
+    await g_(() => window.__g.NEAR.onInteract()); await wait(1500);
+    check(await g_(() => window.__g.DUN.room === 33), 'the end of the ruins tunnel should lead to room 2 (the hydra room, 33)');
+    await g_(() => { const g = window.__g; g.lum.x = 770; g.lum.y = 625; }); await wait(600);
+    await p.screenshot({ path: path.join(SHOTS, `ruins-room2-${vp}.png`) });
+    await g_(() => window.__g.NEAR.onInteract()); await wait(400);
     check(await g_(() => window.__g.DLG.active && /alchemist/.test(window.__g.DLG.lines[0][1])), 'Lum should read the old book');
     await g_(() => { const g = window.__g; g.DLG.active = false; g.DLG.onEnd && g.DLG.onEnd(); }); await wait(300);
     check(await g_(() => { const g = window.__g; return g.C2.potency && g.healRoll({ heal: [5, 7] }) >= 5; }), 'the book should teach Healing Potion Potency');
+    await g_(() => { const g = window.__g; g.DLG.active = false; g.lum.x = 470; g.lum.y = 548; }); await wait(600);
+    await g_(() => window.__g.NEAR.onInteract()); await wait(1500);
+    check(await g_(() => window.__g.DUN.room === 34 && window.__g.dunFree(window.__g.lum.x, window.__g.lum.y)), 'the hydra room\'s left doorway should lead to room 3 (34)');
+    await p.screenshot({ path: path.join(SHOTS, `ruins-room3-${vp}.png`) });
     await g_(() => { window.__g.DLG.active = false; window.__g.C2.potency = 0; });
   },
   async 'breezevale-merchant'(p) {
