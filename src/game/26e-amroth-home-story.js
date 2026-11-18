@@ -55,7 +55,7 @@ function hsMorningTalk(){HST.st=5;hsGoal('Speak with Alma');}   /* she waits by 
 function hsMorningAlma(){WEVENT.on=true;lum.state='idle';lum.vx=lum.vy=0;talk([['Alma',"Good morning, Lum."]],false,hsHug);}
 function hsHug(){
   setTimeout(()=>talk([['Lum',"Thank you for letting me rest."],['Alma',"You almost slept the day away!"],
-    ['Lum',"I feel responsible for what has happened. Fokalur has my apprentice… I must go after him."],['Alma',"My sister will know more. Go and see her."],
+    ['Lum',"I feel responsible for what has happened. Fokalur has my apprentice… I must go after him."],['Alma',"My sister will know more. Go and see her."],['Alma',"But there's no need to rush off. The Evergreen Grove just south of here has berries and herbs. Gather what you need."],['Alma',"And you can rest here as long as you need before you leave."],
     ['Alma',"Amroth is outside. Go and speak with him before you leave."]],false,()=>{HST.st=6;WEVENT.on=false;hsGoal('Speak with Amroth outside');}),400);}
 /* outside in the morning: Amroth by the pond */
 const HSAMR={x:0,y:0};
@@ -63,7 +63,7 @@ function hsAmrPos(){const [x,y]=pierPt(330,118);return [HOMEX+x,HOMEY+y];}   /* 
 function hsAmrTalk(){if(HST.st<6)return;if(HST.st>6){say("Follow the coast east to Breezevale Cove.");return;}
   talk([['Amroth',"Good morning, Lum."],['Amroth',"I must stay here and protect Alma and the baby, in case the demons come."],
     ['Amroth',"You are more than capable. You can make it to Breezevale on your own and seek guidance from Sage Luma."],
-    ['Amroth',"I’ve opened the gate. Follow the coast east."]],false,()=>{HST.st=7;hsGoal('Follow the coast east to Breezevale Cove');});}
+    ['Amroth',"I’ve opened the gate. The grove beyond it is a good place to gather what you need before the long road."],['Amroth',"Come back and rest whenever you like. Then follow the coast east."]],false,()=>{HST.st=7;hsGoal('Follow the coast east to Breezevale Cove');});}
 function updateHomeStory(dt){HST.t+=dt;
   if(SCENE==='thorn'&&inHome()&&C2.joined&&!HST.st)hsArrive();
   /* chimney smoke */
