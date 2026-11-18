@@ -91,7 +91,7 @@ const DROOMS={
   5:{name:'Deeproot',sub:'turn back',dark:.86,floor:[[420,768],[480,640],[560,580],[620,540],[700,540],[800,580],[950,620],[1050,700],[1080,768]]}};
 const EYES5=[[200,144],[290,106],[275,181],[331,319],[500,140],[652,129],[625,238],[731,190],[512,422],[612,444],[212,481],[212,512],[440,275],[420,412],[610,282]];
 function dunArch(x,y){const R=DROOMS[DUN.room];for(const a of (R&&R.arch)||[])if(x>=a.x0&&x<=a.x1){const t=(x-a.x0)/(a.x1-a.x0);const yg=a.y0+(a.y1-a.y0)*t;if(Math.abs(y-yg)<a.dy){const P=a.top;let k=0;while(k<P.length-2&&x>P[k+1][0])k++;const u=clamp((x-P[k][0])/(P[k+1][0]-P[k][0]),0,1);return Math.max(0,yg-(P[k][1]+(P[k+1][1]-P[k][1])*u));}}return -1;}   /* how high a bridge deck lifts whoever is on it (-1: not on one) */
-function dunFree(x,y){const R=DROOMS[DUN.room];if(!inPoly(x,y,R.floor)&&!(R.more||[]).some(P=>inPoly(x,y,P))&&dunArch(x,y)<0)return false;if(DUN.room===20&&WB10.st&&y<615&&x>750&&x<965)return false;if(DUN.room===20&&WB10.chest&&((x-900)/62)**2+((y-692)/22)**2<1)return false;   /* the caved-in archway */
+function dunFree(x,y){const R=DROOMS[DUN.room];if(!inPoly(x,y,R.floor)&&!(R.more||[]).some(P=>inPoly(x,y,P))&&dunArch(x,y)<0)return false;if(DUN.room===20&&WB10.st&&y<615&&x>750&&x<965)return false;if(DUN.room===20&&WB10.chest&&((x-WB10.chest.x)/52)**2+((y-WB10.chest.y-2)/20)**2<1)return false;   /* the caved-in archway */
   for(const b of (R.block||[]))if(b.x0!==undefined?(x>b.x0&&x<b.x1&&y>b.y0&&y<b.y1):((x-b.x)/b.rx)**2+((y-b.y)/b.ry)**2<1)return false;return true;}
 function solveDun(px,py,nx,ny){if(dunFree(nx,ny))return [nx,ny];if(dunFree(nx,py))return [nx,py];if(dunFree(px,ny))return [px,ny];return [px,py];}
 const dunH=y=>{const R=DROOMS[DUN.room]||{};return R.hp?150*Math.exp((clamp(y,250,768)-620)*R.hp)*R.hk:dunH0(y);};   /* hp: true perspective, for deep views where people shrink a lot */
@@ -156,7 +156,7 @@ function setupDun(){DUNINT.length=0;const r=DUN.room,D=(x,y,reach,fn)=>DUNINT.pu
     DUNINT.push({x:330,y:640,reach:110,fire:true,onInteract:()=>{if(canLumMix())openMix();else say("A warm fire crackles in the hearth.");}});}   /* the hearth: Lum can mix here */
   if(r===22){D(1160,728,70,()=>dunGo(21,1120,672,-1));DUNINT.push({x:760,y:738,reach:95,dynDoor:1,door:false,onInteract:hsBed});   /* the bed: '…' bubble, asks to rest */}
   if(r===23){D(258,560,70,()=>dunGo(21,680,640,1));}
-  if(r===20&&WB10.chest)DUNINT.push({x:900,y:715,reach:85,onInteract:openWB10Chest});
+  if(r===20&&WB10.chest)DUNINT.push({x:WB10.chest.x+30,y:WB10.chest.y+28,reach:85,onInteract:openWB10Chest});
   if(r===20){if(!WB10.st)D(862,405,60,()=>dunGo(19,1150,560,-1));
     DUNINT.push({x:900,y:745,reach:95,door:true,onInteract:()=>goScene(enterHome)});   /* out into the open: Amroth's home */
     L(300,600,110,["A carving of a many-headed serpent.","Three empty pedestals stand in a row beneath it."]);L(862,600,70,["Runes are carved above the arch. I can't read them."]);}

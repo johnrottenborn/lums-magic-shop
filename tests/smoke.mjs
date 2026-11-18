@@ -784,10 +784,14 @@ const CASES = {
     for (let i = 0; i < 30 && !(await g_(() => window.__g.DLG.active)); i++) await wait(150);
     { const l = await g_(() => window.__g.DLG.active && window.__g.DLG.lines.map(x => x[0] + ':' + x[1]).join(' | ')); check(l && /Amroth:We made it/.test(l) && /Lum:And I think the passage will block the demons/.test(l) && /Amroth:My home is just outside/.test(l), 'room 10\'s lines after the cave-in: ' + JSON.stringify(l)); }
     for (let i = 0; i < 4 && await g_(() => window.__g.DLG.active); i++) { await p.keyboard.press('Enter'); await wait(350); }
+    for (let i = 0; i < 30 && !(await g_(() => window.__g.DLG.active)); i++) await wait(150);
+    check(await g_(() => window.__g.WB10.glow > 0 && !!window.__g.WB10.chest && window.__g.WB10.chest.x < 700), 'the serpents did not glow and the chest did not appear in the back-left corner');
+    check(/ancients would be impressed/.test(await g_(() => window.__g.DLG.active && window.__g.DLG.lines.map(x => x[1]).join(' '))), 'Amroth should praise solving the torch mystery when the chest appears');
+    await wait(500); await p.screenshot({ path: path.join(SHOTS, `worldbind-room10-amroth-${vp}.png`) });
+    for (let i = 0; i < 4 && await g_(() => window.__g.DLG.active); i++) { await p.keyboard.press('Enter'); await wait(350); }
     for (let i = 0; i < 30 && await g_(() => window.__g.WEVENT.on); i++) await wait(150);
-    check(await g_(() => window.__g.WB10.glow > 0 && !!window.__g.WB10.chest), 'the serpents did not glow and the chest did not appear');
     await wait(1200); await p.screenshot({ path: path.join(SHOTS, `worldbind-room10-chest-${vp}.png`) });
-    await g_(() => { const g = window.__g; g.lum.x = 900; g.lum.y = 728; }); await wait(500);
+    await g_(() => { const g = window.__g; g.lum.x = g.WB10.chest.x + 40; g.lum.y = g.WB10.chest.y + 40; }); await wait(500);
     await g_(() => window.__g.NEAR.onInteract()); await wait(600);
     check(await g_(() => window.__g.BAG.includes('serpentarmor') && !window.__g.WB10.chest), 'the chest did not give the Serpent Armor and disappear');
     await g_(() => { const g = window.__g; g.lum.x = 857; g.lum.y = 625; }); await wait(300);

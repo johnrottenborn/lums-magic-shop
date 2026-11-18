@@ -143,9 +143,11 @@ function trioPos(g){const h=g.hist,out=[];for(const back of [8,16]){const p=h[Ma
 
 /* after the cave-in talk: if all three green-flame torches were lit, the archway's carved serpents glow and a chest appears */
 WB10.glow=0;WB10.chest=null;
+const WB10_CHEST={x:672,y:645};   /* the back-left corner of the room */
 const wbAllTorches=()=>WBT.lion&&WBT.raven&&WBT.serpent;
 function wb10AfterTalk(){if(!wbAllTorches()||WB10.opened){WEVENT.on=false;return;}WB10.glowOn=1;try{sfxIgnite();}catch(e){}
-  setTimeout(()=>{WB10.chest={x:900,y:690,a:0};WB10.spark=1;try{sfxItem();}catch(e){}WEVENT.on=false;setupDun();},2200);}
+  setTimeout(()=>{WB10.chest={x:WB10_CHEST.x,y:WB10_CHEST.y,a:0};WB10.spark=1;try{sfxItem();}catch(e){}setupDun();
+    setTimeout(()=>talk([['Amroth',"The ancients would be impressed, I've tried to solve the torch mystery many times…"]],false,()=>{WEVENT.on=false;}),900);},2200);}
 function updateWB10Reward(dt){if(WB10.glowOn)WB10.glow=Math.min(1,WB10.glow+dt*.6);const c=WB10.chest;if(c)c.a=Math.min(1,c.a+dt*1.5);if(WB10.spark>0)WB10.spark=Math.max(0,WB10.spark-dt*.8);}
 function openWB10Chest(){if(!WB10.chest)return;const c=WB10.chest;WB10.chest=null;WB10.opened=1;WB10.spark=1;WB10.sx=c.x;WB10.sy=c.y;giveItem('serpentarmor');setupDun();}
 /* glowing serpent lines (traced from the archway art) and the chest, in room coordinates */
