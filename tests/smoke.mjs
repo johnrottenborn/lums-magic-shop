@@ -1059,6 +1059,10 @@ const CASES = {
     await g_(() => window.__g.NEAR.onInteract()); await wait(1500);
     check(await g_(() => { const g = window.__g; return g.DUN.room === 36 && g.dunFree(g.lum.x, g.lum.y) && g.dunFree(412, 562) && g.dunFree(690, 520) && !g.dunFree(752, 576); }), 'the long hall should lead to room 5 (36): stairs and back gap reachable, the pool not');
     await p.screenshot({ path: path.join(SHOTS, `ruins-room5-${vp}.png`) });
+    await g_(() => { const g = window.__g; g.DLG.active = false; g.lum.x = 690; g.lum.y = 525; }); await wait(600);
+    await g_(() => window.__g.NEAR.onInteract()); await wait(1500);
+    check(await g_(() => { const g = window.__g; return g.DUN.room === 37 && g.dunFree(g.lum.x, g.lum.y) && !g.dunFree(750, 590); }), 'the gap in room 5 should lead to room 6 (37), with the pool not walkable');
+    await p.screenshot({ path: path.join(SHOTS, `ruins-room6-${vp}.png`) });
     await g_(() => { window.__g.DLG.active = false; window.__g.C2.potency = 0; });
   },
   async 'breezevale-merchant'(p) {

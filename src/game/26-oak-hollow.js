@@ -79,6 +79,8 @@ const DROOMS={
   /* 36: underground ruins room 5 (the designer's painting): the carved hall opens round a still pool; stairs on the left climb up to the island ruins, a broken gap in the back wall is the passage to room 6 */
   36:{name:'',dark:0,wide:1,hk:1.05,hp:.0046,floor:[[470,735],[440,670],[450,620],[400,585],[395,555],[440,548],[560,545],[620,525],[700,512],[780,522],[830,545],[900,565],[940,600],[930,650],[880,700],[880,735]],
      block:[{x:752,y:576,rx:118,ry:22}]},   /* the pool */
+  /* 37: underground ruins room 6 (the designer's painting): a dead-end chamber, roots over the back wall, a dark pool, an old adventurer's skeleton slumped by the right pillar. A big monster will wait here (still to come) */
+  37:{name:'',dark:0,wide:1,hk:1.1,floor:[[560,735],[560,690],[600,652],[700,646],[800,632],[880,614],[930,622],[955,665],[955,705],[920,735]]},
   /* 22: the loft, the bed under the thatch; the stair comes up on the right behind the rail */
   22:{name:'',dark:0,home:1,hk:1.9,floor:[[120,738],[460,730],[1050,726],[1050,612],[1185,612],[1185,768],[110,768]],
      block:[{x0:440,y0:430,x1:1052,y1:724}]},   /* the serpent gate (above): arrive in the lit stairwell behind the carved archway (back to room 19), walk down through it; the way on is in the foreground */
@@ -138,7 +140,8 @@ function setupDun(){DUNINT.length=0;const r=DUN.room,D=(x,y,reach,fn)=>DUNINT.pu
   if(r===31){D(690,755,70,()=>dunGo(30,812,372,1));for(const n of BVNPC)if(n.room===31)DUNINT.push({x:n.x,y:n.y+10,reach:100,onInteract:()=>bvNpcTalk(n)});}
   if(r===32&&!C2.ruinsIn){C2.ruinsIn=1;hsGoal('Explore the underground ruins');}
   if(r===32){D(318,566,75,()=>goScene(leaveRuins));D(840,508,55,()=>dunGo(33,660,730,1));}   /* the steps back up; the way on to room 2 */
-  if(r===36){D(660,738,80,()=>dunGo(35,728,525,1));D(412,560,55,()=>say("Stairs climb up toward the island ruins…"));D(690,518,45,()=>say("A broken gap in the wall leads on…"));}   /* back to the long hall; the stairs up to the island ruins and the gap to room 6 (both still to come) */
+  if(r===37){D(740,738,75,()=>dunGo(36,690,532,1));}   /* the only way in and out: back through the gap to room 5 */
+  if(r===36){D(660,738,80,()=>dunGo(35,728,525,1));D(412,560,55,()=>say("Stairs climb up toward the island ruins…"));D(690,518,45,()=>dunGo(37,740,712,1));}   /* back to the long hall; the stairs up to the island ruins (still to come); the gap to room 6 */
   if(r===35){D(660,738,80,()=>dunGo(34,650,530,1));D(728,512,45,()=>dunGo(36,660,712,1));}   /* back to the crypt; the tunnel at the far end to room 5 */
   if(r===34){D(660,738,80,()=>dunGo(33,470,560,1));D(650,516,50,()=>dunGo(35,660,712,1));D(1100,535,55,()=>say("A dark archway…"));}   /* back to the hydra room; the passage ahead to room 4; the right arch (where it leads is still to come) */
   if(r===33){D(660,758,80,()=>dunGo(32,840,525,-1));D(470,540,55,()=>dunGo(34,660,712,1));DUNINT.push({x:770,y:618,reach:85,onInteract:ruinsBook});}   /* back to the tunnel; the doorway to room 3; the old book on the altar */
