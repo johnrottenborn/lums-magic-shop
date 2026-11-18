@@ -1016,6 +1016,17 @@ const CASES = {
     check(await g_(() => window.__g.SCENE === 'thorn' && window.__g.inBW()), 'the steps in ruins room 1 did not lead back up to the Breezeway');
     await g_(() => clearInterval(window.__noFoes));
   },
+  async 'mixing-amounts'(p) {
+    const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop';
+    await p.evaluate(() => { const g = window.__g; g.startChapter2(); g.c2Skip(); g.WB10.st = 2; g.chPlaytestBreezeway(); g.enterBreezevale(); g.enterDun(28, 600, 700, 1); }); await wait(800);
+    const r = await p.evaluate(() => { const g = window.__g, out = [];
+      for (let k = 0; k < 6; k++) { g.MATS.dewberry = 1; g.MATS.slimeparts = 1; const b = g.POWDERS.frost || 0; g.doMix(1); out.push((g.POWDERS.frost || 0) - b); }
+      g.MATS.duskberry = 2; const pb = g.BAG.filter(x => x === 'potion').length; g.doMix(0); out.push(g.BAG.filter(x => x === 'potion').length - pb); return out; });
+    check(r.slice(0, 6).every(n => n >= 4 && n <= 6) && r[6] === 1, 'powders should mix 4–6 at a time and the potion 1 (got ' + r.join(',') + ')');
+    await p.evaluate(() => window.__g.openMix()); await wait(500);
+    await p.screenshot({ path: `tests/screenshots/${vp}-mixing.png` });
+    await p.evaluate(() => window.__g.closeMix());
+  },
   async 'breezevale-tavern'(p) {
     const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop';
     await p.evaluate(() => { const g = window.__g; g.startChapter2(); g.c2Skip(); g.WB10.st = 2; g.chPlaytestBreezeway(); g.enterBreezevale(); const h = g.BVHOUSES[1]; g.lum.x = g.BVX + g.bvDoorX(h); g.lum.y = g.BVY + h.y + 40; }); await wait(600);

@@ -43,9 +43,9 @@ function drawVHut(){const im=IMG.vanehut;if(!ready(im))return;const [rz]=roomVie
 /* ---------- mixing ---------- */
 const RECIPES=[
   {id:'potion',name:'Healing Potion',out:1,desc:'Restores 5–7 HP',need:{duskberry:2}},
-  {id:'frost',name:'Frostbloom Powder',out:2,desc:'Freezes · enemy may lose a turn',need:{dewberry:1,slimeparts:1}},
-  {id:'thorn',name:'Thornbane Powder',out:2,desc:'Weakens enemy attacks',need:{emberberry:1,thornsprig:1}},
-  {id:'moon',name:'Moonmint Powder',out:2,desc:'Calms · strong vs undead',need:{moonleaf:2,boneparts:1}}];
+  {id:'frost',name:'Frostbloom Powder',out:4,outMax:6,desc:'Freezes · enemy may lose a turn',need:{dewberry:1,slimeparts:1}},
+  {id:'thorn',name:'Thornbane Powder',out:4,outMax:6,desc:'Weakens enemy attacks',need:{emberberry:1,thornsprig:1}},
+  {id:'moon',name:'Moonmint Powder',out:4,outMax:6,desc:'Calms · strong vs undead',need:{moonleaf:2,boneparts:1}}];
 const MIX={on:false,sel:0,hits:[],flash:0,msg:'',msgT:0};
 function canLumMix(){return HERO==='lum'&&CH>0;}
 function fireInteract(){if(!canLumMix()){say("The fire crackles happily.");return;}askChoice("Mix?",[["Yes",openMix],["No",()=>{}]]);}
@@ -54,15 +54,16 @@ function closeMix(){MIX.on=false;CHOICE.until=performance.now()+300;sfxPage&&sfx
 const haveMat=id=>MATS[id]||0;
 const haveOut=r=>r.id==='potion'?BAG.filter(b=>b==='potion').length:POWDERS[r.id]||0;
 const mixOk=r=>Object.entries(r.need).every(([k,n])=>haveMat(k)>=n);
-function doMix(i){const r=RECIPES[i];if(!r)return;if(!mixOk(r)){MIX.msg="Not enough ingredients.";MIX.msgT=2;MIX.bad=1;sfxPage&&sfxPage(.3);return;}
+/* powders make 4–6 at a time (out..outMax); the potion makes one */
+function doMix(i){const r=RECIPES[i];if(!r)return;const made=r.outMax?r.out+((Math.random()*(r.outMax-r.out+1))|0):r.out;if(!mixOk(r)){MIX.msg="Not enough ingredients.";MIX.msgT=2;MIX.bad=1;sfxPage&&sfxPage(.3);return;}
   for(const [k,n] of Object.entries(r.need)){MATS[k]-=n;if(MATS[k]<=0){delete MATS[k];const j=BAG.indexOf(k);if(j>=0)BAG.splice(j,1);}}
-  if(r.id==='potion'){for(let q=0;q<r.out;q++)BAG.push('potion');}else POWDERS[r.id]=(POWDERS[r.id]||0)+r.out;
-  STATS.mixed=(STATS.mixed||0)+r.out;MIX.flash=1;MIX.fx=i;MIX.msg=`Mixed ${r.out>1?r.out+'× ':''}${r.name}!`;MIX.msgT=2.2;MIX.bad=0;if(typeof SAVEC!=='undefined')SAVEC.t=99;
+  if(r.id==='potion'){for(let q=0;q<made;q++)BAG.push('potion');}else POWDERS[r.id]=(POWDERS[r.id]||0)+made;
+  STATS.mixed=(STATS.mixed||0)+made;MIX.flash=1;MIX.fx=i;MIX.msg=`Mixed ${made>1?made+'× ':''}${r.name}!`;MIX.msgT=2.2;MIX.bad=0;if(typeof SAVEC!=='undefined')SAVEC.t=99;
   if(SND.ready){const t=SND.ctx.currentTime;noiseHit(t,.18,'bandpass',900,2,.25,SND.sfx);noiseHit(t+.12,.18,'bandpass',1300,2,.2,SND.sfx);noiseHit(t+.24,.25,'highpass',3000,1,.18,SND.sfx);}sfxItem&&setTimeout(()=>sfxItem(),280);}
 function mixKey(c){const n=RECIPES.length;if(c==='ArrowUp'||c==='KeyW')MIX.sel=(MIX.sel+n)%(n+1);else if(c==='ArrowDown'||c==='KeyS')MIX.sel=(MIX.sel+1)%(n+1);
   else if(c==='Enter'||c==='Space'||c==='KeyE'||c==='KeyK'){if(MIX.sel===n)closeMix();else doMix(MIX.sel);}else if(c==='Escape'||c==='KeyI'||c==='Tab')closeMix();}
 function mixTap(x,y){for(const h of MIX.hits)if(x>h.x&&x<h.x+h.w&&y>h.y&&y<h.y+h.h){h.act();return;}}
-const MATNAME={slimeparts:'Slime',boneparts:'Bone',thornsprig:'Thorn',duskberry:'Dusk',dewberry:'Dew',emberberry:'Ember',moonleaf:'Moonmint'};
+const MATNAME={slimeparts:'Slime',boneparts:'Bone',thornsprig:'Thorn',duskberry:'Dusk',dewberry:'Dew',emberberry:'Ember',moonleaf:'Moonmint',venomvine:'Venomvine'};
 function drawMortar(c,x,y,s){{const im=IMG.icon3_mortar_clay;if(ready(im)){const z=26*s;c.drawImage(im,x-z/2,y-z/2-1,z,z);return;}}c.save();c.translate(x,y);c.scale(s,s);c.lineJoin='round';c.lineCap='round';
   c.strokeStyle='#6a4a2a';c.lineWidth=2.4;c.beginPath();c.moveTo(1,-1);c.lineTo(9,-12);c.stroke();c.fillStyle='#b08a5a';c.beginPath();c.arc(9.5,-12.5,2.6,0,TAU);c.fill();c.stroke();
   c.fillStyle='#8f9aa8';c.strokeStyle='#3e4450';c.lineWidth=1.6;c.beginPath();c.moveTo(-9,-2);c.lineTo(9,-2);c.quadraticCurveTo(8,8,0,8);c.quadraticCurveTo(-8,8,-9,-2);c.closePath();c.fill();c.stroke();
@@ -77,7 +78,7 @@ function drawMix(){if(!MIX.on)return;MIX.hits=[];const dt=1/60;MIX.flash=Math.ma
   ctx.font='italic 12px Alegreya, Georgia, serif';ctx.fillStyle='#7a6040';ctx.fillText('Grind parts into powders and potions',x+50,y+49);
   RECIPES.forEach((r,i)=>{const yy=y+70+i*(rh+8),ok=mixOk(r),sel=!TOUCHUI()&&MIX.sel===i;
     ctx.fillStyle=MIX.fx===i&&MIX.flash>0?`rgba(240,200,110,${(.25+.4*MIX.flash).toFixed(3)})`:'rgba(120,86,40,.12)';rr(x+12,yy,w-24,rh,11);ctx.fill();if(sel){ctx.strokeStyle='#e0a83a';ctx.lineWidth=2;ctx.stroke();}
-    drawResultIcon(r,x+36,yy+rh/2);ctx.textAlign='left';ctx.fillStyle='#4a3420';ctx.font='700 14px "Alegreya SC", Georgia, serif';ctx.fillText(r.name+(r.out>1?' ×'+r.out:''),x+60,yy+20);
+    drawResultIcon(r,x+36,yy+rh/2);ctx.textAlign='left';ctx.fillStyle='#4a3420';ctx.font='700 14px "Alegreya SC", Georgia, serif';ctx.fillText(r.name+(r.outMax?' ×'+r.out+'–'+r.outMax:r.out>1?' ×'+r.out:''),x+60,yy+20);
     ctx.font='italic 11.5px Alegreya, Georgia, serif';ctx.fillStyle='#7a6040';ctx.fillText(r.desc,x+60,yy+35);
     let ix=x+60;ctx.font='700 11px "Alegreya SC", Georgia, serif';for(const [k,q] of Object.entries(r.need)){const has=haveMat(k);drawIcon(ctx,k,ix+7,yy+49,15);ctx.fillStyle=has>=q?'#4f7a3a':'#b04a3a';const t=`${MATNAME[k]} ${Math.min(has,q)}/${q}`;ctx.fillText(t,ix+17,yy+53);ix+=ctx.measureText(t).width+30;}
     const bw=58,bh=30,bx=x+w-24-bw,by=yy+(rh-bh)/2;ctx.globalAlpha=ok?1:.4;const g=ctx.createLinearGradient(0,by,0,by+bh);g.addColorStop(0,'#e8b85a');g.addColorStop(1,'#b07a2a');ctx.fillStyle=g;rr(bx,by,bw,bh,10);ctx.fill();ctx.strokeStyle='#5a3a14';ctx.lineWidth=1.3;ctx.stroke();

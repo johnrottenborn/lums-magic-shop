@@ -33,7 +33,7 @@ Live at https://lums-magic-shop.vercel.app. Story and lore: `docs/story.md`. Mak
 | 21-stranglethorn | Stranglethorn maze (`TMZ`), fog and atmosphere (red falling leaves only up to the Worldbind Passage, none from Amroth's home on), spiders and webs, the lantern-less gate view |
 | 22-jak-and-thorn-foes | Jak (resting, follower, joining), roaming Stranglethorn foes, the Broodmother boss |
 | 23-battle-kit | powders (`POWDERS`; icons `POWICON` from the designer's powder sheet icon13: Sparkdust starry pouch, Frostbloom frost pile, Thornbane thorny mortar, Moonmint moon bowl, Poison green bowl; the rest saved for later), weaknesses (`WEAKTO`), foe special moves, hit effects, battle drawing for new foes |
-| 24-vane-hut-and-mixing | Vane's hut and mixing at the fire |
+| 24-vane-hut-and-mixing | Vane's hut and mixing at the fire (`RECIPES`: each powder mix makes 4–6, `out`..`outMax`; the Healing Potion makes 1) |
 | 25-ch1-opening-and-foraging | Chapter 1 opening cutscene, foraging, ingredients |
 | 26-oak-hollow | the five-room root dungeon under the old oak |
 | 26b-ch2-start | `ch2Respawn`: losing a battle in Chapter 2 heals the party and wakes Lum at the way into the area (or room) she was in. Chapter 2 "The Ashes of Awakening": opening cutscene (`C2`: narration on black, Amroth from the gatehouse, Stonebreak Elixir frees Lum, baby in Spar's ashes), Amroth follower (`AMR`). Chapter 2 saves and continues (`c2Snapshot`/`applySaveC2` in 18-save: story flags, party, hp, satchel, gear, where Lum is; anything caught half-way simply replays) |
