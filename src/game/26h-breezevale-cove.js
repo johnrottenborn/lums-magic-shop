@@ -21,7 +21,7 @@ function bvYard(h){const L=h.x-h.w*.45,R=h.x+h.w*.45,d=bvDoorX(h),y=h.y+8,up=h.y
   if(!h.noL)out.push(d-L>gap+120?[[L-8,up],[L-14,y-30],[L+30,y],[d-gap,y]]:[[L-8,up],[L-14,y-30],[L+12,y]]);   /* a short side (door near the corner) only wraps the corner */
   if(!h.noR)out.push(R-d>gap+120?[[d+gap,y],[R-30,y],[R+14,y-30],[R+8,up]]:[[R-12,y],[R+14,y-30],[R+8,up]]);return out;}
 const BVFOUNT={x:1050,y:990,w:760};
-const BVFOUNT_ROWS=[[.40,.48,.28,.79],[.48,.68,.217,.851],[.68,.88,0,1],[.88,.93,0,.92],[.93,.98,.16,.84]];
+const BVFOUNT_ROWS=[[.40,.48,.28,.79],[.48,.68,.217,.851],[.68,.96,0,1],[.96,.99,.16,.84]]   /* down to where Lum would be drawn behind it, the full width */;
 const bvFP=(u,v)=>{const F=BVFOUNT,h=F.w*633/1100;return [BVX+F.x+(u-.5)*F.w,BVY+F.y-h*.95+v*h];};   /* a point on the fountain art (u,v across it) */
 const inBV=()=>lum.x>BVX-300&&lum.x<ISX-300;
 const BVH_=(a,b)=>hash(a,b,6271);
