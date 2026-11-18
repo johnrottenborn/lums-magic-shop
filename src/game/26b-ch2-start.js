@@ -2,7 +2,7 @@
    Opens in the clearing where Chapter 1 ended (CLR in 21-stranglethorn). Scene 1: narration on black. Scene 2: light rain; Amroth the gatekeeper
    comes out of his gatehouse, walks down to the clearing, frees Lum from the stone, finds a baby in Spar's ashes, and joins Lum.
    Amroth (his own sprite, face always hidden in his helmet) joins the party at the end of the opening and follows Lum on the map.
-   No saving yet. */
+   Saves like Chapter 1 (c2Snapshot / applySaveC2 in 18-save). */
 const C2={on:false,st:0,t:0,w:0,narr:-1,na:0,cam:null,title:0,heal:0,mound:1,shake:0,joined:0};
 const AMR={x:0,y:0,face:1,dir:'side',moving:0,ph:0,a:1};
 const C2NARR=["With the help of Spar, Lum finally found her lost apprentice, Cosmic.","But Cosmic had been deceived.",
@@ -17,7 +17,7 @@ function startChapter2(){audioInit();c1Reset();CH=2;HERO='lum';PC='lum';
   C1.introDone=1;C1.hedgeSeen=1;C1.thornBoss=1;C1.fkDone=1;C1.chEnd=0;C1I.on=false;INTRO.lumShown=true;
   for(let i=0;i<5;i++)C1['cosSeen'+i]=1;
   const k=bestCh1Keepsake();if(k)PARTY.lum.charm=k.id;   // Chapter 2 starts with the best Chapter 1 keepsake equipped
-  enterThorn();GOAL.tag='';GOAL.text='';SAVEC.finished=1;
+  enterThorn();GOAL.tag='';GOAL.text='';SAVEC.finished=0;   /* Chapter 2 saves (the opening cutscene itself never does: saving waits while an event plays) */
   // Lum stands in stone where the battle ended
   lum.x=FKS.cx-240;lum.y=FKS.cy;lum.face=1;lum.state='idle';lum.vx=lum.vy=0;LUMSTONE=1;
   Object.assign(C2,{on:true,st:0,t:0,w:0,narr:0,na:0,cam:null,title:0,heal:0,mound:1,shake:0,joined:0});

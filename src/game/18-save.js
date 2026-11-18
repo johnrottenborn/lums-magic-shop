@@ -6,7 +6,7 @@ function snapshot(){if(C1.jak)C1.jakHp=HEROES.jak.hp;return {v:1,sv:SAVE_VER,t:D
   f:{kingState,bucketTaken,gotEquip,slimesDone,slimesSpawned,wellVisited,gardenDone,sslimesSpawned,mimicState,studyVisited,shedChestOpen,shedSpawned,shedVisited,pondSlimesSpawned,pondDone,shroudTaken,pondVisited,shopTalk,restTalk,skelDone,sayCount,slugTalk,slimeTalk,poolTalk},
   left:{well:WSLIMES.length,study:SSLIMES.length,shed:SHSLIMES.length,pond:PSLIMES.length,slugs:SLUGS.filter(g=>g.kind!=='slugking').length,skels:WSKELS.length},
   ch:CH,c1:{...C1,endCard:0,title:0},powders:{...POWDERS},wf:WFOES.map(g=>g.id),c1built:woodsC1Built,
-  night:{on:NIGHT.on,cut:NIGHT.cut,rain:NIGHT.rain,nudged:NIGHT.nudged||0},stats:STATS,wev:{mid:WEV.mid,circle:WEV.circle,cem:WEV.cem,entered:WEV.entered||0},shopDoor,pondReturn};}
+  night:{on:NIGHT.on,cut:NIGHT.cut,rain:NIGHT.rain,nudged:NIGHT.nudged||0},stats:STATS,wev:{mid:WEV.mid,circle:WEV.circle,cem:WEV.cem,entered:WEV.entered||0},shopDoor,pondReturn,c2:CH>=2?c2Snapshot():null};}
 /* a finished chapter leaves no save behind, so the title menu drops Continue. Call finishChapter() at the end of every chapter. */
 function clearSave(){try{localStorage.removeItem(SAVE_KEY);}catch(e){}}
 function finishChapter(id){try{const p=readProg();p[id]=Object.assign(p[id]||{},{done:1});localStorage.setItem(PROG_KEY,JSON.stringify(p));}catch(e){}clearSave();SAVEC.finished=1;}
@@ -17,7 +17,27 @@ function autosave(dt){SAVEC.t+=dt;if(SAVEC.t>1&&canSave()){SAVEC.t=0;saveGame();
   for(const k in LOADTRIM){const [arr,sp]=L_[k];if(sp()){arr.splice(LOADTRIM[k]);delete LOADTRIM[k];}}}
 const canSaveNow=()=>PLAYER()&&!INTRO.on&&!INTRO.waiting&&!BATTLE.on&&!WEVENT.on&&!WEV.fk&&!WEV.seal&&!(BED.sleeping&&!BED.cosAwake)&&!Object.keys(LOADTRIM).length&&!FADE.cb;
 addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'&&canSaveNow())saveGame();});addEventListener('pagehide',()=>{if(canSaveNow())saveGame();});addEventListener('beforeunload',()=>{if(canSaveNow())saveGame();});
-function applySave(d){if(d.ch===1){applySaveC1(d);return;}const f=d.f||{};if(d.stats)Object.assign(STATS,d.stats,{found:Object.assign({},d.stats.found||{})});
+/* ---- Chapter 2 saving: story flags and progress; events caught half-way simply replay ---- */
+const savePrim=o=>{const r={};for(const k in o){const v=o[k];if(v==null||(typeof v!=='object'&&typeof v!=='function'))r[k]=v;}return r;};
+function c2Snapshot(){const H={};for(const id of PARTY_ORDER)H[id]=HEROES[id].hp;
+  return {c2:savePrim(C2),hst:savePrim(HST),alma:savePrim(ALMA),order:[...PARTY_ORDER],hp:H,home:{t:HOME.t},
+    wb:{boDone:BO.done,wb8beat:WB8.beat,wb10:WB10.st===2?2:0,wbt:{lion:WBT.lion,raven:WBT.raven,serpent:WBT.serpent},wb5:savePrim(WB5)}};}
+function applySaveC2(d){const s=d.c2||{};startChapter2();c2Skip();SAVEC.finished=0;C2.title=0;
+  Object.assign(C1,d.c1||{});C1.endCard=0;C1.title=0;Object.assign(C2,s.c2||{},{on:false,cam:null,title:0,narr:-1});
+  Object.assign(HST,s.hst||{},{heart:0});Object.assign(ALMA,s.alma||{});if(s.home)HOME.t=99;
+  const w=s.wb||{};BO.done=w.boDone||0;if(BO.done)BO.st=0;WB8.beat=w.wb8beat||0;if(!WB8.beat){WB8.L=1;WB8.R=1;}WB10.st=w.wb10||0;Object.assign(WBT,w.wbt||{});
+  for(const k of ['said','said18','jolt'])if(w.wb5&&w.wb5[k]!=null)WB5[k]=w.wb5[k];
+  BAG.length=0;BAG.push(...(d.bag||[]));for(const k in MATS)delete MATS[k];Object.assign(MATS,d.mats||{});
+  if(d.party)for(const who in d.party)if(PARTY[who])Object.assign(PARTY[who],d.party[who]);Object.assign(POWDERS,d.powders||{});
+  if(d.stats)Object.assign(STATS,d.stats,{found:Object.assign({},d.stats.found||{})});
+  PARTY_ORDER.length=0;PARTY_ORDER.push(...(s.order||['lum']));syncMaxHp();for(const id of PARTY_ORDER)HEROES[id].hp=clamp((s.hp||{})[id]||HEROES[id].maxHp,1,HEROES[id].maxHp);
+  if(C2.venom){C2.venom=0;learnVenom();}NIGHT.rain=true;
+  if(d.scene==='dun')enterDun(d.dunRoom||11,d.x,d.y,d.face||1);else{SCENE='thorn';THORN.t=99;}
+  lum.x=d.x;lum.y=d.y;lum.face=d.face||1;lum.state='idle';lum.vx=lum.vy=0;cam.x=lum.x;cam.y=lum.y-50;WCAM.x=lum.x;
+  GVT.t=99;BWT.t=99;BVT.t=99;   /* no area title on a continued game */
+  if(C2.joined)resetAmrFollow();if(C2.jak)resetJak2Follow();
+  GOAL.tag='TASK';GOAL.text=(d.goal&&d.goal.text)||'';HINT.goalT=0;}
+function applySave(d){if(d.ch===2&&d.c2){applySaveC2(d);return;}if(d.ch===1){applySaveC1(d);return;}const f=d.f||{};if(d.stats)Object.assign(STATS,d.stats,{found:Object.assign({},d.stats.found||{})});
   ({bucketTaken,gotEquip,slimesDone,wellVisited,gardenDone,mimicState,studyVisited,shedChestOpen,shedVisited,pondDone,shroudTaken,pondVisited,shopTalk,restTalk,skelDone,sayCount,slugTalk,slimeTalk,poolTalk}=Object.assign({bucketTaken,gotEquip,slimesDone,wellVisited,gardenDone,mimicState,studyVisited,shedChestOpen,shedVisited,pondDone,shroudTaken,pondVisited,shopTalk,restTalk,skelDone,sayCount,slugTalk,slimeTalk,poolTalk},f));
   BAG.length=0;BAG.push(...(d.bag||[]));for(const k in MATS)delete MATS[k];Object.assign(MATS,d.mats||{});if(d.party&&d.party.cosmic)Object.assign(PARTY[HERO],d.party.cosmic);HEROES[HERO].hp=clamp(d.hp||HEROES[HERO].maxHp,1,HEROES[HERO].maxHp);
   if(gardenDone>=5&&!BAG.includes('shedkey')&&!shedChestOpen)BAG.push('shedkey');

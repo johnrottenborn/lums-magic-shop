@@ -976,7 +976,7 @@ const CASES = {
   async 'jak-joins'(p) {
     const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop', g_ = (f, a) => p.evaluate(f, a);
     const end = async () => { for (let i = 0; i < 8; i++) { if (!await g_(() => window.__g.DLG.active)) break; await g_(() => { const g = window.__g; g.DLG.active = false; g.DLG.onEnd && g.DLG.onEnd(); }); await wait(300); } };
-    await g_(() => { const g = window.__g; g.startChapter2(); g.c2Skip(); g.WB10.st = 2; g.chPlaytestBreezeway(); g.enterBreezevale(); g.enterDun(27, 900, 710, 1); }); await wait(1300);
+    await g_(() => { const g = window.__g; g.startChapter2(); g.c2Skip(); g.WB10.st = 2; g.chPlaytestBreezeway(); g.C2.lumaMet = 1; g.enterBreezevale(); g.enterDun(27, 900, 710, 1); }); await wait(1300);
     await g_(() => window.__g.NEAR.onInteract()); await wait(400);
     check(await g_(() => window.__g.DLG.lines[0][0] === 'Jak' && /Sea Serpent/.test(window.__g.DLG.lines[0][1])), 'without a Sea Snake Skin Jak should talk about hunting the Sea Serpent');
     await end();
@@ -1027,6 +1027,13 @@ const CASES = {
     await g_(() => window.__g.NEAR && window.__g.NEAR.onInteract()); await wait(400);
     check(await g_(() => window.__g.DLG.active && window.__g.DLG.lines.some(l => /bare hands/.test(l[1]))), 'back home with Jak, Alma and Amroth should talk about the baby catching a fish');
     await g_(() => { window.__g.DLG.active = false; });
+  },
+  async 'ch2-save-continue'(p) {
+    const g_ = (f, a) => p.evaluate(f, a);
+    await g_(() => { const g = window.__g; g.startChapter2(); g.c2Skip(); g.WB10.st = 2; g.chPlaytestBreezeway(); g.C2.lumaMet = 1; g.C2.jak = 1; g.PARTY_ORDER.includes('jak') || g.PARTY_ORDER.push('jak'); g.MATS.foxtail = 3; g.BAG.push('foxtail'); g.enterDun(27, 700, 700, 1); }); await wait(600);
+    await g_(() => window.__g.saveGame()); await p.reload(); await wait(2000);
+    await g_(() => window.__g.continueGame()); await wait(2000);
+    check(await g_(() => { const g = window.__g; return g.CH === 2 && g.SCENE === 'dun' && g.DUN.room === 27 && g.C2.jak && g.C2.lumaMet && g.PARTY_ORDER.includes('jak') && g.MATS.foxtail === 3; }), 'Chapter 2 should save and continue where Lum was, with Jak, Sage Luma met and the satchel');
   },
   async 'breezevale-merchant'(p) {
     const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop', g_ = (f, a) => p.evaluate(f, a);
