@@ -42,7 +42,10 @@ function bwFree(x,y){const lx=x-BWX;if(lx<24||lx>BWW-20)return false;return bpat
 function bwRuinY(){if(BRUIN.ay)return;BRUIN.ay=Math.min(...BARCHES.map(([ax])=>{let y=BPATH_PTS.reduce((b,p)=>Math.abs(p[0]-BWX-ax)<Math.abs(b[0]-BWX-ax)?p:b)[1];while(bpathDist(BWX+ax,y)<88)y-=4;return y-BWY;}));BRUIN.ey=BRUIN.ay-560;}
 /* evergreens filling the land, hydrangeas along the path's north side, rocks along the path and sea stacks out in the water */
 function bwProps(P){const X=x=>x+BWX,Y=y=>y+BWY;let k=0;bwRuinY();
-  P.push({t:'tree',img:'ruins_entrance',x:X(BRUIN.x+76),y:Y(BRUIN.ey),w:420,flip:true,base:.95});   /* the designer's sunken entrance (mirrored so it stays on the map), its tunnel mouth at the top of the secret way */
+  P.push({t:'tree',img:'ruins_entrance',x:X(BRUIN.x+76),y:Y(BRUIN.ey),w:420,flip:true,base:.95});
+  for(let r=0;r<6;r++)for(let c=0;c<9;c++){const k=r*9+c,x=BRUIN.x-170+c*58+(BH_(k,80)-.5)*30,y=BRUIN.ey-230+r*52+(BH_(k,81)-.5)*20,lane=Math.abs(x-BRUIN.x)<70&&r>=2;   /* grass and shrubs hiding the sunken entrance; the ones in the secret lane part once Jak shows it */
+    P.push({t:'tree',img:'shrub'+Math.floor(BH_(k,82)*12),x:X(x),y:Y(y),w:120+BH_(k,83)*70,flip:BH_(k,84)<.5,base:.92,hideOpen:lane?1:0,sy:Y(BRUIN.ey)+2+r*52});
+    if(BH_(k,85)<.7)P.push({t:'tuft',w:40,x:X(x+(BH_(k,86)-.5)*40),y:Y(y+18),n:6+Math.floor(BH_(k,87)*4),h:30+BH_(k,88)*20,hue:.35,hideOpen:lane?1:0,sy:Y(BRUIN.ey)+3+r*52});}   /* the designer's sunken entrance (mirrored so it stays on the map), its tunnel mouth at the top of the secret way */
   for(let gy=-140;gy<BWH;gy+=92)for(let gx=-60;gx<BWW+80;gx+=100){k++;const lx=gx+(BH_(k,1)-.5)*56,ly=gy+(BH_(k,2)-.5)*44;
     if(!inPoly(lx,ly,BLAND)||BH_(k,3)<.2||bwClear(lx,ly,150)||(Math.abs(lx-BRUIN.x)<105&&ly<BRUIN.ay&&ly>BRUIN.ey-40)||(Math.abs(lx-BRUIN.x-76)<250&&ly>BRUIN.ey-120&&ly<BRUIN.ey+300))continue;let clear=true;for(let up=0;up<=380&&clear;up+=38)if(bpathDist(X(lx),Y(ly-up))<(up?150:190))clear=false;if(!clear)continue;   /* the path stays in view */
     const [img,w]=HTREES[Math.floor(BH_(k,4)*HTREES.length)];P.push({t:'tree',img,x:X(lx),y:Y(ly),w:w*(.72+BH_(k,5)*.32),flip:BH_(k,6)<.5,base:.95});}
