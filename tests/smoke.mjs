@@ -1051,6 +1051,14 @@ const CASES = {
     await g_(() => window.__g.NEAR.onInteract()); await wait(1500);
     check(await g_(() => window.__g.DUN.room === 34 && window.__g.dunFree(window.__g.lum.x, window.__g.lum.y)), 'the hydra room\'s left doorway should lead to room 3 (34)');
     await p.screenshot({ path: path.join(SHOTS, `ruins-room3-${vp}.png`) });
+    await g_(() => { const g = window.__g; g.DLG.active = false; g.lum.x = 650; g.lum.y = 525; }); await wait(600);
+    await g_(() => window.__g.NEAR.onInteract()); await wait(1500);
+    check(await g_(() => window.__g.DUN.room === 35 && window.__g.dunFree(window.__g.lum.x, window.__g.lum.y) && window.__g.dunFree(728, 515)), 'the crypt passage ahead should lead to room 4 (35), walkable to the far tunnel');
+    await p.screenshot({ path: path.join(SHOTS, `ruins-room4-${vp}.png`) });
+    await g_(() => { const g = window.__g; g.DLG.active = false; g.lum.x = 728; g.lum.y = 520; }); await wait(600);
+    await g_(() => window.__g.NEAR.onInteract()); await wait(1500);
+    check(await g_(() => { const g = window.__g; return g.DUN.room === 36 && g.dunFree(g.lum.x, g.lum.y) && g.dunFree(412, 562) && g.dunFree(690, 520) && !g.dunFree(752, 576); }), 'the long hall should lead to room 5 (36): stairs and back gap reachable, the pool not');
+    await p.screenshot({ path: path.join(SHOTS, `ruins-room5-${vp}.png`) });
     await g_(() => { window.__g.DLG.active = false; window.__g.C2.potency = 0; });
   },
   async 'breezevale-merchant'(p) {
