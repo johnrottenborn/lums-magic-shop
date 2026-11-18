@@ -1093,6 +1093,20 @@ const CASES = {
     await g_(() => window.__g.NEAR.onInteract()); await wait(1500);
     check(await g_(() => window.__g.SCENE === 'dun' && window.__g.DUN.room === 36), 'the island entrance should lead back down to room 5');
   },
+  async 'island-mai'(p) {
+    const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop', g_ = (f, a) => p.evaluate(f, a);
+    const end = async () => { for (let i = 0; i < 8; i++) { if (!await g_(() => window.__g.DLG.active)) break; await g_(() => { const g = window.__g; g.DLG.active = false; g.DLG.onEnd && g.DLG.onEnd(); }); await wait(250); } };
+    await g_(() => { const g = window.__g; g.startChapter2(); g.c2Skip(); g.WB10.st = 2; g.chPlaytestIsle(); g.enterIsland(); Object.assign(g.C2, { isl: 0, maiSeen: 0, maiJoined: 0 }); }); await wait(600);
+    for (let i = 0; i < 4; i++) { await g_(i => window.__g.isInspect(i), i); await wait(200); await end(); }
+    await wait(3500);
+    check(await g_(() => window.__g.C2.maiSeen && !window.__g.WEVENT.on), 'after all four inspect spots the screen should glow and Mai appear');
+    await g_(() => { const g = window.__g; g.lum.x = g.ISX + g.IS_MAI.x; g.lum.y = g.ISY + g.IS_MAI.y + 90; }); await wait(600);
+    await p.screenshot({ path: path.join(SHOTS, `island-mai-${vp}.png`) });
+    await g_(() => window.__g.maiTalk()); await wait(200); await end(); await wait(3800);
+    check(await g_(() => window.__g.C2.maiJoined && /rejuvenated/.test(window.__g.DLG.lines[0][1])), 'Mai should join with Lum');
+    await end();
+    check(await g_(() => /Sage Luma/.test(window.__g.GOAL.text)), 'the task should send Lum back to Sage Luma');
+  },
   async 'breezevale-merchant'(p) {
     const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop', g_ = (f, a) => p.evaluate(f, a);
     await g_(() => { const g = window.__g; g.startChapter2(); g.c2Skip(); g.WB10.st = 2; g.chPlaytestBreezeway(); g.MATS.foxtail = 1; g.BAG.push('foxtail'); g.MATS.seagem = 2; g.BAG.push('seagem'); g.enterBreezevale(); g.enterDun(25, 850, 640, 1); }); await wait(1200);

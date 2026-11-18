@@ -11,6 +11,8 @@ const ISH_=(i,s)=>{const x=Math.sin(i*127.1+s*311.7)*43758.5453;return x-Math.fl
 const IS_FONT={x:1400,y:1110,w:310},IS_CHAPEL={x:560,y:1060,w:560},IS_ENT={x:2310,y:880,k:.52,ax:400,ay:1520},IS_GODDESS={x:1690,y:1010,w:170},IS_SEAM={x:1985,y:960,w:470};   /* the font is the centre of the map; the entrance painting (top-right corner) is anchored at the foot of its stairs; a big broken arch hides its left edge */
 const IS_STATUES=[[1000,800,.42,-.04],[1250,730,.3,.02],[1520,730,.55,-.02],[1790,800,.36,.05]];   /* x, y, how much has broken off the top, lean */
 const IS_FALLEN={x:1330,y:1720,len:600};
+const IS_TOWER={x:IS_CHAPEL.x+IS_CHAPEL.w*(570/797-.5),y:IS_CHAPEL.y+22},IS_MAI={x:1990,y:944};   /* the fallen bell tower (in front of the chapel door); where Mai appears, between the big arch's pillars */
+const IS_TOWER_CUT=[[45,-5],[340,-5],[340,300],[300,318],[260,296],[220,322],[180,300],[140,326],[100,302],[45,318]];   /* the bell tower's outline in the chapel art, broken off along a jagged line */
 const IS_LOWARCH=(()=>{const A=[];let i=0;for(let x=330;x<=2470;x+=190,i++){if(Math.abs(x-IS_FALLEN.x)<380)continue;const y=IS_TOP+1560*Math.sqrt(Math.max(0,1-((x-1400)/1250)**2))-290;if(y<1350)continue;A.push([x,y,['pillars','left','crown','left','pillars'][i%5],i%2===1]);}return A;})();   /* broken gateways following the south edge (a gap round the fallen goddess) */
 const IS_DOOR={x:IS_ENT.x,y:IS_ENT.y-4};   /* the foot of the entrance stairs: the way back down to the underground ruins */
 const IS_BOULDERS=(()=>{const B=[];for(let i=2;i<ISLAND.length-2;i+=1){const [x,y]=ISLAND[i];if(y<IS_TOP+120||(x>1980&&y<1000))continue;const dx=x-1400,dy=y-IS_TOP,L=Math.hypot(dx,dy)||1;for(const o of [10,85])B.push([x+dx/L*o+(ISH_(i,o)-.5)*40,y+dy/L*o*.6,90+ISH_(i,o+1)*80]);}for(let i=0;i<70;i++){const x=-200+ISH_(i,50)*(ISW+400),y=IS_TOP+150+ISH_(i,51)*(ISH-IS_TOP+200);if(inPoly(x,y,ISLAND))continue;B.push([x,y,80+ISH_(i,52)*110]);}return B;})();   /* boulders heaped all round the edge (no sea round the island) */
@@ -27,6 +29,8 @@ function isSolid(lx,ly){
   const rect=(x0,y0,x1,y1)=>lx>x0&&lx<x1&&ly>y0&&ly<y1,ell=(x,y,rx,ry)=>((lx-x)/rx)**2+((ly-y)/ry)**2<1;
   const C=IS_CHAPEL,E=IS_ENT,F=IS_FONT;
   if(rect(C.x-C.w*.47,C.y-230,C.x+C.w*.47,C.y-6))return true;
+  if(ell(IS_TOWER.x,IS_TOWER.y-24,128,52))return true;
+  if(C2&&C2.maiSeen&&!C2.maiJoined&&ell(IS_MAI.x,IS_MAI.y,26,12))return true;
   if(rect(E.x-E.ax*E.k+60,E.y-800,E.x+(1206-E.ax)*E.k,E.y-14))return true;
   if(ell(F.x,F.y-60,F.w*.47,70))return true;
   {const A=IS_SEAM;if(rect(A.x-A.w*.5,A.y-30,A.x-A.w*.08,A.y-4)||rect(A.x+A.w*.1,A.y-30,A.x+A.w*.5,A.y-4))return true;}   /* the big arch's two pillars */
@@ -48,7 +52,9 @@ function isProps(P){const X=x=>x+ISX,Y=y=>y+ISY;IS_RUBS.length=0;const rub=o=>{P
     for(const [u0,v0,u1,v1,dx,dy,rot,sz] of RUIN_RUBBLE[cut]||[])rub({t:'isrub',src:[u0,v0,u1,v1],x:X(x)+dx*250*(i%2?-1:1),y:Y(y)+30+dy*80,w:250*sz*.55,rot});}
   for(const [x,y,cut,fl] of IS_LOWARCH){P.push({t:'isarch',x:X(x),y:Y(y),w:300,flip:fl,cut});   /* more broken gateways along the bottom */
     for(const [u0,v0,u1,v1,dx,dy,rot,sz] of RUIN_RUBBLE[cut]||[])rub({t:'isrub',src:[u0,v0,u1,v1],x:X(x)+dx*250*(fl?-1:1),y:Y(y)-20-dy*60,w:250*sz*.55,rot});}
-  P.push({t:'isp',img:'isle_chapel',x:X(IS_CHAPEL.x),y:Y(IS_CHAPEL.y),w:IS_CHAPEL.w});
+  P.push({t:'ischapel',x:X(IS_CHAPEL.x),y:Y(IS_CHAPEL.y),w:IS_CHAPEL.w});
+  P.push({t:'istower',x:X(IS_TOWER.x),y:Y(IS_TOWER.y),w:IS_CHAPEL.w});   /* its bell tower, broken off and lying across the door */
+  P.push({t:'ismai',x:X(IS_MAI.x),y:Y(IS_MAI.y),w:80});
   P.push({t:'isent',x:X(IS_ENT.x),y:Y(IS_ENT.y),w:700});
   P.push({t:'isarch',x:X(IS_SEAM.x),y:Y(IS_SEAM.y),w:IS_SEAM.w,flip:false,cut:'pillars',opaque:1});
   P.push({t:'isp',img:'isle_font',x:X(IS_FONT.x),y:Y(IS_FONT.y),w:IS_FONT.w});
@@ -59,6 +65,11 @@ function isProps(P){const X=x=>x+ISX,Y=y=>y+ISY;IS_RUBS.length=0;const rub=o=>{P
     rub({t:'isrub',src:[[.6,.05,.8,.22],[.3,.04,.58,.2],[.62,.3,.95,.55],[.78,.2,.95,.4]][i%4],x:X(x),y:Y(y),w:60+ISH_(i,6)*50,rot:(ISH_(i,7)-.5)*3});}
 }
 function drawISProp(o){const S=o.t;
+  if(S==='ischapel'||S==='istower'){const im=isTint('isle_chapel');if(!im)return;const k=o.w/im.width,h=im.height*k;ctx.save();
+    if(S==='ischapel'){ctx.translate(o.x-o.w/2,o.y-h*.97);ctx.scale(k,k);ctx.beginPath();ctx.rect(-5,-5,im.width+10,im.height+10);IS_TOWER_CUT.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y));ctx.closePath();ctx.clip('evenodd');ctx.drawImage(im,0,0);}
+    else{ctx.fillStyle='rgba(15,20,35,.3)';ctx.beginPath();ctx.ellipse(o.x,o.y,135*k/.7,26,0,0,TAU);ctx.fill();ctx.translate(o.x,o.y-62*k/.7);ctx.rotate(-1.42);ctx.scale(k,k);ctx.translate(-192,-160);ctx.beginPath();IS_TOWER_CUT.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y));ctx.closePath();ctx.clip();ctx.drawImage(im,0,0);}
+    ctx.restore();return;}
+  if(S==='ismai'){drawMaiOW();return;}
   if(S==='isent'){const im=isTint('isle_entrance');if(!im)return;const E=IS_ENT;ctx.drawImage(im,o.x-E.ax*E.k,o.y-E.ay*E.k,im.width*E.k,im.height*E.k);return;}   /* the designer's painting of the entrance, all but its sky */
   if(S==='isp'){const im=isTint(o.img,o.mode);if(!im)return;const w=o.w,h=w*im.height/im.width;ctx.save();ctx.translate(o.x,o.y);if(o.shadow){ctx.fillStyle='rgba(15,20,35,.25)';ctx.beginPath();ctx.ellipse(0,0,w*.4,w*.12,0,0,TAU);ctx.fill();}if(o.flip)ctx.scale(-1,1);ctx.drawImage(im,-w/2,-h*.97,w,h);ctx.restore();return;}
   if(S==='isarch'){const im=isTint('ruins_arch','ghost');if(!im)return;const w=o.w,h=w*im.height/im.width,P=RUIN_CUT[o.cut];   /* ethereal: see-through, glowing, shimmering */
@@ -113,8 +124,41 @@ function drawISFx(){if(!inIS()||SCENE!=='thorn')return;
 function drawISTitle(){if(!inIS()||IST.t>=4.5||SCENE!=='thorn')return;IST.t+=1/60;const a=Math.min(1,IST.t*1.5,(4.5-IST.t)*1.2);ctx.save();ctx.setTransform(DPR,0,0,DPR,0,0);ctx.globalAlpha=a;ctx.textAlign='center';
   ctx.font='700 30px "Alegreya SC", Georgia, serif';ctx.fillStyle='rgba(10,14,24,.55)';ctx.fillText('Island Ruins',W/2+2,H*.2+2);ctx.fillStyle='#eef3fb';ctx.fillText('Island Ruins',W/2,H*.2);ctx.restore();}
 /* ---- in and out: up the stairs from underground ruins room 5, back down through the entrance ---- */
-function enterIsland(){SCENE='thorn';lum.x=ISX+IS_DOOR.x;lum.y=ISY+IS_DOOR.y+40;lum.face=-1;lum.dir='down';lum.state='idle';lum.vx=lum.vy=0;cam.x=lum.x;cam.y=lum.y-60;THORN.t=99;IST.t=0;if(typeof jak2In==='function'&&jak2In())resetJak2Follow();}
+function enterIsland(){SCENE='thorn';lum.x=ISX+IS_DOOR.x;lum.y=ISY+IS_DOOR.y+40;lum.face=-1;lum.dir='down';lum.state='idle';lum.vx=lum.vy=0;cam.x=lum.x;cam.y=lum.y-60;THORN.t=99;IST.t=0;if(typeof C2!=='undefined'&&!C2.maiSeen)setTimeout(isGoalCount,1200);if(typeof jak2In==='function'&&jak2In())resetJak2Follow();}
 THINT.push({get x(){return ISX+IS_DOOR.x;},get y(){return ISY+IS_DOOR.y;},get reach(){return inIS()?75:-1;},door:true,onInteract:()=>dunGo(36,415,580,1)});
 /* playtest shortcut from chapter select: underground ruins room 5, Jak in the party, ready to climb to the island */
 function chPlaytestIsle(){chPlaytestBreezeway();Object.assign(C2,{lumaMet:1,jak:1,ruinWay:1,ruinsIn:1,bvArrived:1});if(!PARTY_ORDER.includes('jak'))PARTY_ORDER.push('jak');HEROES.jak.hp=HEROES.jak.maxHp;
   hsGoal('Climb the stairs to the island ruins');enterDun(36,450,640,1);resetJak2Follow();}
+
+/* ---- the four inspect spots: Lum learns this was a holy water temple; once all four are seen, the screen glows white and Mai is there ---- */
+const IS_SPOTS=[[()=>[IS_FONT.x,IS_FONT.y+26],"A basin adorned with angels?"],[()=>[IS_TOWER.x,IS_TOWER.y+40],"Who worshiped here?"],[null,"Four statues in a semi circle?"],[()=>[IS_FALLEN.x,IS_FALLEN.y+30],"I recognize this priestess of water from somewhere?"]];
+const ISS={g0:-1,m0:-1,mx:0,my:0};
+function isSeen(){let n=0;for(let i=0;i<4;i++)if((C2.isl||0)>>i&1)n++;return n;}
+function isGoalCount(){if(!C2.maiSeen)hsGoal('Explore the island ruins ('+isSeen()+'/4)');}
+function isInspect(i){lum.state='idle';lum.vx=lum.vy=0;const fresh=!((C2.isl||0)>>i&1);C2.isl=(C2.isl||0)|(1<<i);
+  talk([['Lum',IS_SPOTS[i][1]]],false,()=>{if(C2.maiSeen)return;isGoalCount();if(fresh&&isSeen()===4)setTimeout(isGlow,350);});}
+IS_SPOTS.forEach(([pos],i)=>{if(pos)THINT.push({get x(){return ISX+pos()[0];},get y(){return ISY+pos()[1];},get reach(){return inIS()?105:-1;},onInteract:()=>isInspect(i)});});
+for(const [x,y] of IS_STATUES)THINT.push({get x(){return ISX+x;},get y(){return ISY+y+24;},get reach(){return inIS()?90:-1;},onInteract:()=>isInspect(2)});
+function isGlow(){ISS.g0=performance.now();WEVENT.on=true;lum.vx=lum.vy=0;try{sfxLearn();}catch(e){}}
+/* Mai: Sage Luma's sprite washed pale and see-through */
+function maiSheet(){if(IMG.mai)return IMG.mai;const im=IMG.luma;if(!ready(im))return null;const c=document.createElement('canvas');c.width=im.naturalWidth;c.height=im.naturalHeight;const g=c.getContext('2d');g.drawImage(im,0,0);
+  try{const d=g.getImageData(0,0,c.width,c.height),p=d.data;for(let i=0;i<p.length;i+=4){if(!p[i+3])continue;const L=.3*p[i]+.59*p[i+1]+.11*p[i+2];p[i]=Math.min(255,L*.62+95);p[i+1]=Math.min(255,L*.64+100);p[i+2]=Math.min(255,L*.6+120);}g.putImageData(d,0,0);}catch(e){}
+  C1ATL.mai=C1ATL.luma;return IMG.mai=c;}
+const MAI_H=140;
+function drawMaiFig(x,y,al,anim){const sh=maiSheet();if(!sh)return;ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,x,y-MAI_H*.5,MAI_H*.6,'200,215,255',.22*al);ctx.restore();
+  const yy=y+Math.sin(T*1.6)*3-6;c1Frame(ctx,'mai',anim||'idle',0,x,yy,MAI_H,false,.85*al,0);ctx.save();ctx.globalCompositeOperation='lighter';c1Frame(ctx,'mai',anim||'idle',0,x,yy,MAI_H,false,.22*al,0);ctx.restore();}   /* drawn twice, the second time added on, so she glows white through the blue cast */
+function drawMaiOW(){if(typeof C2==='undefined'||!C2.maiSeen||C2.maiJoined||ISS.m0>=0)return;const g=ISS.g0>=0?Math.min(1,(performance.now()-ISS.g0)/1000-1.1):1;if(g<=0)return;drawMaiFig(ISX+IS_MAI.x,ISY+IS_MAI.y,g,'idle');}
+THINT.push({get x(){return ISX+IS_MAI.x;},get y(){return ISY+IS_MAI.y+20;},get reach(){return inIS()&&C2.maiSeen&&!C2.maiJoined&&ISS.m0<0&&ISS.g0<0?110:-1;},onInteract:maiTalk});
+function maiTalk(){lum.state='idle';lum.vx=lum.vy=0;lum.face=lum.x<ISX+IS_MAI.x?1:-1;
+  talk([['Mai',"…You came. I knew we would meet again."],['Mai',"(She begins to cry.)"],['Mai',"I've wandered these ruins for as long as I can remember… waiting."],['Lum',"Who are you? I feel… a strange connection to you."]],false,()=>{ISS.m0=performance.now();ISS.mx=ISX+IS_MAI.x;ISS.my=ISY+IS_MAI.y;WEVENT.on=true;try{sfxGhost();}catch(e){}});}
+function maiDone(){C2.maiJoined=1;ISS.m0=-1;WEVENT.on=false;for(const id of PARTY_ORDER)HEROES[id].hp=HEROES[id].maxHp;
+  talk([['Lum',"I don't feel possessed… I feel rejuvenated."],['Lum',"I must return to Sage Luma now!"]],false,()=>hsGoal('Return to Sage Luma at the Sanctuary of Water'));}
+/* the white glow when Mai appears, and Mai passing into Lum: Lum glows blue, flashes as Mai, then is Lum again */
+function drawISEvents(){if(!inIS()||SCENE!=='thorn')return;const now=performance.now();
+  if(ISS.g0>=0){const t=(now-ISS.g0)/1000,a=t<1?t:t<1.5?1:Math.max(0,1-(t-1.5)/1.3);if(t>=1&&!C2.maiSeen){C2.maiSeen=1;hsGoal('Speak with the ghost by the big arch');}
+    ctx.save();ctx.fillStyle=`rgba(250,252,255,${a.toFixed(3)})`;ctx.fillRect(cam.x-3000,cam.y-3000,6000,6000);ctx.restore();if(t>2.8){ISS.g0=-1;WEVENT.on=false;}}
+  if(ISS.m0>=0){const t=(now-ISS.m0)/1000,lx=lum.x,ly=lum.y;lum.vx=lum.vy=0;
+    if(t<1.4){const u=t/1.4,e=u*u*(3-2*u);drawMaiFig(ISS.mx+(lx-ISS.mx)*e,ISS.my+(ly-ISS.my)*e,1-u*.6,'idle');}   /* she drifts into Lum */
+    else if(t<2.6){const u=(t-1.4)/1.2;ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,lx,ly-50,90+40*Math.sin(u*Math.PI),'90,150,255',.55*Math.sin(u*Math.PI)+.15);ctx.restore();}   /* Lum glows blue */
+    else if(t<3.1){const u=(t-2.6)/.5;ctx.save();ctx.fillStyle=`rgba(255,255,255,${(.8*(1-u)).toFixed(3)})`;ctx.fillRect(cam.x-3000,cam.y-3000,6000,6000);ctx.restore();drawMaiFig(lx,ly,1,'idle');}   /* a flash: for a moment she is Mai */
+    else maiDone();}}
