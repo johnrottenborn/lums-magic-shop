@@ -735,7 +735,7 @@ const CASES = {
       await g_(() => { const H = window.__g.HEROES; H.lum.hp = H.lum.maxHp; H.amroth.hp = H.amroth.maxHp; for (const h of window.__g.BATTLE.heroes) h.ko = 0; }); }
     await g_(() => { const B = window.__g.BATTLE; B.phase = 'win'; B.t = 1; B.rewarded = 0; });
     for (let i = 0; i < 40 && (await g_(() => window.__g.BATTLE.on)); i++) { await p.keyboard.press('Space'); await wait(300); }
-    check(await g_(() => window.__g.BAG.includes('wbboots') && window.__g.WB8.intense === 1), 'the mini boss did not drop the boots, or the collapse did not worsen');
+    check(await g_(() => window.__g.BAG.includes('demonstone') && window.__g.WB8.intense === 1), 'the mini boss did not drop the Demon Stone, or the collapse did not worsen');
     for (let i = 0; i < 20 && !(await g_(() => window.__g.DLG.active)); i++) await wait(150);
     { const l = await g_(() => window.__g.DLG.active && window.__g.DLG.lines[0]); check(l && l[0] === 'Amroth' && /still chasing from behind/.test(l[1]), 'Amroth did not warn after the mini boss: ' + JSON.stringify(l)); }
     for (let i = 0; i < 3 && await g_(() => window.__g.DLG.active); i++) { await p.keyboard.press('Enter'); await wait(350); }
@@ -1120,16 +1120,19 @@ const CASES = {
   },
   async 'breezevale-merchant'(p) {
     const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop', g_ = (f, a) => p.evaluate(f, a);
-    await g_(() => { const g = window.__g; g.startChapter2(); g.c2Skip(); g.WB10.st = 2; g.chPlaytestBreezeway(); g.MATS.foxtail = 1; g.BAG.push('foxtail'); g.MATS.seagem = 2; g.BAG.push('seagem'); g.enterBreezevale(); g.enterDun(25, 850, 640, 1); }); await wait(1200);
+    await g_(() => { const g = window.__g; g.startChapter2(); g.c2Skip(); g.WB10.st = 2; g.chPlaytestBreezeway(); g.MATS.foxtail = 1; g.BAG.push('foxtail'); g.MATS.seagem = 2; g.BAG.push('seagem'); g.BAG.push('demonstone'); g.C2.slippers = 0; g.enterBreezevale(); g.enterDun(25, 850, 640, 1); }); await wait(1200);
     await g_(() => window.__g.NEAR.onInteract()); await wait(400);
     await g_(() => { const g = window.__g; g.DLG.active = false; g.DLG.onEnd && g.DLG.onEnd(); }); await wait(400);
-    check(await g_(() => window.__g.CHOICE.on && window.__g.CHOICE.opts.length === 4), 'the Breezevale Merchant did not open his trade menu');
+    check(await g_(() => window.__g.CHOICE.on && window.__g.CHOICE.opts.length === 5), 'the Breezevale Merchant did not open his trade menu');
     await p.screenshot({ path: path.join(SHOTS, `breezevale-merchant-${vp}.png`) });
     const pots = await g_(() => window.__g.BAG.filter(x => x === 'potion').length);
     await g_(() => window.__g.pickChoice(0)); await wait(700);
     check(await g_(n => window.__g.BAG.filter(x => x === 'potion').length === n + 1 && !window.__g.MATS.foxtail, pots), 'trading a Fox Tail did not give a Healing Potion');
     await wait(400); await g_(() => window.__g.pickChoice(2)); await wait(700);
     check(await g_(() => window.__g.BAG.includes('seabait') && !window.__g.MATS.seagem && !window.__g.C2.potency), 'two Sea Gems did not trade for Sea Bait');
+    await wait(400); await g_(() => window.__g.pickChoice(3)); await wait(700);
+    check(await g_(() => window.__g.BAG.includes('wbboots') && !window.__g.BAG.includes('demonstone') && window.__g.C2.slippers === 1 && window.__g.CHOICE.opts.length === 4), 'a Demon Stone did not trade (once only) for the Snake Slippers');
+    await p.screenshot({ path: path.join(SHOTS, `breezevale-merchant-after-${vp}.png`) });
     await g_(() => { window.__g.DLG.active = false; window.__g.CHOICE.on = false; });
   },
   async 'coastal-breezeway'(p) {
