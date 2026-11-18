@@ -1084,6 +1084,11 @@ const CASES = {
     await g_(() => window.__g.NEAR.onInteract()); await wait(1800);
     check(await g_(() => { const g = window.__g; return g.SCENE === 'thorn' && g.inIS() && g.isFree(g.lum.x, g.lum.y); }), 'the stairs in room 5 should lead up to the Island Ruins');
     await wait(1500); await p.screenshot({ path: path.join(SHOTS, `island-ruins-${vp}.png`) });
+    for (const [x, y, top, what] of [[1400, 1230, 1110, 'the old font'], [560, 1170, 1060, 'the chapel'], [1250, 830, 730, 'a broken statue']]) {
+      await g_(([x, y]) => { const g = window.__g; g.lum.x = g.ISX + x; g.lum.y = g.ISY + y; }, [x, y]); await wait(200);
+      await p.keyboard.down('ArrowUp'); await wait(1600); await p.keyboard.up('ArrowUp'); await wait(100);
+      check(await g_((top) => window.__g.lum.y - window.__g.ISY > top - 15, top), `Lum walked through ${what} on the island`);
+    }
     await g_(() => { const g = window.__g; g.lum.x = g.ISX + g.IS_DOOR.x; g.lum.y = g.ISY + g.IS_DOOR.y + 20; }); await wait(600);
     await g_(() => window.__g.NEAR.onInteract()); await wait(1500);
     check(await g_(() => window.__g.SCENE === 'dun' && window.__g.DUN.room === 36), 'the island entrance should lead back down to room 5');

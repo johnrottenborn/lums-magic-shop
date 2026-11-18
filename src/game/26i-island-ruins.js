@@ -32,6 +32,7 @@ function isSolid(lx,ly){
   {const A=IS_SEAM;if(rect(A.x-A.w*.5,A.y-30,A.x-A.w*.08,A.y-4)||rect(A.x+A.w*.1,A.y-30,A.x+A.w*.5,A.y-4))return true;}   /* the big arch's two pillars */
   for(const [x,y] of IS_STATUES)if(ell(x,y-10,62,22))return true;
   for(const [x,y] of IS_LOWARCH)if(rect(x-150,y-30,x+150,y-4))return true;
+  for(const [x,y,w] of IS_RUBS)if(ell(x,y-4,w*.42,Math.max(10,w*.14)))return true;
   if(rect(IS_FALLEN.x-IS_FALLEN.len*.5,IS_FALLEN.y-58,IS_FALLEN.x+IS_FALLEN.len*.5+90,IS_FALLEN.y+8))return true;
   for(const [x,y,w] of IS_BOULDERS)if(ell(x,y-8,w*.42,w*.16))return true;
   return false;}
@@ -40,12 +41,13 @@ function isFree(x,y){const lx=x-ISX,ly=y-ISY;if(ly<IS_ARCHY+10)return false;
   if(near<70&&ly>IS_TOP+60)return false;   /* keep off the cliff edge */
   return !isSolid(lx,ly);}
 /* ---- scenery ---- */
-function isProps(P){const X=x=>x+ISX,Y=y=>y+ISY;
+const IS_RUBS=[];   /* fallen chunks big enough to walk round */
+function isProps(P){const X=x=>x+ISX,Y=y=>y+ISY;IS_RUBS.length=0;const rub=o=>{P.push(o);if(o.w>=55)IS_RUBS.push([o.x-ISX,o.y-ISY,o.w]);};
   for(let i=0,n=11;i<n;i++){const t=i/(n-1),x=280+t*1600,y=IS_ARCHY-30*Math.sin(Math.PI*t),cut=['crown','pillars','left','crown','left','pillars','crown','left','pillars','crown','left'][i];   /* the broken gateways along the top, in a gentle curve */
     P.push({t:'isarch',x:X(x),y:Y(y),w:300,flip:i%2===1,cut});
-    for(const [u0,v0,u1,v1,dx,dy,rot,sz] of RUIN_RUBBLE[cut]||[])P.push({t:'isrub',src:[u0,v0,u1,v1],x:X(x)+dx*250*(i%2?-1:1),y:Y(y)+30+dy*80,w:250*sz*.55,rot});}
+    for(const [u0,v0,u1,v1,dx,dy,rot,sz] of RUIN_RUBBLE[cut]||[])rub({t:'isrub',src:[u0,v0,u1,v1],x:X(x)+dx*250*(i%2?-1:1),y:Y(y)+30+dy*80,w:250*sz*.55,rot});}
   for(const [x,y,cut,fl] of IS_LOWARCH){P.push({t:'isarch',x:X(x),y:Y(y),w:300,flip:fl,cut});   /* more broken gateways along the bottom */
-    for(const [u0,v0,u1,v1,dx,dy,rot,sz] of RUIN_RUBBLE[cut]||[])P.push({t:'isrub',src:[u0,v0,u1,v1],x:X(x)+dx*250*(fl?-1:1),y:Y(y)-20-dy*60,w:250*sz*.55,rot});}
+    for(const [u0,v0,u1,v1,dx,dy,rot,sz] of RUIN_RUBBLE[cut]||[])rub({t:'isrub',src:[u0,v0,u1,v1],x:X(x)+dx*250*(fl?-1:1),y:Y(y)-20-dy*60,w:250*sz*.55,rot});}
   P.push({t:'isp',img:'isle_chapel',x:X(IS_CHAPEL.x),y:Y(IS_CHAPEL.y),w:IS_CHAPEL.w});
   P.push({t:'isent',x:X(IS_ENT.x),y:Y(IS_ENT.y),w:700});
   P.push({t:'isarch',x:X(IS_SEAM.x),y:Y(IS_SEAM.y),w:IS_SEAM.w,flip:false,cut:'pillars',opaque:1});
@@ -54,7 +56,7 @@ function isProps(P){const X=x=>x+ISX,Y=y=>y+ISY;
   P.push({t:'isfallen',x:X(IS_FALLEN.x),y:Y(IS_FALLEN.y),len:IS_FALLEN.len,w:IS_FALLEN.len});
   for(const [x,y,w] of IS_BOULDERS)P.push({t:'isp',img:['crockegg','crockpile','crockheap'][Math.floor(ISH_(x,1)*3)],mode:'rock',x:X(x),y:Y(y),w,flip:ISH_(x,2)<.5,shadow:1});
   for(let i=0;i<46;i++){const x=300+ISH_(i,3)*2200,y=600+ISH_(i,4)*1250;if(i%2||!isFree(X(x),Y(y)))continue;   /* rubble through the ruins */
-    P.push({t:'isrub',src:[[.6,.05,.8,.22],[.3,.04,.58,.2],[.62,.3,.95,.55],[.78,.2,.95,.4]][i%4],x:X(x),y:Y(y),w:60+ISH_(i,6)*50,rot:(ISH_(i,7)-.5)*3});}
+    rub({t:'isrub',src:[[.6,.05,.8,.22],[.3,.04,.58,.2],[.62,.3,.95,.55],[.78,.2,.95,.4]][i%4],x:X(x),y:Y(y),w:60+ISH_(i,6)*50,rot:(ISH_(i,7)-.5)*3});}
 }
 function drawISProp(o){const S=o.t;
   if(S==='isent'){const im=isTint('isle_entrance');if(!im)return;const E=IS_ENT;ctx.drawImage(im,o.x-E.ax*E.k,o.y-E.ay*E.k,im.width*E.k,im.height*E.k);return;}   /* the designer's painting of the entrance, all but its sky */
