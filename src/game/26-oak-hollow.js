@@ -145,7 +145,7 @@ function setupDun(){DUNINT.length=0;const r=DUN.room,D=(x,y,reach,fn)=>DUNINT.pu
   if(r===30){D(470,748,95,()=>dunGo(29,700,612,1));D(814,360,40,()=>dunGo(31,690,728,1));}   /* the far door at the top of the stair, to the altar chamber */
   if(r===31){D(690,755,70,()=>dunGo(30,812,372,1));for(const n of BVNPC)if(n.room===31)DUNINT.push({x:n.x,y:n.y+10,reach:100,onInteract:()=>bvNpcTalk(n)});}
   if(r===32&&!C2.ruinsIn){C2.ruinsIn=1;hsGoal('Explore the underground ruins');}
-  if(r===32){D(318,566,75,()=>goScene(leaveRuins));D(840,508,55,()=>dunGo(33,660,730,1));}   /* the steps back up; the way on to room 2 */
+  if(r===32){D(318,566,75,()=>goScene(leaveRuins));D(840,508,55,()=>dunGo(33,660,730,1));D(948,516,45,()=>say("A narrow side passage… it's too dark to see where it goes."));}   /* the steps back up; the way on to room 2; the small arch on the right (its room still to come) */   /* the steps back up; the way on to room 2 */
   if(r===37){RL6.t=-1;D(740,738,75,ruinsLeave6);DUNINT.push({x:905,y:640,reach:80,onInteract:ruinsSkeleton});}   /* the only way out; the old explorer's skeleton (touching it wakes the Wraith Lord) */
   if(r===36){D(660,738,80,()=>dunGo(35,728,525,1));D(412,560,55,()=>goScene(enterIsland));D(690,518,45,()=>dunGo(37,740,712,1));}   /* back to the long hall; the stairs up to the island ruins (still to come); the gap to room 6 */
   if(r===35){D(660,738,80,()=>dunGo(34,650,530,1));D(728,512,45,()=>dunGo(36,660,712,1));}   /* back to the crypt; the tunnel at the far end to room 5 */
