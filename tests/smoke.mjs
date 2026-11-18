@@ -1009,8 +1009,9 @@ const CASES = {
     check(await g_(() => window.__g.SCENE === 'dun' && window.__g.DUN.room === 32 && window.__g.dunFree(window.__g.lum.x, window.__g.lum.y)), 'the hidden entrance did not lead down to underground ruins room 1 (room 32)');
     await p.screenshot({ path: path.join(SHOTS, `ruins-room1-${vp}.png`) });
     check(await g_(() => window.__g.dunFree(840, 515) && window.__g.dunFree(700, 700)), 'the ruins tunnel floor should be walkable to the far end');
-    check(await g_(() => window.__g.DFOES.filter(f => f.room === 32 && f.kind === 'rskel' && f.over && f.over.hp === 18 && f.over.atk === 4).length >= 3), 'skeletons should roam the ruins tunnel');
-    check(await g_(() => window.__g.DFOES.filter(f => f.room === 32 && f.kind === 'ghost').length >= 2 && window.__g.FOE_TYPES.ghost.hp === 14), 'ghosts should drift through the ruins tunnel');
+    check(await g_(() => window.__g.DFOES.filter(f => f.kind === 'rskel' && f.over && f.over.hp === 18 && f.over.atk === 4).length >= 6), 'skeletons should roam the ruins');
+    check(await g_(() => [32, 33, 34, 35, 36].every(r => { const n = window.__g.DFOES.filter(f => f.room === r && (f.kind === 'ghost' || f.kind === 'rskel')).length; return n >= 2 && n <= 3; }) && window.__g.FOE_TYPES.ghost.hp === 14), 'ruins rooms 1–5 should each have 2–3 ghosts and skeletons');
+    check(await g_(() => { const g = window.__g, d = g.DUN.room; g.DUN.room = 32; const a = g.dunH(570, 330), b = g.dunH(690, 400); g.DUN.room = d; return Math.abs(a - b) < 1; }), 'people should not shrink climbing the steps in ruins room 1');
     await g_(() => window.__g.NEAR.onInteract()); await wait(1500);
     check(await g_(() => window.__g.SCENE === 'thorn' && window.__g.inBW()), 'the steps in ruins room 1 did not lead back up to the Breezeway');
     await g_(() => clearInterval(window.__noFoes));
@@ -1061,7 +1062,7 @@ const CASES = {
   },
   async 'learn-potency'(p) {
     const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop', g_ = (f, a) => p.evaluate(f, a);
-    await g_(() => { const g = window.__g; g.startChapter2(); g.c2Skip(); g.WB10.st = 2; g.chPlaytestBreezeway(); g.C2.potency = 0; g.DFOES.forEach(f => f.calm = 99); g.enterDun(32, 840, 515, 1); }); await wait(600);
+    await g_(() => { const g = window.__g; g.startChapter2(); g.c2Skip(); g.WB10.st = 2; g.chPlaytestBreezeway(); g.C2.potency = 0; window.__calmT = setInterval(() => g.DFOES.forEach(f => f.calm = 99), 50); g.enterDun(32, 840, 515, 1); }); await wait(600);   // the ruins' foes stay calm for this walk-through
     await g_(() => window.__g.NEAR.onInteract()); await wait(1500);
     check(await g_(() => window.__g.DUN.room === 33), 'the end of the ruins tunnel should lead to room 2 (the hydra room, 33)');
     await g_(() => { const g = window.__g; g.lum.x = 770; g.lum.y = 625; }); await wait(600);
