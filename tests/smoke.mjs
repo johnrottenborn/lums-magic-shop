@@ -1005,7 +1005,7 @@ const CASES = {
     check(await g_(() => window.__g.SCENE === 'dun' && window.__g.DUN.room === 32 && window.__g.dunFree(window.__g.lum.x, window.__g.lum.y)), 'the hidden entrance did not lead down to underground ruins room 1 (room 32)');
     await p.screenshot({ path: path.join(SHOTS, `ruins-room1-${vp}.png`) });
     check(await g_(() => window.__g.dunFree(840, 515) && window.__g.dunFree(700, 700)), 'the ruins tunnel floor should be walkable to the far end');
-    check(await g_(() => window.__g.DFOES.filter(f => f.room === 32 && f.kind === 'rskel').length >= 3), 'skeletons should roam the ruins tunnel');
+    check(await g_(() => window.__g.DFOES.filter(f => f.room === 32 && f.kind === 'rskel' && f.over && f.over.hp === 27).length >= 3), 'skeletons should roam the ruins tunnel');
     await g_(() => window.__g.NEAR.onInteract()); await wait(1500);
     check(await g_(() => window.__g.SCENE === 'thorn' && window.__g.inBW()), 'the steps in ruins room 1 did not lead back up to the Breezeway');
     await g_(() => clearInterval(window.__noFoes));
