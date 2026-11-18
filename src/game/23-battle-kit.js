@@ -180,6 +180,14 @@ function drawBattleDemon(f){const S=bS(),B=BATTLE,isBrute=f.type==='brute',bg=f.
   if(f.showHp>0&&!f.dead){const bw=60*S,bx=x-bw/2,by=y+16*S;ctx.save();ctx.globalAlpha=Math.min(1,f.showHp*3);ctx.fillStyle='rgba(20,20,30,.55)';rr(bx-2,by-2,bw+4,10,5);ctx.fill();ctx.fillStyle='#7ee08a';rr(bx,by,bw*f.hp/f.max,6,3);ctx.fill();ctx.restore();}}
 
 /* the Water Nymph (designer's art): stands in her casting pose; on her turn water gathers in her raised hand and two water bolts fly at a hero */
+/* the Ghost: drawn see-through with a pale glow; it fades out on the wind-up, is gone through the attack, and appears at its target only at the last instant */
+function ghostAlpha(f){const B=BATTLE,me=B.foes[B.foeI]===f;if(!me)return 1;if(B.phase==='foeWind')return Math.max(0,1-B.t/.55);if(B.phase==='foeLeap')return B.t>B.leapD-.15?1:0;if(B.phase==='foeBack')return B.t<.25?Math.max(0,1-B.t/.2):Math.min(1,(B.t-.25)/.3);return 1;}
+function drawBattleGhost(f){const S=bS(),B=BATTLE,me=B.foes[B.foeI]===f,x=f.x+f.ox,h=Math.min(250*S,W*.46)*(f.s||1),y=f.y+f.oy-14*S+Math.sin(T*1.7+f.ph)*7*S;let al=ghostAlpha(f);if(f.dead)al*=Math.max(0,1-f.dead/.9);if(al<=0)return;
+  bshadow(f.x+f.ox,f.y+f.oy,h*.16,h*.035,.18*al);ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,x,y-h*.5,h*.55,'190,200,255',(.12+.05*Math.sin(T*2+f.ph))*al);ctx.restore();
+  const casting=me&&B.phase==='foeLeap';const an=casting?'cast':'float',fi=casting?5:Math.floor(T*5+f.ph)%6;
+  ctx.save();ctx.globalAlpha=al*.72;c1Frame(ctx,'ghost',an,fi,x+(f.hit>0?Math.sin(f.hit*50)*4:0),y,h,true,al*.72,f.hit>0?Math.min(1,f.hit*3):0);ctx.restore();
+  ctx.save();ctx.globalCompositeOperation='lighter';ctx.globalAlpha=al*.18;c1Frame(ctx,'ghost',an,fi,x+Math.sin(T*3)*3*S,y,h*1.02,true,al*.18,0);ctx.restore();   /* a faint shimmering double */
+  if(me&&B.phase==='foeLeap'&&B.t>B.leapD-.15){ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,x,y-h*.5,h*.6,'220,225,255',.35);ctx.restore();}}
 function drawBattleSnake(f){const S=bS(),x=f.x+f.ox,y=f.y+f.oy,h=Math.min(320*S,W*.56)*(f.s||1),im=IMG.seasnake;let al=1;if(f.dead){al=Math.max(0,1-f.dead/.7);if(al<=0)return;}   /* the Sea Snake (the designer's art, facing left), swaying up out of a ring of water */
   bshadow(x,y,h*.24,h*.05,.3*al);if(!ready(im))return;const w=h*im.width/im.height,sw=Math.sin(T*1.5+f.ph);
   ctx.save();ctx.strokeStyle=`rgba(200,230,250,${(.35*al).toFixed(3)})`;ctx.lineWidth=2*S;for(let i=0;i<2;i++){const q=(T*.6+i/2)%1;ctx.globalAlpha=1-q;ctx.beginPath();ctx.ellipse(x,y,h*(.12+q*.18),h*(.03+q*.04),0,0,TAU);ctx.stroke();}ctx.restore();

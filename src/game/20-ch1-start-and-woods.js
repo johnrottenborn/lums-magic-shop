@@ -11,6 +11,7 @@ C1ATL.amroth={"cw":230,"ch":256,"rows":{"down":[0,1],"up":[1,2],"side":[2,6],"ru
 const AMR_H=137,AMR_BH=166;   /* same size beside Lum in and out of battle */
 C1ATL.alma={"cw":200,"ch":250,"rows":{"down":[0,6],"up":[1,5],"side":[2,4],"run":[3,6],"idle":[4,6]}}; // Alma (Amroth's wife, not in battle): down walk, up walk, side walk + run (these face RIGHT: flip for left), standing idle. Not placed in the game yet
 C1ATL.alma_sit={"cw":200,"ch":240,"rows":{"sitback":[0,5],"sitside":[1,3],"sitfloor":[2,6],"sitchair":[3,6]}}; // Alma sitting: from behind, side, cross-legged on the floor, on a seat (0 waves, 1 hand to chin, 2-5 hands on knees)
+C1ATL.ghost={"cw":190,"ch":250,"rows":{"up":[0,5],"side":[1,4],"float":[2,6],"cast":[3,6]}}; // the ruins' Ghost (designer's sheet): back walk, side walk + float + cast (these face RIGHT: flip for left)
 C1ATL.luma=C1ATL.alma; // Sage Luma, Alma's much older sister (water temple, neighbouring town): Alma's frames recoloured, light blond hair and white robes. Stands in the Sanctuary of Water's altar chamber (room 31)
 C1ATL.breeze_girl={"cw":200,"ch":250,"rows":{"down":[0,6],"up":[1,5],"side":[2,4],"run":[3,6],"idle":[4,6]}}; // a Breezevale townsgirl (citizen, not in battle): down walk, up walk, side walk + run (face LEFT; flip for right), standing idle. For Breezevale Cove, not placed yet
 C1ATL.breeze_boy=C1ATL.breeze_girl; // a Breezevale townsboy (citizen, not in battle): same layout as the townsgirl. For Breezevale Cove, not placed yet
@@ -21,7 +22,7 @@ const JAK2_H=150,JAK2_BH=178; // overworld / battle draw heights
 const SPAR_H=139,SPAR_BH=164; // overworld / battle draw heights (a head taller than Lum)
 function c1Frame(c,sh,anim,i,x,y,h,flip,alpha,flash){const im=IMG[sh],A=C1ATL[sh];if(!ready(im)||!A.rows[anim])return;const [r,n]=A.rows[anim];i=clamp(i|0,0,n-1);const k=h/A.ch;
   c.save();c.translate(x,y);if(flip)c.scale(-1,1);c.globalAlpha*=alpha;if(flash>0)c.filter='brightness(1.8)';c.drawImage(im,i*A.cw,r*A.ch,A.cw,A.ch,-A.cw*k/2,-A.ch*k*.985,A.cw*k,A.ch*k);c.filter='none';c.restore();}
-const UNDEAD=t=>t==='rskel'||t==='reaper'||t==='skel';
+const UNDEAD=t=>t==='rskel'||t==='reaper'||t==='skel'||t==='ghost';
 /* ---------- starting the chapter ---------- */
 function c1Reset(){ZOOMK=1;if(typeof FKS!=='undefined'){FKS.st=0;FKS.chaos=0;FKS.fire=null;}dfoesBuilt=false;DFOES.length=0;CH=1;HERO='lum';PARTY_ORDER.length=1;PARTY_ORDER[0]='lum';HEROES.jak.hp=5;HEROES.spar.hp=HEROES.spar.maxHp;C1.comboS=0;thFoesBuilt=false;THFOES.length=0;JAKF=null;PC='lum';ANIM=LUM_ANIM;
   Object.assign(PARTY.lum,{main:'lumpouch',off:null,head:null,chest:'lumrobe',boots:null,charm:null});Object.assign(PARTY.jak,{main:'jakaxe',off:'jakstick',head:null,chest:'jakcoat',boots:null,charm:null});equipStartingKeepsake();
