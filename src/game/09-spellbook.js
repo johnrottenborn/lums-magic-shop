@@ -164,6 +164,8 @@ function menuTap(x,y){const bx=(x-MENU.ox)/MENU.S,by=(y-MENU.oy)/MENU.S;for(let 
   if(bx<-10||bx>BK.W+10||by<-BK.top||by>BK.H+BK.bot)closeMenu();}
 
 /* sounds for all of the above */
+/* a short rising jingle for learning something new (powders, potions, powers): distinct from the item chime */
+function sfxLearn(){if(!SND.ready)return;const t=SND.ctx.currentTime;[[72,0],[76,.11],[79,.22],[84,.33]].forEach(([n,d],i)=>bell(t+d,NOTE(n),.08,1.2,SND.sfx,(i-1.5)*.25));[84,88,91].forEach((n,i)=>bell(t+.5+i*.012,NOTE(n),.07,2.6,SND.sfxVerb||SND.sfx,(i-1)*.3));[96,100,103,108].forEach((n,i)=>bell(t+.62+i*.07,NOTE(n),.035,1.6,SND.sfxVerb||SND.sfx,(i-1.5)*.3));}
 function sfxItem(){if(!SND.ready)return;const t=SND.ctx.currentTime;[84,88,91,96,100].forEach((n,i)=>bell(t+i*.07,NOTE(n),.07,1.4,SND.sfx,(i-2)*.2));bell(t+.42,NOTE(103),.05,2.2,SND.sfxVerb||SND.sfx,0);}
 function sfxEquip(){if(!SND.ready)return;const t=SND.ctx.currentTime;noiseHit(t,.12,'bandpass',700,1.4,.18,SND.sfx);pluck(t+.02,NOTE(60),.12,.25,SND.sfx,0,.3);[91,96].forEach((n,i)=>bell(t+.08+i*.08,NOTE(n),.05,1,SND.sfx,0));}
 function sfxPage(v=.5){if(!SND.ready)return;const t=SND.ctx.currentTime;noiseHit(t,.18,'bandpass',2600,.8,.05*v,SND.sfx,1400);}

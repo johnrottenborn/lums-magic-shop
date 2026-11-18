@@ -1036,6 +1036,14 @@ const CASES = {
     await g_(() => window.__g.continueGame()); await wait(2000);
     check(await g_(() => { const g = window.__g; return g.CH === 2 && g.SCENE === 'dun' && g.DUN.room === 27 && g.C2.jak && g.C2.lumaMet && g.PARTY_ORDER.includes('jak') && g.MATS.foxtail === 3; }), 'Chapter 2 should save and continue where Lum was, with Jak, Sage Luma met and the satchel');
   },
+  async 'learn-potency'(p) {
+    const g_ = (f, a) => p.evaluate(f, a);
+    await g_(() => { const g = window.__g; g.startChapter2(); g.c2Skip(); g.WB10.st = 2; g.chPlaytestBreezeway(); g.C2.potency = 0; g.enterDun(32, 340, 590, 1); g.ruinsBook(); }); await wait(400);
+    check(await g_(() => window.__g.DLG.active && /alchemist/.test(window.__g.DLG.lines[0][1])), 'Lum should read the old book');
+    await g_(() => { const g = window.__g; g.DLG.active = false; g.DLG.onEnd && g.DLG.onEnd(); }); await wait(300);
+    check(await g_(() => { const g = window.__g; return g.C2.potency && g.healRoll({ heal: [5, 7] }) >= 5; }), 'the book should teach Healing Potion Potency');
+    await g_(() => { window.__g.DLG.active = false; window.__g.C2.potency = 0; });
+  },
   async 'breezevale-merchant'(p) {
     const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop', g_ = (f, a) => p.evaluate(f, a);
     await g_(() => { const g = window.__g; g.startChapter2(); g.c2Skip(); g.WB10.st = 2; g.chPlaytestBreezeway(); g.MATS.foxtail = 1; g.BAG.push('foxtail'); g.MATS.seagem = 2; g.BAG.push('seagem'); g.enterBreezevale(); g.enterDun(25, 850, 640, 1); }); await wait(1200);

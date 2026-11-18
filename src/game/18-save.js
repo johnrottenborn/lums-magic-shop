@@ -31,7 +31,7 @@ function applySaveC2(d){const s=d.c2||{};startChapter2();c2Skip();SAVEC.finished
   if(d.party)for(const who in d.party)if(PARTY[who])Object.assign(PARTY[who],d.party[who]);Object.assign(POWDERS,d.powders||{});
   if(d.stats)Object.assign(STATS,d.stats,{found:Object.assign({},d.stats.found||{})});
   PARTY_ORDER.length=0;PARTY_ORDER.push(...(s.order||['lum']));syncMaxHp();for(const id of PARTY_ORDER)HEROES[id].hp=clamp((s.hp||{})[id]||HEROES[id].maxHp,1,HEROES[id].maxHp);
-  if(C2.venom){C2.venom=0;learnVenom();}NIGHT.rain=true;
+  if(C2.venom){C2.venom=0;learnVenom(true);}NIGHT.rain=true;
   if(d.scene==='dun')enterDun(d.dunRoom||11,d.x,d.y,d.face||1);else{SCENE='thorn';THORN.t=99;}
   lum.x=d.x;lum.y=d.y;lum.face=d.face||1;lum.state='idle';lum.vx=lum.vy=0;cam.x=lum.x;cam.y=lum.y-50;WCAM.x=lum.x;
   GVT.t=99;BWT.t=99;BVT.t=99;   /* no area title on a continued game */

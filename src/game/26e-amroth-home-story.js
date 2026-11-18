@@ -101,8 +101,12 @@ function almaTalk(){if(HST.st===3){hsBabyAdmire();return;}if(HST.st===5){hsMorni
     talk([['Alma',"Is that Venomvine? Careful, its sap stings."],['Alma',"My sister taught me a trick with it when we were young. Grind the vine fine at a fire and it makes a powder that strikes, then leaves a poison behind."],
       ['Alma',"Here, let me show you."]],false,()=>{learnVenom();setTimeout(()=>talk([['Lum',"Poison Powder… Thank you, Alma!"],['Alma',"Feel free to mix it by the fire, right here."]],false,()=>{WEVENT.on=false;}),900);});return;}
   talk([['Alma',C2.venom?"Remember, Venomvine makes Poison Powder. Feel free to mix by the fire!":HST.st<7?"Amroth is outside by the pond. Go and speak with him.":"Safe travels, Lum. My sister will help you, I know it."]]);}
-function learnVenom(){if(C2.venom)return;C2.venom=1;POWDER_LIST.push(['venom','Poison Powder','1–3 damage · poisons 1–3 turns','venom']);RECIPES.push({id:'venom',name:'Poison Powder',out:2,desc:'1–3 damage · poisons 1–3 turns',need:{venomvine:2}});
-  TOAST.t=0;TOAST.name='Learned: Poison Powder';TOAST.id='venom';try{sfxItem();}catch(e){}}
+function learnVenom(quiet){if(C2.venom)return;C2.venom=1;POWDER_LIST.push(['venom','Poison Powder','1–3 damage · poisons 1–3 turns','venom']);RECIPES.push({id:'venom',name:'Poison Powder',out:2,desc:'1–3 damage · poisons 1–3 turns',need:{venomvine:2}});
+  if(quiet)return;TOAST.t=0;TOAST.name='Learned: Poison Powder';TOAST.id='venom';try{sfxLearn();}catch(e){}}
+/* Healing Potion Potency: Healing Potions heal twice as much (healRoll). Learned from the book in underground ruins room 2 */
+function learnPotency(quiet){if(C2.potency)return;C2.potency=1;if(quiet)return;TOAST.t=0;TOAST.name='Learned: Healing Potion Potency';TOAST.id='potion';try{sfxLearn();}catch(e){}}
+function ruinsBook(){if(C2.potency){say("An old alchemist's book, its pages swollen with damp.");return;}lum.state='idle';lum.vx=lum.vy=0;
+  talk([['Lum',"An old alchemist's book… The pages are swollen with damp, but I can still read some of it."],['Lum',"A way to brew Healing Potions twice as strong!"]],false,()=>{learnPotency();setTimeout(()=>talk([['Lum',"My Healing Potions will heal twice as much now."]]),900);});}
 
 /* the loft bed: ask first; resting passes the night and heals everyone */
 function hsBed(){if(HST.st<3){say("A big bed under a patchwork quilt.");return;}
