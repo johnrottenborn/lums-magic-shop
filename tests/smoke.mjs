@@ -1009,8 +1009,8 @@ const CASES = {
     check(await g_(() => window.__g.SCENE === 'dun' && window.__g.DUN.room === 32 && window.__g.dunFree(window.__g.lum.x, window.__g.lum.y)), 'the hidden entrance did not lead down to underground ruins room 1 (room 32)');
     await p.screenshot({ path: path.join(SHOTS, `ruins-room1-${vp}.png`) });
     check(await g_(() => window.__g.dunFree(840, 515) && window.__g.dunFree(700, 700)), 'the ruins tunnel floor should be walkable to the far end');
-    check(await g_(() => window.__g.DFOES.filter(f => f.room === 32 && f.kind === 'rskel' && f.over && f.over.hp === 27).length >= 3), 'skeletons should roam the ruins tunnel');
-    check(await g_(() => window.__g.DFOES.filter(f => f.room === 32 && f.kind === 'ghost').length >= 2 && window.__g.FOE_TYPES.ghost.hp === 27), 'ghosts should drift through the ruins tunnel');
+    check(await g_(() => window.__g.DFOES.filter(f => f.room === 32 && f.kind === 'rskel' && f.over && f.over.hp === 18 && f.over.atk === 4).length >= 3), 'skeletons should roam the ruins tunnel');
+    check(await g_(() => window.__g.DFOES.filter(f => f.room === 32 && f.kind === 'ghost').length >= 2 && window.__g.FOE_TYPES.ghost.hp === 14), 'ghosts should drift through the ruins tunnel');
     await g_(() => window.__g.NEAR.onInteract()); await wait(1500);
     check(await g_(() => window.__g.SCENE === 'thorn' && window.__g.inBW()), 'the steps in ruins room 1 did not lead back up to the Breezeway');
     await g_(() => clearInterval(window.__noFoes));
@@ -1091,12 +1091,22 @@ const CASES = {
   async 'wraith-lord'(p) {
     const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop', g_ = (f, a) => p.evaluate(f, a);
     await g_(() => { const g = window.__g; g.startChapter2(); g.c2Skip(); g.WB10.st = 2; g.chPlaytestBreezeway(); g.C2.serpentPouch = 0; g.C2.wraithBeat = 0; g.enterDun(37, 880, 660, 1); }); await wait(900);
-    await g_(() => window.__g.ruinsSkeleton()); await wait(300);
-    check(await g_(() => window.__g.BAG.includes('serpentpouch')), 'the skeleton in room 6 should give the Serpentskin Pouch');
-    await g_(() => window.__g.ruinsLeave6()); await wait(1800);
-    check(await g_(() => window.__g.DLG.active && /Leaving so soon/.test(window.__g.DLG.lines[0][1])), 'trying to leave room 6 should wake the big ghost');
+    await g_(() => window.__g.ruinsSkeleton()); await wait(1800);
+    check(await g_(() => window.__g.DLG.active && /Leaving so soon/.test(window.__g.DLG.lines[0][1]) && !window.__g.BAG.includes('serpentpouch')), 'touching the skeleton should wake the Wraith Lord (no pouch yet)');
     await g_(() => { const g = window.__g; g.DLG.active = false; g.DLG.onEnd && g.DLG.onEnd(); }); await wait(2500);
-    check(await g_(() => window.__g.BATTLE.on && window.__g.BATTLE.foes[0].type === 'glord'), 'the big ghost should attack');
+    check(await g_(() => window.__g.BATTLE.on && window.__g.BATTLE.foes[0].type === 'glord'), 'the Wraith Lord should attack');
+    await p.screenshot({ path: path.join(SHOTS, `wraith-lord-${vp}.png`) });
+    // losing: Lum wakes healed at room 6's way in, and the skeleton can wake it again
+    await g_(() => { const g = window.__g, B = g.BATTLE; for (const h of B.heroes) { g.HEROES[h.id].hp = 0; h.ko = 1; } B.phase = 'lose'; B.t = 0; B.ending = 0; }); await wait(4500);
+    check(await g_(() => { const g = window.__g; return !g.BATTLE.on && g.DUN.room === 37 && Math.abs(g.lum.x - 880) < 40 && g.HEROES.lum.hp === g.HEROES.lum.maxHp && g.RL6.t < 0 && !g.C2.wraithBeat; }), 'losing to the Wraith Lord should restart Lum healed at the start of room 6');
+    // winning gives the pouch
+    await g_(() => { window.__g.DLG.active = false; window.__g.ruinsSkeleton(); }); await wait(1800);
+    await g_(() => { const g = window.__g; g.DLG.active = false; g.DLG.onEnd && g.DLG.onEnd(); }); await wait(2500);
+    await g_(() => { const B = window.__g.BATTLE; for (const f of B.foes) f.hp = 0; B.phase = 'win'; B.t = 0; B.rewarded = 0; }); await wait(1500);
+    for (let i = 0; i < 20 && await g_(() => window.__g.BATTLE.on); i++) { await p.keyboard.press('Space'); await wait(300); }
+    await wait(1200); for (let i = 0; i < 4 && await g_(() => window.__g.DLG.active); i++) { await p.keyboard.press('Enter'); await wait(400); }
+    await wait(500);
+    check(await g_(() => window.__g.C2.wraithBeat && window.__g.BAG.includes('serpentpouch')), 'beating the Wraith Lord should give the Serpentskin Pouch');
     await p.screenshot({ path: path.join(SHOTS, `wraith-lord-${vp}.png`) });
   },
   async 'island-ruins'(p) {

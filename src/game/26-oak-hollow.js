@@ -144,7 +144,7 @@ function setupDun(){DUNINT.length=0;const r=DUN.room,D=(x,y,reach,fn)=>DUNINT.pu
   if(r===31){D(690,755,70,()=>dunGo(30,812,372,1));for(const n of BVNPC)if(n.room===31)DUNINT.push({x:n.x,y:n.y+10,reach:100,onInteract:()=>bvNpcTalk(n)});}
   if(r===32&&!C2.ruinsIn){C2.ruinsIn=1;hsGoal('Explore the underground ruins');}
   if(r===32){D(318,566,75,()=>goScene(leaveRuins));D(840,508,55,()=>dunGo(33,660,730,1));}   /* the steps back up; the way on to room 2 */
-  if(r===37){RL6.t=-1;D(740,738,75,ruinsLeave6);DUNINT.push({x:905,y:640,reach:80,onInteract:ruinsSkeleton});}   /* the only way out (the Wraith Lord rises the first time Lum tries it); the old explorer's skeleton */
+  if(r===37){RL6.t=-1;D(740,738,75,ruinsLeave6);DUNINT.push({x:905,y:640,reach:80,onInteract:ruinsSkeleton});}   /* the only way out; the old explorer's skeleton (touching it wakes the Wraith Lord) */
   if(r===36){D(660,738,80,()=>dunGo(35,728,525,1));D(412,560,55,()=>goScene(enterIsland));D(690,518,45,()=>dunGo(37,740,712,1));}   /* back to the long hall; the stairs up to the island ruins (still to come); the gap to room 6 */
   if(r===35){D(660,738,80,()=>dunGo(34,650,530,1));D(728,512,45,()=>dunGo(36,660,712,1));}   /* back to the crypt; the tunnel at the far end to room 5 */
   if(r===34){D(660,738,80,()=>dunGo(33,470,560,1));D(650,516,50,()=>dunGo(35,660,712,1));D(1100,535,55,()=>say("A dark archway…"));}   /* back to the hydra room; the passage ahead to room 4; the right arch (where it leads is still to come) */
@@ -194,7 +194,7 @@ function buildDFoes(){if(dfoesBuilt)return;dfoesBuilt=true;DFOES.length=0;let id
   for(const [room,x,y] of [[7,720,690],[7,1080,700],[7,1210,625],...(C1.hoodOut?[]:[[8,640,650],[8,960,660]])])DFOES.push({id:id++,kind:'rvixen',scene:'dun',room,x,y,hx:x,hy:y,tx:x,ty:y,s:1,pack:1,calm:2,ph:rnd(0,TAU),t:0,face:-1});
   if(!C1.lairBoss)DFOES.push({id:95,kind:'bigspider',scene:'dun',room:10,x:720,y:575,hx:720,hy:575,tx:720,ty:575,s:1,pack:1,calm:0,ph:0,t:0,face:-1,still:1,lair:1,over:{name:'Webmother',hp:46,atk:5,def:2,loot:'foxsuit',flag:'lairBoss'}});
   for(const [room,x,y,pack] of [[32,760,610,1],[32,560,700,1]])DFOES.push({id:id++,kind:'ghost',scene:'dun',room,x,y,hx:x,hy:y,tx:x,ty:y,s:1,pack,calm:1,ph:rnd(0,TAU),t:0,face:-1});   /* ghosts drifting through the ruins' tunnel */
-  for(const [room,x,y,pack] of [[32,640,650,1],[32,900,560,1],[32,980,660,2]])DFOES.push({id:id++,kind:'rskel',scene:'dun',room,x,y,hx:x,hy:y,tx:x,ty:y,s:1,pack,calm:1,ph:rnd(0,TAU),t:0,face:-1,over:{hp:27,atk:6,def:2}});   /* skeletons in the underground ruins' tunnel (ghosts to come): 1.5x a Water Nymph (18 HP, 4 ATK, 1 DEF) */
+  for(const [room,x,y,pack] of [[32,640,650,1],[32,900,560,1],[32,980,660,2]])DFOES.push({id:id++,kind:'rskel',scene:'dun',room,x,y,hx:x,hy:y,tx:x,ty:y,s:1,pack,calm:1,ph:rnd(0,TAU),t:0,face:-1,over:{hp:18,atk:4,def:2}});   /* skeletons in the underground ruins' tunnel */
   for(const [room,x,y] of [[2,520,700],[2,950,690],[5,900,690]])DFOES.push({id:id++,kind:'bat',scene:'dun',room,x,y,hx:x,hy:y,tx:x,ty:y,s:1,pack:1,calm:0,ph:rnd(0,TAU),t:0,face:-1});}
 function updateDFoes(dt){const ok=!DLG.active&&!WEVENT.on&&!MENU.open&&!FADE.dir&&!BATTLE.on&&!BATTLE.pending&&!CHOICE.on&&!MIX.on;
   for(const g of DFOES){if(g.room!==DUN.room)continue;g.ph+=dt;g.t+=dt;g.calm=Math.max(0,g.calm-dt);const d=Math.hypot(lum.x-g.x,lum.y-g.y);
