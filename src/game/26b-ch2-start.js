@@ -111,7 +111,7 @@ function ch2Respawn(){for(const id of PARTY_ORDER)HEROES[id].hp=HEROES[id].maxHp
   else if(inGrove()){enterGrove(false);GVT.t=99;}
   else if(inHome()){enterHome();HOME.t=99;}
   else{SCENE='thorn';lum.x=CLR.x0+190;lum.y=CLR.cy;lum.face=1;lum.vx=lum.vy=0;lum.state='idle';cam.x=lum.x+120;cam.y=lum.y-50;}
-  if(typeof resetAmrFollow==='function')resetAmrFollow();}
+  if(typeof resetAmrFollow==='function')resetAmrFollow();if(typeof jak2In==='function'&&jak2In())resetJak2Follow();}
 function enterWorldbind(){enterDun(11,238,250,1);
   /* first time in: the baby cries, and Amroth talks as they start down the stairs */
   if(!C2.wbSeen){C2.wbSeen=1;setTimeout(()=>{try{sfxBabyCry(.8);}catch(e){}},700);

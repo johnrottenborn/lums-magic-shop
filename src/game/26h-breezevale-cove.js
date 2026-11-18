@@ -168,7 +168,7 @@ function drawBVGirl(o){const G=BVGIRL,talking=DLG.active&&G.talking,an=talking&&
   ctx.save();ctx.fillStyle='rgba(10,10,20,.25)';ctx.beginPath();ctx.ellipse(o.x,o.y,22,7,0,0,TAU);ctx.fill();ctx.restore();
   ctx.save();ctx.translate(o.x,0);ctx.scale(.86,1);ctx.translate(-o.x,0);c1Frame(ctx,'breeze_girl',an,0,o.x,o.y,BVFOLK_H,an==='side'&&lum.x>o.x,1,0);ctx.restore();if(!DLG.active)G.talking=0;}
 function bvGirlTalk(){BVGIRL.talking=1;lum.face=lum.x<BVX+BVGIRL.x?1:-1;talk([['Townsgirl',"Welcome to Breezevale Cove."],['Townsgirl',"The rain makes me so happy."]],false,()=>{BVGIRL.talking=0;});}
-function enterBreezevale(){SCENE='thorn';lum.x=BVX+BVSOUTH.x;lum.y=BVY+BVSOUTH.y-4;lum.face=1;lum.dir='up';lum.state='idleUp';lum.at=-1e9;lum.vx=lum.vy=0;cam.x=lum.x;cam.y=lum.y-200;THORN.t=99;BVT.t=0;}
+function enterBreezevale(){SCENE='thorn';lum.x=BVX+BVSOUTH.x;lum.y=BVY+BVSOUTH.y-4;lum.face=1;lum.dir='up';lum.state='idleUp';lum.at=-1e9;lum.vx=lum.vy=0;cam.x=lum.x;cam.y=lum.y-200;THORN.t=99;BVT.t=0;if(!C2.bvArrived&&!C2.lumaMet){C2.bvArrived=1;setTimeout(()=>hsGoal('Find Sage Luma in Breezevale Cove'),1200);}}   /* first arrival: the task moves on */
 /* playtest card: the story up to the morning after at Amroth's (Lum alone, Amroth stays home), then the Breezeway's east end */
 function chPlaytestBreezeway(){HST.st=7;HST.amrOut=1;if(typeof C2!=='undefined'){C2.joined=0;}if(PARTY_ORDER.includes('amroth'))PARTY_ORDER.splice(PARTY_ORDER.indexOf('amroth'),1);
   {const i=BAG.indexOf('baby');if(i>=0)BAG.splice(i,1);}hsGoal('Follow the coast east to Breezevale Cove');enterBWEast();BWT.t=0;}
@@ -219,7 +219,7 @@ THINT.push({get x(){return BVX+bvBridgeMid()[0];},get y(){return BVY+bvBridgeMid
 function jakTalk(){if(!(MATS.snakeskin>0)){talk([['Jak',"These heavy rains over the last week have swallowed up the cave of the Sea Serpent."],['Jak',"I've been hunting it for its rare serpent skin. I saw it just off the coast. It comes close to shore to eat fish."],['Jak',"I'd like to help you, I really would. But rain like this only comes along every few years. It's my best chance to catch it for that prized skin."]]);return;}
   talk([['Jak',"Wait… is that Sea Serpent skin?!"]],false,()=>setTimeout(()=>askChoice('Give Jak the Sea Snake Skin?',[['Yes',jakGetsSkin],['No',()=>talk([['Jak',"Well, if you change your mind, you know where to find me."]])]]),200));}
 function jakGetsSkin(){bvTakeMat('snakeskin',1);sfxItem&&sfxItem();talk([['Jak',"You really caught it? Ha! A deal's a deal, then. I'm coming with you."],['Lum',"Can you show me the way to the old ruins?"],['Jak',"The old ruins? I know a secret route there. Why you'd want to go poking around some old ruins, I'll never know. Nothing ever happens there…"],['Jak',"…but a deal's a deal."]],false,jak2Join);}
-function jak2Join(){C2.jak=1;if(!PARTY_ORDER.includes('jak'))PARTY_ORDER.push('jak');HEROES.jak.hp=HEROES.jak.maxHp;const n=BVNPC.find(n=>n.name==='Jak');JK2.x=n?n.x:lum.x;JK2.y=n?n.y:lum.y;JK2.dir='down';JK2.moving=0;JK2CRUMB.length=0;}
+function jak2Join(){C2.jak=1;if(!C2.ruinWay)hsGoal('Head to the west end of the Coastal Breezeway with Jak');if(!PARTY_ORDER.includes('jak'))PARTY_ORDER.push('jak');HEROES.jak.hp=HEROES.jak.maxHp;const n=BVNPC.find(n=>n.name==='Jak');JK2.x=n?n.x:lum.x;JK2.y=n?n.y:lum.y;JK2.dir='down';JK2.moving=0;JK2CRUMB.length=0;}
 const JK2={x:0,y:0,face:1,dir:'down',moving:0,ph:0},JK2CRUMB=[];
 function jak2In(){return CH>=2&&typeof C2!=='undefined'&&!!C2.jak;}
 function resetJak2Follow(){JK2.x=lum.x;JK2.y=lum.y;JK2.moving=0;JK2.face=lum.face;JK2CRUMB.length=0;}

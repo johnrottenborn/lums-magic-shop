@@ -127,6 +127,7 @@ function setupDun(){DUNINT.length=0;const r=DUN.room,D=(x,y,reach,fn)=>DUNINT.pu
   if(r===29){D(690,750,90,()=>goScene(leaveSanctuary));D(700,592,95,()=>dunGo(30,470,725,1));}
   if(r===30){D(470,748,95,()=>dunGo(29,700,612,1));D(814,360,40,()=>dunGo(31,690,728,1));}   /* the far door at the top of the stair, to the altar chamber */
   if(r===31){D(690,755,70,()=>dunGo(30,812,372,1));for(const n of BVNPC)if(n.room===31)DUNINT.push({x:n.x,y:n.y+10,reach:100,onInteract:()=>bvNpcTalk(n)});}
+  if(r===32&&!C2.ruinsIn){C2.ruinsIn=1;hsGoal('Explore the underground ruins');}
   if(r===32){D(318,566,75,()=>goScene(leaveRuins));D(840,508,55,()=>say("The tunnel runs on into the dark…"));}   /* the steps back up; the way on (room 2 art still to come) */
   if(r===28){D(190,650,95,()=>goScene(()=>leaveBVHouse(0)));for(const n of BVNPC)if(n.room===28)DUNINT.push({x:n.x,y:n.y+10,reach:95,onInteract:()=>bvNpcTalk(n)});
     DUNINT.push({x:905,y:585,reach:110,fire:true,onInteract:()=>{if(canLumMix())openMix();else say("A warm fire crackles under the kettle.");}});}   /* the hearth: Lum can mix here */
@@ -215,7 +216,7 @@ function drawDun(){const R=DROOMS[DUN.room],im=IMG['dun'+DUN.room];if(!ready(im)
     if(DUN.room===18&&WB8.boss){const g=WB8.boss;L.push([g.y,()=>drawDemonOW(g.x,g.y,g.face,g.a,g.mv,2,g)]);}
     if(DUN.room>=15&&DUN.room<=19)for(const g of [WB5.chaser,WB5.brown])if(g){L.push([g.y,()=>drawDemonOW(g.x,g.y,g.face,g.a,g.mv,g.big,g)]);if(g.trio)for(const [tx,ty] of trioPos(g))L.push([ty,()=>drawDemonOW(tx,ty,g.face,g.a,g.mv,0)]);}
     for(const F of (R.fg||[]))L.push([F.y,()=>{ctx.save();ctx.beginPath();F.poly.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y));ctx.closePath();ctx.clip();ctx.drawImage(im,0,0,1375,768);ctx.restore();}]);   /* furniture that stands in front of whoever is behind it */
-    if(DUN.room===29&&NIGHT.rain)L.push([9997,()=>{ctx.save();drawRain(1/60);ctx.restore();}]);   /* the Sanctuary's front is out in the rain */
+    if((DUN.room===29||DUN.room===24)&&NIGHT.rain)L.push([9997,()=>{ctx.save();ctx.beginPath();ctx.rect(0,0,1375,768);ctx.clip();drawRain(1/60);ctx.restore();}]);   /* only over the painting, not the dark bands around it */   /* the Sanctuary's front is out in the rain */
     if(DUN.room===24){L.unshift([-1,()=>drawOverlookMist(0)]);L.push([9998,()=>drawOverlookMist(1)]);}   /* mist over the sea behind, low wisps drifting in front */
     L.sort((a,b)=>a[0]-b[0]);for(const [,f] of L)f();}
   if(DUN.room===14&&BO.a>0){ctx.fillStyle=`rgba(0,0,0,${BO.a*.55})`;ctx.fillRect(-2000,-500,5375,1800);}
