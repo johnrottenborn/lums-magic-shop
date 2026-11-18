@@ -1011,6 +1011,13 @@ const CASES = {
     check(await g_(() => window.__g.SCENE === 'thorn' && window.__g.inBW()), 'the steps in ruins room 1 did not lead back up to the Breezeway');
     await g_(() => clearInterval(window.__noFoes));
   },
+  async 'breezevale-tavern'(p) {
+    const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop';
+    await p.evaluate(() => { const g = window.__g; g.startChapter2(); g.c2Skip(); g.WB10.st = 2; g.chPlaytestBreezeway(); g.enterBreezevale(); const h = g.BVHOUSES[1]; g.lum.x = g.BVX + g.bvDoorX(h); g.lum.y = g.BVY + h.y + 40; }); await wait(600);
+    await p.keyboard.press('e'); await wait(2500);
+    check(await p.evaluate(() => window.__g.SCENE === 'dun' && window.__g.DUN.room === 38), 'the top-right shell house door should lead inside (room 38)');
+    await p.screenshot({ path: `tests/screenshots/${vp}-breezevale-tavern.png` });
+  },
   async 'breezevale-gossip'(p) {
     const g_ = (f, a) => p.evaluate(f, a);
     await g_(() => { const g = window.__g; g.startChapter2(); g.c2Skip(); g.WB10.st = 2; g.chPlaytestBreezeway(); g.C2.lumaMet = 0; g.enterBreezevale(); g.enterDun(26, 330, 720, 1); }); await wait(1000);
