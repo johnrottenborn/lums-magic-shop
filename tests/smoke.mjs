@@ -1021,6 +1021,18 @@ const CASES = {
     await p.keyboard.press('e'); await wait(2500);
     check(await p.evaluate(() => window.__g.SCENE === 'dun' && window.__g.DUN.room === 38), 'the top-right shell house door should lead inside (room 38)');
     await p.screenshot({ path: `tests/screenshots/${vp}-breezevale-tavern.png` });
+    // the innkeeper behind the bar offers a bed upstairs; Lum wakes rested at the foot of the stairs
+    await p.evaluate(() => { const g = window.__g; g.lum.x = 955; g.lum.y = 590; g.HEROES.lum.hp = 3; }); await wait(500);
+    await p.screenshot({ path: `tests/screenshots/${vp}-breezevale-innkeeper.png` });
+    await p.evaluate(() => window.__g.NEAR.onInteract()); await wait(400);
+    check(await p.evaluate(() => window.__g.DLG.active && window.__g.DLG.lines.some(l => l[0] === 'Innkeeper' && /rest/.test(l[1]))), 'the innkeeper should offer a bed upstairs');
+    for (let i = 0; i < 6 && await p.evaluate(() => window.__g.DLG.active); i++) { await p.keyboard.press('Enter'); await wait(350); }
+    await wait(400); check(await p.evaluate(() => window.__g.CHOICE.on), 'the innkeeper should ask whether to rest');
+    await p.evaluate(() => window.__g.pickChoice(0));
+    for (let i = 0; i < 60 && (await p.evaluate(() => window.__g.WEVENT.on)); i++) await wait(250);
+    await wait(800);
+    check(await p.evaluate(() => { const g = window.__g; return g.DUN.room === 38 && g.HEROES.lum.hp === g.HEROES.lum.maxHp && Math.abs(g.lum.x - 1150) < 30 && Math.abs(g.lum.y - 556) < 30; }), 'after resting Lum should be healed at the foot of the stairs');
+    await p.screenshot({ path: `tests/screenshots/${vp}-breezevale-inn-rested.png` });
   },
   async 'breezevale-gossip'(p) {
     const g_ = (f, a) => p.evaluate(f, a);

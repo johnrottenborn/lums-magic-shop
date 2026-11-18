@@ -52,9 +52,9 @@ const DROOMS={
      block:[{x0:20,y0:640,x1:245,y1:769},{x0:230,y0:612,x1:482,y1:692},{x0:792,y0:612,x1:1152,y1:680},{x0:1210,y0:600,x1:1380,y1:769}],
      fg:[{y:672,poly:[[790,495],[1152,495],[1152,680],[790,680]]}]},   /* the dining table and chairs */
   /* 38: inside the top-right shell house (it replaced the Mayor's; the designer's painting): a long vaulted hall with a stone hearth, long tables, a bar of barrels and a stair to a loft; Lum comes in at the front */
-  38:{name:'',dark:0,home:1,hk:1.35,floor:[[300,600],[400,560],[520,522],[640,500],[790,500],[790,565],[1100,565],[1230,575],[1300,640],[1310,768],[80,768],[80,700],[300,690]],
-     block:[{x0:0,y0:575,x1:312,y1:768},{x0:505,y0:548,x1:848,y1:692},{x0:455,y0:488,x1:632,y1:560},{x0:1000,y0:572,x1:1290,y1:768},{x0:818,y0:512,x1:872,y1:566},{x0:912,y0:518,x1:968,y1:576},{x0:1012,y0:528,x1:1076,y1:578}],
-     fg:[{y:550,poly:[[500,535],[850,535],[850,700],[500,700]]},{y:577,poly:[[0,560],[312,560],[312,768],[0,768]]},{y:574,poly:[[1000,560],[1300,560],[1300,768],[1000,768]]}]},   /* the long tables and benches */
+  38:{name:'',dark:0,home:1,hk:1.35,floor:[[300,600],[400,560],[520,522],[640,500],[790,500],[790,565],[1100,565],[1100,546],[1200,546],[1230,575],[1300,640],[1310,768],[80,768],[80,700],[300,690]],
+     block:[{x0:0,y0:575,x1:312,y1:768},{x0:505,y0:548,x1:848,y1:692},{x0:455,y0:488,x1:632,y1:560},{x0:1000,y0:590,x1:1092,y1:768},{x0:1092,y0:572,x1:1290,y1:768},{x0:818,y0:512,x1:872,y1:566},{x0:912,y0:518,x1:968,y1:576},{x0:1012,y0:528,x1:1076,y1:578}],
+     fg:[{y:550,poly:[[500,535],[850,535],[850,700],[500,700]]},{y:577,poly:[[0,560],[312,560],[312,768],[0,768]]},{y:574,poly:[[1000,560],[1300,560],[1300,768],[1000,768]]},{y:540,poly:[[785,458],[1100,458],[1100,562],[785,562]]}]},   /* the long tables and benches; the bar counter, in front of the innkeeper */
   /* 28: inside the top-left shell house (the designer's painting): a fisher's home, table, hearth, bed; the door is on the left wall */
   28:{name:'',dark:0,home:1,hk:1.35,floor:[[150,622],[300,598],[480,566],[820,560],[1040,566],[1050,640],[1035,768],[340,768],[200,700],[150,680]],
      block:[{x0:470,y0:540,x1:815,y1:690},{x0:1040,y0:470,x1:1380,y1:769},{x0:0,y0:640,x1:150,y1:769},{x0:130,y0:680,x1:340,y1:769}],
@@ -149,7 +149,7 @@ function setupDun(){DUNINT.length=0;const r=DUN.room,D=(x,y,reach,fn)=>DUNINT.pu
   if(r===35){D(660,738,80,()=>dunGo(34,650,530,1));D(728,512,45,()=>dunGo(36,660,712,1));}   /* back to the crypt; the tunnel at the far end to room 5 */
   if(r===34){D(660,738,80,()=>dunGo(33,470,560,1));D(650,516,50,()=>dunGo(35,660,712,1));D(1100,535,55,()=>say("A dark archway…"));}   /* back to the hydra room; the passage ahead to room 4; the right arch (where it leads is still to come) */
   if(r===33){D(660,758,80,()=>dunGo(32,840,525,-1));D(470,540,55,()=>dunGo(34,660,712,1));DUNINT.push({x:770,y:618,reach:85,onInteract:ruinsBook});}   /* back to the tunnel; the doorway to room 3; the old book on the altar */
-  if(r===38){D(690,752,90,()=>goScene(()=>leaveBVHouse(1)));DUNINT.push({x:300,y:612,reach:110,fire:true,onInteract:()=>{if(canLumMix())openMix();else say("A big fire roars in the stone hearth.");}});}   /* the way out at the front; the hearth: Lum can mix here */
+  if(r===38){D(690,752,90,()=>goScene(()=>leaveBVHouse(1)));for(const n of BVNPC)if(n.room===38)DUNINT.push({x:n.x,y:575,reach:110,onInteract:()=>bvNpcTalk(n)});DUNINT.push({x:300,y:612,reach:110,fire:true,onInteract:()=>{if(canLumMix())openMix();else say("A big fire roars in the stone hearth.");}});}   /* the way out at the front; the hearth: Lum can mix here */
   if(r===28){D(190,650,95,()=>goScene(()=>leaveBVHouse(0)));for(const n of BVNPC)if(n.room===28)DUNINT.push({x:n.x,y:n.y+10,reach:95,onInteract:()=>bvNpcTalk(n)});
     DUNINT.push({x:905,y:585,reach:110,fire:true,onInteract:()=>{if(canLumMix())openMix();else say("A warm fire crackles under the kettle.");}});}   /* the hearth: Lum can mix here */
   if(r===27){D(590,612,90,()=>goScene(()=>leaveBVHouse(4)));for(const n of BVNPC)if(n.room===27)DUNINT.push({x:n.x,y:n.y+10,get reach(){return n.gone&&n.gone()?-1:100;},onInteract:()=>bvNpcTalk(n)});
