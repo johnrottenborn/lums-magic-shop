@@ -213,7 +213,7 @@ function bvDropBait(){const i=BAG.indexOf('seabait');if(i<0)return;BAG.splice(i,
 function updateBVSnake(){if(BVSNK.t<0)return;const t0=BVSNK.t;BVSNK.t=(performance.now()-BVSNK.w0)/1000;lum.vx=lum.vy=0;const t=BVSNK.t;
   if(t0<.55&&t>=.55){sfxSplash&&sfxSplash();}
   if(t0<1.1&&t>=1.1){sfxSplash&&sfxSplash();}
-  if(t>=2.4){BVSNK.t=-1;WEVENT.on=false;startEncounter({kind:'seasnake',s:1,x:lum.x,y:lum.y},'normal');}}
+  if(t>=2.4){BVSNK.t=-1;WEVENT.on=false;startEncounter({kind:'seasnake',s:1,x:lum.x,y:lum.y,onWin:()=>{if(C2.rainDone)return;C2.rainDone=1;setTimeout(()=>talk([['Lum',"The rain… it's stopping."]]),2200);}},'normal');}}   /* beating the sea serpent the first time ends the rain for good (C2.rainDone) */
 function drawBVSnake(){if(BVSNK.t<0||!inBV()||SCENE!=='thorn')return;const t=BVSNK.t,[mx,my]=bvBridgeMid(),bx=BVX+mx,by=BVY+my;
   if(t<.55){const u=t/.55;ctx.fillStyle='#8a6a4a';ctx.beginPath();ctx.ellipse(bx,by-40+u*(BVSNK.y-by+40),6,4,0,0,TAU);ctx.fill();}   /* the bait falls */
   const rings=(t0,x,y,big)=>{if(t<t0)return;const q=t-t0;for(let i=0;i<3;i++){const r=(q*1.2+i*.25);if(r>1.2)continue;ctx.strokeStyle=`rgba(225,240,250,${(.6*(1-r/1.2)).toFixed(3)})`;ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(x,y,big*(10+r*60),big*(3+r*18),0,0,TAU);ctx.stroke();}};

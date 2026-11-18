@@ -976,6 +976,15 @@ const CASES = {
     await wait(2600);
     check(await g_(() => window.__g.BATTLE.on && window.__g.BATTLE.foes[0].type === 'seasnake' && !window.__g.BAG.includes('seabait')), 'dropping the Sea Bait did not bring up the Sea Snake for a battle');
     await p.screenshot({ path: path.join(SHOTS, `sea-snake-battle-${vp}.png`) });
+    // beating it ends the rain (drops and sound) for good
+    check(await g_(() => window.__g.NIGHT.rain && !window.__g.C2.rainDone), 'it should still be raining before the Sea Serpent is beaten');
+    await g_(() => { const B = window.__g.BATTLE; for (const f of B.foes) f.hp = 0; B.phase = 'win'; B.t = 0; B.rewarded = 0; }); await wait(1500);
+    for (let i = 0; i < 20 && await g_(() => window.__g.BATTLE.on); i++) { await p.keyboard.press('Space'); await wait(300); }
+    await wait(3000);
+    check(await g_(() => window.__g.C2.rainDone && !window.__g.NIGHT.rain && window.__g.DLG.active && /rain/.test(window.__g.DLG.lines[0][1])), 'beating the Sea Serpent should stop the rain for good');
+    await g_(() => { window.__g.DLG.active = false; window.__g.enterBWEast(); }); await wait(1500);
+    check(await g_(() => !window.__g.NIGHT.rain), 'the rain should stay stopped on the Breezeway too');
+    await p.screenshot({ path: path.join(SHOTS, `sea-snake-rain-over-${vp}.png`) });
   },
   async 'jak-joins'(p) {
     const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop', g_ = (f, a) => p.evaluate(f, a);
