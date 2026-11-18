@@ -76,6 +76,7 @@ function updateHomeStory(dt){HST.t+=dt;
   if(SCENE==='dun'&&DUN.room===21&&HST.st===4)hsMorningTalk();
   if(SCENE==='dun'&&DUN.room===21&&HST.st===3&&HST.almaGo&&!DLG.active){if(almaWalk(AMR.x+80,AMR.y+2,70,dt)){ALMA.face=-1;ALMA.dir='side';HST.almaGo=0;}}   /* Alma goes to stand beside Amroth */
   if(SCENE==='dun'&&DUN.room===21&&HST.st>=4&&ALMA.on&&!ALMA.moving&&!ALMA.sit){ALMA.dir='side';ALMA.face=lum.x<ALMA.x?-1:1;}   /* she stays by the fire and turns to follow Lum */
+  if(hsHome2()&&SCENE==='dun'&&DUN.room===21){AMR.x=872;AMR.y=700;AMR.moving=0;AMR.dir='side';AMR.face=-1;}   /* inside beside Alma's chair */
   if(HST.amrOut&&SCENE==='thorn'){const [x,y]=hsAmrPos();AMR.x=x;AMR.y=y;AMR.moving=0;AMR.dir='side';AMR.face=1;}   /* looking out over the water */
   if(HST.heart>0&&!DLG.active&&!HST.meet&&!HST.walk&&HST.st!==5)HST.heart=Math.max(0,HST.heart-dt);}
 /* night over the home (screen space), with warm windows and door; the chimney smoke in world space */
@@ -85,14 +86,18 @@ function drawHomeNight(){if(!hsNight())return;ctx.save();ctx.setTransform(DPR,0,
   for(const [dx,dy,r] of [[-150,-95,46],[-92,-60,40],[55,-95,46],[150,-110,46]]){const [x,y]=sc(HOMEX+C.x+dx,HOMEY+C.y+dy);drawGlow(ctx,x,y,r*zoom*2.2,'255,180,90',.32);drawGlow(ctx,x,y,r*zoom*.7,'255,220,150',.4);}
   const [lx,ly]=sc(lum.x,lum.y-60);drawGlow(ctx,lx,ly,170*zoom,'150,170,220',.12);ctx.restore();}
 /* Amroth outside by the pond can be spoken to */
-THINT.push({get x(){return hsAmrPos()[0];},get y(){return hsAmrPos()[1]+10;},get reach(){return HST.amrOut&&HST.st>=6?95:0;},onInteract:()=>hsAmrTalk()});
+THINT.push({get x(){return hsAmrPos()[0];},get y(){return hsAmrPos()[1]+10;},get reach(){return HST.amrOut&&HST.st>=6&&!hsHome2()?95:0;},onInteract:()=>hsAmrTalk()});
 
 /* Alma teaches Poison Powder, once Lum carries Venomvine (talk to her in the cottage after the night) */
 /* before Lum goes up to bed: Alma and Amroth stand together over the baby */
 function hsBabyAdmire(){WEVENT.on=true;lum.state='idle';lum.vx=lum.vy=0;
   talk([['Alma',"Look at him, Amroth. Such a sweet little face."],['Amroth',"And those eyes… I have never seen eyes so bright and kind."],
     ['Alma',"He’s fast asleep now. You should be too, Lum. Go and rest upstairs."],['Amroth',"Rest well, Lum. We will be right here."]],false,()=>{WEVENT.on=false;});}
-function almaTalk(){if(HST.st===3){hsBabyAdmire();return;}if(HST.st===5){hsMorningAlma();return;}if(HST.st<6)return;if(!C2.venom&&(MATS.venomvine||0)>0){WEVENT.on=true;ALMA.face=lum.x<ALMA.x?-1:1;lum.face=-ALMA.face;
+/* back home with Jak in the party: Amroth is inside beside Alma, and they talk about the baby */
+function hsHome2(){return HST.st>=7&&typeof jak2In==='function'&&jak2In();}
+function hsBabyGrow(){lum.state='idle';lum.vx=lum.vy=0;if(C2.babyGrow){talk([['Amroth',"Take care out there, both of you."]]);return;}
+  talk([['Alma',"Lum! Welcome back."],['Amroth',"The baby seems to be growing already."],['Alma',"He caught a fish with his bare hands!"],['Amroth',"Right out of the pond. I've never seen anything like it."]],false,()=>{C2.babyGrow=1;});}
+function almaTalk(){if(HST.st===3){hsBabyAdmire();return;}if(HST.st===5){hsMorningAlma();return;}if(HST.st<6)return;if(hsHome2()&&!(!C2.venom&&(MATS.venomvine||0)>0)){hsBabyGrow();return;}if(!C2.venom&&(MATS.venomvine||0)>0){WEVENT.on=true;ALMA.face=lum.x<ALMA.x?-1:1;lum.face=-ALMA.face;
     talk([['Alma',"Is that Venomvine? Careful, its sap stings."],['Alma',"My sister taught me a trick with it when we were young. Grind the vine fine at a fire and it makes a powder that strikes, then leaves a poison behind."],
       ['Alma',"Here, let me show you."]],false,()=>{learnVenom();setTimeout(()=>talk([['Lum',"Poison Powder… Thank you, Alma!"],['Alma',"Feel free to mix it by the fire, right here."]],false,()=>{WEVENT.on=false;}),900);});return;}
   talk([['Alma',C2.venom?"Remember, Venomvine makes Poison Powder. Feel free to mix by the fire!":HST.st<7?"Amroth is outside by the pond. Go and speak with him.":"Safe travels, Lum. My sister will help you, I know it."]]);}

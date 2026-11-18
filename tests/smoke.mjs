@@ -1020,6 +1020,14 @@ const CASES = {
     check(!/Sanctuary of Water/.test(await said('Townsman')), 'after meeting Sage Luma the Townsman should drop the line about where she lives');
     await g_(() => { window.__g.DLG.active = false; window.__g.C2.lumaMet = 0; });
   },
+  async 'home-baby-grows'(p) {
+    const g_ = (f, a) => p.evaluate(f, a);
+    await g_(() => { const g = window.__g; g.startChapter2(); g.c2Skip(); g.WB10.st = 2; g.chPlaytestBreezeway(); g.C2.jak = 1; g.PARTY_ORDER.includes('jak') || g.PARTY_ORDER.push('jak'); g.C2.babyGrow = 0; g.enterDun(21, 760, 700, 1); }); await wait(1200);
+    await g_(() => { const g = window.__g; g.lum.x = 800; g.lum.y = 705; }); await wait(600);
+    await g_(() => window.__g.NEAR && window.__g.NEAR.onInteract()); await wait(400);
+    check(await g_(() => window.__g.DLG.active && window.__g.DLG.lines.some(l => /bare hands/.test(l[1]))), 'back home with Jak, Alma and Amroth should talk about the baby catching a fish');
+    await g_(() => { window.__g.DLG.active = false; });
+  },
   async 'breezevale-merchant'(p) {
     const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop', g_ = (f, a) => p.evaluate(f, a);
     await g_(() => { const g = window.__g; g.startChapter2(); g.c2Skip(); g.WB10.st = 2; g.chPlaytestBreezeway(); g.MATS.foxtail = 1; g.BAG.push('foxtail'); g.MATS.seagem = 2; g.BAG.push('seagem'); g.enterBreezevale(); g.enterDun(25, 850, 640, 1); }); await wait(1200);
