@@ -165,7 +165,7 @@ const RL6={t:-1,x:735,y:640};
 function ruinsSkeleton(){if(C2.serpentPouch){say("An old explorer… they never made it out.");return;}
   if(C2.wraithBeat){C2.serpentPouch=1;sfxPage&&sfxPage(.8);giveItem('serpentpouch');return;}
   if(RL6.t>=0)return;RL6.t=0;WEVENT.on=true;lum.vx=lum.vy=0;lum.state='idle';try{sfxGhost();sfxEerie&&sfxEerie();}catch(e){}
-  setTimeout(()=>talk([['???',"Leaving so soon…?"]],false,()=>{WEVENT.on=false;startEncounter({kind:'glord',scene:'dun',x:RL6.x,y:RL6.y,face:-1,s:1,pack:1,calm:0,boss:1,noFlee:1,
+  setTimeout(()=>talk([['???',"Prepare to join the dead…"]],false,()=>{WEVENT.on=false;startEncounter({kind:'glord',scene:'dun',x:RL6.x,y:RL6.y,face:-1,s:1,pack:1,calm:0,boss:1,noFlee:1,
     onWin:()=>{C2.wraithBeat=1;RL6.t=-1;setTimeout(()=>talk([['Lum',"It's gone… The air feels lighter already."]],false,()=>{C2.serpentPouch=1;sfxPage&&sfxPage(.8);giveItem('serpentpouch');}),900);},
     onLose:()=>{RL6.t=-1;ch2Respawn();}},'normal');}),1500);}
 function ruinsLeave6(){dunGo(36,690,532,1);}   /* the only way out */

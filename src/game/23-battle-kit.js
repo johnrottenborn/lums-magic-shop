@@ -181,13 +181,13 @@ function drawBattleDemon(f){const S=bS(),B=BATTLE,isBrute=f.type==='brute',bg=f.
 
 /* the Water Nymph (designer's art): stands in her casting pose; on her turn water gathers in her raised hand and two water bolts fly at a hero */
 /* the Ghost: drawn see-through with a pale glow; it fades out on the wind-up, is gone through the attack, and appears at its target only at the last instant */
-function ghostAlpha(f){const B=BATTLE,me=B.foes[B.foeI]===f;if(!me)return 1;if(B.phase==='foeWind')return Math.max(0,1-B.t/.55);if(B.phase==='foeLeap')return B.t>B.leapD-.15?1:0;if(B.phase==='foeBack')return B.t<.25?Math.max(0,1-B.t/.2):Math.min(1,(B.t-.25)/.3);return 1;}
-function drawBattleGhost(f){const S=bS(),B=BATTLE,me=B.foes[B.foeI]===f,x=f.x+f.ox,h=Math.min(250*S,W*.46)*(f.s||1),y=f.y+f.oy-14*S+Math.sin(T*1.7+f.ph)*7*S;let al=ghostAlpha(f);if(f.dead)al*=Math.max(0,1-f.dead/.9);if(al<=0)return;
-  bshadow(f.x+f.ox,f.y+f.oy,h*.16,h*.035,.18*al);ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,x,y-h*.5,h*.55,'190,200,255',(.12+.05*Math.sin(T*2+f.ph))*al);ctx.restore();
-  const casting=me&&B.phase==='foeLeap';const an=casting?'cast':'float',fi=casting?5:Math.floor(T*5+f.ph)%6;
-  ctx.save();ctx.globalAlpha=al*.72;c1Frame(ctx,'ghost',an,fi,x+(f.hit>0?Math.sin(f.hit*50)*4:0),y,h,true,al*.72,f.hit>0?Math.min(1,f.hit*3):0);ctx.restore();
-  ctx.save();ctx.globalCompositeOperation='lighter';ctx.globalAlpha=al*.18;c1Frame(ctx,'ghost',an,fi,x+Math.sin(T*3)*3*S,y,h*1.02,true,al*.18,0);ctx.restore();   /* a faint shimmering double */
-  if(me&&B.phase==='foeLeap'&&B.t>B.leapD-.15){ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,x,y-h*.5,h*.6,'220,225,255',.35);ctx.restore();}}
+function ghostAlpha(f){const B=BATTLE,me=B.foes[B.foeI]===f;if(!me)return 1;
+  if(f.type==='ghost'){if(B.phase==='foeWind')return Math.max(0,1-B.t/1.1);if(B.phase==='foeLeap')return Math.min(1,B.t/Math.max(.1,B.leapD-.1));if(B.phase==='foeBack')return B.t<.6?Math.max(0,1-B.t/.6):Math.min(1,(B.t-.6)/.8);return 1;}   /* the ruins' Ghost fades out slowly, slowly takes shape beside its target, then fades home */
+  if(B.phase==='foeWind')return Math.max(0,1-B.t/.55);if(B.phase==='foeLeap')return B.t>B.leapD-.15?1:0;if(B.phase==='foeBack')return B.t<.25?Math.max(0,1-B.t/.2):Math.min(1,(B.t-.25)/.3);return 1;}
+/* the ruins' Ghost in battle: the designer's still art at full detail (ghost_hd), no walking or bobbing; it only fades in and out */
+function drawBattleGhost(f){const S=bS(),B=BATTLE,me=B.foes[B.foeI]===f,x=f.x+f.ox,h=Math.min(250*S,W*.46)*(f.s||1),y=f.y+f.oy-14*S,im=IMG.ghost_hd;let al=ghostAlpha(f);if(f.dead)al*=Math.max(0,1-f.dead/1.4);if(al<=0||!ready(im))return;const w=h*im.width/im.height;
+  bshadow(f.x+f.ox,f.y+f.oy,h*.16,h*.035,.18*al);ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,x,y-h*.5,h*.55,'190,200,255',.13*al);ctx.restore();
+  ctx.save();ctx.globalAlpha=al*.8;ctx.drawImage(im,x-w/2+(f.hit>0?Math.sin(f.hit*50)*4:0),y-h,w,h);if(f.hit>0){ctx.globalCompositeOperation='lighter';ctx.globalAlpha=al*Math.min(1,f.hit*3)*.5;ctx.drawImage(im,x-w/2,y-h,w,h);}ctx.restore();}
 /* the Wraith Lord (room 6 of the underground ruins): the designer's art in the ghosts' pale colours, about three ghosts tall, see-through and glowing; it teleports like them */
 function drawBattleGhostLord(f){const S=bS(),B=BATTLE,x=f.x+f.ox,h=Math.min(250*S*2.5,H*.66,f.y-40*S,W*.6*1.05),y=f.y+f.oy-10*S+Math.sin(T*1.3+f.ph)*10*S,im=IMG.ghost_lord;let al=ghostAlpha(f);if(f.dead)al*=Math.max(0,1-f.dead/1.2);if(al<=0||!ready(im))return;const w=h*im.width/im.height;
   bshadow(f.x+f.ox,f.y+f.oy,h*.12,h*.025,.2*al);ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,x,y-h*.5,h*.5,'190,200,255',(.14+.05*Math.sin(T*2+f.ph))*al);ctx.restore();

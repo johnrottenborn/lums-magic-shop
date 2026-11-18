@@ -1092,7 +1092,7 @@ const CASES = {
     const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop', g_ = (f, a) => p.evaluate(f, a);
     await g_(() => { const g = window.__g; g.startChapter2(); g.c2Skip(); g.WB10.st = 2; g.chPlaytestBreezeway(); g.C2.serpentPouch = 0; g.C2.wraithBeat = 0; g.enterDun(37, 880, 660, 1); }); await wait(900);
     await g_(() => window.__g.ruinsSkeleton()); await wait(1800);
-    check(await g_(() => window.__g.DLG.active && /Leaving so soon/.test(window.__g.DLG.lines[0][1]) && !window.__g.BAG.includes('serpentpouch')), 'touching the skeleton should wake the Wraith Lord (no pouch yet)');
+    check(await g_(() => window.__g.DLG.active && /Prepare to join the dead/.test(window.__g.DLG.lines[0][1]) && !window.__g.BAG.includes('serpentpouch')), 'touching the skeleton should wake the Wraith Lord (no pouch yet)');
     await g_(() => { const g = window.__g; g.DLG.active = false; g.DLG.onEnd && g.DLG.onEnd(); }); await wait(2500);
     check(await g_(() => window.__g.BATTLE.on && window.__g.BATTLE.foes[0].type === 'glord'), 'the Wraith Lord should attack');
     await p.screenshot({ path: path.join(SHOTS, `wraith-lord-${vp}.png`) });
