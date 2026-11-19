@@ -7,6 +7,7 @@ const C1={hedgeSeen:0,tracksSeen:0,cemSeen:0,reaper:0,vane:0,endSeen:0,woodsSeen
 const WFOES=[];let REAPER=null,VANE=null;
 C1ATL.fox_red=C1ATL.fox;C1ATL.fox_forest=C1ATL.fox;C1ATL.wisp_grove=C1ATL.wisp;C1ATL.nymph={"cw":230,"ch":260,"rows":{"up":[0,5],"side":[1,4],"run":[2,6],"idle":[3,6]}};   /* Water Nymph: walk away, side walk + run (face RIGHT), casting idle (front) */   /* Evergreen Grove's Forest Fox and Grove Wisp: recoloured sheets */
 C1ATL.spider_dark=C1ATL.spider;
+C1ATL.amroth_atk={"cw":400,"ch":256,"rows":{"swing":[0,5]}};   /* the designer's battle swing (amroth_atk): 0 sword raised back, 1 overhead, 2–3 the downswing with its arc, 4 recovery (also his battle stance) */
 C1ATL.amroth={"cw":230,"ch":256,"rows":{"down":[0,1],"up":[1,2],"side":[2,6],"run":[3,6],"bidle":[4,2],"bslash":[5,3]}}; // Amroth: visor always closed. down (1 frame), up, side walk + run (face LEFT), battle guard (faces the viewer, unused in battle), sword slash (faces right; frame 0 is his battle stance)
 const AMR_H=137,AMR_BH=166;   /* same size beside Lum in and out of battle */
 C1ATL.alma={"cw":200,"ch":250,"rows":{"down":[0,6],"up":[1,5],"side":[2,4],"run":[3,6],"idle":[4,6]}}; // Alma (Amroth's wife, not in battle): down walk, up walk, side walk + run (these face RIGHT: flip for left), standing idle. Not placed in the game yet

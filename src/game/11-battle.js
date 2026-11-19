@@ -269,15 +269,15 @@ function drawAflurry(){const B=BATTLE,a=B.af;if(B.phase!=='aflurry'||!a||a.done)
   if(a.hit===1){ctx.globalCompositeOperation='lighter';drawGlow(ctx,x,y,R*2.4,'255,240,180',.7*(1-u));}
   ctx.restore();ctx.save();ctx.fillStyle='#fdf6e4';ctx.strokeStyle='rgba(20,10,30,.7)';ctx.lineWidth=4;ctx.font='700 '+Math.round(20*S)+'px "Alegreya SC", Georgia, serif';ctx.textAlign='center';
   const txt=a.hits+' / '+AF_N;ctx.strokeText(txt,x,c_.top-26*S);ctx.fillText(txt,x,c_.top-26*S);ctx.restore();}
-function drawBattleAmroth(h){const S=bS(),B=BATTLE,x=h.x+h.ox+Math.max(0,62*S-h.x-h.ox+20*S)*(h.ox<=0?1:0),y=h.y+h.oy,me=B.heroes[B.cur]===h,ph=B.phase,t=B.t,H_=AMR_BH*S;let an='bslash',fi=0,flip=false,rot=0,guard=true;   /* stands in the slash row's ready pose, side-on and facing right toward the foes (his guard row faces the viewer) */
-  if(me&&(ph==='bonkRun'||ph==='bonkBack'||ph==='run'||ph==='fled')){guard=false;an='run';fi=Math.floor(t*12)%6;flip=ph==='bonkRun';}   /* his run row faces left */
-  else if(me&&ph==='bonkWind'){guard=false;an='bslash';fi=0;rot=-.22*Math.min(1,t/B.windD);}   /* draws the sword back */
-  else if(me&&ph==='bonkHit'){guard=false;an='bslash';flip=false;   /* the slash: a snap forward into the swing frame (with its arc), held, then the follow-through */
-    if(t<.04){fi=0;rot=-.22;}else if(t<.3){fi=1;const u=(t-.04)/.26;rot=-.22+.34*Math.min(1,u*3);}else{fi=2;rot=.12*(1-Math.min(1,(t-.3)/.15));}}
-  else if(me&&ph==='aflurry'){guard=false;const a=B.af||{};an='bslash';fi=a.swing>.16?1:a.swing>0?2:0;flip=false;}
-  bshadow(x,y+2,40*S,11*S,.35);ctx.save();ctx.translate(x,y+3);if(h.hurt>0)ctx.translate(Math.sin(h.hurt*60)*4,0);ctx.rotate(flip?-rot:rot);ctx.scale(.88,1);   /* a little slimmer */
+function drawBattleAmroth(h){const S=bS(),B=BATTLE,x=h.x+h.ox+Math.max(0,62*S-h.x-h.ox+20*S)*(h.ox<=0?1:0),y=h.y+h.oy,me=B.heroes[B.cur]===h,ph=B.phase,t=B.t,H_=AMR_BH*S;let sh='amroth_atk',an='swing',fi=4,flip=false,rot=0,guard=true,lean=0;   /* in battle he stands in the swing sheet's recovery pose: sword forward over the shield, facing right toward the foes */
+  if(me&&(ph==='bonkRun'||ph==='bonkBack'||ph==='run'||ph==='fled')){guard=false;sh='amroth';an='run';fi=Math.floor(t*12)%6;flip=ph==='bonkRun';}   /* his run row faces left */
+  else if(me&&ph==='bonkWind'){guard=false;fi=t<B.windD*.45?0:1;lean=-6*S*Math.min(1,t/B.windD);}   /* the wind-up: sword drawn back, then raised overhead */
+  else if(me&&ph==='bonkHit'){guard=false;   /* the strike: overhead, down through the arc, follow-through, then recovery */
+    fi=t<.06?1:t<.15?2:t<.34?3:4;lean=t<.34?10*S*Math.min(1,t/.15):10*S*(1-Math.min(1,(t-.34)/.2));}
+  else if(me&&ph==='aflurry'){guard=false;const a=B.af||{};fi=a.swing>.2?1:a.swing>.1?2:a.swing>0?3:4;lean=a.swing>0?6*S:0;}   /* Lion's Fury: each beat a fresh overhead-to-arc slash */
+  bshadow(x,y+2,40*S,11*S,.35);ctx.save();ctx.translate(x+lean,y+3);if(h.hurt>0)ctx.translate(Math.sin(h.hurt*60)*4,0);ctx.rotate(flip?-rot:rot);ctx.scale(.92,1);
   if(guard){const b=Math.sin(T*1.5);ctx.scale(1-.004*b,1+.01*b);}
-  c1Frame(ctx,'amroth',an,fi,0,0,H_,flip,1,h.hurt>.3?1:0);ctx.restore();}
+  c1Frame(ctx,sh,an,fi,0,0,H_,flip,1,h.hurt>.3?1:0);ctx.restore();}
 function drawBattleSpar(h){const S=bS(),B=BATTLE,x=h.x+h.ox,y=h.y+h.oy,me=B.heroes[B.cur]===h,ph=B.phase,t=B.t,H_=SPAR_BH*S;let an='brun',fi=1,flip=false,rot=0,guard=true;
   /* at rest he stands on guard: knees bent, sword gripped two-handed across his body (run row frame 1), breathing; the run row faces right, toward the foes */
   if(me&&(ph==='bonkRun'||ph==='bonkBack'||ph==='run'||ph==='fled')){guard=false;an='brun';fi=Math.floor(t*12)%5;flip=ph!=='bonkRun';}

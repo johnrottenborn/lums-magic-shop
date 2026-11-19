@@ -63,8 +63,8 @@ const DROOMS={
      fg:[{y:550,poly:[[500,535],[850,535],[850,700],[500,700]]},{y:577,poly:[[0,560],[312,560],[312,768],[0,768]]},{y:574,poly:[[1000,560],[1300,560],[1300,768],[1000,768]]},{y:540,poly:[[785,458],[1100,458],[1100,562],[785,562]]}]},   /* the long tables and benches; the bar counter, in front of the innkeeper */
   /* 28: inside the top-left shell house (the designer's painting): a fisher's home, table, hearth, bed; the door is on the left wall */
   28:{name:'',dark:0,home:1,hk:1.35,floor:[[150,622],[300,598],[480,566],[820,560],[1040,566],[1050,640],[1035,768],[340,768],[200,700],[150,680]],
-     block:[{x0:470,y0:540,x1:815,y1:690},{x0:1040,y0:470,x1:1380,y1:769},{x0:0,y0:640,x1:150,y1:769},{x0:130,y0:680,x1:340,y1:769}],
-     fg:[{y:688,poly:[[415,470],[815,470],[815,690],[415,690]]}]},   /* the table and chairs */
+     block:[{x0:478,y0:560,x1:815,y1:658},{x0:400,y0:560,x1:545,y1:692},{x0:1040,y0:470,x1:1380,y1:769},{x0:0,y0:640,x1:150,y1:769},{x0:130,y0:680,x1:340,y1:769}],
+     fg:[{y:656,poly:[[482,495],[808,490],[812,548],[798,560],[798,656],[640,656],[640,580],[545,578],[485,560]]},{y:690,poly:[[415,470],[452,464],[466,518],[546,518],[546,690],[415,690]]}]},   /* the table (with the chest under it) and the front chair, each drawn in front of anyone behind it */
   24:{name:'Ruins Overlook',dark:0,wide:1,hk:.62,floor:[[690,768],[700,705],[738,655],[768,603],[782,560],[780,512],[766,488],[756,450],[788,433],[880,431],[922,450],[914,480],[872,498],[860,560],[868,612],[880,664],[902,715],[922,768]]},
   /* 29: the Sanctuary of Water's front (the designer's painting): carved double doors in a glass-domed hall, steps up between two fern planters, spouts pouring into pools either side */
   29:{name:'Sanctuary of Water',dark:0,wide:1,hk:1,floor:[[590,768],[596,720],[580,700],[568,640],[592,610],[596,592],[500,590],[420,588],[418,568],[600,574],[700,580],[800,574],[985,568],[985,588],[900,590],[806,592],[810,610],[808,640],[795,700],[782,720],[790,768]],
