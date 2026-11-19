@@ -386,7 +386,7 @@ const CASES = {
     await wait(1500); await p.screenshot({ path: path.join(SHOTS, `ch2-after-${vp}.png`) });
   },
   async 'amroth-battle'(p) {
-    // Amroth fights beside Lum: guard stance, sword attack, and Lion's Fury (tap as each ring meets the star, up to 15 hits)
+    // Amroth fights beside Lum: guard stance, sword attack, and Lion's Fury (tap as each ring meets the star, up to 10 hits, the last one heavy)
     const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop', g_ = f => p.evaluate(f);
     await g_(() => { window.__g.startChapter2(); window.__g.c2Skip(); }); await wait(1500);
     await g_(() => window.__g.startEncounter({ kind: 'spider', scene: 'thorn', x: 0, y: 0, s: 1, pack: 1, calm: 0, over: { hp: 60 } }, 'normal'));
@@ -403,7 +403,7 @@ const CASES = {
     await wait(2600); await p.screenshot({ path: path.join(SHOTS, `amroth-lions-fury-${vp}.png`) });
     for (let i = 0; i < 60 && !(await g_(() => window.__g.BATTLE.af && window.__g.BATTLE.af.done)); i++) await wait(200);
     const hits = await g_(() => window.__g.BATTLE.af.hits);
-    check(hits >= 13, "Lion's Fury landed too few hits with good timing: " + hits);
+    check(hits >= 9 && hits <= 10, "Lion's Fury should land up to 10 hits with good timing: " + hits);
     await g_(() => { window.__g.BATTLE.on = false; });
     await g_(() => { const g = window.__g; g.openMenu(); g.MENU.page = 'char'; g.MENU.who = 'amroth'; }); await wait(600);
     await p.screenshot({ path: path.join(SHOTS, `amroth-spellbook-${vp}.png`) });
@@ -985,6 +985,27 @@ const CASES = {
     await g_(() => { window.__g.DLG.active = false; window.__g.enterBWEast(); }); await wait(1500);
     check(await g_(() => !window.__g.NIGHT.rain), 'the rain should stay stopped on the Breezeway too');
     await p.screenshot({ path: path.join(SHOTS, `sea-snake-rain-over-${vp}.png`) });
+  },
+  async 'guard-perks'(p) {
+    // a perfect guard: Amroth earns a combo star, Jak counter-attacks (half the time); Jak's combo is Thunderfury, from his axe
+    const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop', g_ = (f, a) => p.evaluate(f, a);
+    await g_(() => { const g = window.__g; g.startChapter2(); g.c2Skip(); g.C2.jak = 1; g.PARTY_ORDER.includes('jak') || g.PARTY_ORDER.push('jak'); g.HEROES.jak.hp = g.HEROES.jak.maxHp; }); await wait(1200);
+    await g_(() => window.__g.startEncounter({ kind: 'spider', scene: 'thorn', x: 0, y: 0, s: 1, pack: 1, calm: 0, over: { hp: 80 } }, 'normal'));
+    for (let i = 0; i < 60; i++) { await wait(150); if (await g_(() => window.__g.BATTLE.phase) === 'heroMenu') break; }
+    check(await g_(() => window.__g.BATTLE.heroes.map(h => h.id).join(',')) === 'lum,amroth,jak', 'Lum, Amroth and Jak should all be in the battle');
+    const foeHit = (id, r) => g_(([id, r]) => { const g = window.__g, B = g.BATTLE, f = B.foes[0]; window.__rnd = Math.random; if (r != null) Math.random = () => r; B.foeI = 0; f.tgt = B.heroes.find(h => h.id === id); f.second = 1; B.cmd = { guard: true, lock: 0, tried: true }; B.phase = 'foeLeap'; B.leapD = .42; B.t = .42; return f.hp; }, [id, r]);
+    await g_(() => { window.__g.C1X.comboA = 0; }); await foeHit('amroth'); await wait(120); await g_(() => { Math.random = window.__rnd; });
+    check(await g_(() => window.__g.C1X.comboA === 1), "Amroth's perfect guard should earn a combo star");
+    let hp0 = await foeHit('jak', 0.1); await wait(60); await p.screenshot({ path: path.join(SHOTS, `jak-counter-${vp}.png`) }); await g_(() => { Math.random = window.__rnd; });
+    check(await g_((hp0) => window.__g.BATTLE.foes[0].hp < hp0, hp0), "Jak's perfect guard should counter-attack (roll under 50%)");
+    await wait(900); hp0 = await foeHit('jak', 0.9); await wait(120); await g_(() => { Math.random = window.__rnd; });
+    check(await g_((hp0) => window.__g.BATTLE.foes[0].hp === hp0, hp0), "Jak should not counter on a roll over 50%");
+    await wait(900);
+    check(await g_(() => window.__g.HCOMBO.jak === 'Thunderfury'), "Jak's combo should be called Thunderfury");
+    await g_(() => { const g = window.__g, B = g.BATTLE; B.cur = 2; B.phase = 'jbolt'; B.t = 0; B.burstDone = 0; }); await wait(450);
+    await p.screenshot({ path: path.join(SHOTS, `jak-thunderfury-${vp}.png`) }); await wait(1600);
+    check(await g_(() => window.__g.BATTLE.foes[0].hp < 80 - 5), 'Thunderfury should hit the foe');
+    await g_(() => { window.__g.BATTLE.on = false; });
   },
   async 'jak-joins'(p) {
     const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop', g_ = (f, a) => p.evaluate(f, a);
