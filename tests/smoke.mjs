@@ -1002,6 +1002,19 @@ const CASES = {
     check(await g_((hp0) => window.__g.BATTLE.foes[0].hp === hp0, hp0), "Jak should not counter on a roll over 50%");
     await wait(900);
     check(await g_(() => window.__g.HCOMBO.jak === 'Thunderfury'), "Jak's combo should be called Thunderfury");
+    // Beast Trap: Jak sets it on a party member; the next attack on them springs it for Jak's attack damage and the attack does no harm
+    await g_(() => { const g = window.__g, B = g.BATTLE; B.cur = 2; B.phase = 'heroMenu'; B.menu = 0; }); await wait(300);
+    check(await g_(() => window.__g.menuOpts().some(o => o[0] === 'trap')), "Jak's battle menu should have a Trap command");
+    await p.screenshot({ path: path.join(SHOTS, `jak-trap-menu-${vp}.png`) });
+    await g_(() => { const g = window.__g, B = g.BATTLE; B.phase = 'tpick'; B.tpick = 0; }); await wait(300);
+    await p.screenshot({ path: path.join(SHOTS, `jak-trap-pick-${vp}.png`) });
+    await g_(() => window.__g.setTrap(0)); await wait(900);
+    await p.screenshot({ path: path.join(SHOTS, `jak-trap-set-${vp}.png`) });
+    const lumHp = await g_(() => window.__g.HEROES.lum.hp);
+    hp0 = await foeHit('lum'); await wait(150); await g_(() => { Math.random = window.__rnd; });
+    check(await g_((hp0) => window.__g.BATTLE.foes[0].hp < hp0, hp0), 'the Beast Trap should hurt the attacking foe');
+    check(await g_((h) => window.__g.HEROES.lum.hp === h && !window.__g.BATTLE.heroes[0].trap, lumHp), 'the trapped attack should be stopped and the trap used up');
+    await wait(900);
     await g_(() => { const g = window.__g, B = g.BATTLE; B.cur = 2; B.phase = 'jbolt'; B.t = 0; B.burstDone = 0; }); await wait(450);
     await p.screenshot({ path: path.join(SHOTS, `jak-thunderfury-${vp}.png`) }); await wait(1600);
     check(await g_(() => window.__g.BATTLE.foes[0].hp < 80 - 5), 'Thunderfury should hit the foe');
