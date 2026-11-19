@@ -1252,6 +1252,45 @@ const CASES = {
     await g_(() => window.__g.NEAR.onInteract()); await wait(1500);
     check(await g_(() => window.__g.SCENE === 'dun' && window.__g.DUN.room === 36), 'the island entrance should lead back down to room 5');
   },
+  async 'world-reactions'(p) {
+    // after the rain stops the townsfolk have new lines; Amroth and Alma greet Jak, then react after the ruins
+    const g_ = (f, a) => p.evaluate(f, a);
+    const end = async () => { for (let i = 0; i < 8; i++) { if (!await g_(() => window.__g.DLG.active)) break; await g_(() => { const g = window.__g; g.DLG.active = false; g.DLG.onEnd && g.DLG.onEnd(); }); await wait(200); } };
+    await g_(() => { const g = window.__g; g.startChapter2(); g.c2Skip(); }); await wait(800);
+    const first = () => g_(() => window.__g.DLG.lines.map(l => l[1]).join(' | '));
+    await g_(() => { const g = window.__g; g.C2.rainDone = 0; g.bvNpcTalk(g.BVNPC.find(n => n.name === 'Townsman')); }); await wait(200);
+    check(/out of the rain/.test(await first()), 'before the rain stops the Townsman should mention the rain');
+    await end();
+    for (const [who, re] of [['Townsman', /Blue sky/], ['Townswoman', /sun in the window/], ['Fisherman', /gone quiet/], ['Fisherwoman', /back out deep/]]) {
+      await g_((who) => { const g = window.__g; g.C2.rainDone = 1; g.bvNpcTalk(g.BVNPC.find(n => n.name === who)); }, who); await wait(200);
+      const t = await first(); check(re.test(t) && !/rain\./.test(t), `${who} should have a new line once the rain stops: ${t}`); await end();
+    }
+    await g_(() => window.__g.bvGirlTalk()); await wait(200); check(/rain stopped/.test(await first()), 'the townsgirl should notice the rain has stopped'); await end();
+    await g_(() => { const g = window.__g; g.innRest(g.BVNPC.find(n => n.name === 'Innkeeper')); }); await wait(200); check(/dry for once/.test(await first()), 'the innkeeper should notice Lum is dry'); await end();
+    await g_(() => { const g = window.__g; g.CHOICE && (g.CHOICE.on = false); Object.assign(g.C2, { babyGrow: 0, maiJoined: 0, homeMai: 0 }); g.hsBabyGrow(); }); await wait(200);
+    { const t = await first(); check(/companion/.test(t) && /Jak\. Explorer/.test(t) && /bare hands/.test(t), 'Amroth and Alma should greet Jak, then talk about the baby: ' + t); } await end();
+    await g_(() => { const g = window.__g; g.C2.maiJoined = 1; g.hsBabyGrow(); }); await wait(200);
+    check(/Brighter/.test(await first()) && /Mai/.test(await first()), 'after the ruins Alma and Amroth should react to Mai'); await end();
+    check(await g_(() => window.__g.C2.homeMai === 1), 'the after-the-ruins talk should only play once');
+  },
+  async 'ch2-ending'(p) {
+    // back to Sage Luma with Mai within her: the last talk, End of Chapter 2, and the results card (snakeskin gear for 5 stars, a serpent keepsake)
+    const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop', g_ = (f, a) => p.evaluate(f, a);
+    const end = async () => { for (let i = 0; i < 12; i++) { if (!await g_(() => window.__g.DLG.active)) break; await g_(() => { const g = window.__g; g.DLG.active = false; g.DLG.onEnd && g.DLG.onEnd(); }); await wait(200); } };
+    await g_(() => { localStorage.removeItem('lums-magic-shop-progress'); const g = window.__g; g.startChapter2(); g.c2Skip(); Object.assign(g.C2, { lumaMet: 1, maiJoined: 1, done: 0 }); g.enterDun(31, 688, 720, 1); }); await wait(1200);
+    check(await g_(() => window.__g.ch2Score().snake === 0), 'with no snakeskin gear the count should be 0');
+    await g_(() => { const g = window.__g; for (const id of ['taipanhat', 'serpentarmor', 'wbboots', 'serpentcharm', 'serpentpouch']) g.BAG.includes(id) || g.BAG.push(id); Object.assign(g.STATS, { time: 2400, atk: 20, nice: 19, foeAtk: 10, guards: 9, kos: 0 }); g.C2.wraithBeat = 1; });
+    check(await g_(() => window.__g.ch2Score().snake === 5 && window.__g.ch2Score().stars === 5), 'all five snakeskin pieces and a clean run should give 5 stars');
+    await g_(() => window.__g.lumaTalk()); await wait(300);
+    check(await g_(() => window.__g.DLG.active && window.__g.DLG.lines[0][0] === 'Sage Luma' && /not alone/.test(window.__g.DLG.lines[0][1])), 'Sage Luma should begin the chapter\'s last talk');
+    await end(); await wait(3500); await p.screenshot({ path: path.join(SHOTS, `ch2-ending-title-${vp}.png`) });
+    await wait(9000);
+    check(await g_(() => window.__g.RESULTS.ch === 'ch2' && window.__g.C1RES.t > 6.5 && window.__g.RESULTS.r && window.__g.RESULTS.r.stars === 5), 'the Chapter 2 results card should show 5 stars');
+    check(await g_(() => window.__g.RESULTS.keep && window.__g.RESULTS.keep.id === 'serpentmedal'), '5 stars should give the Serpent Medallion keepsake');
+    check(await g_(() => { const p = window.__g.readProg(); return p.ch2 && p.ch2.done && p.ch2.keepsake && p.ch2.keepsake.id === 'serpentmedal'; }), 'Chapter 2 should be recorded as finished, with its keepsake');
+    await p.screenshot({ path: path.join(SHOTS, `ch2-results-${vp}.png`) });
+    check(await g_(() => { const s = window.__g.ch2Score; window.__g.BAG.splice(window.__g.BAG.indexOf('taipanhat'), 1); return s().snake === 4 && s().stars <= 4.5; }), 'without every snakeskin piece the stars should stop at 4.5');
+  },
   async 'island-mai'(p) {
     const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop', g_ = (f, a) => p.evaluate(f, a);
     const end = async () => { for (let i = 0; i < 8; i++) { if (!await g_(() => window.__g.DLG.active)) break; await g_(() => { const g = window.__g; g.DLG.active = false; g.DLG.onEnd && g.DLG.onEnd(); }); await wait(250); } };

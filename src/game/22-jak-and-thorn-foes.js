@@ -277,8 +277,8 @@ function drawFKS(){const x=FKS.cx,y=FKS.cy;
 
 /* Chapter 1's results: fade to black, a closing line, then the same results card as the prologue */
 const C1RES={t:0};
-function startCh1Results(){RESULTS.ch='ch1';RESULTS.r=null;RESULTS.sealT=0;RESULTS.msgT=0;C1RES.t=.001;C1RES.t0=performance.now();WEVENT.on=true;}
+function startCh1Results(ch){RESULTS.ch=ch||'ch1';RESULTS.r=null;RESULTS.sealT=0;RESULTS.msgT=0;C1RES.t=.001;C1RES.t0=performance.now();WEVENT.on=true;}
 function drawC1Results(){if(!C1RES.t)return;C1RES.t=Math.max(.001,(performance.now()-C1RES.t0)/1000);const t=C1RES.t;if(t>2)ZOOMK=1;ctx.save();ctx.setTransform(DPR,0,0,DPR,0,0);ctx.fillStyle=`rgba(0,0,0,${Math.min(1,t/2)})`;ctx.fillRect(0,0,W,H);
   if(t>6.5){ctx.restore();ctx.save();ctx.setTransform(DPR,0,0,DPR,0,0);drawResults(t-6.5);ctx.restore();return;}
   ctx.globalAlpha=Math.max(0,Math.min(1,(t-2)/1.5,(6.5-t)/.8));ctx.textAlign='center';
-  ctx.font='700 22px "Alegreya SC", Georgia, serif';ctx.fillStyle='rgba(232,226,242,.85)';ctx.fillText('End of Chapter 1',W/2,H*.47);ctx.restore();}
+  ctx.font='700 22px "Alegreya SC", Georgia, serif';ctx.fillStyle='rgba(232,226,242,.85)';ctx.fillText(RESCH[RESULTS.ch].end,W/2,H*.47);ctx.restore();}

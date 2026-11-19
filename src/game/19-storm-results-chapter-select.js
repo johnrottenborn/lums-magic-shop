@@ -103,6 +103,17 @@ function ch1Keepsake(st){return st>=5?{id:'foxtotem',name:'Carved Fox Totem',tie
 /* progress for any chapter: best stars, badges ever earned, best keepsake by tier (Chapter 2 starts with it) */
 function recordChapterProg(ch,stars,badges,keep){try{const p=readProg(),c=p[ch]=p[ch]||{};c.done=1;c.best=Math.max(c.best||0,stars);c.badges=c.badges||{};for(const b of badges||[])if(b.got)c.badges[b.id]=1;if(keep&&(!c.keepsake||(c.keepsake.tier||0)<keep.tier))c.keepsake=keep;localStorage.setItem(PROG_KEY,JSON.stringify(p));}catch(e){}}
 function bestCh1Keepsake(){const p=readProg();return (p.ch1&&p.ch1.keepsake)||null;}
+function bestCh2Keepsake(){const p=readProg();return (p.ch2&&p.ch2.keepsake)||null;}
+/* Chapter 2 scoring: all five pieces of snakeskin gear are needed for 5 stars; hidden places are the overlook, the Hidden Grove, the serpent pool, the vault and the skeleton's room */
+const SNAKE5=[['taipanhat','taipan'],['serpentarmor',null],['wbboots','slippers'],['serpentcharm','serpentCharm'],['serpentpouch','serpentPouch']],C2PLACES=[24,39,40,41,37];
+function ch2Score(){const S_=STATS,snake=SNAKE5.filter(([id,f])=>(f&&C2[f])||(id==='serpentarmor'&&WB10.opened)||owns(id)).length,places=C2PLACES.filter(r=>C1['seen'+r]).length;
+  const strike=S_.atk?S_.nice/S_.atk:0,guard=S_.foeAtk?S_.guards/S_.foeAtk:1,mins=S_.time/60;
+  const pts=snake/5+Math.min(1,strike/.8)+Math.min(1,guard/.6)+(S_.kos===0?1:S_.kos===1?.5:0)+(mins<=60?1:mins>=130?0:1-(mins-60)/70);
+  let stars=Math.round(clamp(pts,0,5)*2)/2;if(snake<5)stars=Math.min(stars,4.5);
+  const rank=stars>=5?'Legendary Witch':stars>=4?'Brilliant Witch':stars>=3?'Promising Witch':stars>=2?'Curious Witch':'Sleepy Witch';
+  return {stars,rank,snake,places,strike,guard};}
+function ch2Badges(R){const S_=STATS;return [{id:'snake',name:'Serpent Collector',got:R.snake>=5},{id:'shield',name:'Untouchable',got:S_.kos===0},{id:'hourglass',name:'Swift Path',got:S_.time<=3600},{id:'target',name:'Perfect Timing',got:S_.atk>=3&&S_.nice/S_.atk>=.9},{id:'ghost',name:'Wraith Slayer',got:!!C2.wraithBeat}];}
+function ch2Keepsake(st){return st>=5?{id:'serpentmedal',name:'Serpent Medallion',tier:3}:st>=4?{id:'serpentcameo',name:'Jade Serpent Cameo',tier:2}:st>=3?{id:'serpentcord',name:'Serpent Cord',tier:1}:null;}
 const RESCH={
   prologue:{end:'End of Prologue',done:'Prologue Complete',seal:'APPRENTICE',keepFor:'Keepsake for Chapter 1',file:'lums-magic-shop-prologue.png',share:'the Prologue',
     score:()=>prologueScore(),badges:R=>earnedBadges(R),keep:st=>keepsakeFor(st),record:(s,b,k)=>recordPrologue(s,b,k),best:()=>bestKeepsake(),
@@ -117,7 +128,14 @@ const RESCH={
       ['Timed strikes landed',S_.atk?Math.round(R.strike*100)+'%':'—'],['Enemy attacks guarded',S_.foeAtk?Math.round(R.guard*100)+'%':'—'],['Enemies defeated',String(S_.kills)],['Items used',String(S_.items)],
       ['Damage taken',String(S_.dmg)],['Times knocked out',String(S_.kos)],['Battles fled',String(S_.flees)]],
     gold:(k,R)=>(k==='Fox items found'&&R.fox===5)||(k==='Hidden rooms found'&&R.places===C1PLACES.length),
-    card:(R,S_)=>[['Time',fmtTime(S_.time)],['Fox items',`${R.fox}/5`],['Timed strikes',S_.atk?Math.round(R.strike*100)+'%':'—'],['Guards',S_.foeAtk?Math.round(R.guard*100)+'%':'—'],['Enemies',String(S_.kills)],['Steps',S_.steps.toLocaleString()]]}};
+    card:(R,S_)=>[['Time',fmtTime(S_.time)],['Fox items',`${R.fox}/5`],['Timed strikes',S_.atk?Math.round(R.strike*100)+'%':'—'],['Guards',S_.foeAtk?Math.round(R.guard*100)+'%':'—'],['Enemies',String(S_.kills)],['Steps',S_.steps.toLocaleString()]]},
+  ch2:{end:'End of Chapter 2',done:'Chapter 2 Complete',seal:'WITCH',keepFor:'Keepsake for Chapter 3',file:'lums-magic-shop-chapter-2.png',share:'Chapter 2',
+    score:ch2Score,badges:ch2Badges,keep:ch2Keepsake,record:(s,b,k)=>recordChapterProg('ch2',s,b,k),best:bestCh2Keepsake,
+    rows:(R,S_)=>[['Time to complete',fmtTime(S_.time)],['Steps taken',S_.steps.toLocaleString()],['Snakeskin gear found',`${R.snake} / 5`],['Hidden places found',`${R.places} / ${C2PLACES.length}`],
+      ['Timed strikes landed',S_.atk?Math.round(R.strike*100)+'%':'—'],['Enemy attacks guarded',S_.foeAtk?Math.round(R.guard*100)+'%':'—'],['Enemies defeated',String(S_.kills)],['Items used',String(S_.items)],
+      ['Damage taken',String(S_.dmg)],['Times knocked out',String(S_.kos)],['Battles fled',String(S_.flees)]],
+    gold:(k,R)=>(k==='Snakeskin gear found'&&R.snake===5)||(k==='Hidden places found'&&R.places===C2PLACES.length),
+    card:(R,S_)=>[['Time',fmtTime(S_.time)],['Snakeskin gear',`${R.snake}/5`],['Timed strikes',S_.atk?Math.round(R.strike*100)+'%':'—'],['Guards',S_.foeAtk?Math.round(R.guard*100)+'%':'—'],['Enemies',String(S_.kills)],['Steps',S_.steps.toLocaleString()]]}};
 function earnedBadges(R){const S_=STATS;return [{id:'treasure',name:'Treasure Hunter',got:R.fnd>=HIDDEN.length},{id:'shield',name:'Untouchable',got:S_.kos===0},{id:'hourglass',name:'Quick Study',got:S_.time<=1200},{id:'target',name:'Perfect Timing',got:S_.atk>=3&&S_.nice/S_.atk>=.9},{id:'crown',name:'Royal Slayer',got:!!S_.kingSlain}];}
 function keepsakeFor(st){return st>=5?{id:'mooncharm',name:"Lum's Moon Charm",tier:3}:st>=4?{id:'moonmint',name:'Silver Moonmint Sprig',tier:2}:st>=3?{id:'duskflower',name:'Pressed Duskberry Blossom',tier:1}:null;}
 /* Chapter 1 opens with the best keepsake ever earned in the Prologue already in the Charm slot */
@@ -134,6 +152,8 @@ function drawBadge(id,got){const c=ctx;c.save();const g=c.createRadialGradient(-
     c.fillStyle=got?'#fff3dc':'#aaa';c.beginPath();c.moveTo(-6,3);c.quadraticCurveTo(0,5,6,3);c.quadraticCurveTo(3,10,0,11);c.quadraticCurveTo(-3,10,-6,3);c.fill();c.fillStyle='#3a2410';c.beginPath();c.arc(-4,0,1.4,0,TAU);c.arc(4,0,1.4,0,TAU);c.fill();c.beginPath();c.arc(0,10,1.5,0,TAU);c.fill();}
   else if(id==='spider'){for(const sd of [-1,1])for(let k=0;k<4;k++){const a=-.9+k*.55;c.beginPath();c.moveTo(0,1);c.lineTo(sd*8*Math.cos(a)*1.2,1+8*Math.sin(a));c.lineTo(sd*13*Math.cos(a),4+11*Math.sin(a));c.stroke();}
     c.fillStyle=got?'#4a3a5a':'#555';c.beginPath();c.ellipse(0,4,6,7,0,0,TAU);c.fill();c.stroke();c.beginPath();c.arc(0,-5,4,0,TAU);c.fill();c.stroke();c.fillStyle=got?'#e0404a':'#888';c.beginPath();c.arc(-1.6,-5.5,1,0,TAU);c.arc(1.6,-5.5,1,0,TAU);c.fill();}
+  else if(id==='snake'){c.strokeStyle=got?'#3d7a3a':'#666';c.lineWidth=5;c.beginPath();c.moveTo(-11,9);c.bezierCurveTo(-14,-2,0,2,-2,-6);c.bezierCurveTo(-4,-14,10,-14,8,-6);c.stroke();c.strokeStyle='#3a2410';c.lineWidth=1.4;c.stroke();c.fillStyle=got?'#3d7a3a':'#666';c.beginPath();c.ellipse(8,-7,5,3.6,-.3,0,TAU);c.fill();c.stroke();c.fillStyle=got?'#ffd56a':'#aaa';c.beginPath();c.arc(9.5,-8,1.1,0,TAU);c.fill();c.strokeStyle=got?'#c8323e':'#888';c.lineWidth=1.2;c.beginPath();c.moveTo(12.5,-7);c.lineTo(15,-6);c.stroke();}
+  else if(id==='ghost'){c.fillStyle=got?'rgba(235,240,255,.95)':'#888';c.beginPath();c.moveTo(-9,10);c.lineTo(-9,-3);c.bezierCurveTo(-9,-15,9,-15,9,-3);c.lineTo(9,10);c.lineTo(5,7);c.lineTo(2,10);c.lineTo(-2,7);c.lineTo(-5,10);c.closePath();c.fill();c.stroke();c.fillStyle='#3a2410';c.beginPath();c.ellipse(-3.5,-3,1.6,2.4,0,0,TAU);c.ellipse(3.5,-3,1.6,2.4,0,0,TAU);c.fill();}
   else if(id==='crown'){c.fillStyle=got?'#f2c440':'#888';c.beginPath();c.moveTo(-12,7);c.lineTo(-12,-6);c.lineTo(-6,0);c.lineTo(0,-10);c.lineTo(6,0);c.lineTo(12,-6);c.lineTo(12,7);c.closePath();c.fill();c.stroke();c.fillStyle=got?'#5cc08a':'#666';c.beginPath();c.arc(0,2,2.6,0,TAU);c.fill();}
   else{c.beginPath();c.arc(0,0,11,0,TAU);c.stroke();c.beginPath();c.arc(0,0,5.5,0,TAU);c.stroke();c.fillStyle=got?'#c8323e':'#666';c.beginPath();c.arc(0,0,2.6,0,TAU);c.fill();}
   c.restore();}

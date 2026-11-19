@@ -171,7 +171,7 @@ function rr(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h
 function drawUI(){if(!WATERBUILT&&creekCv&&ready(IMG.water_tile)&&ready(IMG.water_rocks)){WATERBUILT=true;buildCreek(riverR);buildPond(Math.min(1.6,riverR*1.2));}   /* repaint the water once its art has loaded */
   drawHomeSky();drawUIinner();drawC1IntroUI();drawC1Title();drawC2UI();drawHomeTitle();drawGroveTitle();drawBWTitle();drawBVTitle();drawISTitle();drawMix();drawChoice();drawSceneFade();drawWipe();}
 let menuLast=performance.now();
-function drawUIinner(){const _n=performance.now(),_dt=Math.min(.05,(_n-menuLast)/1000);menuLast=_n;drawIntroOverlay();drawSoundBtn();if(INTRO.on&&!INTRO.talking)return;if(!INTRO.on&&!WEV.end&&!C1RES.t){ctx.save();UI_FADE=INTRO.ui;drawUI_();drawBookBtn();drawToast();ctx.restore();UI_FADE=1;drawMenu(_dt);}if(INTRO.on&&INTRO.talking){drawSay();}}
+function drawUIinner(){const _n=performance.now(),_dt=Math.min(.05,(_n-menuLast)/1000);menuLast=_n;drawIntroOverlay();if(C1RES.t&&SCENE!=='thorn')drawC1Results();drawSoundBtn();if(INTRO.on&&!INTRO.talking)return;if(!INTRO.on&&!WEV.end&&!C1RES.t){ctx.save();UI_FADE=INTRO.ui;drawUI_();drawBookBtn();drawToast();ctx.restore();UI_FADE=1;drawMenu(_dt);}if(INTRO.on&&INTRO.talking){drawSay();}}
 let UI_FADE=1;
 const STICKUI={a:1,idle:0,touch:(()=>{try{return matchMedia('(pointer: coarse)').matches||navigator.maxTouchPoints>0;}catch(e){return false;}})()};
 addEventListener('pointerdown',e=>{if(e.pointerType==='touch')STICKUI.touch=true;else if(e.pointerType==='mouse'&&!navigator.maxTouchPoints)STICKUI.touch=false;},{capture:true});

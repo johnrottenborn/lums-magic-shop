@@ -95,8 +95,10 @@ function hsBabyAdmire(){WEVENT.on=true;lum.state='idle';lum.vx=lum.vy=0;
     ['Alma',"He’s fast asleep now. You should be too, Lum. Go and rest upstairs."],['Amroth',"Rest well, Lum. We will be right here."]],false,()=>{WEVENT.on=false;});}
 /* back home with Jak in the party: Amroth is inside beside Alma, and they talk about the baby */
 function hsHome2(){return HST.st>=7&&typeof jak2In==='function'&&jak2In();}
-function hsBabyGrow(){lum.state='idle';lum.vx=lum.vy=0;if(C2.babyGrow){talk([['Amroth',"Take care out there, both of you."]]);return;}
-  talk([['Alma',"Lum! Welcome back."],['Amroth',"The baby seems to be growing already."],['Alma',"He caught a fish with his bare hands!"],['Amroth',"Right out of the pond. I've never seen anything like it."]],false,()=>{C2.babyGrow=1;});}
+function hsBabyGrow(){lum.state='idle';lum.vx=lum.vy=0;
+  if(C2.maiJoined&&!C2.homeMai){talk([['Alma',"Lum… you look different. Brighter, somehow."],['Lum',"I met someone in the island ruins. Her name was Mai."],['Amroth',"The island ruins? No one has set foot there in an age."],['Alma',"Go to my sister, Lum. Sage Luma will know what this means."]],false,()=>{C2.homeMai=1;});return;}   /* after the ruins (placeholder lines) */
+  if(C2.babyGrow){talk([['Amroth',C2.maiJoined?"Sage Luma is waiting for you. Go safely.":"Take care out there, both of you."]]);return;}
+  talk([['Amroth',"You've found a companion. Good. The roads past the grove are no place to walk alone."],['Jak',"Jak. Explorer, mostly. Lost, sometimes."],['Alma',"Any friend of Lum's is welcome by our fire."],['Alma',"And welcome back, Lum."],['Amroth',"The baby seems to be growing already."],['Alma',"He caught a fish with his bare hands!"],['Amroth',"Right out of the pond. I've never seen anything like it."]],false,()=>{C2.babyGrow=1;});}
 function almaTalk(){if(HST.st===3){hsBabyAdmire();return;}if(HST.st===5){hsMorningAlma();return;}if(HST.st<6)return;if(hsHome2()&&!(!C2.venom&&(MATS.venomvine||0)>0)){hsBabyGrow();return;}if(!C2.venom&&(MATS.venomvine||0)>0){WEVENT.on=true;ALMA.face=lum.x<ALMA.x?-1:1;lum.face=-ALMA.face;
     talk([['Alma',"Is that Venomvine? Careful, its sap stings."],['Alma',"My sister taught me a trick with it when we were young. Grind the vine fine at a fire and it makes a powder that strikes, then leaves a poison behind."],
       ['Alma',"Here, let me show you."]],false,()=>{learnVenom();setTimeout(()=>talk([['Lum',"Poison Powder… Thank you, Alma!"],['Alma',"Feel free to mix it by the fire, right here."]],false,()=>{WEVENT.on=false;}),900);});return;}
