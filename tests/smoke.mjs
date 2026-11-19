@@ -1286,8 +1286,16 @@ const CASES = {
     }
     await g_(() => window.__g.bvGirlTalk()); await wait(200); check(/rain stopped/.test(await first()), 'the townsgirl should notice the rain has stopped'); await end();
     await g_(() => { const g = window.__g; g.innRest(g.BVNPC.find(n => n.name === 'Innkeeper')); }); await wait(200); check(/dry for once/.test(await first()), 'the innkeeper should notice Lum is dry'); await end();
-    await g_(() => { const g = window.__g; g.CHOICE && (g.CHOICE.on = false); Object.assign(g.C2, { babyGrow: 0, maiJoined: 0, homeMai: 0 }); g.hsBabyGrow(); }); await wait(200);
+    await g_(() => { const g = window.__g; g.CHOICE && (g.CHOICE.on = false); g.HST.st = 7; Object.assign(g.C2, { babyGrow: 0, maiJoined: 0, homeMai: 0, babyN: 0, venom: 1, lumaMet: 1, rainDone: 0, jak: 0, ruinsIn: 0, wraithBeat: 0 }); g.almaTalk(); }); await wait(200);
+    check(/outgrown the basket/.test(await first()) && /needs a name/.test(await first()), 'after Lum meets Sage Luma, Alma should talk about the baby growing and his name'); await end();
+    await g_(() => { const g = window.__g; g.C2.rainDone = 1; g.almaTalk(); }); await wait(200);
+    check(/laughed at the sun/.test(await first()), 'after the rain stops, Alma should have a new baby comment'); await end();
+    await g_(() => { const g = window.__g; g.C2.jak = 1; g.hsBabyGrow(); }); await wait(200);
     { const t = await first(); check(/companion/.test(t) && /Jak\. Explorer/.test(t) && /bare hands/.test(t), 'Amroth and Alma should greet Jak, then talk about the baby: ' + t); } await end();
+    await g_(() => { const g = window.__g; g.C2.ruinsIn = 1; g.hsBabyGrow(); }); await wait(200);
+    check(/lifted my shield/.test(await first()) && /Ember/.test(await first()), 'after the ruins open up, Amroth and Alma should talk about the baby again'); await end();
+    await g_(() => { const g = window.__g; g.C2.wraithBeat = 1; g.hsBabyGrow(); }); await wait(200);
+    check(/first word/.test(await first()), 'after the Wraith Lord, the baby says his first word'); await end();
     await g_(() => { const g = window.__g; g.C2.maiJoined = 1; g.hsBabyGrow(); }); await wait(200);
     check(/Brighter/.test(await first()) && /Mai/.test(await first()), 'after the ruins Alma and Amroth should react to Mai'); await end();
     check(await g_(() => window.__g.C2.homeMai === 1), 'the after-the-ruins talk should only play once');
