@@ -87,8 +87,8 @@ const DROOMS={
   /* 35: underground ruins room 4 (the designer's painting): a long carved hall of arches, a stream running down it toward a dark tunnel at the far end */
   35:{name:'',dark:0,fill:[180,45,1195,742],hk:1.05,hp:.0046,floor:[[470,735],[440,670],[450,620],[540,575],[640,525],[700,505],[760,505],[820,535],[900,570],[940,600],[930,650],[880,700],[880,735]]},
   /* 36: underground ruins room 5 (the designer's painting): the carved hall opens round a still pool; stairs on the left climb up to the island ruins, a broken gap in the back wall is the passage to room 6 */
-  36:{name:'',dark:0,fill:[180,45,1195,742],hk:1.05,hp:.0046,floor:[[470,735],[440,670],[450,620],[400,585],[395,555],[440,548],[560,545],[620,525],[700,512],[780,522],[830,545],[900,565],[940,600],[930,650],[880,700],[880,735]],
-     block:[{x:752,y:576,rx:118,ry:22}]},   /* the pool */
+  36:{name:'',dark:0,fill:[180,45,1195,742],hk:1.05,hp:.0046,floor:[[470,735],[440,670],[450,620],[400,585],[395,555],[440,548],[560,545],[620,522],[700,512],[790,512],[862,520],[912,545],[940,600],[930,650],[880,700],[880,735]],
+     block:[{x:760,y:574,rx:112,ry:18}]},   /* the pool (a walkway runs behind it to the gap in the back wall) */
   /* 37: underground ruins room 6 (the designer's painting): a dead-end chamber, roots over the back wall, a dark pool, an old adventurer's skeleton slumped by the right pillar. A big monster will wait here (still to come) */
   37:{name:'',dark:0,fill:[180,45,1195,742],hk:1.1,floor:[[560,735],[560,690],[600,652],[700,646],[800,632],[880,614],[930,622],[955,665],[955,705],[920,735]]},
   /* 22: the loft, the bed under the thatch; the stair comes up on the right behind the rail */
@@ -152,7 +152,7 @@ function setupDun(){DUNINT.length=0;const r=DUN.room,D=(x,y,reach,fn)=>DUNINT.pu
   if(r===32){D(318,566,75,()=>goScene(leaveRuins));D(840,508,55,()=>dunGo(33,660,730,1));D(948,516,45,()=>dunGo(40,688,736,1));}   /* the steps back up; the way on to room 2; the small arch on the right, to the serpent pool (room 40) */
   if(r===40){D(688,756,85,()=>dunGo(32,940,532,-1));DUNINT.push({x:700,y:690,reach:80,onInteract:serpentPool});}   /* back to the tunnel; the pool */   /* the steps back up; the way on to room 2 */
   if(r===37){RL6.t=-1;D(740,738,75,ruinsLeave6);DUNINT.push({x:905,y:640,reach:80,onInteract:ruinsSkeleton});}   /* the only way out; the old explorer's skeleton (touching it wakes the Wraith Lord) */
-  if(r===36){D(660,738,80,()=>dunGo(35,728,525,1));D(412,560,55,()=>goScene(enterIsland));D(690,518,45,()=>dunGo(37,740,712,1));}   /* back to the long hall; the stairs up to the island ruins (still to come); the gap to room 6 */
+  if(r===36){D(660,738,80,()=>dunGo(35,728,525,1));D(412,560,55,()=>goScene(enterIsland));D(820,526,75,()=>dunGo(37,740,712,1));}   /* back to the long hall; the stairs up to the island ruins (still to come); the gap to room 6 */
   if(r===35){D(660,738,80,()=>dunGo(34,650,530,1));D(728,512,45,()=>dunGo(36,660,712,1));}   /* back to the crypt; the tunnel at the far end to room 5 */
   if(r===34){D(660,738,80,()=>dunGo(33,470,560,1));D(650,516,50,()=>dunGo(35,660,712,1));D(1100,535,55,()=>dunGo(41,905,626,-1));}   /* back to the hydra room; the passage ahead to room 4; the right arch to the vault (room 41) */
   if(r===41){D(925,606,60,()=>dunGo(34,1090,560,-1));DUNINT.push({x:395,y:632,reach:80,onInteract:vaultChest});}   /* back to the crypt, inside the right arch; the locked chest on the far left */

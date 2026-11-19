@@ -55,7 +55,7 @@ function isProps(P){const X=x=>x+ISX,Y=y=>y+ISY;IS_RUBS.length=0;const rub=o=>{P
   P.push({t:'ischapel',x:X(IS_CHAPEL.x),y:Y(IS_CHAPEL.y),w:IS_CHAPEL.w});
   P.push({t:'istower',x:X(IS_TOWER.x),y:Y(IS_TOWER.y),w:IS_CHAPEL.w});   /* its bell tower, broken off and lying across the door */
   P.push({t:'ismai',x:X(IS_MAI.x),y:Y(IS_MAI.y),w:80});
-  P.push({t:'isent',x:X(IS_ENT.x),y:Y(IS_ENT.y),w:700});
+  P.push({t:'isent',x:X(IS_ENT.x),y:Y(IS_ENT.y),sy:Y(IS_ENT.y-20),w:700});   /* sorted just behind the walkable ground at the foot of the stairs, so Lum is never drawn under the painting there */
   P.push({t:'isarch',x:X(IS_SEAM.x),y:Y(IS_SEAM.y),w:IS_SEAM.w,flip:false,cut:'pillars',opaque:1});
   P.push({t:'isp',img:'isle_font',x:X(IS_FONT.x),y:Y(IS_FONT.y),w:IS_FONT.w});
     for(const [x,y,cut,lean] of IS_STATUES){P.push({t:'isbroken',x:X(x),y:Y(y),w:150,cut,lean});}   /* the broken statues */

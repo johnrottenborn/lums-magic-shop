@@ -168,7 +168,7 @@ function ruinsSkeleton(){if(C2.serpentPouch){say("An old explorer… they never 
   setTimeout(()=>talk([['???',"Prepare to join the dead…"]],false,()=>{WEVENT.on=false;startEncounter({kind:'glord',scene:'dun',x:RL6.x,y:RL6.y,face:-1,s:1,pack:1,calm:0,boss:1,noFlee:1,
     onWin:()=>{C2.wraithBeat=1;RL6.t=-1;setTimeout(()=>talk([['Lum',"It's gone… The air feels lighter already."]],false,()=>{C2.serpentPouch=1;sfxPage&&sfxPage(.8);giveItem('serpentpouch');}),900);},
     onLose:()=>{RL6.t=-1;ch2Respawn();}},'normal');}),1500);}
-function ruinsLeave6(){dunGo(36,690,532,1);}   /* the only way out */
+function ruinsLeave6(){dunGo(36,815,538,1);}   /* the only way out */
 function drawRL6(){if(RL6.t<0||SCENE!=='dun'||DUN.room!==37||(BATTLE.on&&!CAPTURE.on))return;RL6.t+=1/60;const im=IMG.ghost_lord;if(!ready(im))return;const u=Math.min(1,RL6.t/1.4),h=470,w=h*im.width/im.height,y=RL6.y+Math.sin(RL6.t*1.3)*8;   /* it materialises out of the dark over the pool */
   ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,RL6.x,y-h*.5,h*.55,'190,200,255',.18*u);ctx.restore();ctx.save();ctx.globalAlpha=.72*u*u;ctx.drawImage(im,RL6.x-w*.55,y-h,w,h);ctx.restore();}
 
