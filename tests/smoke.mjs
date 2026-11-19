@@ -1301,7 +1301,7 @@ const CASES = {
     await g_(() => { const g = window.__g; g.lum.x = g.ISX + g.IS_MAI.x; g.lum.y = g.ISY + g.IS_MAI.y + 90; }); await wait(600);
     await p.screenshot({ path: path.join(SHOTS, `island-mai-${vp}.png`) });
     await g_(() => window.__g.maiTalk()); await wait(200); await end(); await wait(3800);
-    check(await g_(() => window.__g.C2.maiJoined && /rejuvenated/.test(window.__g.DLG.lines[0][1])), 'Mai should join with Lum');
+    check(await g_(() => window.__g.C2.maiJoined && /She's here/.test(window.__g.DLG.lines[0][1])), 'Mai should join with Lum');
     await end();
     check(await g_(() => /Sage Luma/.test(window.__g.GOAL.text)), 'the task should send Lum back to Sage Luma');
   },

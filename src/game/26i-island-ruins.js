@@ -150,9 +150,11 @@ function drawMaiFig(x,y,al,anim){const sh=maiSheet();if(!sh)return;ctx.save();ct
 function drawMaiOW(){if(typeof C2==='undefined'||!C2.maiSeen||C2.maiJoined||ISS.m0>=0)return;const g=ISS.g0>=0?Math.min(1,(performance.now()-ISS.g0)/1000-1.1):1;if(g<=0)return;drawMaiFig(ISX+IS_MAI.x,ISY+IS_MAI.y,g,'idle');}
 THINT.push({get x(){return ISX+IS_MAI.x;},get y(){return ISY+IS_MAI.y+20;},get reach(){return inIS()&&C2.maiSeen&&!C2.maiJoined&&ISS.m0<0&&ISS.g0<0?110:-1;},onInteract:maiTalk});
 function maiTalk(){lum.state='idle';lum.vx=lum.vy=0;lum.face=lum.x<ISX+IS_MAI.x?1:-1;
-  talk([['Mai',"…You came. I knew we would meet again."],['Mai',"(She begins to cry.)"],['Mai',"I've wandered these ruins for as long as I can remember… waiting."],['Lum',"Who are you? I feel… a strange connection to you."]],false,()=>{ISS.m0=performance.now();ISS.mx=ISX+IS_MAI.x;ISS.my=ISY+IS_MAI.y;WEVENT.on=true;try{sfxGhost();}catch(e){}});}
+  talk([['Mai',"…You came. I knew we would meet again."],['Lum',"Again? I've never been here before."],['Mai',"No… not in this life."],['Mai',"Forgive me. It has been so long since anyone walked these stones."],
+    ['Mai',"Long ago, four stood against a god. Their magic bound him… and it bound them too."],['Mai',"They were given forever. No one is meant to have forever."],['Mai',"One of them wished to live many lives. I am… only a small piece of her."],
+    ['Lum',"Fokalur… you know him."],['Mai',"A fire that hates this world. I kept watch over these ruins as long as I could."],['Mai',"I'm so tired. Let me give you what is left of me."],['Lum',"Wait… who are you?"],['Mai',"Someone who has missed you."]],false,()=>{ISS.m0=performance.now();ISS.mx=ISX+IS_MAI.x;ISS.my=ISY+IS_MAI.y;WEVENT.on=true;try{sfxGhost();}catch(e){}});}
 function maiDone(){C2.maiJoined=1;ISS.m0=-1;WEVENT.on=false;for(const id of PARTY_ORDER)HEROES[id].hp=HEROES[id].maxHp;
-  talk([['Lum',"I don't feel possessed… I feel rejuvenated."],['Lum',"I must return to Sage Luma now!"]],false,()=>hsGoal('Return to Sage Luma at the Sanctuary of Water'));}
+  talk([['Lum',"…She's gone. No. She's here. I can feel her inside me."],['Lum',"Is this how Cosmic feels?"],['Lum',"Why did Sage Luma send me here…?"],['Lum',"I need to go back to the Sanctuary."]],false,()=>hsGoal('Return to Sage Luma at the Sanctuary of Water'));}
 /* the white glow when Mai appears, and Mai passing into Lum: Lum glows blue, flashes as Mai, then is Lum again */
 function drawISEvents(){if(!inIS()||SCENE!=='thorn')return;const now=performance.now();
   if(ISS.g0>=0){const t=(now-ISS.g0)/1000,a=t<1?t:t<1.5?1:Math.max(0,1-(t-1.5)/1.3);if(t>=1&&!C2.maiSeen){C2.maiSeen=1;hsGoal('Speak with the ghost by the big arch');}
