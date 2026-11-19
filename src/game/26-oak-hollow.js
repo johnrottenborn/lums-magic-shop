@@ -56,7 +56,7 @@ const DROOMS={
   /* 40: the side room off ruins room 1 (the designer's tall painting, centred with blurred mirrored sides): a dead end, a still pool under dripping stone; Lum comes in at the front */
   40:{name:'',dark:0,wide:1,tall:[476,898],hk:.9,hd:.2,floor:[[480,768],[480,600],[522,575],[600,590],[640,615],[578,650],[562,676],[640,692],[770,688],[802,662],[792,640],[850,630],[894,650],[894,768]]},
   /* 41: through room 3's dark right arch (the designer's painting, centred with blurred mirrored sides): a crumbling vault with old chests and barrels; Lum comes in at the front */
-  41:{name:'',dark:0,wide:1,hk:.75,hp:.004,floor:[[569,768],[470,700],[420,662],[398,640],[440,628],[477,590],[591,553],[733,544],[840,559],[945,598],[978,622],[890,655],[869,768]]},
+  41:{name:'',dark:0,fill:[275,0,1100,768],hk:.75,hp:.004,floor:[[569,768],[470,700],[420,662],[398,640],[440,628],[477,590],[591,553],[733,544],[840,559],[945,598],[978,622],[890,655],[869,768]]},
   /* 38: inside the top-right shell house (it replaced the Mayor's; the designer's painting): a long vaulted hall with a stone hearth, long tables, a bar of barrels and a stair to a loft; Lum comes in at the front */
   38:{name:'',dark:0,home:1,hk:1.35,floor:[[300,600],[400,560],[520,522],[640,500],[790,500],[790,565],[1100,565],[1100,546],[1200,546],[1230,575],[1300,640],[1310,768],[80,768],[80,700],[300,690]],
      block:[{x0:0,y0:575,x1:312,y1:768},{x0:505,y0:548,x1:848,y1:692},{x0:455,y0:488,x1:632,y1:560},{x0:1000,y0:590,x1:1092,y1:768},{x0:1092,y0:572,x1:1290,y1:768},{x0:818,y0:512,x1:872,y1:566},{x0:912,y0:518,x1:968,y1:576},{x0:1012,y0:528,x1:1076,y1:578}],
@@ -79,18 +79,18 @@ const DROOMS={
      block:[{x0:540,y0:470,x1:835,y1:598},{x:688,y:620,rx:34,ry:16}],   /* the altar; Sage Luma */
      fg:[{y:598,poly:[[538,395],[835,395],[838,598],[538,598]]}]},   /* the altar, in front of whoever walks behind it */
   /* 32: underground ruins room 1 (the designer's painting), down the sunken entrance off the Breezeway's secret way: Lum comes in at the steps on the left; a vaulted tunnel runs on to the next room */
-  32:{name:'',dark:0,wide:1,hk:.95,hp:.0047,flat:{x0:430,x1:580,y:690},floor:[[350,725],[345,690],[320,640],[300,600],[292,565],[330,548],[420,560],[500,600],[560,578],[650,548],[720,518],[780,503],[900,503],[960,528],[1010,578],[1050,640],[1075,725]]},
+  32:{name:'',dark:0,fill:[100,0,1240,768],hk:.95,hp:.0047,flat:{x0:430,x1:580,y:690},floor:[[350,725],[345,690],[320,640],[300,600],[292,565],[330,548],[420,560],[500,600],[560,578],[650,548],[720,518],[780,503],[900,503],[960,528],[1010,578],[1050,640],[1075,725]]},
   /* 33: underground ruins room 2 (the designer's painting): a five-headed hydra statue under a shaft of light, an altar with a cauldron and old books in front of it; the doorway on the left leads to room 3 */
-  33:{name:'',dark:0,wide:1,hk:1.15,floor:[[410,705],[340,650],[325,575],[400,548],[470,530],[520,545],[530,610],[965,610],[975,560],[1000,545],[1020,600],[1000,640],[945,640],[905,700],[955,740],[380,740]]},
+  33:{name:'',dark:0,fill:[195,40,1180,728],hk:1.15,floor:[[410,705],[340,650],[325,575],[400,548],[470,530],[520,545],[530,610],[965,610],[975,560],[1000,545],[1020,600],[1000,640],[945,640],[905,700],[955,740],[380,740]]},
   /* 34: underground ruins room 3 (the designer's painting): a vaulted crypt of pillars, a trickle of water across the floor; a doorway straight ahead and a dark arch on the right */
-  34:{name:'',dark:0,wide:1,hk:1.05,hp:.0042,floor:[[420,740],[470,680],[460,640],[480,580],[540,540],[580,512],[720,512],[800,540],[870,575],[990,560],[1050,530],[1150,530],[1150,560],[1010,600],[990,640],[930,700],[880,740]]},
+  34:{name:'',dark:0,fill:[180,45,1195,742],hk:1.05,hp:.0042,floor:[[420,740],[470,680],[460,640],[480,580],[540,540],[580,512],[720,512],[800,540],[870,575],[990,560],[1050,530],[1150,530],[1150,560],[1010,600],[990,640],[930,700],[880,740]]},
   /* 35: underground ruins room 4 (the designer's painting): a long carved hall of arches, a stream running down it toward a dark tunnel at the far end */
-  35:{name:'',dark:0,wide:1,hk:1.05,hp:.0046,floor:[[470,735],[440,670],[450,620],[540,575],[640,525],[700,505],[760,505],[820,535],[900,570],[940,600],[930,650],[880,700],[880,735]]},
+  35:{name:'',dark:0,fill:[180,45,1195,742],hk:1.05,hp:.0046,floor:[[470,735],[440,670],[450,620],[540,575],[640,525],[700,505],[760,505],[820,535],[900,570],[940,600],[930,650],[880,700],[880,735]]},
   /* 36: underground ruins room 5 (the designer's painting): the carved hall opens round a still pool; stairs on the left climb up to the island ruins, a broken gap in the back wall is the passage to room 6 */
-  36:{name:'',dark:0,wide:1,hk:1.05,hp:.0046,floor:[[470,735],[440,670],[450,620],[400,585],[395,555],[440,548],[560,545],[620,525],[700,512],[780,522],[830,545],[900,565],[940,600],[930,650],[880,700],[880,735]],
+  36:{name:'',dark:0,fill:[180,45,1195,742],hk:1.05,hp:.0046,floor:[[470,735],[440,670],[450,620],[400,585],[395,555],[440,548],[560,545],[620,525],[700,512],[780,522],[830,545],[900,565],[940,600],[930,650],[880,700],[880,735]],
      block:[{x:752,y:576,rx:118,ry:22}]},   /* the pool */
   /* 37: underground ruins room 6 (the designer's painting): a dead-end chamber, roots over the back wall, a dark pool, an old adventurer's skeleton slumped by the right pillar. A big monster will wait here (still to come) */
-  37:{name:'',dark:0,wide:1,hk:1.1,floor:[[560,735],[560,690],[600,652],[700,646],[800,632],[880,614],[930,622],[955,665],[955,705],[920,735]]},
+  37:{name:'',dark:0,fill:[180,45,1195,742],hk:1.1,floor:[[560,735],[560,690],[600,652],[700,646],[800,632],[880,614],[930,622],[955,665],[955,705],[920,735]]},
   /* 22: the loft, the bed under the thatch; the stair comes up on the right behind the rail */
   22:{name:'',dark:0,home:1,hk:1.9,floor:[[120,738],[460,730],[1050,726],[1050,612],[1185,612],[1185,768],[110,768]],
      block:[{x0:440,y0:430,x1:1052,y1:724}]},   /* the serpent gate (above): arrive in the lit stairwell behind the carved archway (back to room 19), walk down through it; the way on is in the foreground */
