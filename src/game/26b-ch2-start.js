@@ -5,12 +5,7 @@
    Saves like Chapter 1 (c2Snapshot / applySaveC2 in 18-save). */
 const C2={on:false,st:0,t:0,w:0,narr:-1,na:0,cam:null,title:0,heal:0,mound:1,shake:0,joined:0};
 const AMR={x:0,y:0,face:1,dir:'side',moving:0,ph:0,a:1};
-const C2NARR=["With the help of Spar, Lum finally found her lost apprentice, Cosmic.","But Cosmic had been deceived.",
-  "Through his foolish curiosity, he unknowingly awakened an ancient evil thought to be lost to the ages…","A Demon God.","Fokalur.",
-  "Freed from his thousand-year imprisonment, the demon unleashed his fury upon the world.",
-  "Lum and Spar stood against him, but their combined strength was no match for the newly awakened god.",
-  "The battle was over almost as quickly as it began.",
-  "Days passed. Rain fell upon the scorched earth, slowly extinguishing the fires that had consumed the surrounding wilderness.","But the devastation remained…"];
+const C2NARR=["Freed from his thousand-year imprisonment, the demon god Fokalur unleashed his fury...","Lum and Spar stood against him to save Cosmic, but their combined strength was no match for the newly awakened god.","Days passed. Rain fell upon the scorched earth, slowly extinguishing the fires that had consumed the surrounding wilderness..."];
 /* Spar's ashes: the mound beside where Lum was turned to stone */
 const ASHMOUND={get x(){return FKS.cx-240+120},get y(){return FKS.cy+8}};
 function startChapter2(){audioInit();c1Reset();CH=2;HERO='lum';PC='lum';
@@ -36,29 +31,28 @@ function updateC2(dt){if(!C2.on)return;C2.t+=dt;
   if(C2.narr>=0){C2.na+=dt;const L=C2NARR[C2.narr];if(C2.na>2.6+L.length*.045)c2NarrNext();return;}
   if(C2.fadeIn)C2.fadeIn=Math.max(0,C2.fadeIn-dt*.6);
   const S=STONELUM,st=C2.st;C2.cam=st>=1?{x:(st>=5?(AMR.x+lum.x)/2:AMR.x),y:(st>=5?Math.min(AMR.y,lum.y):AMR.y)-60}:C2.cam;
-  if(st===1){AMR.a=Math.min(1,C2.t/1.2);amrWalk(CPATH.xt+3,CPATH.ytop+130,40,dt);if(C2.t>2.4){AMR.moving=0;AMR.dir='down';c2Talk([['Amroth',"Ahh… rain. A welcome change."]],2);}}
-  else if(st===2){if(C2.t>.8){AMR.dir='down';c2Talk([['Amroth',"Hm? What in the world happened here? Those flames…"]],3);C2.route=c2PathDown().filter(p=>p[1]>CPATH.ytop+150);C2.ri=0;}}
-  else if(st===3){const R=C2.route;if(C2.ri<R.length){if(amrWalk(R[C2.ri][0],R[C2.ri][1],95,dt))C2.ri++;}else c2Talk([['Amroth',"I’ve patrolled these mountains for years, but I’ve never seen wildfires like this."]],4);}
-  else if(st===4){if(amrWalk(S.x+300,S.y+30,85,dt)){amrFace(S.x);c2Talk([['Amroth',"Alma?!"]],5);}}
-  else if(st===5){if(amrWalk(S.x+70,S.y+12,190,dt)){amrFace(S.x);c2Talk([['Amroth',"Alma! What happened to you?!"]],6);C2.route=[[S.x+30,S.y+55],[S.x-60,S.y+40],[S.x-80,S.y-10],[S.x-20,S.y-40],[S.x+60,S.y-20],[S.x+75,S.y+14]];C2.ri=0;}}
-  else if(st===6){const R=C2.route;if(C2.ri<R.length){if(amrWalk(R[C2.ri][0],R[C2.ri][1],70,dt))C2.ri++;}else{amrFace(S.x);c2Talk([['Amroth',"Turned to stone…? What kind of magic could do this?"],['Amroth',"Well… it’s a good thing I carry a Stonebreak Elixir. And an even better thing I haven’t had to use it."]],7);}}
+  if(st===1){AMR.a=Math.min(1,C2.t/1.2);amrWalk(CPATH.xt+3,CPATH.ytop+130,40,dt);if(C2.t>2.4){AMR.moving=0;AMR.dir='down';c2Talk([['Amroth',"Ahh… the rains. A welcome blessing."]],2);}}
+  else if(st===2){if(C2.t>.8){AMR.dir='down';c2Talk([['Amroth',"Hm? What in the world happened here?"]],3);C2.route=c2PathDown().filter(p=>p[1]>CPATH.ytop+150);C2.ri=0;}}
+  else if(st===3){const R=C2.route;if(C2.ri<R.length){if(amrWalk(R[C2.ri][0],R[C2.ri][1],95,dt))C2.ri++;}else c2Talk([['Amroth',"These trees… burned to cinders..."],['Amroth',"I’ve never seen wildfires like this..."]],4);}
+  else if(st===4){if(amrWalk(S.x+300,S.y+30,85,dt)){amrFace(S.x);c2Talk([['Amroth',"Alma?"]],5);}}
+  else if(st===5){if(amrWalk(S.x+70,S.y+12,190,dt)){amrFace(S.x);c2Talk([['Amroth',"ALMA! What happened to you?!"]],6);C2.route=[[S.x+30,S.y+55],[S.x-60,S.y+40],[S.x-80,S.y-10],[S.x-20,S.y-40],[S.x+60,S.y-20],[S.x+75,S.y+14]];C2.ri=0;}}
+  else if(st===6){const R=C2.route;if(C2.ri<R.length){if(amrWalk(R[C2.ri][0],R[C2.ri][1],70,dt))C2.ri++;}else{amrFace(S.x);c2Talk([['Amroth',"Turned to stone…? What manner of sorcery could possibly do such a thing?"],['Amroth',"Hold on, my love..."],['Amroth',"Aha! A Stonebane Elixir... I have one!"]],7);}}
   else if(st===7){C2.heal=Math.min(1,C2.t/3);if(C2.t>.05&&!C2.chimed){C2.chimed=1;try{sfxEerie();}catch(e){}}
     if(C2.t>3&&LUMSTONE){LUMSTONE=0;C2.flash=1;try{sfxFizzle();}catch(e){}}if(C2.t>4.2){C2.heal=0;
-    c2Talk([['Amroth',"Alma! You’re safe! Thank the gods. How did you—"],['Lum',"Thank you… but I’m afraid you’ve mistaken me for someone else."],['Amroth',"What?"],['Lum',"My name is Lum."],
-      ['Amroth',"Lum…? But you look exactly like my wife. You’re her mirror image!"],['Lum',"That’s… a strange coincidence. But there’s little time to explain."],
-      ['Amroth',"Then start with how you ended up turned to stone in the middle of a burned forest."],['Lum',"I was searching for my apprentice, Cosmic. I finally found him, but something was terribly wrong."],
-      ['Lum',"A powerful demon named Fokalur had possessed his body. He had been imprisoned for centuries… and Cosmic unknowingly set him free."],['Amroth',"Fokalur?"],
-      ['Amroth',"I’ve heard that name in the old accounts. An ancient demon god… sealed away long before my time."],['Lum',"He claimed the seal had held him shackled for a thousand years."],['Amroth',"A thousand years…?"],
-      ['Lum',"He was far more powerful than we could have imagined. Spar and I tried to stop him, but…"],['Lum',"Spar didn’t survive."]],8);}}
+    c2Talk([['Amroth',"Alma! You’re alive! Thank the gods. How did you..."],['Lum',"Thank you. But I’m afraid you are mistaken."],['Amroth',"What?"],['Lum',"I am Lum."],
+      ['Amroth',"Lum…? You are the mirror image of my wife, Alma."],['Lum',"Alma? I see... That is certainly an unusual coincidence. But I'm afraid we have little time for explanations."],
+      ['Amroth',"Then perhaps you'd care to explain how you ended up turned to stone in the middle of a burned forest!"],['Lum',"I was searching for my apprentice, Cosmic. I finally found him... but something was terribly wrong."],
+      ['Lum',"An ancient demon named Fokalur had taken possession of his body. Cosmic had unknowingly freed him from his prison."],['Amroth',"Fokalur?"],
+      ['Amroth',"I’ve encountered that name in the old chronicles. An ancient demon god, sealed away long before my time."],['Lum',"Indeed. He claimed the seal had imprisoned him for a thousand years."],['Amroth',"Then the legends were true."],
+      ['Lum',"I fear they were. Spar and I stood against him, but we were hopelessly outmatched…"],['Lum',"Spar did not... he did not survive."]],8);}}
   else if(st===8){if(C2.t>1.6)c2Talk([['Amroth',"I’m sorry."]],9);}
   else if(st===9){if(C2.t>.6){C2.shake=1;amrFace(ASHMOUND.x);c2Talk([['Amroth',"Wait…"]],10);}}
-  else if(st===10){C2.shake=1;if(C2.t>1)c2Talk([['Amroth',"Something’s moving."]],11);}
+  else if(st===10){C2.shake=1;if(C2.t>1)c2Talk([['Amroth',"Did you hear that?"]],11);}
   else if(st===11){C2.shake=.6;if(amrWalk(ASHMOUND.x-70,ASHMOUND.y+6,45,dt)){amrFace(ASHMOUND.x);c2Talk([['Amroth',"Show yourself, demon!"]],12);}}
-  else if(st===12){C2.shake=0;if(C2.t>1.4&&!C2.cried){C2.cried=1;try{sfxBabyCry();}catch(e){}}if(C2.t>2.8)c2Talk([['Lum',"A baby…? How could a child possibly have survived this?"],['Amroth',"I don’t know. And I wish we had more time to find out."],
-      ['Amroth',"I patrol the passage through the Worldbind Mountains. It’s not safe to linger here, especially after sunset."],['Lum',"What lies beyond the passage?"],['Amroth',"Darkness. And things best left undisturbed."],
-      ['Amroth',"Whatever happened here, we need to get moving. I’ll escort you down the mountain."]],13);}
+  else if(st===12){C2.shake=0;if(C2.t>1.4&&!C2.cried){C2.cried=1;try{sfxBabyCry();}catch(e){}}if(C2.t>2.8)c2Talk([['Lum',"A baby…? How could he possibly have survived these fires?"],['Amroth',"I haven't the faintest idea. It's a miracle the little one is alive."],
+      ['Amroth',"We must leave at once back through the passage. It will soon be nightfall."],['Amroth',"Whatever happened here, we need to get moving. I’ll escort you down the mountain."]],13);}
   else if(st===13){C2.mound=Math.max(0,1-C2.t/1.6);if(C2.t>.4&&!C2.cried2){C2.cried2=1;try{sfxBabyCry(.6);}catch(e){}}if(C2.t>1.2&&!BAG.includes('baby'))giveItem('baby');if(C2.t>2)c2Talk([['Lum',"Where did this little one come from?"],['Amroth',"That’s a question for another time."]],14);}
-  else if(st===14){if(C2.t>1.4)c2Talk([['Amroth',"Come on. We need to reach the passage before nightfall."]],15);}
+  else if(st===14){if(C2.t>1.4)c2Talk([['Amroth',"Let's move, Lum."]],15);}
   else if(st===15){if(C2.t<1.2)amrWalk(S.x+420,S.y+40,60,dt);else AMR.moving=0;lum.face=1;if(C2.t>1.4&&!FADE.dir)goScene(c2Finish);}   /* Amroth turns for the path; Lum stays put, so the player takes over exactly where the scene ends */
   // Lum is still while the cutscene runs (she only walks at the very end)
   if(st!==15&&!LUMSTONE){lum.state='idle';lum.fi=0;}}
@@ -82,7 +76,7 @@ function drawC2UI(){if(CH<2)return;ctx.save();ctx.setTransform(DPR,0,0,DPR,0,0);
   if(C2.title){C2.title+=1/60;const t=C2.title;if(t>5)C2.title=0;else{const a=Math.min(1,t*1.2,(5-t)*1.2);ctx.globalAlpha=a;ctx.fillStyle='rgba(20,14,30,.55)';ctx.fillRect(0,H*.3-46,W,92);ctx.textAlign='center';
     ctx.fillStyle='#fdf6e4';ctx.font='700 24px "Alegreya SC", Georgia, serif';ctx.fillText('Chapter 2',W/2,H*.3);}}
   ctx.restore();}
-/* world-space effects: the Stonebreak Elixir's light and cracks over the stone Lum, then a flash */
+/* world-space effects: the Stonebane Elixir’s light and cracks over the stone Lum, then a flash */
 function drawC2World(){if(CH<2)return;const x=lum.x,y=lum.y;
   if(C2.heal>0){const u=C2.heal;ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,x,y-60,90+40*u,'200,230,255',.35*u);const top=y-150*u;drawGlow(ctx,x,top,60,'230,245,255',.5*Math.sin(u*Math.PI));ctx.restore();
     ctx.save();ctx.strokeStyle=`rgba(40,36,34,${Math.min(.8,u*1.2)})`;ctx.lineWidth=1.4;for(let i=0;i<9;i++){if(hash(i,1,501)>u*1.4)continue;let px=x+(hash(i,2,501)-.5)*50,py=y-20-hash(i,3,501)*120;ctx.beginPath();ctx.moveTo(px,py);for(let k=0;k<4;k++){px+=(hash(i,k+4,501)-.5)*22;py+=(hash(i,k+9,501)-.3)*20;ctx.lineTo(px,py);}ctx.stroke();}ctx.restore();}
@@ -129,8 +123,8 @@ function updateC2Torch(dt){updateBlackout(dt);updateWorldbind5(dt);updateWorldbi
   const third=(x0,y0,d)=>Math.hypot(lum.x-x0,lum.y-y0)>=d;
   const wbSay=(lines,flag)=>{C2[flag]=1;WEVENT.on=true;lum.state='idle';lum.vx=lum.vy=0;talk(lines,false,()=>{WEVENT.on=false;});};
   if(SCENE==='dun'&&C2.joined&&!FADE.dir&&!DLG.active){
-    if(DUN.room===11&&C2.wbSeen&&!C2.wbLine&&third(238,250,330))wbSay([['Amroth',"We will take you to my home, little one."],['Amroth',"It’s much easier walking down these stairs than climbing up them. I climb them every day."],['Amroth',"My job is to make sure no one tries to use this passage anymore…"]],'wbLine');
-    if(DUN.room===13&&!C2.batLine&&third(540,240,255))wbSay([['Amroth',"We may see a few small bats, but the passage is safe."]],'batLine');}
+    if(DUN.room===11&&C2.wbSeen&&!C2.wbLine&&third(238,250,330))wbSay([['Amroth',"We will take you to my home, little one."],['Amroth',"I patrol this passage every day. It’s much easier walking back down."],['Amroth',"My job is to make sure no one tries to use this passage anymore…"]],'wbLine');
+    if(DUN.room===13&&!C2.batLine&&third(540,240,255))wbSay([['Amroth',"Don't be afraid of a few small bats, the passage is safe."]],'batLine');}
   if(SCENE!=='dun'||DUN.room!==12)return;if(!C2.torchLit&&!C2.torchScene&&C2.joined&&!FADE.dir)c2TorchScene();
   if(C2.torchWalk){if(amrWalk(150,500,90,dt)){C2.torchWalk=0;AMR.dir='side';AMR.face=-1;AMR.moving=0;setTimeout(()=>{C2.torchLit=1;C2.lightT=0;try{sfxIgnite();}catch(e){}
       setTimeout(()=>talk([['Amroth',"There. That's better."]],false,()=>{WEVENT.on=false;resetAmrFollow();AMR.x=150;AMR.y=500;}),900);},500);}}
@@ -150,7 +144,7 @@ function updateBlackout(dt){if(SCENE!=='dun'||DUN.room!==14){if(BO.st&&BO.st<9){
   if(!BO.st){if(!BO.done&&C2.joined&&lum.x>687&&!FADE.dir&&!DLG.active){go(1);WEVENT.on=true;lum.state='idle';lum.vx=lum.vy=0;BO.L=BO.R=0;try{sfxSnuff();}catch(e){}}}
   else if(BO.st===1){BO.a=Math.min(1,BO.t/.35);if(BO.t>1.4&&!DLG.active){go(2);talk([['Amroth',"Stand still while I relight the torches."],['Amroth',"I know this passage like the back of my hand!"]],false,()=>go(3));}}
   else if(BO.st===3){const there=amrWalk(150,520,130,dt);if(!there){AMR.dir='side';AMR.face=-1;}
-    if(BO.t>1.3&&!BO.said){BO.said=1;talk([['Lum',"Amroth? Do you hear something?"]],false,()=>{});}
+    if(BO.t>1.3&&!BO.said){BO.said=1;talk([['Lum',"Amroth?"],['Lum',"Do you hear something?"]],false,()=>{});}
     if(there&&BO.said&&!DLG.active){AMR.moving=0;go(4);}}
   else if(BO.st===4){if(BO.t>.6&&!BO.L){BO.L=1;BO.lt=0;BO.ow=demonPair();try{sfxIgnite();}catch(e){}}if(BO.L){BO.lt=Math.min(1,BO.lt+dt*1.5);BO.a=Math.max(0,1-BO.lt);}
     if(BO.t>2.2){go(5);WEVENT.on=false;startEncounter({kind:'demon',scene:'dun',x:lum.x+125,y:lum.y,s:1,pack:2,calm:0,noFlee:1,

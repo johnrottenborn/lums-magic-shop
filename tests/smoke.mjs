@@ -575,7 +575,7 @@ const CASES = {
     await wait(1600); { const l = await g_(() => window.__g.DLG.active && window.__g.DLG.lines.map(x => x[1]).join(' ')); check(l && /Stand still/.test(l) && /back of my hand/.test(l), 'Amroth did not speak in the dark: ' + JSON.stringify(l)); }
     await p.screenshot({ path: path.join(SHOTS, `worldbind-room4-dark-${vp}.png`) });
     for (let i = 0; i < 3 && await g_(() => window.__g.DLG.active); i++) { await p.keyboard.press('Enter'); await wait(400); }
-    await wait(1600); { const l = await g_(() => window.__g.DLG.active && window.__g.DLG.lines[0]); check(l && l[0] === 'Lum' && /hear something/.test(l[1]), 'Lum did not ask what she hears: ' + JSON.stringify(l)); }
+    await wait(1600); { const l = await g_(() => window.__g.DLG.active && window.__g.DLG.lines); check(l && l[0][0] === 'Lum' && /hear something/.test(l.map(x => x[1]).join(' ')), 'Lum did not ask what she hears: ' + JSON.stringify(l)); }
     await p.screenshot({ path: path.join(SHOTS, `worldbind-room4-hear-${vp}.png`) });
     await p.keyboard.press('Enter');
     for (let i = 0; i < 70 && !(await g_(() => window.__g.BO.ow.length === 2 && window.__g.BO.lt >= 1)); i++) await wait(200);
@@ -715,7 +715,7 @@ const CASES = {
     await p.keyboard.down('ArrowRight'); for (let i = 0; i < 30 && (await g_(() => window.__g.WB8.L)); i++) await wait(150);
     check(await g_(() => window.__g.WB8.L === 0 && window.__g.WB8.R === 1), 'room 8\'s left torch did not go out as Lum passed');
     for (let i = 0; i < 40 && !(await g_(() => window.__g.DLG.active)); i++) await wait(150); await p.keyboard.up('ArrowRight');
-    { const l = await g_(() => window.__g.DLG.active && window.__g.DLG.lines.map(x => x[0] + ':' + x[1]).join(' | ')); check(l && /Amroth:I feel the presence of evil/.test(l) && /Lum:Something wretched is coming/.test(l), 'room 8\'s halfway lines did not play: ' + JSON.stringify(l)); }
+    { const l = await g_(() => window.__g.DLG.active && window.__g.DLG.lines.map(x => x[0] + ':' + x[1]).join(' | ')); check(l && /Amroth:I feel the presence of evil/.test(l) && !/Lum:Something wretched/.test(l), 'room 8\'s halfway lines did not play: ' + JSON.stringify(l)); }
     await p.screenshot({ path: path.join(SHOTS, `worldbind-room8-dim-${vp}.png`) });
     for (let i = 0; i < 3 && await g_(() => window.__g.DLG.active); i++) { await p.keyboard.press('Enter'); await wait(350); }
     await wait(1200); await g_(() => { const c = window.__g.WB5.chaser; if (c) c.calm = 99; });
@@ -782,7 +782,7 @@ const CASES = {
     await wait(700); await p.screenshot({ path: path.join(SHOTS, `worldbind-room10-collapse-${vp}.png`) });
     // after the cave-in: Amroth and Lum speak; all three torches were lit, so the serpents glow and a chest appears
     for (let i = 0; i < 30 && !(await g_(() => window.__g.DLG.active)); i++) await wait(150);
-    { const l = await g_(() => window.__g.DLG.active && window.__g.DLG.lines.map(x => x[0] + ':' + x[1]).join(' | ')); check(l && /Amroth:We made it/.test(l) && /Lum:And I think the passage will block the demons/.test(l) && /Amroth:My home is just outside/.test(l), 'room 10\'s lines after the cave-in: ' + JSON.stringify(l)); }
+    { const l = await g_(() => window.__g.DLG.active && window.__g.DLG.lines.map(x => x[0] + ':' + x[1]).join(' | ')); check(l && /Amroth:We made it/.test(l) && /Lum:And I think the passage is blocked/.test(l) && /Amroth:My home is just outside\. Alma is waiting/.test(l), 'room 10\'s lines after the cave-in: ' + JSON.stringify(l)); }
     for (let i = 0; i < 4 && await g_(() => window.__g.DLG.active); i++) { await p.keyboard.press('Enter'); await wait(350); }
     for (let i = 0; i < 30 && !(await g_(() => window.__g.DLG.active)); i++) await wait(150);
     check(await g_(() => window.__g.WB10.glow > 0 && !!window.__g.WB10.chest && window.__g.WB10.chest.x < 700), 'the serpents did not glow and the chest did not appear in the back-left corner');

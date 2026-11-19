@@ -31,18 +31,18 @@ function hsEnterWalk(dt){HST.et+=dt;const a=amrWalk(HSPOS.amr[0],HSPOS.amr[1],85
   if(a&&l&&HST.et>.45){HST.enter=2;c1Idle();lum.face=1;AMR.face=1;AMR.moving=0;setTimeout(hsNightLines,350);}}
 function hsNightLines(){
   setTimeout(()=>talk([['Amroth',"Alma! Thank the stars, you’re safe."],['Alma',"Amroth! You’re home so late. What happened?"],
-    ['Amroth',"I found this woman at the summit’s clearing, just outside Stranglethorn. She had been turned to stone."],['Amroth',"Her name is Lum."],
-    ['Lum',"I live on the other side of Stranglethorn, at the edge of the world."],['Lum',"I was searching for my lost apprentice. His trail led me across Stranglethorn…"],
-    ['Lum',"…and when I found him, he had been possessed by Fokalur."],['Alma',"Fokalur… I’ve heard that name before."],['Amroth',"As have I. Your sister would know more, Alma."],
-    ['Alma',"Yes. My sister Luma is a sage in Breezevale Cove, the coastal town nearby. She knows the old stories better than anyone."]],false,hsMeet),700);}
+    ['Amroth',"I found this woman at the summit’s clearing.. and she had been turned to stone."],['Amroth',"Her name is Lum."],['Alma',"Lum...?"],
+    ['Lum',"It's a pleasure to meet you. Though I imagine my appearance must come as something of a surprise."],['Amroth',"You can say that again! I thought Lum was you, Alma."],
+    ['Lum',"I have a magic shop and I was searching for my lost apprentice..."],['Lum',"…when I finally found him, I discovered he was no longer himself. An ancient demon named Fokalur had possessed his body."],
+    ['Alma',"Fokalur… I’ve heard that name before."],['Amroth',"Alma, surely your sister knows something of these legends."],
+    ['Alma',"Yes. My sister Luma is a sage. She lives nearby in Breezevale."],['Alma',"If anyone knows about Fokalur, it's her."],['Lum',"Then perhaps she can help us."]],false,hsMeet),700);}
 function hsMeet(){HST.meet=1;}   /* Alma steps up to Lum; they look at each other */
-function hsMeetTalk(){talk([['Alma',"…"],['Lum',"…"],['Alma',"You look just like me."],['Lum',"I was thinking the same thing. It’s strange… it feels like I’ve known you forever."],
-    ['Alma',"So do I."]],false,()=>{HST.heart=0;setTimeout(hsBabyTalk,500);});}
+function hsMeetTalk(){talk([['Alma',"…"],['Lum',"…"],['Alma',"Lum. You look just like me."],['Lum',"I was thinking the same thing, Alma."],['Lum',"And it feels like I’ve known you forever."]],false,()=>{HST.heart=0;setTimeout(hsBabyTalk,500);});}
 function hsBabyTalk(){try{sfxBabyCry(.9);}catch(e){}
-  setTimeout(()=>talk([['Amroth',"And that isn’t all. On the way through the passage we were attacked by demons."],['Amroth',"We found this baby, too, in the ashes at the clearing."],
-    ['Amroth',"I have never seen demons before. I believe Fokalur is behind this invasion."],['Alma',"Oh… look at his kind eyes."]],false,()=>{
+  setTimeout(()=>talk([['Amroth',"Oh, how I have missed you, Alma. My patrol turned into chaos..."],['Lum',"On our way here we were attacked by an army of demons. We managed to escape just before the passage collapsed."],
+    ['Amroth',"And there is more... we found this baby in the ashes near Lum."],['Alma',"Oh… look at his kind eyes."]],false,()=>{
       const i=BAG.indexOf('baby');if(i>=0)BAG.splice(i,1);ALMA.baby=1;   /* Alma takes the baby */
-      setTimeout(()=>talk([['Alma',"I’ll care for him for now."],['Alma',"Lum, you must be exhausted. Please, rest upstairs. We can talk more in the morning."]],false,hsToRest),600);}),1100);}
+      setTimeout(()=>talk([['Alma',"We will care for him for now."],['Alma',"Lum, you must be exhausted. Please, rest upstairs."]],false,hsToRest),600);}),1100);}
 function hsToRest(){HST.st=3;WEVENT.on=false;HST.amrIn=1;HST.almaGo=1;AMR.x=700;AMR.y=640;AMR.dir='side';AMR.face=1;AMR.moving=0;
   C2.joined=0;const k=PARTY_ORDER.indexOf('amroth');if(k>=0)PARTY_ORDER.splice(k,1);   /* Lum goes on alone from here */
   hsGoal('Rest upstairs');setupDun();}

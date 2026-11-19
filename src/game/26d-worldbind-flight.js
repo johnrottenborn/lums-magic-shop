@@ -65,7 +65,7 @@ function updateWB5Room(dt){
   if(r8)updateWB8(dt);
   if(!on&&C2.joined&&!FADE.dir&&!DLG.active&&(r6||r8?lum.x>687:Math.hypot(lum.x-(r7||r9?422:425),lum.y-230)>=(r9?440:290))){WEVENT.on=true;lum.state='idle';lum.vx=lum.vy=0;WB5[key]=1;
     if(r9)talk([['Amroth',"The exit is just ahead…"]],false,()=>{WEVENT.on=false;WB5.respawn=.6;});   /* room 9, halfway */
-    else if(r8)talk([['Amroth',"I feel the presence of evil."],['Lum',"Something wretched is coming…"]],false,()=>{WEVENT.on=false;WB5.respawn=.6;});   /* room 8, halfway */
+    else if(r8)talk([['Amroth',"I feel the presence of evil."]],false,()=>{WEVENT.on=false;WB5.respawn=.6;});   /* room 8, halfway */
     else if(r7)talk([['Lum',"This place is going to collapse!"],['Amroth',"We’re not far from the exit."]],false,()=>{WEVENT.on=false;WB5.respawn=.6;});   /* room 7, a third of the way in */
     else if(r6){try{sfxBabyCry(.8);}catch(e){}   /* room 6, halfway across: the baby cries */
       setTimeout(()=>talk([['Amroth',"Are the demons coming after this baby?"]],false,()=>{WEVENT.on=false;WB5.respawn=.6;}),1100);}
@@ -98,7 +98,7 @@ function updateWorldbind10(dt){updateWB10Reward(dt);if(SCENE!=='dun'||DUN.room!=
   if(WB10.st===1){WB10.t+=dt;const t=WB10.t,amp=t<1.8?9*(1-t/2):0;WB10.q=[rnd(-amp,amp),rnd(-amp,amp)*.7];
     if(t<1.4&&Math.random()<dt*40)WB10.rocks.push({x:rnd(ARCH.x0+10,ARCH.x1-10),y:rnd(200,260),vy:rnd(0,80),ground:rnd(560,620),s:rnd(9,22),rot:rnd(0,TAU),spin:rnd(-5,5),cell:Math.floor(rnd(0,7)),land:0});
     if(t>.35)WB10.fill=Math.min(1,WB10.fill+dt*.9);
-    if(t>2.4){WB10.st=2;WB10.q=[0,0];WEVENT.on=true;setTimeout(()=>talk([['Amroth',"We made it!"],['Lum',"And I think the passage will block the demons… for now…"],['Amroth',"My home is just outside."]],false,wb10AfterTalk),500);}}
+    if(t>2.4){WB10.st=2;WB10.q=[0,0];WEVENT.on=true;setTimeout(()=>talk([['Amroth',"We made it!"],['Lum',"And I think the passage is blocked… for now…"],['Amroth',"My home is just outside. Alma is waiting."]],false,wb10AfterTalk),500);}}
   for(const p of WB10.rocks){if(p.land){p.land+=dt;continue;}p.vy+=900*dt;p.y+=p.vy*dt;p.rot+=dt*p.spin;if(p.y>=p.ground){p.y=p.ground;p.land=.001;}}
   for(let i=WB10.rocks.length-1;i>=0;i--)if(WB10.rocks[i].land>(WB10.fill>=1?.3:1.2))WB10.rocks.splice(i,1);}
 /* the blocked archway, drawn over the room image (under the characters) */
