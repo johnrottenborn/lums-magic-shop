@@ -1214,11 +1214,13 @@ const CASES = {
   },
   async 'island-ruins'(p) {
     const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop', g_ = (f, a) => p.evaluate(f, a);
-    await g_(() => { const g = window.__g; g.startChapter2(); g.c2Skip(); g.WB10.st = 2; g.chPlaytestIsle(); window.__calmT = setInterval(() => g.DFOES.forEach(f => { f.calm = 99; f.x = -999; }), 30); });   // room 5's foes stay out of the way await wait(900);
+    await g_(() => { const g = window.__g; g.startChapter2(); g.c2Skip(); g.WB10.st = 2; g.chPlaytestIsle(); window.__calmT = setInterval(() => { g.DFOES.forEach(f => { f.calm = 99; f.x = -999; }); g.THFOES.forEach(f => { if (f.isl) f.calm = 99; }); }, 30); });   // room 5's foes and the island ghosts stay out of the way
+    await wait(900);
     check(await g_(() => { const g = window.__g; return g.SCENE === 'dun' && g.DUN.room === 36 && g.jak2In(); }), 'the Island Ruins playtest should start in underground ruins room 5 with Jak');
     await g_(() => { const g = window.__g; g.lum.x = 412; g.lum.y = 575; }); await wait(600);
     await g_(() => window.__g.NEAR.onInteract()); await wait(1800);
     check(await g_(() => { const g = window.__g; return g.SCENE === 'thorn' && g.inIS() && g.isFree(g.lum.x, g.lum.y); }), 'the stairs in room 5 should lead up to the Island Ruins');
+    check(await g_(() => window.__g.THFOES.filter(f => f.isl && f.kind === 'ghost').length === 4), 'four ghosts should drift over the Island Ruins');
     await wait(1500); await p.screenshot({ path: path.join(SHOTS, `island-ruins-${vp}.png`) });
     for (const [x, y, top, what] of [[1400, 1230, 1110, 'the old font'], [560, 1170, 1060, 'the chapel'], [1250, 830, 730, 'a broken statue']]) {
       await g_(([x, y]) => { const g = window.__g; g.lum.x = g.ISX + x; g.lum.y = g.ISY + y; }, [x, y]); await wait(200);
@@ -1232,7 +1234,7 @@ const CASES = {
   async 'island-mai'(p) {
     const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop', g_ = (f, a) => p.evaluate(f, a);
     const end = async () => { for (let i = 0; i < 8; i++) { if (!await g_(() => window.__g.DLG.active)) break; await g_(() => { const g = window.__g; g.DLG.active = false; g.DLG.onEnd && g.DLG.onEnd(); }); await wait(250); } };
-    await g_(() => { const g = window.__g; g.startChapter2(); g.c2Skip(); g.WB10.st = 2; g.chPlaytestIsle(); g.enterIsland(); Object.assign(g.C2, { isl: 0, maiSeen: 0, maiJoined: 0 }); }); await wait(600);
+    await g_(() => { const g = window.__g; g.startChapter2(); g.c2Skip(); g.WB10.st = 2; g.chPlaytestIsle(); g.enterIsland(); Object.assign(g.C2, { isl: 0, maiSeen: 0, maiJoined: 0 }); setInterval(() => g.THFOES.forEach(f => { if (f.isl) f.calm = 99; }), 30); }); await wait(600);
     for (let i = 0; i < 4; i++) { await g_(i => window.__g.isInspect(i), i); await wait(200); await end(); }
     await wait(3500);
     check(await g_(() => window.__g.C2.maiSeen && !window.__g.WEVENT.on), 'after all four inspect spots the screen should glow and Mai appear');

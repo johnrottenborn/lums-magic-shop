@@ -162,3 +162,9 @@ function drawISEvents(){if(!inIS()||SCENE!=='thorn')return;const now=performance
     else if(t<2.6){const u=(t-1.4)/1.2;ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,lx,ly-50,90+40*Math.sin(u*Math.PI),'90,150,255',.55*Math.sin(u*Math.PI)+.15);ctx.restore();}   /* Lum glows blue */
     else if(t<3.1){const u=(t-2.6)/.5;ctx.save();ctx.fillStyle=`rgba(255,255,255,${(.8*(1-u)).toFixed(3)})`;ctx.fillRect(cam.x-3000,cam.y-3000,6000,6000);ctx.restore();drawMaiFig(lx,ly,1,'idle');}   /* a flash: for a moment she is Mai */
     else maiDone();}}
+
+/* the island's ghosts: four drifting among the ruins (they wander a small patch and chase when near) */
+const IS_GHOSTS=[[880,1360],[1880,1300],[1120,820],[1700,1520]];
+function addISFoes(){if(typeof ISX==='undefined'||THFOES.some(g=>g.isl))return;let id=5400;const dead=new Set(C1.thDead||[]);
+  for(const [lx,ly] of IS_GHOSTS){const x=ISX+lx,y=ISY+ly,myid=id++;if(dead.has(myid)||!isFree(x,y))continue;
+    THFOES.push({kind:'ghost',isl:1,scene:'thorn',x,y,hx:x,hy:y,tx:x,ty:y,cx:x-TCW/2,cy:y-TCH/2,s:1,pack:1,calm:1,dead:0,t:rnd(0,4),ph:rnd(0,TAU),face:-1,id:myid,bl:0});}}
