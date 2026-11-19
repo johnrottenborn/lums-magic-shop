@@ -1214,7 +1214,7 @@ const CASES = {
   },
   async 'island-ruins'(p) {
     const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop', g_ = (f, a) => p.evaluate(f, a);
-    await g_(() => { const g = window.__g; g.startChapter2(); g.c2Skip(); g.WB10.st = 2; g.chPlaytestIsle(); }); await wait(900);
+    await g_(() => { const g = window.__g; g.startChapter2(); g.c2Skip(); g.WB10.st = 2; g.chPlaytestIsle(); window.__calmT = setInterval(() => g.DFOES.forEach(f => { f.calm = 99; f.x = -999; }), 30); });   // room 5's foes stay out of the way await wait(900);
     check(await g_(() => { const g = window.__g; return g.SCENE === 'dun' && g.DUN.room === 36 && g.jak2In(); }), 'the Island Ruins playtest should start in underground ruins room 5 with Jak');
     await g_(() => { const g = window.__g; g.lum.x = 412; g.lum.y = 575; }); await wait(600);
     await g_(() => window.__g.NEAR.onInteract()); await wait(1800);
