@@ -240,8 +240,15 @@ function drawJak2OW(){if(CAPTURE.on)return;const vert=JK2.dir==='up'||JK2.dir===
   c1Frame(ctx,'jak2',an,JK2.moving?Math.floor(JK2.ph/16)%n:0,JK2.x,JK2.y+3,JAK2_H,!vert&&JK2.face<0,1,0);}   /* his side rows face right */
 /* Sage Luma in the Sanctuary's altar chamber: she knew Lum would come; the ruins to the west hold someone who can tell her about Fokalur */
 /* the end of Chapter 2: Lum returns to Sage Luma with Mai within her (placeholder lines, for the designer to revise) */
-function lumaEnding(){WEVENT.on=true;talk([['Sage Luma',"Lum… you've come back. And you are not alone."],['Sage Luma',"I can feel her light within you. Mai."],['Lum',"She was waiting in the island ruins. She said she knew we would meet again."],
-    ['Sage Luma',"Then she chose you. Her strength is yours now, as yours is hers."],['Lum',"Will it be enough to stand against Fokalur?"],['Sage Luma',"Not yet. But it is a beginning."],['Sage Luma',"Rest now, child. When the tide turns, so will your path."]],
+function lumaEnding(){WEVENT.on=true;talk([['Sage Luma',"Lum… you've come back. And you are not alone."],['Sage Luma',"I can feel her within you. After all this time, Mai has found her rest."],
+    ['Lum',"She said four heroes bound a god… and that she was only a piece of one of them."],['Lum',"Mai, Alma, you… and me. Are we connected somehow?"],
+    ['Sage Luma',"…The water carries many voices, child. Not all of them are mine to tell."],
+    ['Sage Luma',"Four hundred years ago the old temple fell to ruin. I helped raise this sanctuary from its stones."],['Sage Luma',"Water flows through every corner of the world. Through it, I hear what others cannot."],
+    ['Sage Luma',"Just over a year ago, I heard a voice calling out to a boy. To Cosmic."],['Sage Luma',"I did not know whose voice it was. I only knew he had to be hidden."],
+    ['Sage Luma',"I could think of no safer place than the end of the world… and no one I trusted more than you."],['Sage Luma',"But the demon god is patient, and cunning. He deceived me. I am so sorry, Lum."],
+    ['Lum',"All I ever wanted was a quiet life in my little shop… far away from everyone."],['Sage Luma',"I know. And now the one who wished to live apart from the world may be the one to save it."],
+    ['Sage Luma',"My sister sent you to me because she believes I know everything. I do not."],['Sage Luma',"But I know someone who knows more. Some would say he knows everything."],
+    ['Sage Luma',"King Bramt. His empire stretches across the western continent."],['Lum',"Across the sea…"],['Sage Luma',"Rest tonight, child. When the tide turns, so will your path."]],
   false,()=>{C2.done=1;setTimeout(()=>{finishChapter('ch2');startCh1Results('ch2');},400);});}
 function lumaTalk(){if(C2.maiJoined&&!C2.done){lumaEnding();return;}if(C2.lumaMet){talk([['Sage Luma',"Seek the ruins to the west, Lum… and do not go alone."]]);return;}
   talk([['Sage Luma',"Ah… Lum. I knew you would visit one day. I have been waiting for you."],['Lum',"I've traveled far to ask you about Fokalur."],['Sage Luma',"Fokalur… Yes. I remember…"],
