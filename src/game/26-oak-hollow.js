@@ -54,7 +54,7 @@ const DROOMS={
   /* 39: the Hidden Grove (the designer's painting), reached from Evergreen Grove's top-right corner: a mossy clearing among giant trees, a stream running in from the back; Lum comes in at the front */
   39:{name:'Hidden Grove',dark:0,wide:1,hk:1.05,hp:.0042,floor:[[250,768],[330,722],[480,692],[640,662],[610,600],[650,562],[760,536],[900,516],[1060,492],[1200,502],[1290,560],[1330,660],[1345,768]]},
   /* 40: the side room off ruins room 1 (the designer's tall painting, centred with blurred mirrored sides): a dead end, a still pool under dripping stone; Lum comes in at the front */
-  40:{name:'',dark:0,wide:1,hk:.9,hd:.2,floor:[[480,768],[480,600],[522,575],[600,590],[640,615],[578,650],[562,676],[640,692],[770,688],[802,662],[792,640],[850,630],[894,650],[894,768]]},
+  40:{name:'',dark:0,wide:1,tall:[476,898],hk:.9,hd:.2,floor:[[480,768],[480,600],[522,575],[600,590],[640,615],[578,650],[562,676],[640,692],[770,688],[802,662],[792,640],[850,630],[894,650],[894,768]]},
   /* 41: through room 3's dark right arch (the designer's painting, centred with blurred mirrored sides): a crumbling vault with old chests and barrels; Lum comes in at the front */
   41:{name:'',dark:0,wide:1,hk:.75,hp:.004,floor:[[569,768],[470,700],[420,662],[398,640],[440,628],[477,590],[591,553],[733,544],[840,559],[945,598],[978,622],[890,655],[869,768]]},
   /* 38: inside the top-right shell house (it replaced the Mayor's; the designer's painting): a long vaulted hall with a stone hearth, long tables, a bar of barrels and a stair to a loft; Lum comes in at the front */
