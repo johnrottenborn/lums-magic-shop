@@ -248,6 +248,7 @@ function drawDun(){const R=DROOMS[DUN.room],im=IMG['dun'+DUN.room];if(!ready(im)
     if(DUN.room>=15&&DUN.room<=19)for(const g of [WB5.chaser,WB5.brown])if(g){L.push([g.y,()=>drawDemonOW(g.x,g.y,g.face,g.a,g.mv,g.big,g)]);if(g.trio)for(const [tx,ty] of trioPos(g))L.push([ty,()=>drawDemonOW(tx,ty,g.face,g.a,g.mv,0)]);}
     for(const F of (R.fg||[]))L.push([F.y,()=>{ctx.save();ctx.beginPath();F.poly.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y));ctx.closePath();ctx.clip();ctx.drawImage(im,0,0,1375,768);ctx.restore();}]);   /* furniture that stands in front of whoever is behind it */
     if(DUN.room===37&&RL6.t>=0)L.push([RL6.y,drawRL6]);
+    if(RUINS_ROOMS.includes(DUN.room))L.push([9994,drawRuinsAir]);   /* drips from the ceiling and haunted fog in every underground ruins room */
     if(DUN.room===40&&GSN.t>=0)L.push([9996,drawGSRise]);   /* the ghostly serpent rising from the pool */
     if((DUN.room===29||DUN.room===24)&&NIGHT.rain)L.push([9997,()=>{ctx.save();ctx.beginPath();ctx.rect(0,0,1375,768);ctx.clip();drawRain(1/60);ctx.restore();}]);   /* only over the painting, not the dark bands around it */   /* the Sanctuary's front is out in the rain */
     if(DUN.room===24){L.unshift([-1,()=>drawOverlookMist(0)]);L.push([9998,()=>drawOverlookMist(1)]);}   /* mist over the sea behind, low wisps drifting in front */
@@ -287,4 +288,20 @@ function drawWorldbindAir(R){const M=wbMist(R),span=M.x1-M.x0+300;ctx.save();ctx
   // very tiny bats, flitting high in the dark
   ctx.save();ctx.fillStyle='rgba(12,14,22,.9)';for(let i=0;i<5;i++){const s=T*(.18+hash(i,1,DUN.room+40)*.12)+hash(i,2,DUN.room+40)*9,x=687+Math.sin(s)*(420+hash(i,3,DUN.room)*200)+Math.sin(s*3.1)*40,y=110+hash(i,4,DUN.room)*170+Math.sin(s*2.3)*30+Math.sin(s*7)*6,
     fl=Math.sin(T*28+i*2),w=6,dir=Math.cos(s)>0?1:-1;ctx.beginPath();ctx.moveTo(x,y);ctx.quadraticCurveTo(x-w*.6*dir,y-3*fl-1,x-w,y-2*fl);ctx.quadraticCurveTo(x-w*.5,y+.8,x,y+1.2);ctx.quadraticCurveTo(x+w*.5,y+.8,x+w,y-2*fl);ctx.quadraticCurveTo(x+w*.6*dir,y-3*fl-1,x,y);ctx.fill();}
+  ctx.restore();}
+
+/* the underground ruins (rooms 32-37, 40, 41): now and then a drop of water falls from the ceiling and plinks on the stone, and a haunted fog drifts low through every room */
+const RUINS_ROOMS=[32,33,34,35,36,37,40,41],RAIR={drops:[],next:1,room:-1};
+function drawRuinsAir(){const dt=1/60;if(RAIR.room!==DUN.room){RAIR.room=DUN.room;RAIR.drops.length=0;RAIR.next=.6+Math.random()*1.2;}
+  RAIR.next-=dt;if(RAIR.next<=0){RAIR.next=1.2+Math.random()*2.6;for(let k=0;k<30;k++){const x=300+Math.random()*775,y=520+Math.random()*240;if(dunFree(x,y)){RAIR.drops.push({x,y,z:y-260-Math.random()*200,v:0,hit:-1});break;}}}
+  ctx.save();ctx.beginPath();ctx.rect(0,0,1375,768);ctx.clip();
+  for(const d of RAIR.drops){if(d.hit<0){d.v+=1400*dt;d.z+=d.v*dt;if(d.z>=d.y){d.z=d.y;d.hit=0;const near=Math.max(.35,1-Math.hypot(d.x-lum.x,d.y-lum.y)/900);try{sfxDrip(near);}catch(e){}}
+      else{ctx.strokeStyle='rgba(205,225,240,.75)';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(d.x,d.z-10);ctx.lineTo(d.x,d.z);ctx.stroke();}}
+    else{d.hit+=dt;const u=d.hit/.7;for(let i=0;i<2;i++){const r=u-i*.18;if(r<0||r>1)continue;ctx.strokeStyle=`rgba(210,230,245,${(.55*(1-r)).toFixed(3)})`;ctx.lineWidth=1.5;ctx.beginPath();ctx.ellipse(d.x,d.y,4+r*22,1.5+r*6,0,0,TAU);ctx.stroke();}
+      if(d.hit<.25){ctx.fillStyle='rgba(215,235,248,.8)';for(let i=0;i<4;i++){const a=-Math.PI*(.2+.6*i/3),s=d.hit*90;ctx.beginPath();ctx.arc(d.x+Math.cos(a)*s,d.y+Math.sin(a)*s*.7+d.hit*d.hit*160,1.4,0,TAU);ctx.fill();}}}}
+  RAIR.drops=RAIR.drops.filter(d=>d.hit<.8);
+  const t=performance.now()/1000;ctx.globalCompositeOperation='screen';
+  {const fg=ctx.createLinearGradient(0,420,0,768);fg.addColorStop(0,'rgba(150,175,185,0)');fg.addColorStop(1,`rgba(150,175,185,${(.16+.04*Math.sin(t*.5)).toFixed(3)})`);ctx.fillStyle=fg;ctx.fillRect(0,420,1375,348);}   /* a low pale layer over the floor */
+  for(let i=0;i<9;i++){const ph=i*1.7,x=((i*230+t*(16+i*3))%1800)-210,y=540+Math.sin(t*.25+ph)*55+(i%3)*65,r=240+(i%3)*80,a=.15+.06*Math.sin(t*.4+ph);
+    ctx.save();ctx.translate(x,y);ctx.scale(1,.42);const g=ctx.createRadialGradient(0,0,0,0,0,r);g.addColorStop(0,`rgba(160,185,190,${a.toFixed(3)})`);g.addColorStop(.6,`rgba(160,185,190,${(a*.45).toFixed(3)})`);g.addColorStop(1,'rgba(160,185,190,0)');ctx.fillStyle=g;ctx.beginPath();ctx.arc(0,0,r,0,TAU);ctx.fill();ctx.restore();}   /* the gradient is squashed with the oval so the wisps have no edges */
   ctx.restore();}

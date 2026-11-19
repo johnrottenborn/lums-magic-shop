@@ -88,6 +88,8 @@ function sfxStep(stone){if(!SND.ready)return;const t=SND.ctx.currentTime;
     if(SND.runeCool<=0&&Math.random()<.45){SND.runeCool=.6;const sc=[86,88,90,93,95,98];bell(t+.03,NOTE(sc[(Math.random()*sc.length)|0]),.025,1.6,SND.sfx,(Math.random()-.5)*.4);}}
   else noiseHit(t,.1,'bandpass',1200+Math.random()*500,.9,.035,SND.sfx);}
 function sfxWade(){if(!SND.ready)return;const t=SND.ctx.currentTime;noiseHit(t,.22,'bandpass',1800+Math.random()*600,1.1,.12,SND.sfx,600);noiseHit(t+.03,.12,'highpass',3500,.7,.04,SND.sfx);}
+/* a single drip of water hitting stone in the underground ruins, with a faint cave echo */
+function sfxDrip(v=1){if(!SND.ready)return;const c=SND.ctx,t=c.currentTime;for(const [d,g0] of [[0,.07],[.17,.022],[.33,.008]]){const o=c.createOscillator(),g=c.createGain();o.type='sine';const f=1500+Math.random()*500;o.frequency.setValueAtTime(f,t+d);o.frequency.exponentialRampToValueAtTime(f*.45,t+d+.07);g.gain.setValueAtTime(0,t+d);g.gain.linearRampToValueAtTime(g0*v,t+d+.004);g.gain.exponentialRampToValueAtTime(.0001,t+d+.14);o.connect(g);g.connect(SND.sfx);o.start(t+d);o.stop(t+d+.16);}noiseHit(t,.04,'highpass',5000,1,.02*v,SND.sfx);}
 function sfxSplash(){if(!SND.ready)return;const t=SND.ctx.currentTime;noiseHit(t,.5,'bandpass',3200,1.2,.22,SND.sfx,700);noiseHit(t+.02,.28,'highpass',4000,.7,.06,SND.sfx);
   for(let i=0;i<6;i++){const st=t+.35+Math.random()*.6,o=SND.ctx.createOscillator(),g=SND.ctx.createGain(),f=1100+Math.random()*1300;o.frequency.setValueAtTime(f,st);o.frequency.exponentialRampToValueAtTime(f*.55,st+.05);
     g.gain.setValueAtTime(.04,st);g.gain.exponentialRampToValueAtTime(.0005,st+.07);o.connect(g);g.connect(SND.sfx);o.start(st);o.stop(st+.09);}}
