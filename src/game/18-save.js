@@ -1,3 +1,5 @@
+/* Slime Parts and Bone Parts were removed from the game: strip them from old saves */
+function dropRetiredMats(){for(const id of ['slimeparts','boneparts']){delete MATS[id];for(let i=BAG.indexOf(id);i>=0;i=BAG.indexOf(id))BAG.splice(i,1);}}
 /* ---------- save & continue (kept in this browser) ---------- */
 const SAVE_KEY='lums-magic-shop-save-v1';const TITLE={hits:[],confirm:-1e9};const SAVEC={t:0};const LOADTRIM={};
 function readSave(){try{const s=localStorage.getItem(SAVE_KEY);return s?JSON.parse(s):null;}catch(e){return null;}}
@@ -27,7 +29,7 @@ function applySaveC2(d){const s=d.c2||{};startChapter2();c2Skip();SAVEC.finished
   Object.assign(HST,s.hst||{},{heart:0});Object.assign(ALMA,s.alma||{});if(s.home)HOME.t=99;
   const w=s.wb||{};BO.done=w.boDone||0;if(BO.done)BO.st=0;WB8.beat=w.wb8beat||0;if(!WB8.beat){WB8.L=1;WB8.R=1;}WB10.st=w.wb10||0;Object.assign(WBT,w.wbt||{});
   for(const k of ['said','said18','jolt'])if(w.wb5&&w.wb5[k]!=null)WB5[k]=w.wb5[k];
-  BAG.length=0;BAG.push(...(d.bag||[]));for(const k in MATS)delete MATS[k];Object.assign(MATS,d.mats||{});
+  BAG.length=0;BAG.push(...(d.bag||[]));for(const k in MATS)delete MATS[k];Object.assign(MATS,d.mats||{});dropRetiredMats();
   if(d.party)for(const who in d.party)if(PARTY[who])Object.assign(PARTY[who],d.party[who]);Object.assign(POWDERS,d.powders||{});
   if(d.stats)Object.assign(STATS,d.stats,{found:Object.assign({},d.stats.found||{})});
   PARTY_ORDER.length=0;PARTY_ORDER.push(...(s.order||['lum']));syncMaxHp();for(const id of PARTY_ORDER)HEROES[id].hp=clamp((s.hp||{})[id]||HEROES[id].maxHp,1,HEROES[id].maxHp);
@@ -39,7 +41,7 @@ function applySaveC2(d){const s=d.c2||{};startChapter2();c2Skip();SAVEC.finished
   GOAL.tag='TASK';GOAL.text=(d.goal&&d.goal.text)||'';HINT.goalT=0;}
 function applySave(d){if(d.ch===2&&d.c2){applySaveC2(d);return;}if(d.ch===1){applySaveC1(d);return;}const f=d.f||{};if(d.stats)Object.assign(STATS,d.stats,{found:Object.assign({},d.stats.found||{})});
   ({bucketTaken,gotEquip,slimesDone,wellVisited,gardenDone,mimicState,studyVisited,shedChestOpen,shedVisited,pondDone,shroudTaken,pondVisited,shopTalk,restTalk,skelDone,sayCount,slugTalk,slimeTalk,poolTalk}=Object.assign({bucketTaken,gotEquip,slimesDone,wellVisited,gardenDone,mimicState,studyVisited,shedChestOpen,shedVisited,pondDone,shroudTaken,pondVisited,shopTalk,restTalk,skelDone,sayCount,slugTalk,slimeTalk,poolTalk},f));
-  BAG.length=0;BAG.push(...(d.bag||[]));for(const k in MATS)delete MATS[k];Object.assign(MATS,d.mats||{});if(d.party&&d.party.cosmic)Object.assign(PARTY[HERO],d.party.cosmic);HEROES[HERO].hp=clamp(d.hp||HEROES[HERO].maxHp,1,HEROES[HERO].maxHp);
+  BAG.length=0;BAG.push(...(d.bag||[]));for(const k in MATS)delete MATS[k];Object.assign(MATS,d.mats||{});dropRetiredMats();if(d.party&&d.party.cosmic)Object.assign(PARTY[HERO],d.party.cosmic);HEROES[HERO].hp=clamp(d.hp||HEROES[HERO].maxHp,1,HEROES[HERO].maxHp);
   if(gardenDone>=5&&!BAG.includes('shedkey')&&!shedChestOpen)BAG.push('shedkey');
   if(bucketTaken){const j=WOBST.findIndex(o=>o.bucket);if(j>=0)WOBST.splice(j,1);}
   const L_=d.left||{};for(const [k,flag] of [['well','slimesSpawned'],['study','sslimesSpawned'],['shed','shedSpawned'],['pond','pondSlimesSpawned']])if(f[flag])LOADTRIM[k]=L_[k]??0;

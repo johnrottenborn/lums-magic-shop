@@ -150,8 +150,8 @@ const CASES = {
     check(/small and circular/.test(seen), 'lantern line was: ' + seen);
     await p.evaluate(() => window.__g.pressA()); await wait(500);
     check(await p.evaluate(() => window.__g.BAG.includes('foxring')), 'Fox Ring was not given');
-    const got = await p.evaluate(() => { const g = window.__g, r = Math.random; g.PARTY.lum.charm = 'foxring'; const before = g.MATS.slimeparts || 0; Math.random = () => 0.1;
-      g.foxRingSteal({ type: 'slime', x: 0, y: 0 }); Math.random = r; return (g.MATS.slimeparts || 0) - before; });
+    const got = await p.evaluate(() => { const g = window.__g, r = Math.random; g.PARTY.lum.charm = 'foxring'; const before = g.MATS.foxtail || 0; Math.random = () => 0.1;
+      g.foxRingSteal({ type: 'ffox', x: 0, y: 0 }); Math.random = r; return (g.MATS.foxtail || 0) - before; });
     check(got === 1, 'Fox Ring did not steal on a successful roll');
   },
   async 'hidden-spring'(p) {
@@ -900,7 +900,7 @@ const CASES = {
     check(r.all === 5 && r.allFox === 5, 'a perfect run with every Fox item should be 5 stars: ' + JSON.stringify(r));
     check(r.four <= 4.5, 'missing a Fox item still gave 5 stars');
     check(r.k5 === 'foxtotem' && r.k4 === 'foxpendant' && r.k3 === 'foxtails' && r.k2 === null, 'wrong keepsake charms: ' + JSON.stringify(r));
-    const stole = await p.evaluate(() => { const g = window.__g, rnd = Math.random; g.PARTY.lum.charm = 'foxtotem'; const b = g.MATS.slimeparts || 0; Math.random = () => 0.1; g.foxRingSteal({ type: 'slime', x: 0, y: 0 }); Math.random = rnd; return (g.MATS.slimeparts || 0) - b; });
+    const stole = await p.evaluate(() => { const g = window.__g, rnd = Math.random; g.PARTY.lum.charm = 'foxtotem'; const b = g.MATS.foxtail || 0; Math.random = () => 0.1; g.foxRingSteal({ type: 'ffox', x: 0, y: 0 }); Math.random = rnd; return (g.MATS.foxtail || 0) - b; });
     check(stole === 1, 'the Carved Fox Totem did not steal on a successful roll');
   },
   async 'breezevale-cove'(p) {
@@ -1111,7 +1111,7 @@ const CASES = {
     const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop';
     await p.evaluate(() => { const g = window.__g; g.startChapter2(); g.c2Skip(); g.WB10.st = 2; g.chPlaytestBreezeway(); g.enterBreezevale(); g.enterDun(28, 600, 700, 1); }); await wait(800);
     const r = await p.evaluate(() => { const g = window.__g, out = [];
-      for (let k = 0; k < 6; k++) { g.MATS.dewberry = 1; g.MATS.slimeparts = 1; const b = g.POWDERS.frost || 0; g.doMix(1); out.push((g.POWDERS.frost || 0) - b); }
+      for (let k = 0; k < 6; k++) { g.MATS.dewberry = 1; const b = g.POWDERS.frost || 0; g.doMix(1); out.push((g.POWDERS.frost || 0) - b); }
       g.MATS.duskberry = 2; const pb = g.BAG.filter(x => x === 'potion').length; g.doMix(0); out.push(g.BAG.filter(x => x === 'potion').length - pb); return out; });
     check(r.slice(0, 6).every(n => n >= 4 && n <= 6) && r[6] === 1, 'powders should mix 4–6 at a time and the potion 1 (got ' + r.join(',') + ')');
     await p.evaluate(() => window.__g.openMix()); await wait(500);
@@ -1384,7 +1384,7 @@ const CASES = {
   },
   async 'battle-loot-resets'(p) {
     await startCh1(p);
-    await p.evaluate(() => { const g = window.__g; g.BATTLE.loot = ['slimeparts']; g.BATTLE.rewarded = 1;
+    await p.evaluate(() => { const g = window.__g; g.BATTLE.loot = ['foxtail']; g.BATTLE.rewarded = 1;
       g.startEncounter({ kind: 'wisp', scene: 'dun', x: 0, y: 0, s: 1, pack: 1, calm: 0 }, 'normal'); });
     for (let i = 0; i < 40 && !(await p.evaluate(() => window.__g.BATTLE.on)); i++) await wait(100);
     const r = await p.evaluate(() => ({ loot: window.__g.BATTLE.loot.length, rewarded: window.__g.BATTLE.rewarded }));

@@ -74,7 +74,7 @@ function drawForageIcon(c,id,x,y,s){c.save();c.translate(x,y);c.lineJoin='round'
   c.restore();}
 
 /* ---------- satchel: ingredients list ---------- */
-const ING_ORDER=['duskberry','dewberry','emberberry','moonleaf','slimeparts','thornsprig','boneparts','venomvine'];
+const ING_ORDER=['duskberry','dewberry','emberberry','moonleaf','thornsprig','venomvine'];
 function ingUse(id){const r=RECIPES.filter(r=>r.need[id]);return r.length?'for '+r.map(r=>r.name.replace(' Powder','')).join(', '):'';}
 function drawIngTab(c,px,pw,y0,y1){const x=px+18,w=pw-36;
   // the one rule of Lum's Magic Mixing

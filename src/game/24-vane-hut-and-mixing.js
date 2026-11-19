@@ -43,9 +43,9 @@ function drawVHut(){const im=IMG.vanehut;if(!ready(im))return;const [rz]=roomVie
 /* ---------- mixing ---------- */
 const RECIPES=[
   {id:'potion',name:'Healing Potion',out:1,desc:'Restores 5–7 HP',need:{duskberry:2}},
-  {id:'frost',name:'Frostbloom Powder',out:4,outMax:6,desc:'Freezes · enemy may lose a turn',need:{dewberry:1,slimeparts:1}},
+  {id:'frost',name:'Frostbloom Powder',out:4,outMax:6,desc:'Freezes · enemy may lose a turn',need:{dewberry:1}},
   {id:'thorn',name:'Thornbane Powder',out:4,outMax:6,desc:'Weakens enemy attacks',need:{emberberry:1,thornsprig:1}},
-  {id:'moon',name:'Moonmint Powder',out:4,outMax:6,desc:'Calms · strong vs undead',need:{moonleaf:2,boneparts:1}}];
+  {id:'moon',name:'Moonmint Powder',out:4,outMax:6,desc:'Calms · strong vs undead',need:{moonleaf:2}}];
 const MIX={on:false,sel:0,hits:[],flash:0,msg:'',msgT:0};
 function canLumMix(){return HERO==='lum'&&CH>0;}
 function fireInteract(){if(!canLumMix()){say("The fire crackles happily.");return;}askChoice("Mix?",[["Yes",openMix],["No",()=>{}]]);}
@@ -63,7 +63,7 @@ function doMix(i){const r=RECIPES[i];if(!r)return;const made=r.outMax?r.out+((Ma
 function mixKey(c){const n=RECIPES.length;if(c==='ArrowUp'||c==='KeyW')MIX.sel=(MIX.sel+n)%(n+1);else if(c==='ArrowDown'||c==='KeyS')MIX.sel=(MIX.sel+1)%(n+1);
   else if(c==='Enter'||c==='Space'||c==='KeyE'||c==='KeyK'){if(MIX.sel===n)closeMix();else doMix(MIX.sel);}else if(c==='Escape'||c==='KeyI'||c==='Tab')closeMix();}
 function mixTap(x,y){for(const h of MIX.hits)if(x>h.x&&x<h.x+h.w&&y>h.y&&y<h.y+h.h){h.act();return;}}
-const MATNAME={slimeparts:'Slime',boneparts:'Bone',thornsprig:'Thorn',duskberry:'Dusk',dewberry:'Dew',emberberry:'Ember',moonleaf:'Moonmint',venomvine:'Venomvine'};
+const MATNAME={thornsprig:'Thorn',duskberry:'Dusk',dewberry:'Dew',emberberry:'Ember',moonleaf:'Moonmint',venomvine:'Venomvine'};
 function drawMortar(c,x,y,s){{const im=IMG.icon3_mortar_clay;if(ready(im)){const z=26*s;c.drawImage(im,x-z/2,y-z/2-1,z,z);return;}}c.save();c.translate(x,y);c.scale(s,s);c.lineJoin='round';c.lineCap='round';
   c.strokeStyle='#6a4a2a';c.lineWidth=2.4;c.beginPath();c.moveTo(1,-1);c.lineTo(9,-12);c.stroke();c.fillStyle='#b08a5a';c.beginPath();c.arc(9.5,-12.5,2.6,0,TAU);c.fill();c.stroke();
   c.fillStyle='#8f9aa8';c.strokeStyle='#3e4450';c.lineWidth=1.6;c.beginPath();c.moveTo(-9,-2);c.lineTo(9,-2);c.quadraticCurveTo(8,8,0,8);c.quadraticCurveTo(-8,8,-9,-2);c.closePath();c.fill();c.stroke();
