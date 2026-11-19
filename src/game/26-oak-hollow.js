@@ -56,7 +56,7 @@ const DROOMS={
   /* 40: the side room off ruins room 1 (the designer's tall painting, centred with blurred mirrored sides): a dead end, a still pool under dripping stone; Lum comes in at the front */
   40:{name:'',dark:0,wide:1,hk:.9,hd:.2,floor:[[480,768],[480,600],[522,575],[600,590],[640,615],[578,650],[562,676],[640,692],[770,688],[802,662],[792,640],[850,630],[894,650],[894,768]]},
   /* 41: through room 3's dark right arch (the designer's painting, centred with blurred mirrored sides): a crumbling vault with old chests and barrels; Lum comes in at the front */
-  41:{name:'',dark:0,wide:1,hk:.75,hp:.004,floor:[[569,768],[512,677],[434,634],[477,577],[591,553],[733,544],[840,559],[933,601],[983,637],[890,653],[869,768]]},
+  41:{name:'',dark:0,wide:1,hk:.75,hp:.004,floor:[[569,768],[470,700],[420,662],[398,640],[440,628],[477,590],[591,553],[733,544],[840,559],[945,598],[978,622],[890,655],[869,768]]},
   /* 38: inside the top-right shell house (it replaced the Mayor's; the designer's painting): a long vaulted hall with a stone hearth, long tables, a bar of barrels and a stair to a loft; Lum comes in at the front */
   38:{name:'',dark:0,home:1,hk:1.35,floor:[[300,600],[400,560],[520,522],[640,500],[790,500],[790,565],[1100,565],[1100,546],[1200,546],[1230,575],[1300,640],[1310,768],[80,768],[80,700],[300,690]],
      block:[{x0:0,y0:575,x1:312,y1:768},{x0:505,y0:548,x1:848,y1:692},{x0:455,y0:488,x1:632,y1:560},{x0:1000,y0:590,x1:1092,y1:768},{x0:1092,y0:572,x1:1290,y1:768},{x0:818,y0:512,x1:872,y1:566},{x0:912,y0:518,x1:968,y1:576},{x0:1012,y0:528,x1:1076,y1:578}],
@@ -154,8 +154,8 @@ function setupDun(){DUNINT.length=0;const r=DUN.room,D=(x,y,reach,fn)=>DUNINT.pu
   if(r===37){RL6.t=-1;D(740,738,75,ruinsLeave6);DUNINT.push({x:905,y:640,reach:80,onInteract:ruinsSkeleton});}   /* the only way out; the old explorer's skeleton (touching it wakes the Wraith Lord) */
   if(r===36){D(660,738,80,()=>dunGo(35,728,525,1));D(412,560,55,()=>goScene(enterIsland));D(690,518,45,()=>dunGo(37,740,712,1));}   /* back to the long hall; the stairs up to the island ruins (still to come); the gap to room 6 */
   if(r===35){D(660,738,80,()=>dunGo(34,650,530,1));D(728,512,45,()=>dunGo(36,660,712,1));}   /* back to the crypt; the tunnel at the far end to room 5 */
-  if(r===34){D(660,738,80,()=>dunGo(33,470,560,1));D(650,516,50,()=>dunGo(35,660,712,1));D(1100,535,55,()=>dunGo(41,719,722,1));}   /* back to the hydra room; the passage ahead to room 4; the right arch to the vault (room 41) */
-  if(r===41)D(719,756,85,()=>dunGo(34,1090,560,-1));   /* back to the crypt */
+  if(r===34){D(660,738,80,()=>dunGo(33,470,560,1));D(650,516,50,()=>dunGo(35,660,712,1));D(1100,535,55,()=>dunGo(41,905,626,-1));}   /* back to the hydra room; the passage ahead to room 4; the right arch to the vault (room 41) */
+  if(r===41){D(925,606,60,()=>dunGo(34,1090,560,-1));DUNINT.push({x:395,y:632,reach:80,onInteract:vaultChest});}   /* back to the crypt, inside the right arch; the locked chest on the far left */
   if(r===33){D(660,758,80,()=>dunGo(32,840,525,-1));D(470,540,55,()=>dunGo(34,660,712,1));DUNINT.push({x:770,y:618,reach:85,onInteract:ruinsBook});}   /* back to the tunnel; the doorway to room 3; the old book on the altar */
   if(r===39){D(720,752,90,()=>goScene(leaveHiddenGrove));DUNINT.push({x:660,y:566,reach:85,onInteract:hiddenStream});}   /* the way back to Evergreen Grove; the stream, where the Serpent Charm glints */
   if(r===38){D(690,752,90,()=>goScene(()=>leaveBVHouse(1)));for(const n of BVNPC)if(n.room===38)DUNINT.push({x:n.x,y:575,reach:110,onInteract:()=>bvNpcTalk(n)});DUNINT.push({x:300,y:612,reach:110,fire:true,onInteract:()=>{if(canLumMix())openMix();else say("A big fire roars in the stone hearth.");}});}   /* the way out at the front; the hearth: Lum can mix here */
@@ -249,7 +249,8 @@ function drawDun(){const R=DROOMS[DUN.room],im=IMG['dun'+DUN.room];if(!ready(im)
     for(const F of (R.fg||[]))L.push([F.y,()=>{ctx.save();ctx.beginPath();F.poly.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y));ctx.closePath();ctx.clip();ctx.drawImage(im,0,0,1375,768);ctx.restore();}]);   /* furniture that stands in front of whoever is behind it */
     if(DUN.room===37&&RL6.t>=0)L.push([RL6.y,drawRL6]);
     if(RUINS_ROOMS.includes(DUN.room))L.push([9994,drawRuinsAir]);   /* drips from the ceiling and haunted fog in every underground ruins room */
-    if(DUN.room===40&&GSN.t>=0)L.push([9996,drawGSRise]);   /* the ghostly serpent rising from the pool */
+    if(DUN.room===40&&GSN.t>=0)L.push([9996,drawGSRise]);
+    if(DUN.room===41&&VG.t>=0)L.push([VG.y,drawVaultGhost]);   /* the ghostly serpent rising from the pool */
     if((DUN.room===29||DUN.room===24)&&NIGHT.rain)L.push([9997,()=>{ctx.save();ctx.beginPath();ctx.rect(0,0,1375,768);ctx.clip();drawRain(1/60);ctx.restore();}]);   /* only over the painting, not the dark bands around it */   /* the Sanctuary's front is out in the rain */
     if(DUN.room===24){L.unshift([-1,()=>drawOverlookMist(0)]);L.push([9998,()=>drawOverlookMist(1)]);}   /* mist over the sea behind, low wisps drifting in front */
     L.sort((a,b)=>a[0]-b[0]);for(const [,f] of L)f();}
@@ -292,7 +293,7 @@ function drawWorldbindAir(R){const M=wbMist(R),span=M.x1-M.x0+300;ctx.save();ctx
 
 /* the underground ruins (rooms 32-37, 40, 41): now and then a drop of water falls from the ceiling and plinks on the stone, and a haunted fog drifts low through every room */
 const RUINS_ROOMS=[32,33,34,35,36,37,40,41],RAIR={drops:[],next:1,room:-1};
-function drawRuinsAir(){const dt=1/60;if(RAIR.room!==DUN.room){RAIR.room=DUN.room;RAIR.drops.length=0;RAIR.next=.6+Math.random()*1.2;}
+function drawRuinsAir(){const dt=1/60;if(DUN.room===41)updateVault();if(RAIR.room!==DUN.room){RAIR.room=DUN.room;RAIR.drops.length=0;RAIR.next=.6+Math.random()*1.2;}
   RAIR.next-=dt;if(RAIR.next<=0){RAIR.next=1.2+Math.random()*2.6;for(let k=0;k<30;k++){const x=300+Math.random()*775,y=520+Math.random()*240;if(dunFree(x,y)){RAIR.drops.push({x,y,z:y-260-Math.random()*200,v:0,hit:-1});break;}}}
   ctx.save();ctx.beginPath();ctx.rect(0,0,1375,768);ctx.clip();
   for(const d of RAIR.drops){if(d.hit<0){d.v+=1400*dt;d.z+=d.v*dt;if(d.z>=d.y){d.z=d.y;d.hit=0;const near=Math.max(.35,1-Math.hypot(d.x-lum.x,d.y-lum.y)/900);try{sfxDrip(near);}catch(e){}}

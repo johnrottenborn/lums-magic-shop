@@ -1083,9 +1083,27 @@ const CASES = {
     await g_(() => { const g = window.__g; g.startChapter2(); g.c2Skip(); g.WB10.st = 2; g.chPlaytestIsle(); window.__calmT = setInterval(() => g.DFOES.forEach(f => { f.calm = 99; f.x = -999; }), 30); }); await wait(800);
     await g_(() => window.__g.enterDun(34, 1090, 560, 1)); await wait(900);
     await g_(() => window.__g.NEAR.onInteract()); await wait(1600);
-    check(await g_(() => window.__g.DUN.room === 41 && window.__g.dunFree(window.__g.lum.x, window.__g.lum.y)), 'the crypt\'s right arch should lead to the vault (room 41)');
+    check(await g_(() => window.__g.DUN.room === 41 && window.__g.lum.x > 850 && window.__g.dunFree(window.__g.lum.x, window.__g.lum.y)), 'the crypt\'s right arch should lead to the vault (room 41), arriving inside its right arch');
     await p.screenshot({ path: path.join(SHOTS, `ruins-vault-${vp}.png`) });
-    await g_(() => { const g = window.__g; g.lum.x = 719; g.lum.y = 745; }); await wait(500);
+    // halfway across, a large ghost rises: a battle with 2 ghosts
+    await g_(() => { const g = window.__g; g.C2.vaultGhosts = 0; g.lum.x = 680; g.lum.y = 610; }); await wait(1000);
+    await p.screenshot({ path: path.join(SHOTS, `ruins-vault-ghost-${vp}.png`) });
+    await wait(3000);
+    check(await g_(() => window.__g.BATTLE.on && window.__g.BATTLE.foes.length === 2 && window.__g.BATTLE.foes.every(f => f.type === 'ghost')), 'halfway across the vault, 2 ghosts should attack');
+    await g_(() => { const B = window.__g.BATTLE; for (const f of B.foes) f.hp = 0; B.phase = 'win'; B.t = 0; B.rewarded = 0; }); await wait(1500);
+    for (let i = 0; i < 20 && await g_(() => window.__g.BATTLE.on); i++) { await p.keyboard.press('Space'); await wait(300); }
+    await wait(800);
+    // the locked chest on the far left
+    await g_(() => { const g = window.__g; g.BAG.splice(0, g.BAG.length, ...g.BAG.filter(b => b !== 'oldkey')); g.C2.taipan = 0; g.lum.x = 430; g.lum.y = 640; }); await wait(500);
+    await g_(() => window.__g.NEAR.onInteract()); await wait(400);
+    check(await g_(() => window.__g.DLG.active && /Locked/.test(window.__g.DLG.lines[0][1])), 'without the Copperhead Key the chest should be locked');
+    await g_(() => { const g = window.__g; g.DLG.active = false; g.BAG.push('oldkey'); }); await wait(400);
+    await g_(() => window.__g.NEAR.onInteract()); await wait(400);
+    check(await g_(() => window.__g.CHOICE.on && /Copperhead/.test(window.__g.CHOICE.q)), 'with the key Lum should be asked to use it');
+    await g_(() => window.__g.pickChoice(0)); await wait(900);
+    check(await g_(() => window.__g.BAG.includes('taipanhat') && !window.__g.BAG.includes('oldkey')), 'the key should open the chest for the Taipan Hat');
+    await p.screenshot({ path: path.join(SHOTS, `ruins-vault-hat-${vp}.png`) });
+    await g_(() => { const g = window.__g; g.lum.x = 905; g.lum.y = 622; }); await wait(500);
     await g_(() => window.__g.NEAR.onInteract()); await wait(1600);
     check(await g_(() => window.__g.DUN.room === 34), 'the vault\'s door should lead back to the crypt');
   },

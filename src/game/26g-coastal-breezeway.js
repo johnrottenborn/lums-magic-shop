@@ -186,3 +186,13 @@ function drawGSRise(){const t=(performance.now()-GSN.w0)/1000,P=GSPOOL;
   const im=IMG.seasnake_ghost;if(t>1.15&&ready(im)){const u=clamp((t-1.15)/.9,0,1),e=1-(1-u)**3,h=250,w=h*im.width/im.height;
     ctx.save();ctx.beginPath();ctx.rect(P.x-w,P.y-h*1.4,w*2,h*1.4+4);ctx.clip();ctx.globalAlpha=.7;ctx.translate(P.x,P.y+h*(1-e)*.95);ctx.rotate(Math.sin(t*3)*.04);ctx.drawImage(im,-w*.5,-h,w,h);ctx.globalCompositeOperation='lighter';ctx.globalAlpha=.18;ctx.drawImage(im,-w*.5,-h,w,h);ctx.restore();
     ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,P.x,P.y-h*.5*e,h*.5,'190,200,255',.14*e);ctx.restore();}}
+
+/* the vault (room 41): halfway across, Lum stops and a large ghost rises between her and the chest; a battle with 2 ghosts (once, C2.vaultGhosts). The chest on the far left is locked: the Copperhead Key opens it for the Taipan Hat (C2.taipan) */
+const VG={t:-1,w0:0,x:560,y:618};
+function updateVault(){if(SCENE!=='dun'||DUN.room!==41||C2.vaultGhosts||VG.t>=0||BATTLE.on||WIPE.dir)return;if(lum.x<690){VG.t=0;VG.w0=performance.now();WEVENT.on=true;lum.vx=lum.vy=0;lum.state='idle';lum.face=-1;try{sfxGhost();}catch(e){}
+  setTimeout(()=>{WEVENT.on=false;startEncounter({kind:'ghost',scene:'dun',s:1,pack:2,x:VG.x,y:VG.y,calm:0,onWin:()=>{C2.vaultGhosts=1;VG.t=-1;},onLose:()=>{VG.t=-1;ch2Respawn();}},'normal');},1900);}}
+function drawVaultGhost(){const t=(performance.now()-VG.w0)/1000,a=Math.min(1,t/1.2),k=dunH(VG.y,VG.x)/151,h=160*k*1.7,fy=VG.y-14*k+Math.sin(t*1.7)*6*k;
+  ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,VG.x,fy-h*.5,h*.55,'190,200,255',.16*a);ctx.restore();
+  ctx.save();ctx.globalAlpha=.7*a;c1Frame(ctx,'ghost','float',Math.floor(t*5)%6,VG.x,fy,h,true,.7*a,0);ctx.restore();}
+function vaultChest(){if(C2.taipan){say("The chest is empty.");return;}if(!BAG.includes('oldkey')){say("Locked.");return;}
+  askChoice('Use Copperhead Key?',[['Yes',()=>{C2.taipan=1;const i=BAG.indexOf('oldkey');if(i>=0)BAG.splice(i,1);sfxPage&&sfxPage(.9);setTimeout(()=>giveItem('taipanhat'),400);}],['No',()=>{}]]);}
