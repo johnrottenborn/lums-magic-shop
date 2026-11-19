@@ -156,7 +156,7 @@ function setupDun(){DUNINT.length=0;const r=DUN.room,D=(x,y,reach,fn)=>DUNINT.pu
   if(r===35){D(660,738,80,()=>dunGo(34,650,530,1));D(728,512,45,()=>dunGo(36,660,712,1));}   /* back to the crypt; the tunnel at the far end to room 5 */
   if(r===34){D(660,738,80,()=>dunGo(33,470,560,1));D(650,516,50,()=>dunGo(35,660,712,1));D(1100,535,55,()=>dunGo(41,905,626,-1));}   /* back to the hydra room; the passage ahead to room 4; the right arch to the vault (room 41) */
   if(r===41){D(925,606,60,()=>dunGo(34,1090,560,-1));DUNINT.push({x:395,y:632,reach:80,onInteract:vaultChest});}   /* back to the crypt, inside the right arch; the locked chest on the far left */
-  if(r===33){D(660,758,80,()=>dunGo(32,840,525,-1));D(470,540,55,()=>dunGo(34,660,712,1));DUNINT.push({x:770,y:618,reach:85,onInteract:ruinsBook});}   /* back to the tunnel; the doorway to room 3; the old book on the altar */
+  if(r===33){D(660,758,80,()=>dunGo(32,840,525,-1));D(470,540,55,()=>dunGo(34,660,712,1));DUNINT.push({x:770,y:618,reach:85,onInteract:ruinsBook});DUNINT.push({x:885,y:612,reach:70,onInteract:hydraBase});}   /* back to the tunnel; the doorway to room 3; the old book on the altar */
   if(r===39){D(720,752,90,()=>goScene(leaveHiddenGrove));DUNINT.push({x:660,y:566,reach:85,onInteract:hiddenStream});}   /* the way back to Evergreen Grove; the stream, where the Serpent Charm glints */
   if(r===38){D(690,752,90,()=>goScene(()=>leaveBVHouse(1)));for(const n of BVNPC)if(n.room===38)DUNINT.push({x:n.x,y:575,reach:110,onInteract:()=>bvNpcTalk(n)});DUNINT.push({x:300,y:612,reach:110,fire:true,onInteract:()=>{if(canLumMix())openMix();else say("A big fire roars in the stone hearth.");}});}   /* the way out at the front; the hearth: Lum can mix here */
   if(r===28){D(190,650,95,()=>goScene(()=>leaveBVHouse(0)));for(const n of BVNPC)if(n.room===28)DUNINT.push({x:n.x,y:n.y+10,reach:95,onInteract:()=>bvNpcTalk(n)});
@@ -293,7 +293,9 @@ function drawWorldbindAir(R){const M=wbMist(R),span=M.x1-M.x0+300;ctx.save();ctx
 
 /* the underground ruins (rooms 32-37, 40, 41): now and then a drop of water falls from the ceiling and plinks on the stone, and a haunted fog drifts low through every room */
 const RUINS_ROOMS=[32,33,34,35,36,37,40,41],RAIR={drops:[],next:1,room:-1};
-function drawRuinsAir(){const dt=1/60;if(DUN.room===41)updateVault();if(RAIR.room!==DUN.room){RAIR.room=DUN.room;RAIR.drops.length=0;RAIR.next=.6+Math.random()*1.2;}
+/* the hydra statue's base in underground ruins room 2: four figures carved holding a chain (placeholder lines) */
+function hydraBase(){lum.state='idle';lum.vx=lum.vy=0;talk([['Lum',"Four figures are carved round the statue's base, hand in hand."],['Lum',"A chain runs between them… and down into the dark."],...(C2.maiJoined?[['Lum',"Mai… was this you?"]]:[])]);}
+function drawRuinsAir(){const dt=1/60;if(DUN.room===41)updateVault();if(DUN.room===35)updateMaiGlimpse();if(RAIR.room!==DUN.room){RAIR.room=DUN.room;RAIR.drops.length=0;RAIR.next=.6+Math.random()*1.2;}
   RAIR.next-=dt;if(RAIR.next<=0){RAIR.next=1.2+Math.random()*2.6;for(let k=0;k<30;k++){const x=300+Math.random()*775,y=520+Math.random()*240;if(dunFree(x,y)){RAIR.drops.push({x,y,z:y-260-Math.random()*200,v:0,hit:-1});break;}}}
   ctx.save();ctx.beginPath();ctx.rect(0,0,1375,768);ctx.clip();
   for(const d of RAIR.drops){if(d.hit<0){d.v+=1400*dt;d.z+=d.v*dt;if(d.z>=d.y){d.z=d.y;d.hit=0;const near=Math.max(.35,1-Math.hypot(d.x-lum.x,d.y-lum.y)/900);try{sfxDrip(near);}catch(e){}}

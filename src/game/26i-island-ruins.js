@@ -131,12 +131,16 @@ function chPlaytestIsle(){chPlaytestBreezeway();Object.assign(C2,{lumaMet:1,jak:
   hsGoal('Climb the stairs to the island ruins');enterDun(36,450,640,1);resetJak2Follow();}
 
 /* ---- the four inspect spots: Lum learns this was a holy water temple; once all four are seen, the screen glows white and Mai is there ---- */
-const IS_SPOTS=[[()=>[IS_FONT.x,IS_FONT.y+26],"A basin adorned with angels?"],[()=>[IS_TOWER.x,IS_TOWER.y+40],"Who worshiped here?"],[null,"Four statues in a semi circle?"],[()=>[IS_FALLEN.x,IS_FALLEN.y+30],"I recognize this priestess of water from somewhere?"]];
+/* the four inspect spots: each tells a little of the four heroes and the seal, and a faint voice (Mai) answers. Placeholder lines for the designer to revise */
+const IS_SPOTS=[[()=>[IS_FONT.x,IS_FONT.y+26],[['Lum',"A basin adorned with angels… there's still water in it, after all this time."],['Lum',"Words are carved round the rim: \"What is bound must be kept.\""],['???',"…kept… forever…"]]],
+  [()=>[IS_TOWER.x,IS_TOWER.y+40],[['Lum',"The bell tower has fallen right across the chapel door."],['Lum',"There's writing on the bell: \"Ring for the four, who keep watch without end.\""],['Lum',"Who worshiped here?"],['???',"No one rings it now…"]]],
+  [null,[['Lum',"Four statues in a half circle… their faces are worn away."],['Lum',"Each one reaches toward the centre, as if they were all holding something down."],['???',"We thought it would be our end…"]]],
+  [()=>[IS_FALLEN.x,IS_FALLEN.y+30],[['Lum',"This one has fallen. Her robes are carved with tiny figures… dozens of them."],['Lum',"They all have the same face as her."],['Lum',"Why does she look so familiar?"],['???',"So many lives… so many faces…"]]]];
 const ISS={g0:-1,m0:-1,mx:0,my:0};
 function isSeen(){let n=0;for(let i=0;i<4;i++)if((C2.isl||0)>>i&1)n++;return n;}
 function isGoalCount(){if(!C2.maiSeen)hsGoal('Explore the island ruins ('+isSeen()+'/4)');}
 function isInspect(i){lum.state='idle';lum.vx=lum.vy=0;const fresh=!((C2.isl||0)>>i&1);C2.isl=(C2.isl||0)|(1<<i);
-  talk([['Lum',IS_SPOTS[i][1]]],false,()=>{if(C2.maiSeen)return;isGoalCount();if(fresh&&isSeen()===4)setTimeout(isGlow,350);});}
+  talk(IS_SPOTS[i][1],false,()=>{if(C2.maiSeen)return;isGoalCount();if(fresh&&isSeen()===4)setTimeout(isGlow,350);});}
 IS_SPOTS.forEach(([pos],i)=>{if(pos)THINT.push({get x(){return ISX+pos()[0];},get y(){return ISY+pos()[1];},get reach(){return inIS()?105:-1;},onInteract:()=>isInspect(i)});});
 for(const [x,y] of IS_STATUES)THINT.push({get x(){return ISX+x;},get y(){return ISY+y+24;},get reach(){return inIS()?90:-1;},onInteract:()=>isInspect(2)});
 function isGlow(){ISS.g0=performance.now();WEVENT.on=true;lum.vx=lum.vy=0;try{sfxLearn();}catch(e){}}
@@ -145,6 +149,11 @@ function maiSheet(){if(IMG.mai)return IMG.mai;const im=IMG.luma;if(!ready(im))re
   try{const d=g.getImageData(0,0,c.width,c.height),p=d.data;for(let i=0;i<p.length;i+=4){if(!p[i+3])continue;const L=.3*p[i]+.59*p[i+1]+.11*p[i+2];p[i]=Math.min(255,L*.62+95);p[i+1]=Math.min(255,L*.64+100);p[i+2]=Math.min(255,L*.6+120);}g.putImageData(d,0,0);}catch(e){}
   C1ATL.mai=C1ATL.luma;return IMG.mai=c;}
 const MAI_H=140;
+/* seeding Mai: the first time Lum walks into underground ruins room 4, a pale figure stands for a moment at the far end of the hall and is gone */
+const MGL={t:-1};
+function updateMaiGlimpse(){if(DUN.room!==35||C2.maiGlimpse)return;if(MGL.t<0){if(!DLG.active&&!FADE.dir)MGL.t=0;return;}MGL.t+=1/60;const t=MGL.t-1.2;
+  if(t>0&&t<2.6){const a=t<.8?t/.8:t<1.6?1:Math.max(0,1-(t-1.6));ctx.save();ctx.translate(735,500);ctx.scale(.34,.34);drawMaiFig(0,0,a*.8,'idle');ctx.restore();}
+  if(t>=2.6){C2.maiGlimpse=1;MGL.t=-1;lum.vx=lum.vy=0;talk([['Lum',"…Did someone just— ?"],...(jak2In()?[['Jak',"I didn't see anything. Just the fog."]]:[]),['Lum',"I could have sworn someone was standing there."]]);}}
 function drawMaiFig(x,y,al,anim){const sh=maiSheet();if(!sh)return;ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,x,y-MAI_H*.5,MAI_H*.6,'200,215,255',.22*al);ctx.restore();
   const yy=y+Math.sin(T*1.6)*3-6;c1Frame(ctx,'mai',anim||'idle',0,x,yy,MAI_H,false,.85*al,0);ctx.save();ctx.globalCompositeOperation='lighter';c1Frame(ctx,'mai',anim||'idle',0,x,yy,MAI_H,false,.22*al,0);ctx.restore();}   /* drawn twice, the second time added on, so she glows white through the blue cast */
 function drawMaiOW(){if(typeof C2==='undefined'||!C2.maiSeen||C2.maiJoined||ISS.m0>=0)return;const g=ISS.g0>=0?Math.min(1,(performance.now()-ISS.g0)/1000-1.1):1;if(g<=0)return;drawMaiFig(ISX+IS_MAI.x,ISY+IS_MAI.y,g,'idle');}

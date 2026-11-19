@@ -1252,6 +1252,25 @@ const CASES = {
     await g_(() => window.__g.NEAR.onInteract()); await wait(1500);
     check(await g_(() => window.__g.SCENE === 'dun' && window.__g.DUN.room === 36), 'the island entrance should lead back down to room 5');
   },
+  async 'mai-seeds'(p) {
+    // hints of Mai before the island: a pale figure in ruins room 4, the hydra's base, Sage Luma's pause; the island's inspect spots tell of the four heroes and a faint voice answers
+    const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop', g_ = (f, a) => p.evaluate(f, a);
+    const end = async () => { for (let i = 0; i < 8; i++) { if (!await g_(() => window.__g.DLG.active)) break; await g_(() => { const g = window.__g; g.DLG.active = false; g.DLG.onEnd && g.DLG.onEnd(); }); await wait(200); } };
+    const all = () => g_(() => window.__g.DLG.lines.map(l => l[0] + ': ' + l[1]).join(' | '));
+    await g_(() => { const g = window.__g; g.startChapter2(); g.c2Skip(); }); await wait(1200); await g_(() => window.__g.chPlaytestIsle()); await wait(800);
+    await g_(() => { const g = window.__g; g.C2.jak = 1; g.C2.maiGlimpse = 0; g.DFOES.forEach(f => { f.calm = 99; f.x = -999; }); g.enterDun(35, 660, 700, -1); setInterval(() => g.DFOES.forEach(f => { f.calm = 99; f.x = -999; }), 30); }); await wait(2600);
+    await p.screenshot({ path: path.join(SHOTS, `mai-glimpse-${vp}.png`) });
+    for (let i = 0; i < 60 && !await g_(() => window.__g.C2.maiGlimpse); i++) await wait(150); await wait(200);
+    { const t = await all(); check(/Did someone/.test(t) && /Jak:/.test(t), 'a pale figure should appear in ruins room 4 and Lum should notice: ' + t); } await end();
+    check(await g_(() => window.__g.C2.maiGlimpse === 1), 'the glimpse of Mai should only happen once');
+    await g_(() => window.__g.hydraBase()); await wait(200); check(/Four figures/.test(await all()), "the hydra's base should show the four figures"); await end();
+    for (let i = 0; i < 4; i++) {
+      await g_((i) => window.__g.isInspect(i), i); await wait(200);
+      const t = await all(); check(/\?\?\?:/.test(t) && t.split('|').length >= 3, `inspect spot ${i} should tell more and a faint voice should answer: ${t}`); await end();
+    }
+    await g_(() => { const g = window.__g; g.C2.lumaMet = 0; g.C2.maiJoined = 0; g.lumaTalk(); }); await wait(200);
+    check(/not felt in a very long time/.test(await all()), 'Sage Luma should pause over someone at the ruins'); await end();
+  },
   async 'world-reactions'(p) {
     // after the rain stops the townsfolk have new lines; Amroth and Alma greet Jak, then react after the ruins
     const g_ = (f, a) => p.evaluate(f, a);
