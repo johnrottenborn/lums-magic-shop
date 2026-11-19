@@ -1152,6 +1152,14 @@ const CASES = {
     await p.screenshot({ path: `tests/screenshots/${vp}-mixing.png` });
     await p.evaluate(() => window.__g.closeMix());
   },
+  async 'house28-chair'(p) {
+    // the fisher couple's front chair is solid where it stands and only hides people behind its real shape
+    const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop', g_ = (f, a) => p.evaluate(f, a);
+    await g_(() => { const g = window.__g; g.startChapter2(); g.c2Skip(); g.WB10.st = 2; g.chPlaytestBreezeway(); g.enterBreezevale(); g.enterDun(28, 600, 700, 1); }); await wait(800);
+    check(await g_(() => !window.__g.dunFree(490, 660) && window.__g.dunFree(400, 610) && window.__g.dunFree(405, 700)), 'the chair should block only its own footprint');
+    await g_(() => { const g = window.__g; g.lum.x = 402; g.lum.y = 612; g.lum.face = 1; }); await wait(400);
+    await p.screenshot({ path: path.join(SHOTS, `house28-chair-${vp}.png`) });
+  },
   async 'breezevale-tavern'(p) {
     const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop';
     await p.evaluate(() => { const g = window.__g; g.startChapter2(); g.c2Skip(); g.WB10.st = 2; g.chPlaytestBreezeway(); g.enterBreezevale(); const h = g.BVHOUSES[1]; g.lum.x = g.BVX + g.bvDoorX(h); g.lum.y = g.BVY + h.y + 40; }); await wait(600);
@@ -1198,7 +1206,7 @@ const CASES = {
   },
   async 'learn-potency'(p) {
     const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop', g_ = (f, a) => p.evaluate(f, a);
-    await g_(() => { const g = window.__g; g.startChapter2(); g.c2Skip(); g.WB10.st = 2; g.chPlaytestBreezeway(); g.C2.potency = 0; window.__calmT = setInterval(() => g.DFOES.forEach(f => f.calm = 99), 50); g.enterDun(32, 840, 515, 1); }); await wait(600);   // the ruins' foes stay calm for this walk-through
+    await g_(() => { const g = window.__g; g.startChapter2(); g.c2Skip(); g.WB10.st = 2; g.chPlaytestBreezeway(); g.C2.potency = 0; g.C2.maiGlimpse = 1; window.__calmT = setInterval(() => g.DFOES.forEach(f => f.calm = 99), 50); g.enterDun(32, 840, 515, 1); }); await wait(600);   // the ruins' foes stay calm for this walk-through
     await g_(() => window.__g.NEAR.onInteract()); await wait(1500);
     check(await g_(() => window.__g.DUN.room === 33), 'the end of the ruins tunnel should lead to room 2 (the hydra room, 33)');
     await g_(() => { const g = window.__g; g.lum.x = 770; g.lum.y = 625; }); await wait(600);
@@ -1207,6 +1215,8 @@ const CASES = {
     check(await g_(() => window.__g.DLG.active && /alchemist/.test(window.__g.DLG.lines[0][1])), 'Lum should read the old book');
     await g_(() => { const g = window.__g; g.DLG.active = false; g.DLG.onEnd && g.DLG.onEnd(); }); await wait(300);
     check(await g_(() => { const g = window.__g; return g.C2.potency && g.healRoll({ heal: [5, 7] }) >= 5; }), 'the book should teach Healing Potion Potency');
+    check(await g_(() => window.__g.LEARN.text === 'Lum learned Healing Potion Potency!' && window.__g.LEARN.t < 4.2), 'learning should show the centred "Lum learned …!" banner');
+    await wait(500); await p.screenshot({ path: path.join(SHOTS, `learn-banner-${vp}.png`) }); await wait(1200); await g_(() => { const g = window.__g; g.DLG.active = false; g.DLG.onEnd && g.DLG.onEnd(); }); await wait(300);
     await g_(() => { const g = window.__g; g.DLG.active = false; g.lum.x = 470; g.lum.y = 548; }); await wait(600);
     await g_(() => window.__g.NEAR.onInteract()); await wait(1500);
     check(await g_(() => window.__g.DUN.room === 34 && window.__g.dunFree(window.__g.lum.x, window.__g.lum.y)), 'the hydra room\'s left doorway should lead to room 3 (34)');

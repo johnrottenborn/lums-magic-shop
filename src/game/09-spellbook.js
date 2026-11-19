@@ -167,6 +167,26 @@ function menuTap(x,y){const bx=(x-MENU.ox)/MENU.S,by=(y-MENU.oy)/MENU.S;for(let 
 
 /* sounds for all of the above */
 /* a short rising jingle for learning something new (powders, potions, powers): distinct from the item chime */
+/* a ~4 second uplifting, magical jingle for learning something new: a rising bell arpeggio, a warm swelling chord and a sprinkle of high sparkles */
+function sfxJingle(){if(!SND.ready)return;const c=SND.ctx,t=c.currentTime,out=SND.sfxVerb||SND.sfx;
+  [[72,0],[76,.12],[79,.24],[84,.36],[88,.5],[91,.64]].forEach(([n,d],i)=>bell(t+d,NOTE(n),.085,1.4,SND.sfx,(i-2.5)*.2));
+  [60,64,67,72,76].forEach((n,i)=>{const o=c.createOscillator(),g=c.createGain();o.type=i%2?'triangle':'sine';o.frequency.value=NOTE(n);o.detune.value=(i-2)*4;g.gain.setValueAtTime(0,t+.6);g.gain.linearRampToValueAtTime(.035,t+1.3);g.gain.setValueAtTime(.035,t+2.6);g.gain.exponentialRampToValueAtTime(.0005,t+4);o.connect(g);g.connect(out);o.start(t+.6);o.stop(t+4.05);});
+  [84,88,91,96].forEach((n,i)=>bell(t+.78+i*.015,NOTE(n),.07,2.8,out,(i-1.5)*.3));
+  [100,103,108,103,105,110,108,112].forEach((n,i)=>bell(t+1.1+i*.28+Math.random()*.06,NOTE(n),.028,1.4,out,Math.random()*1.2-.6));
+  [96,100,103,108].forEach((n,i)=>bell(t+3.2+i*.06,NOTE(n),.03,1.2,out,(i-1.5)*.3));}
+/* the "learned" banner: centred on screen, text centred, no icon */
+const LEARN={t:9,text:''};
+function learnBanner(text){LEARN.t=0;LEARN.text=text;try{sfxJingle();}catch(e){}}
+function drawLearn(dt){if(LEARN.t>4.2)return;LEARN.t+=dt;const t=LEARN.t,a=Math.min(1,t*3,(4.2-t)*2.2);if(a<=0)return;ctx.save();ctx.globalAlpha=a;ctx.textAlign='center';ctx.textBaseline='middle';
+  const maxW=Math.min(W-40,460);let fs=21;ctx.font=`700 ${fs}px "Alegreya SC", Georgia, serif`;let lines=[LEARN.text];
+  if(ctx.measureText(LEARN.text).width>maxW-44){const w_=LEARN.text.split(' ');let best=1,bd=1e9;for(let i=1;i<w_.length;i++){const d=Math.abs(ctx.measureText(w_.slice(0,i).join(' ')).width-ctx.measureText(w_.slice(i).join(' ')).width);if(d<bd){bd=d;best=i;}}lines=[w_.slice(0,best).join(' '),w_.slice(best).join(' ')];}
+  while(fs>14&&Math.max(...lines.map(l=>ctx.measureText(l).width))>maxW-44){fs--;ctx.font=`700 ${fs}px "Alegreya SC", Georgia, serif`;}
+  const tw_=Math.max(...lines.map(l=>ctx.measureText(l).width)),bw=Math.min(maxW,tw_+56),lh=fs*1.25,bh=lines.length*lh+34,cx=W/2,cy=H*.3+(1-Math.min(1,t*3))*10;
+  drawGlow(ctx,cx,cy,bw*.62,'255,225,150',.35+.12*Math.sin(t*5));
+  ctx.fillStyle='rgba(40,20,10,.3)';rr(cx-bw/2+2,cy-bh/2+4,bw,bh,16);ctx.fill();ctx.fillStyle='#f8efd8';rr(cx-bw/2,cy-bh/2,bw,bh,16);ctx.fill();ctx.strokeStyle='#c49a4e';ctx.lineWidth=2;ctx.stroke();
+  ctx.strokeStyle='rgba(196,154,78,.45)';ctx.lineWidth=1;rr(cx-bw/2+5,cy-bh/2+5,bw-10,bh-10,12);ctx.stroke();
+  for(let k=0;k<6;k++){const u=(t*.5+k/6)%1,px=cx-bw/2+bw*((k*.37+.1)%1),py=cy-bh/2-4-u*26;ctx.globalAlpha=a*(1-u);ctx.fillStyle='#ffe7a0';ctx.beginPath();ctx.arc(px,py,2.2*(1-u)+.6,0,TAU);ctx.fill();}
+  ctx.globalAlpha=a;ctx.fillStyle='#4a3420';lines.forEach((l,i)=>ctx.fillText(l,cx,cy+(i-(lines.length-1)/2)*lh));ctx.restore();}
 function sfxLearn(){if(!SND.ready)return;const t=SND.ctx.currentTime;[[72,0],[76,.11],[79,.22],[84,.33]].forEach(([n,d],i)=>bell(t+d,NOTE(n),.08,1.2,SND.sfx,(i-1.5)*.25));[84,88,91].forEach((n,i)=>bell(t+.5+i*.012,NOTE(n),.07,2.6,SND.sfxVerb||SND.sfx,(i-1)*.3));[96,100,103,108].forEach((n,i)=>bell(t+.62+i*.07,NOTE(n),.035,1.6,SND.sfxVerb||SND.sfx,(i-1.5)*.3));}
 function sfxItem(){if(!SND.ready)return;const t=SND.ctx.currentTime;[84,88,91,96,100].forEach((n,i)=>bell(t+i*.07,NOTE(n),.07,1.4,SND.sfx,(i-2)*.2));bell(t+.42,NOTE(103),.05,2.2,SND.sfxVerb||SND.sfx,0);}
 function sfxEquip(){if(!SND.ready)return;const t=SND.ctx.currentTime;noiseHit(t,.12,'bandpass',700,1.4,.18,SND.sfx);pluck(t+.02,NOTE(60),.12,.25,SND.sfx,0,.3);[91,96].forEach((n,i)=>bell(t+.08+i*.08,NOTE(n),.05,1,SND.sfx,0));}
