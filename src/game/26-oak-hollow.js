@@ -55,6 +55,8 @@ const DROOMS={
   39:{name:'Hidden Grove',dark:0,wide:1,hk:1.05,hp:.0042,floor:[[250,768],[330,722],[480,692],[640,662],[610,600],[650,562],[760,536],[900,516],[1060,492],[1200,502],[1290,560],[1330,660],[1345,768]]},
   /* 40: the side room off ruins room 1 (the designer's tall painting, centred with blurred mirrored sides): a dead end, a still pool under dripping stone; Lum comes in at the front */
   40:{name:'',dark:0,wide:1,hk:.9,hd:.2,floor:[[480,768],[480,600],[522,575],[600,590],[640,615],[578,650],[562,676],[640,692],[770,688],[802,662],[792,640],[850,630],[894,650],[894,768]]},
+  /* 41: through room 3's dark right arch (the designer's painting, centred with blurred mirrored sides): a crumbling vault with old chests and barrels; Lum comes in at the front */
+  41:{name:'',dark:0,wide:1,hk:.75,hp:.004,floor:[[569,768],[512,677],[434,634],[477,577],[591,553],[733,544],[840,559],[933,601],[983,637],[890,653],[869,768]]},
   /* 38: inside the top-right shell house (it replaced the Mayor's; the designer's painting): a long vaulted hall with a stone hearth, long tables, a bar of barrels and a stair to a loft; Lum comes in at the front */
   38:{name:'',dark:0,home:1,hk:1.35,floor:[[300,600],[400,560],[520,522],[640,500],[790,500],[790,565],[1100,565],[1100,546],[1200,546],[1230,575],[1300,640],[1310,768],[80,768],[80,700],[300,690]],
      block:[{x0:0,y0:575,x1:312,y1:768},{x0:505,y0:548,x1:848,y1:692},{x0:455,y0:488,x1:632,y1:560},{x0:1000,y0:590,x1:1092,y1:768},{x0:1092,y0:572,x1:1290,y1:768},{x0:818,y0:512,x1:872,y1:566},{x0:912,y0:518,x1:968,y1:576},{x0:1012,y0:528,x1:1076,y1:578}],
@@ -152,7 +154,8 @@ function setupDun(){DUNINT.length=0;const r=DUN.room,D=(x,y,reach,fn)=>DUNINT.pu
   if(r===37){RL6.t=-1;D(740,738,75,ruinsLeave6);DUNINT.push({x:905,y:640,reach:80,onInteract:ruinsSkeleton});}   /* the only way out; the old explorer's skeleton (touching it wakes the Wraith Lord) */
   if(r===36){D(660,738,80,()=>dunGo(35,728,525,1));D(412,560,55,()=>goScene(enterIsland));D(690,518,45,()=>dunGo(37,740,712,1));}   /* back to the long hall; the stairs up to the island ruins (still to come); the gap to room 6 */
   if(r===35){D(660,738,80,()=>dunGo(34,650,530,1));D(728,512,45,()=>dunGo(36,660,712,1));}   /* back to the crypt; the tunnel at the far end to room 5 */
-  if(r===34){D(660,738,80,()=>dunGo(33,470,560,1));D(650,516,50,()=>dunGo(35,660,712,1));D(1100,535,55,()=>say("A dark archway…"));}   /* back to the hydra room; the passage ahead to room 4; the right arch (where it leads is still to come) */
+  if(r===34){D(660,738,80,()=>dunGo(33,470,560,1));D(650,516,50,()=>dunGo(35,660,712,1));D(1100,535,55,()=>dunGo(41,719,722,1));}   /* back to the hydra room; the passage ahead to room 4; the right arch to the vault (room 41) */
+  if(r===41)D(719,756,85,()=>dunGo(34,1090,560,-1));   /* back to the crypt */
   if(r===33){D(660,758,80,()=>dunGo(32,840,525,-1));D(470,540,55,()=>dunGo(34,660,712,1));DUNINT.push({x:770,y:618,reach:85,onInteract:ruinsBook});}   /* back to the tunnel; the doorway to room 3; the old book on the altar */
   if(r===39){D(720,752,90,()=>goScene(leaveHiddenGrove));DUNINT.push({x:660,y:566,reach:85,onInteract:hiddenStream});}   /* the way back to Evergreen Grove; the stream, where the Serpent Charm glints */
   if(r===38){D(690,752,90,()=>goScene(()=>leaveBVHouse(1)));for(const n of BVNPC)if(n.room===38)DUNINT.push({x:n.x,y:575,reach:110,onInteract:()=>bvNpcTalk(n)});DUNINT.push({x:300,y:612,reach:110,fire:true,onInteract:()=>{if(canLumMix())openMix();else say("A big fire roars in the stone hearth.");}});}   /* the way out at the front; the hearth: Lum can mix here */

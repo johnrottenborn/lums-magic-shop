@@ -1078,6 +1078,17 @@ const CASES = {
     await g_(() => { window.__g.DLG.active = false; window.__g.serpentPool(); }); await wait(300);
     check(await g_(() => window.__g.DLG.active && /dead end/.test(window.__g.DLG.lines[0][1]) && window.__g.DLG.lines.length === 1), 'after the serpent is beaten the pool is just a dead end');
   },
+  async 'ruins-vault'(p) {
+    const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop', g_ = (f, a) => p.evaluate(f, a);
+    await g_(() => { const g = window.__g; g.startChapter2(); g.c2Skip(); g.WB10.st = 2; g.chPlaytestIsle(); window.__calmT = setInterval(() => g.DFOES.forEach(f => { f.calm = 99; f.x = -999; }), 30); }); await wait(800);
+    await g_(() => window.__g.enterDun(34, 1090, 560, 1)); await wait(900);
+    await g_(() => window.__g.NEAR.onInteract()); await wait(1600);
+    check(await g_(() => window.__g.DUN.room === 41 && window.__g.dunFree(window.__g.lum.x, window.__g.lum.y)), 'the crypt\'s right arch should lead to the vault (room 41)');
+    await p.screenshot({ path: path.join(SHOTS, `ruins-vault-${vp}.png`) });
+    await g_(() => { const g = window.__g; g.lum.x = 719; g.lum.y = 745; }); await wait(500);
+    await g_(() => window.__g.NEAR.onInteract()); await wait(1600);
+    check(await g_(() => window.__g.DUN.room === 34), 'the vault\'s door should lead back to the crypt');
+  },
   async 'mixing-amounts'(p) {
     const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop';
     await p.evaluate(() => { const g = window.__g; g.startChapter2(); g.c2Skip(); g.WB10.st = 2; g.chPlaytestBreezeway(); g.enterBreezevale(); g.enterDun(28, 600, 700, 1); }); await wait(800);
