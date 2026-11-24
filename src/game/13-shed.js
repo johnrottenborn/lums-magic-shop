@@ -9,8 +9,8 @@ const shedH=y=>163+(clamp(y,590,730)-608)*.21;
 const SHINT=[],SHSLIMES=[];let shedChestOpen=false;let shedSpawned=false,shedVisited=false;
 function setupShed(){SHINT.length=0;{const [x,y]=sp_(560,1010);SHINT.push({x,y,reach:60,onInteract:()=>goScene(()=>enterGardenFromShed())});}const L=(sx,sy,reach,lines)=>{const [x,y]=sp_(sx,sy);let i=0;SHINT.push({x,y,reach,onInteract:()=>say(lines[(i++)%lines.length])});};
   L(400,870,70,["Shelves and shelves of seedlings. Some of them are glowing! Master Lum, what are you growing in here?","This little one has blue sparkly leaves. I'm calling it Sprout. Hi, Sprout."]);
-  {const [x,y]=sp_(290,930);SHINT.push({x,y,reach:70,grab:()=>!shedChestOpen&&BAG.includes('shedkey'),onInteract:()=>{if(shedChestOpen){say("Empty now. Just a little dust and the smell of mint.");return;}if(!BAG.includes('shedkey')){say("Locked");return;}
-    shedChestOpen=true;BAG.splice(BAG.indexOf('shedkey'),1);delete MATS.shedkey;giveItem('gboots');}});}
+  {const [x,y]=sp_(290,930);SHINT.push({x,y,reach:70,grab:()=>!shedChestOpen,onInteract:()=>{if(shedChestOpen){say("Empty now. Just a little dust and the smell of mint.");return;}if(!BAG.includes('shedkey')){say("Locked");return;}   /* a chest: always the hand emote */
+    askChoice('Use Garden Shed Key?',[['Yes',()=>{if(shedChestOpen||!BAG.includes('shedkey'))return;shedChestOpen=true;BAG.splice(BAG.indexOf('shedkey'),1);delete MATS.shedkey;giveItem('gboots');}],['No',()=>{}]]);}});}
   L(600,880,80,["A potting bench with a little brass scale, a trowel, and a seed packet that says 'DO NOT PLANT INDOORS'.","There's a spellbook on the bench, open to a page about growing moonmint. Someone's been taking notes in the margins."]);
   L(560,880,70,["A big sack of potting soil. It smells like rain and earthworms. Good earthworms."]);
   L(840,870,70,["Rakes, shovels, a little pitchfork… Master Lum keeps everything so tidy. Except me. I'm the untidy part."]);

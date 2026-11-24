@@ -869,6 +869,22 @@ const CASES = {
     await p.evaluate(() => { const g = window.__g; g.DLG.active = false; g.PARTY.lum.charm = 'vanecharm'; g.vaneTrade(); }); await wait(300);
     check(await p.evaluate(() => window.__g.PARTY.lum.charm === null), 'the worn cross was not handed back');
   },
+  async 'shed-chest'(p) {
+    // the garden shed chest always shows the hand emote; with the key it asks "Use Garden Shed Key?" before opening
+    const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop', g_ = (f, a) => p.evaluate(f, a);
+    await g_(() => { const g = window.__g; g.INTRO.on = false; g.INTRO.waiting = false; g.INTRO.fade = 0; g.INTRO.ui = 1; g.HINT.on = false; g.enterShed(); }); await wait(800);
+    const ch = () => g_(() => window.__g.SHINT.find(i => i.grab));
+    check(await g_(() => { const c = window.__g.SHINT.find(i => i.grab); return !!c && c.grab(); }), 'the shed chest should show the hand emote even without the key');
+    await g_(() => { const g = window.__g, c = g.SHINT.find(i => i.grab); g.lum.x = c.x; g.lum.y = c.y + 10; }); await wait(500);
+    await p.screenshot({ path: path.join(SHOTS, `shed-chest-hand-${vp}.png`) });
+    await g_(() => { const g = window.__g; g.SHINT.find(i => i.grab).onInteract(); }); await wait(300);
+    check(await g_(() => window.__g.DLG.active && /Locked/.test(window.__g.DLG.lines[0][1])), 'without the key the chest should say Locked');
+    await g_(() => { const g = window.__g; g.DLG.active = false; g.BAG.push('shedkey'); g.SHINT.find(i => i.grab).onInteract(); }); await wait(500);
+    check(await g_(() => window.__g.CHOICE.on), 'with the key the chest should ask to use it');
+    await p.screenshot({ path: path.join(SHOTS, `shed-chest-ask-${vp}.png`) });
+    await g_(() => window.__g.pickChoice(0)); await wait(600);
+    check(await g_(() => !window.__g.BAG.includes('shedkey') && window.__g.BAG.includes('gboots')), 'choosing Yes should use the key and give the boots');
+  },
   async 'battle-tutorials'(p) {
     // Prologue only: slug battles (the Slug King too) teach timed attacks, slime battles teach timed guards; no tutorials after the Prologue
     const g_ = (f, a) => p.evaluate(f, a);
