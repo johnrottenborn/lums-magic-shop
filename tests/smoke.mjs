@@ -869,6 +869,19 @@ const CASES = {
     await p.evaluate(() => { const g = window.__g; g.DLG.active = false; g.PARTY.lum.charm = 'vanecharm'; g.vaneTrade(); }); await wait(300);
     check(await p.evaluate(() => window.__g.PARTY.lum.charm === null), 'the worn cross was not handed back');
   },
+  async 'battle-tutorials'(p) {
+    // Prologue only: slug battles (the Slug King too) teach timed attacks, slime battles teach timed guards; no tutorials after the Prologue
+    const g_ = (f, a) => p.evaluate(f, a);
+    const r = await g_(() => { const g = window.__g, B = g.BATTLE, keep = B.foes, out = {};
+      const t = types => { B.foes = types.map(type => ({ type })); return [g.tutAtk(), g.tutGuard()].join(); };
+      out.slug = t(['slug']); out.king = t(['slugking']); out.slime = t(['slime']); out.jelly = t(['jelly']); out.other = t(['spider']);
+      B.foes = keep; return out; });
+    check(r.slug === 'true,false' && r.king === 'true,false', 'Prologue slug battles should teach timed attacks only: ' + JSON.stringify(r));
+    check(r.slime === 'false,true' && r.jelly === 'false,true', 'Prologue slime battles should teach timed guards only: ' + JSON.stringify(r));
+    check(r.other === 'false,false', 'other Prologue battles should have no tutorial');
+    const r2 = await g_(() => { const g = window.__g, B = g.BATTLE; g.startChapter2(); g.c2Skip(); const keep = B.foes; B.foes = [{ type: 'slug' }, { type: 'slime' }]; const v = [g.tutAtk(), g.tutGuard()].join(); B.foes = keep; return v; });
+    check(r2 === 'false,false', 'no slug or slime tutorials after the Prologue: ' + r2);
+  },
   async 'slug-king-night'(p) {
     // the Slug King still fights at night (other slugs sleep)
     await p.evaluate(() => { const g = window.__g; g.INTRO.on = false; g.INTRO.waiting = false; g.INTRO.fade = 0; g.INTRO.ui = 1; g.HINT.on = false; g.DLG.active = false; g.NIGHT.on = true; g.becomeCosmic(0, 900, 1); g.spawnKing(false); const k = g.SLUGS.find(s => s.kind === 'slugking'); k.calm = 0; k.x = g.lum.x + 40; k.y = g.lum.y; }); await wait(1500);

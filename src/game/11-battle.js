@@ -395,12 +395,15 @@ function drawCommandUI(){const B=BATTLE,S=bS();drawBladeSlash();
   if(B.phase==='bonkWind'){const f=B.foes[B.target],cx=f.x,cy=f.y-40*S*f.s,w=B.t/B.windD,r=Math.max(18*S,(1-w)*110*S+18*S);
     ctx.save();ctx.strokeStyle=`rgba(255,240,180,${(.4+.6*w).toFixed(3)})`;ctx.lineWidth=3;ctx.beginPath();ctx.arc(cx,cy,r,0,TAU);ctx.stroke();
     const on=w>.8&&w<=1.02;drawGlow(ctx,cx,cy,on?40*S:24*S,'255,220,120',on?.9:.4);ctx.fillStyle=on?'#fff6c8':'#e8c060';ctx.beginPath();for(let k=0;k<10;k++){const a=k/10*TAU-Math.PI/2,rr_=k%2?7*S:16*S;ctx.lineTo(cx+Math.cos(a)*rr_,cy+Math.sin(a)*rr_);}ctx.closePath();ctx.fill();ctx.restore();
-    if(!B.tut.bonk)tutText(tw('Tap just as the ring touches the star!','Press Space just as the ring touches the star!'));}
-  if((B.phase==='foeWind'||B.phase==='foeLeap')&&!B.tut.guard)tutText(`${tw('Tap','Press Space')} just before the ${B.foes[B.foeI]?B.foes[B.foeI].name:'enemy'} hits to guard!`);
+    if(tutAtk())tutText(tw('Tap just as the ring touches the star for extra damage!','Press Space just as the ring touches the star for extra damage!'));}
+  if((B.phase==='foeWind'||B.phase==='foeLeap')&&tutGuard())tutText(`${tw('Tap','Press Space')} just before the ${B.foes[B.foeI]?B.foes[B.foeI].name:'enemy'} hits to guard and take less damage!`);
   if(B.phase==='run'){const h=B.heroes[B.cur],c=B.cmd,w=150*S,x=W/2-w/2,y=H*.75;ctx.fillStyle='rgba(20,20,30,.6)';rr(x-4,y-4,w+8,22,11);ctx.fill();ctx.fillStyle=c.fill>=.6?'#7ee08a':'#f2d58a';rr(x,y,w*c.fill,14,7);ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x+w*.6,y-6);ctx.lineTo(x+w*.6,y+20);ctx.stroke();
     tutText(tw('Tap tap tap as fast as you can to run away!','Mash Space as fast as you can to run away!'));}}
 function drawBladeSlash(){const B=BATTLE;if(PARTY[HERO].main!=='blade'||(B.phase!=='bonkHit'&&!(B.phase==='bonkWind'&&B.t>=B.windD)))return;const f=B.foes[B.target];if(!f)return;const S=bS(),u=B.phase==='bonkHit'?Math.min(1,B.t/.3):0,cx=f.x+f.ox,cy=f.y-50*S;
   ctx.save();ctx.globalCompositeOperation='lighter';ctx.globalAlpha=(1-u*.8)*.55;ctx.lineCap='round';for(const [w,col] of [[16,'rgba(150,0,15,.6)'],[8,'rgba(230,40,50,.9)'],[3,'rgba(255,200,200,1)']]){ctx.strokeStyle=col;ctx.lineWidth=w*S;ctx.beginPath();ctx.arc(cx-30*S,cy+10*S,70*S,-1.9+u*.2,-.2+u*.6);ctx.stroke();}ctx.restore();drawGlow(ctx,cx,cy,80*S,'220,30,40',.4*(1-u));}
+/* battle tutorials, Prologue only: every slug battle (the Slug King too) teaches timed attacks, every slime battle teaches timed guards; none after the Prologue */
+function tutAtk(){return CH===0&&BATTLE.foes.some(f=>f.type==='slug'||f.type==='slugking');}
+function tutGuard(){return CH===0&&BATTLE.foes.some(f=>f.type==='slime'||f.type==='jelly');}
 function tutText(t){ctx.save();ctx.font='italic 15px Alegreya, Georgia, serif';ctx.textAlign='center';const w=ctx.measureText(t).width+30,y=H*.84;ctx.fillStyle='rgba(30,26,40,.72)';rr(W/2-w/2,y-19,w,32,16);ctx.fill();ctx.fillStyle='#fdf6e4';ctx.fillText(t,W/2,y+2);ctx.restore();}
 function drawPartyHUD(){const B=BATTLE;let x=20;for(const id of PARTY_ORDER){const H_=HEROES[id],w=140,y=20;ctx.save();ctx.fillStyle='rgba(246,236,210,.92)';rr(x,y,w,44,12);ctx.fill();ctx.strokeStyle='#c49a4e';ctx.lineWidth=1.5;ctx.stroke();
   ctx.fillStyle='#4a3420';ctx.font='700 13px "Alegreya SC", Georgia, serif';ctx.textAlign='left';ctx.fillText(H_.name,x+12,y+18);
