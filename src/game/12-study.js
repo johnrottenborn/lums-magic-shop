@@ -22,7 +22,7 @@ function setupStudy(){SINT.length=0;SINT.push({x:175,y:722,reach:85,onInteract:(
   L(1085,612,90,["The fire's still warm. Someone was here not long ago…","Dried herbs and two glowing crystals on the mantel. It smells like lavender and woodsmoke."]);
   L(1100,700,95,["A giant spellbook on a stand. The writing glows when I lean close… I can't read a single word. Yet!"]);
   L(1225,680,85,["A little lantern and an old scroll. It's a map of the garden! Someone circled the well and drew a tiny crown beside it."]);
-  SINT.push({x:415,y:722,reach:85,onInteract:()=>{if(mimicState===2){say("Just a regular chest now. I think it's sulking.");return;}
+  SINT.push({x:415,y:722,reach:85,grab:()=>true,onInteract:()=>{if(mimicState===2){say("Just a regular chest now. I think it's sulking.");return;}
     const fight=()=>startEncounter({kind:'mimic',scene:'study',x:415,y:705,s:1,calm:0,dead:0,scripted:mimicState===0},'ambush');
     if(mimicState===0)talk([['Cosmic',"A sturdy old chest… locked tight. Maybe there's treasure inside!"],['Cosmic',"Wait. Is the lock… warm? Is it BREATHING?!"]],false,fight);
     else talk([['Cosmic',"Okay, chest. Round two. And this time I have a sword."]],false,fight);}});

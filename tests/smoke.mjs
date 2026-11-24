@@ -906,6 +906,12 @@ const CASES = {
     check(await g_(() => window.__g.BATTLE.on && window.__g.tutGuard()), 'a Prologue slime battle should show the guard banner');
     await wait(1500); await p.screenshot({ path: path.join(SHOTS, `prologue-slime-guard-banner-${vp}.png`) });
     await g_(() => { window.__g.BATTLE.on = false; });
+    check(await g_(() => window.__g.battleMenuOpts().find(o => o[0] === 'bonk')[1] === 'Attack'), 'the attack button should say Attack');
+    await wait(1500); await g_(() => { const g = window.__g; g.BATTLE.on = false; g.BATTLE.phase = ''; g.startEncounter({ kind: 'slug', scene: g.SCENE, x: 0, y: 0, s: 1, pack: 1, calm: 0 }, 'normal'); });
+    for (let i = 0; i < 60; i++) { await wait(150); if (await g_(() => window.__g.BATTLE.phase) === 'heroMenu') break; }
+    check(await g_(() => window.__g.BATTLE.on && window.__g.tutAtk()), 'a Prologue slug battle should show the attack banner');
+    await wait(1500); await p.screenshot({ path: path.join(SHOTS, `prologue-slug-attack-banner-${vp}.png`) });
+    await g_(() => { window.__g.BATTLE.on = false; });
     const r2 = await g_(() => { const g = window.__g, B = g.BATTLE; g.startChapter2(); g.c2Skip(); const keep = B.foes; B.foes = [{ type: 'slug' }, { type: 'slime' }]; const v = [g.tutAtk(), g.tutGuard()].join(); B.foes = keep; return v; });
     check(r2 === 'false,false', 'no slug or slime tutorials after the Prologue: ' + r2);
   },
