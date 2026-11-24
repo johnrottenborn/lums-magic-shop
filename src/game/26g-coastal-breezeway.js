@@ -174,8 +174,8 @@ function drawRL6(){if(RL6.t<0||SCENE!=='dun'||DUN.room!==37||(BATTLE.on&&!CAPTUR
 
 /* the serpent pool (room 40, off ruins room 1): a dead end; Jak offers to throw a stone in, and a ghostly sea serpent rises (twice the Breezevale serpent) and drops a Muddy Object (clean it in the satchel to find a key) */
 const GSN={t:-1,w0:0},GSPOOL={x:712,y:640};
-function serpentPool(){lum.state='idleUp';lum.at=-1e9;if(C2.gsnakeBeat||!jak2In()){say("It's a dead end.");return;}
-  talk([['Lum',"It's a dead end."],['Jak',"Should I throw a stone?"]],false,()=>setTimeout(()=>askChoice('Throw a stone?',[['Yes',gsThrow],['No',()=>{}]]),200));}
+function serpentPool(){lum.state='idleUp';lum.at=-1e9;if(C2.gsnakeBeat||(!jak2In()&&!C2.jakLeft)){say("It's a dead end.");return;}
+  talk([['Lum',"It's a dead end."],jak2In()?['Jak',"Should I throw a stone?"]:['Lum',"Unless… maybe I should throw a stone?"]],false,()=>setTimeout(()=>askChoice('Throw a stone?',[['Yes',gsThrow],['No',()=>{}]]),200));}
 function gsThrow(){GSN.t=0;GSN.w0=performance.now();WEVENT.on=true;lum.vx=lum.vy=0;
   setTimeout(()=>{sfxSplash&&sfxSplash();},550);setTimeout(()=>{sfxSplash&&sfxSplash();try{sfxGhost();}catch(e){}},1150);
   setTimeout(()=>{GSN.t=-1;WEVENT.on=false;startEncounter({kind:'gsnake',scene:'dun',s:1,x:GSPOOL.x,y:GSPOOL.y,pack:1,calm:0,onWin:()=>{C2.gsnakeBeat=1;}},'normal');},2500);}
