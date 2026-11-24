@@ -1097,7 +1097,7 @@ const CASES = {
     check(await g_(() => window.__g.SCENE === 'dun' && window.__g.DUN.room === 32 && window.__g.dunFree(window.__g.lum.x, window.__g.lum.y)), 'the hidden entrance did not lead down to underground ruins room 1 (room 32)');
     await p.screenshot({ path: path.join(SHOTS, `ruins-room1-${vp}.png`) });
     check(await g_(() => window.__g.dunFree(840, 515) && window.__g.dunFree(700, 700)), 'the ruins tunnel floor should be walkable to the far end');
-    check(await g_(() => window.__g.DFOES.filter(f => f.kind === 'rskel' && f.over && f.over.hp === 18 && f.over.atk === 4).length >= 6), 'skeletons should roam the ruins');
+    check(await g_(() => window.__g.DFOES.filter(f => f.kind === 'rskel' && f.over && f.over.hp === 18 && f.over.atk === 4).length === 5), 'one skeleton should roam each of ruins rooms 1–5');
     check(await g_(() => [32, 33, 34, 35, 36].every(r => { const n = window.__g.DFOES.filter(f => f.room === r && (f.kind === 'ghost' || f.kind === 'rskel')).length; return n >= 2 && n <= 3; }) && window.__g.FOE_TYPES.ghost.hp === 14), 'ruins rooms 1–5 should each have 2–3 ghosts and skeletons');
     check(await g_(() => { const g = window.__g, d = g.DUN.room; g.DUN.room = 32; const a = g.dunH(570, 330), b = g.dunH(690, 400); g.DUN.room = d; return Math.abs(a - b) < 1; }), 'people should not shrink climbing the steps in ruins room 1');
     await g_(() => window.__g.NEAR.onInteract()); await wait(1500);
