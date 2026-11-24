@@ -73,7 +73,8 @@ const HEADS=[[117,66],[120,64],[118,66],[118,64],[121,65],[119,64],[118,67],[119
 const CHEAD=[[117,66,54],[120,65,53],[118,66,53],[118,65,54],[120,65,54],[119,65,54],[118,67,54],[118,65,55],[116,57,50],[115,55,51],[118,52,51],[118,57,51],[115,56,49],[118,57,51],[116,56,50],[114,58,52],[117,59,55],[122,59,56],[120,60,55],[113,61,54],[121,62,56],[123,68,54]];
 
 function statLine(who){return heroStats(who);}
-function giveItem(id){BAG.push(id);if(typeof SAVEC!=='undefined')SAVEC.t=99;if(HIDDEN.some(([k])=>k===id))STATS.found[id]=1;TOAST.t=0;TOAST.name=ITEMS[id].name;TOAST.id=id;MENU.newItems++;sfxItem();}
+const NEWEQ={on:0,t0:0};   /* the Prologue's "New equipment!" prompt for every piece of gear Cosmic finds after the bucket (ring, boots, body, sword); it clears when the spellbook opens */
+function giveItem(id){BAG.push(id);if(CH===0&&ITEMS[id]&&ITEMS[id].slot&&id!=='bucket'){NEWEQ.on=1;NEWEQ.t0=performance.now();}if(typeof SAVEC!=='undefined')SAVEC.t=99;if(HIDDEN.some(([k])=>k===id))STATS.found[id]=1;TOAST.t=0;TOAST.name=ITEMS[id].name;TOAST.id=id;MENU.newItems++;sfxItem();}
 /* weapons belong to their fighters: powder pouches are Lum's alone, and Lum can't take up a sword (or axe) */
 const isPouch=id=>/pouch/.test(id);
 function canWear(who,id){const it=ITEMS[id];if(!it||it.slot!=='main')return true;return isPouch(id)?who==='lum':who!=='lum';}
@@ -82,7 +83,7 @@ function equip(who,id){if(!canWear(who,id)){MENU.note=wearNote(who,id);MENU.note
   MENU.sel={kind:'slot',slot:it.slot};if(TUT.stage===3&&id==='bucket'){TUT.stage=4;TUT.t=0;}}
 function satchelSlots(){return new Set(BAG.filter(b=>ITEMS[b]&&ITEMS[b].kind!=='mat')).size;}
 function unequip(who,slot){const id=PARTY[who][slot];if(!id)return;if(satchelSlots()>=8&&!BAG.includes(id)){MENU.note='Your satchel is full!';MENU.noteT=2;return;}PARTY[who][slot]=null;syncMaxHp(who);BAG.push(id);MENU.sel={kind:'bag',i:BAG.length-1};sfxPage(.5);}
-function openMenu(){if(MENU.open||DLG.active||FADE.dir||INTRO.on||INTRO.waiting||busy())return;MENU.open=true;MENU.sel=null;MENU.newItems=0;MENU.who=HERO;MENU.tab="bag";MENU.pick=null;sfxBook(true);lum.vx=lum.vy=0;stick.id=null;
+function openMenu(){if(MENU.open||DLG.active||FADE.dir||INTRO.on||INTRO.waiting||busy())return;MENU.open=true;MENU.sel=null;MENU.newItems=0;NEWEQ.on=0;MENU.who=HERO;MENU.tab="bag";MENU.pick=null;sfxBook(true);lum.vx=lum.vy=0;stick.id=null;
   if(TUT.stage===1){TUT.stage=2;TUT.t=0;}MENU.page=TUT.stage>=2?'bag':'char';}
 function closeMenu(){if(!MENU.open)return;MENU.open=false;SAVEC.t=99;sfxBook(false);
   if(TUT.stage===4){TUT.stage=0;setTimeout(()=>say("How do I look? Very heroic, I bet. …Is it on backwards?"),450);}
@@ -161,7 +162,7 @@ const SLOT_GHOST={head:'hat',chest:'cloak',boots:'boots',main:'staff',off:'shiel
 
 /* ---------- HUD: the spellbook button and the "you found something" toast ---------- */
 const BOOKBTN={x:30,y:30,r:19};
-function drawBookBtn(){if(INTRO.on||INTRO.waiting||!PLAYER())return;const {x,y,r}=BOOKBTN;const tut=TUT.stage===1&&!MENU.open;
+function drawBookBtn(){if(INTRO.on||INTRO.waiting||!PLAYER())return;const {x,y,r}=BOOKBTN;const tut=(TUT.stage===1||(NEWEQ.on&&CH===0))&&!MENU.open;
   ctx.save();ctx.globalAlpha=UI_FADE;
   if(tut){drawGlow(ctx,x,y,46+Math.sin(T*5)*6,'255,220,140',.55);}
   ctx.fillStyle='rgba(30,44,30,.35)';ctx.beginPath();ctx.arc(x,y,r,0,TAU);ctx.fill();
@@ -174,7 +175,7 @@ function drawBookBtn(){if(INTRO.on||INTRO.waiting||!PLAYER())return;const {x,y,r
   {const H_=HEROES[HERO];if(SCENE!=='garden'||H_.hp<H_.maxHp){ctx.save();ctx.globalAlpha=UI_FADE*.9;ctx.fillStyle='rgba(30,44,30,.35)';rr(x+24,y-12,78,24,12);ctx.fill();const hx=x+36,hy=y+1;ctx.fillStyle='#ff8a84';ctx.beginPath();ctx.moveTo(hx,hy+5);ctx.bezierCurveTo(hx-10,hy-2,hx-5,hy-8,hx,hy-3);ctx.bezierCurveTo(hx+5,hy-8,hx+10,hy-2,hx,hy+5);ctx.fill();ctx.fillStyle='#fdf8ec';ctx.font='700 12px "Alegreya SC", Georgia, serif';ctx.textAlign='left';ctx.fillText(`${H_.hp}/${H_.maxHp}`,hx+12,y+5);ctx.restore();}}
   if(MENU.newItems>0){ctx.save();ctx.globalAlpha=UI_FADE;drawGlow(ctx,x+14,y-13,12,'255,230,150',.6+.3*Math.sin(T*4));ctx.fillStyle='#ffe7a0';ctx.beginPath();ctx.arc(x+14,y-13,4,0,TAU);ctx.fill();ctx.restore();}
   if(tut&&!DLG.active){const by=y+r+18+Math.abs(Math.sin(T*4))*8;ctx.save();ctx.fillStyle='#fdf0c8';ctx.strokeStyle='rgba(60,40,20,.5)';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x,by-10);ctx.lineTo(x+9,by+4);ctx.lineTo(x+3,by+4);ctx.lineTo(x+3,by+14);ctx.lineTo(x-3,by+14);ctx.lineTo(x-3,by+4);ctx.lineTo(x-9,by+4);ctx.closePath();ctx.stroke();ctx.fill();ctx.restore();
-    const txt=tw('New equipment! Tap the spellbook to wear it','New equipment! Click the spellbook (or press I) to wear it'),a=Math.min(1,TUT.t*2);ctx.save();ctx.globalAlpha=a;ctx.font='500 15px Alegreya, Georgia, serif';ctx.textAlign='center';const w=ctx.measureText(txt).width+32,yy=H*.62;ctx.fillStyle='rgba(30,38,30,.55)';rr(W/2-w/2,yy-18,w,34,17);ctx.fill();ctx.fillStyle='#fdf8ec';ctx.fillText(txt,W/2,yy+5);
+    const txt=tw('New equipment! Tap the spellbook to wear it','New equipment! Click the spellbook (or press I) to wear it'),a=Math.min(1,TUT.stage===1?TUT.t*2:(performance.now()-NEWEQ.t0)/500);ctx.save();ctx.globalAlpha=a;ctx.font='500 15px Alegreya, Georgia, serif';ctx.textAlign='center';const w=ctx.measureText(txt).width+32,yy=H*.62;ctx.fillStyle='rgba(30,38,30,.55)';rr(W/2-w/2,yy-18,w,34,17);ctx.fill();ctx.fillStyle='#fdf8ec';ctx.fillText(txt,W/2,yy+5);
     ctx.font='italic 12px Alegreya, Georgia, serif';ctx.fillStyle='rgba(253,248,236,.7)';ctx.fillText('(or press I on a keyboard)',W/2,yy+32);ctx.restore();}}
 function drawToast(){if(TOAST.t>3.6)return;const a=Math.min(1,TOAST.t*3,(3.6-TOAST.t)*2),y=H*.2-(1-Math.min(1,TOAST.t*3))*12;ctx.save();ctx.globalAlpha=a;ctx.textAlign='center';
   const w=Math.min(W-40,250);ctx.fillStyle='rgba(60,40,20,.25)';rr(W/2-w/2+2,y-30,w,62,14);ctx.fill();ctx.fillStyle='#f6ecd2';rr(W/2-w/2,y-32,w,62,14);ctx.fill();ctx.strokeStyle='#c49a4e';ctx.lineWidth=1.5;ctx.stroke();

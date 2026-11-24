@@ -872,7 +872,7 @@ const CASES = {
   async 'shed-chest'(p) {
     // the garden shed chest always shows the hand emote; with the key it asks "Use Garden Shed Key?" before opening
     const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop', g_ = (f, a) => p.evaluate(f, a);
-    await g_(() => { const g = window.__g; g.INTRO.on = false; g.INTRO.waiting = false; g.INTRO.fade = 0; g.INTRO.ui = 1; g.HINT.on = false; g.enterShed(); }); await wait(800);
+    await g_(() => { const g = window.__g; g.INTRO.on = false; g.INTRO.waiting = false; g.INTRO.fade = 0; g.INTRO.ui = 1; g.HINT.on = false; g.becomeCosmic && g.becomeCosmic(500, 700, 1); g.enterShed(); }); await wait(800);
     const ch = () => g_(() => window.__g.SHINT.find(i => i.grab));
     check(await g_(() => { const c = window.__g.SHINT.find(i => i.grab); return !!c && c.grab(); }), 'the shed chest should show the hand emote even without the key');
     await g_(() => { const g = window.__g, c = g.SHINT.find(i => i.grab); g.lum.x = c.x; g.lum.y = c.y + 10; }); await wait(500);
@@ -884,6 +884,11 @@ const CASES = {
     await p.screenshot({ path: path.join(SHOTS, `shed-chest-ask-${vp}.png`) });
     await g_(() => window.__g.pickChoice(0)); await wait(600);
     check(await g_(() => !window.__g.BAG.includes('shedkey') && window.__g.BAG.includes('gboots')), 'choosing Yes should use the key and give the boots');
+    check(await g_(() => window.__g.NEWEQ.on), 'new gear in the Prologue should bring up the "New equipment!" prompt');
+    await g_(() => { window.__g.DLG.active = false; }); await wait(2200); await p.screenshot({ path: path.join(SHOTS, `shed-new-equipment-${vp}.png`) });
+    await g_(() => window.__g.openMenu()); await wait(400);
+    check(await g_(() => !window.__g.NEWEQ.on), 'opening the spellbook should clear the prompt');
+    await g_(() => window.__g.closeMenu && window.__g.closeMenu());
   },
   async 'battle-tutorials'(p) {
     // Prologue only: slug battles (the Slug King too) teach timed attacks, slime battles teach timed guards; no tutorials after the Prologue

@@ -9,7 +9,7 @@ function drawHints(){if(!HINT.on&&HINT.goalT>7)return;if(MENU.a>.01)return;
   if(HINT.goalT<7){const a=Math.min(1,HINT.goalT*2,(7-HINT.goalT)*1.5);ctx.save();ctx.globalAlpha=a;ctx.textAlign='center';
     ctx.font='500 15px Alegreya, Georgia, serif';const bw=Math.min(W-24,Math.max(300,ctx.measureText(GOAL.text).width+40));ctx.fillStyle='rgba(30,38,30,.55)';rr(W/2-bw/2,58,bw,52,14);ctx.fill();ctx.fillStyle='#f2d58a';ctx.font='700 11px "Alegreya SC", Georgia, serif';ctx.fillText(GOAL.tag,W/2,77);
     ctx.fillStyle='#fdf8ec';ctx.font='500 15px Alegreya, Georgia, serif';ctx.fillText(GOAL.text,W/2,98);ctx.restore();}
-  if(HINT.on&&HINT.step<3&&HINT.goalT>1.5&&!(TUT.stage===1)&&!WEVENT.on){const txt=HINT_TEXT[HINT.step],a=Math.min(1,HINT.t*2)*(.8+.2*Math.sin(T*3));ctx.save();ctx.globalAlpha=a;ctx.font='500 15px Alegreya, Georgia, serif';ctx.textAlign='center';
+  if(HINT.on&&HINT.step<3&&HINT.goalT>1.5&&!(TUT.stage===1||NEWEQ.on)&&!WEVENT.on){const txt=HINT_TEXT[HINT.step],a=Math.min(1,HINT.t*2)*(.8+.2*Math.sin(T*3));ctx.save();ctx.globalAlpha=a;ctx.font='500 15px Alegreya, Georgia, serif';ctx.textAlign='center';
     const w=ctx.measureText(txt).width+32,y=H*.62;ctx.fillStyle='rgba(30,38,30,.5)';rr(W/2-w/2,y-18,w,34,17);ctx.fill();ctx.fillStyle='#fdf8ec';ctx.fillText(txt,W/2,y+5);ctx.restore();}}
 
 /* ---------- slugs: slow, sulky, shimmering, and very fond of Lum's garden ---------- */
