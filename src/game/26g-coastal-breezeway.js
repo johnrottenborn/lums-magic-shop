@@ -193,6 +193,6 @@ function updateVault(){if(SCENE!=='dun'||DUN.room!==41||C2.vaultGhosts||VG.t>=0|
   setTimeout(()=>{WEVENT.on=false;startEncounter({kind:'ghost',scene:'dun',s:1,pack:2,x:VG.x,y:VG.y,calm:0,onWin:()=>{C2.vaultGhosts=1;VG.t=-1;},onLose:()=>{VG.t=-1;ch2Respawn();}},'normal');},1900);}}
 function drawVaultGhost(){const t=(performance.now()-VG.w0)/1000,a=Math.min(1,t/1.2),k=dunH(VG.y,VG.x)/151,h=160*k*1.7,fy=VG.y-14*k+Math.sin(t*1.7)*6*k;
   ctx.save();ctx.globalCompositeOperation='lighter';drawGlow(ctx,VG.x,fy-h*.5,h*.55,'190,200,255',.16*a);ctx.restore();
-  ctx.save();ctx.globalAlpha=.7*a;c1Frame(ctx,'ghost','float',Math.floor(t*5)%6,VG.x,fy,h,true,.7*a,0);ctx.restore();}
+  ctx.save();ctx.globalAlpha=.7*a;c1Frame(ctx,'ghost','float',0,VG.x,fy,h,false,.7*a,0);ctx.restore();}   /* idle: one still pose that only bobs, facing right toward the party */
 function vaultChest(){if(C2.taipan){say("The chest is empty.");return;}if(!BAG.includes('oldkey')){say("Locked.");return;}
   askChoice('Use Copperhead Key?',[['Yes',()=>{C2.taipan=1;const i=BAG.indexOf('oldkey');if(i>=0)BAG.splice(i,1);sfxPage&&sfxPage(.9);setTimeout(()=>giveItem('taipanhat'),400);}],['No',()=>{}]]);}
