@@ -392,11 +392,11 @@ function drawPop(p){const S=bS(),u=p.t/1.2,y=p.y-Math.min(1,p.t*4)*24*S;ctx.save
   else{const big=p.kind==='nice';ctx.font=`700 ${Math.round((big?24:15)*S)}px "Alegreya SC", Georgia, serif`;ctx.lineWidth=4;ctx.strokeStyle='rgba(40,20,50,.75)';ctx.fillStyle=big?'#ffe27a':'#fdf6e4';const sc=big?1+.4*Math.max(0,1-p.t*5):1;ctx.translate(p.x,y);ctx.scale(sc,sc);ctx.strokeText(p.text,0,0);ctx.fillText(p.text,0,0);}
   ctx.restore();}
 function drawCommandUI(){const B=BATTLE,S=bS();drawBladeSlash();
+  if(tutGuard()&&B.phase!=='win'&&B.phase!=='lose'&&B.phase!=='fled')tutBanner(tw('Tap just before enemy hits to guard and take less damage','Press Space just before enemy hits to guard and take less damage'));   /* Prologue slime battles: a banner at the top for the whole battle */
   if(B.phase==='bonkWind'){const f=B.foes[B.target],cx=f.x,cy=f.y-40*S*f.s,w=B.t/B.windD,r=Math.max(18*S,(1-w)*110*S+18*S);
     ctx.save();ctx.strokeStyle=`rgba(255,240,180,${(.4+.6*w).toFixed(3)})`;ctx.lineWidth=3;ctx.beginPath();ctx.arc(cx,cy,r,0,TAU);ctx.stroke();
     const on=w>.8&&w<=1.02;drawGlow(ctx,cx,cy,on?40*S:24*S,'255,220,120',on?.9:.4);ctx.fillStyle=on?'#fff6c8':'#e8c060';ctx.beginPath();for(let k=0;k<10;k++){const a=k/10*TAU-Math.PI/2,rr_=k%2?7*S:16*S;ctx.lineTo(cx+Math.cos(a)*rr_,cy+Math.sin(a)*rr_);}ctx.closePath();ctx.fill();ctx.restore();
     if(tutAtk())tutText(tw('Tap just as the ring touches the star for extra damage!','Press Space just as the ring touches the star for extra damage!'));}
-  if((B.phase==='foeWind'||B.phase==='foeLeap')&&tutGuard())tutText(`${tw('Tap','Press Space')} just before the ${B.foes[B.foeI]?B.foes[B.foeI].name:'enemy'} hits to guard and take less damage!`);
   if(B.phase==='run'){const h=B.heroes[B.cur],c=B.cmd,w=150*S,x=W/2-w/2,y=H*.75;ctx.fillStyle='rgba(20,20,30,.6)';rr(x-4,y-4,w+8,22,11);ctx.fill();ctx.fillStyle=c.fill>=.6?'#7ee08a':'#f2d58a';rr(x,y,w*c.fill,14,7);ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x+w*.6,y-6);ctx.lineTo(x+w*.6,y+20);ctx.stroke();
     tutText(tw('Tap tap tap as fast as you can to run away!','Mash Space as fast as you can to run away!'));}}
 function drawBladeSlash(){const B=BATTLE;if(PARTY[HERO].main!=='blade'||(B.phase!=='bonkHit'&&!(B.phase==='bonkWind'&&B.t>=B.windD)))return;const f=B.foes[B.target];if(!f)return;const S=bS(),u=B.phase==='bonkHit'?Math.min(1,B.t/.3):0,cx=f.x+f.ox,cy=f.y-50*S;
@@ -404,7 +404,14 @@ function drawBladeSlash(){const B=BATTLE;if(PARTY[HERO].main!=='blade'||(B.phase
 /* battle tutorials, Prologue only: every slug battle (the Slug King too) teaches timed attacks, every slime battle teaches timed guards; none after the Prologue */
 function tutAtk(){return CH===0&&BATTLE.foes.some(f=>f.type==='slug'||f.type==='slugking');}
 function tutGuard(){return CH===0&&BATTLE.foes.some(f=>f.type==='slime'||f.type==='jelly');}
-function tutText(t){ctx.save();ctx.font='italic 15px Alegreya, Georgia, serif';ctx.textAlign='center';const w=ctx.measureText(t).width+30,y=H*.84;ctx.fillStyle='rgba(30,26,40,.72)';rr(W/2-w/2,y-19,w,32,16);ctx.fill();ctx.fillStyle='#fdf6e4';ctx.fillText(t,W/2,y+2);ctx.restore();}
+/* a tutorial line at the bottom of the battle; it shrinks to fit narrow screens */
+function tutText(t){ctx.save();let fs=15;ctx.font=`italic ${fs}px Alegreya, Georgia, serif`;while(fs>11&&ctx.measureText(t).width+30>W-16){fs--;ctx.font=`italic ${fs}px Alegreya, Georgia, serif`;}ctx.textAlign='center';const w=Math.min(W-16,ctx.measureText(t).width+30),y=H*.84;ctx.fillStyle='rgba(30,26,40,.72)';rr(W/2-w/2,y-19,w,32,16);ctx.fill();ctx.fillStyle='#fdf6e4';ctx.fillText(t,W/2,y+2);ctx.restore();}
+/* a tutorial banner across the top of the battle, under the party cards; wraps onto two lines on a phone */
+function tutBanner(t){ctx.save();ctx.textAlign='center';ctx.textBaseline='middle';const maxW=Math.min(W-24,520);let fs=16;ctx.font=`600 ${fs}px Alegreya, Georgia, serif`;let lines=[t];
+  if(ctx.measureText(t).width>maxW-28){const w_=t.split(' ');let best=1,bd=1e9;for(let i=1;i<w_.length;i++){const d=Math.abs(ctx.measureText(w_.slice(0,i).join(' ')).width-ctx.measureText(w_.slice(i).join(' ')).width);if(d<bd){bd=d;best=i;}}lines=[w_.slice(0,best).join(' '),w_.slice(best).join(' ')];}
+  while(fs>12&&Math.max(...lines.map(l=>ctx.measureText(l).width))>maxW-28){fs--;ctx.font=`600 ${fs}px Alegreya, Georgia, serif`;}
+  const bw=Math.min(maxW,Math.max(...lines.map(l=>ctx.measureText(l).width))+32),lh=fs*1.25,bh=lines.length*lh+16,y=76;
+  ctx.fillStyle='rgba(30,26,40,.78)';rr(W/2-bw/2,y,bw,bh,12);ctx.fill();ctx.strokeStyle='rgba(224,168,58,.6)';ctx.lineWidth=1.5;ctx.stroke();ctx.fillStyle='#fdf6e4';lines.forEach((l,i)=>ctx.fillText(l,W/2,y+8+lh*(i+.5)));ctx.restore();}
 function drawPartyHUD(){const B=BATTLE;let x=20;for(const id of PARTY_ORDER){const H_=HEROES[id],w=140,y=20;ctx.save();ctx.fillStyle='rgba(246,236,210,.92)';rr(x,y,w,44,12);ctx.fill();ctx.strokeStyle='#c49a4e';ctx.lineWidth=1.5;ctx.stroke();
   ctx.fillStyle='#4a3420';ctx.font='700 13px "Alegreya SC", Georgia, serif';ctx.textAlign='left';ctx.fillText(H_.name,x+12,y+18);
   const hx=x+12,hy=y+31;ctx.fillStyle='#e8605a';ctx.beginPath();ctx.moveTo(hx+6,hy+5);ctx.bezierCurveTo(hx-4,hy-2,hx+1,hy-8,hx+6,hy-3);ctx.bezierCurveTo(hx+11,hy-8,hx+16,hy-2,hx+6,hy+5);ctx.fill();

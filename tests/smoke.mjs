@@ -900,6 +900,12 @@ const CASES = {
     check(r.slug === 'true,false' && r.king === 'true,false', 'Prologue slug battles should teach timed attacks only: ' + JSON.stringify(r));
     check(r.slime === 'false,true' && r.jelly === 'false,true', 'Prologue slime battles should teach timed guards only: ' + JSON.stringify(r));
     check(r.other === 'false,false', 'other Prologue battles should have no tutorial');
+    const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop';
+    await g_(() => { const g = window.__g; g.INTRO.on = false; g.INTRO.waiting = false; g.becomeCosmic(500, 700, 1); g.startEncounter({ kind: 'jelly', scene: g.SCENE, x: 0, y: 0, s: 1, pack: 1, calm: 0 }, 'normal'); });
+    for (let i = 0; i < 60; i++) { await wait(150); if (await g_(() => window.__g.BATTLE.phase) === 'heroMenu') break; }
+    check(await g_(() => window.__g.BATTLE.on && window.__g.tutGuard()), 'a Prologue slime battle should show the guard banner');
+    await wait(1500); await p.screenshot({ path: path.join(SHOTS, `prologue-slime-guard-banner-${vp}.png`) });
+    await g_(() => { window.__g.BATTLE.on = false; });
     const r2 = await g_(() => { const g = window.__g, B = g.BATTLE; g.startChapter2(); g.c2Skip(); const keep = B.foes; B.foes = [{ type: 'slug' }, { type: 'slime' }]; const v = [g.tutAtk(), g.tutGuard()].join(); B.foes = keep; return v; });
     check(r2 === 'false,false', 'no slug or slime tutorials after the Prologue: ' + r2);
   },

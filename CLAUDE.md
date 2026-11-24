@@ -24,7 +24,7 @@ Live at https://lums-magic-shop.vercel.app. Story and lore: `docs/story.md`. Mak
 | 08-equipment-and-icons | `ITEMS`, gear slots, `equip`/`unequip`, item icons, the HUD book button and toast |
 | 09-spellbook | the spellbook menu (party portraits, character page, satchel, item card, potion target picker) |
 | 10-conservatory-slimes | prologue slimes |
-| 11-battle | the battle engine: `startEncounter`, turn phases, action commands, combo meter (`COMBO_MAX`), battle drawing, battle music. Battle tutorials are Prologue only (`tutAtk`/`tutGuard`): every slug battle (the Slug King too) shows the timed-attack hint, every slime battle the timed-guard hint; no tutorial hints after the Prologue |
+| 11-battle | the battle engine: `startEncounter`, turn phases, action commands, combo meter (`COMBO_MAX`), battle drawing, battle music. Battle tutorials are Prologue only (`tutAtk`/`tutGuard`): every slug battle (the Slug King too) shows the timed-attack hint, every slime battle a banner at the top for the whole battle, "Tap just before enemy hits to guard and take less damage" (`tutBanner`); no tutorial hints after the Prologue |
 | 12–16 | prologue rooms: study, shed, sunken shrine, Lum's shop, bedroom |
 | 17-woods-and-cemetery | Whispering Woods, roads, cemetery, the restless dead, the seal |
 | 18-save | save/continue and save migrations (bump `SAVE_VER` and add a migration when a change could break old saves) |
