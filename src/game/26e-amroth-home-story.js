@@ -56,7 +56,7 @@ function hsMorningAlma(){WEVENT.on=true;lum.state='idle';lum.vx=lum.vy=0;talk([[
 function hsHug(){
   setTimeout(()=>talk([['Lum',"Thank you for letting me rest."],['Alma',"You almost slept the day away!"],
     ['Lum',"I feel responsible for what has happened. Fokalur has my apprentice… I must go after him."],['Alma',"My sister will know more. Go and see her."],['Alma',"But there's no need to rush off. The Evergreen Grove just south of here has berries and herbs. Gather what you need."],['Alma',"And you can rest here as long as you need before you leave."],
-    ['Alma',"Amroth is outside. Go and speak with him before you leave."]],false,()=>{HST.st=6;WEVENT.on=false;hsGoal('Speak with Amroth outside');}),400);}
+    ['Alma',"Amroth is outside. Go and speak with him before you leave."]],false,()=>{HST.st=6;WEVENT.on=false;GOAL.tag='';GOAL.text='';}),400);}
 /* outside in the morning: Amroth by the pond */
 const HSAMR={x:0,y:0};
 function hsAmrPos(){const [x,y]=pierPt(330,118);return [HOMEX+x,HOMEY+y];}   /* out at the end of the fishing pier */
