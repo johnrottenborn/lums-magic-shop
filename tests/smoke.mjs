@@ -512,9 +512,8 @@ const CASES = {
   async 'ch2-home-shortcut'(p) {
     // chapter select: the playtest card under Chapter 2 starts on the Coastal Breezeway, by the way on to Breezevale Cove
     const g_ = f => p.evaluate(f);
-    await g_(() => window.__g.openChapterSelect()); await wait(1200);
-    await g_(() => { const g = window.__g; g.CHSEL.confirm = g.CHAPTERS.findIndex(c => c.id === 'ch2home'); }); await wait(300);
-    await g_(() => window.__g.CHSEL.hits.slice(-2)[0].act()); await wait(2500);
+    check(await g_(() => !window.__g.CHAPTERS.some(c => c.id === 'ch2home' || c.id === 'ch2isle')), 'the Chapter 2 playtest cards should be gone from chapter select');
+    await g_(() => { const g = window.__g; g.startChapter2(); g.c2Skip(); g.WB10.st = 2; g.chPlaytestBreezeway(); }); await wait(2500);
     check(await g_(() => { const g = window.__g; return g.SCENE === 'thorn' && g.inBW() && !g.PARTY_ORDER.includes('amroth') && g.HST.st === 7 && g.NEAR && g.NEAR.door; }), 'the Chapter 2 playtest card did not start on the Coastal Breezeway by the door to Breezevale Cove');
   },
   async 'worldbind-passage'(p) {

@@ -304,7 +304,10 @@ function drawRuinsAir(){const dt=1/60;if(DUN.room===41)updateVault();if(DUN.room
       if(d.hit<.25){ctx.fillStyle='rgba(215,235,248,.8)';for(let i=0;i<4;i++){const a=-Math.PI*(.2+.6*i/3),s=d.hit*90;ctx.beginPath();ctx.arc(d.x+Math.cos(a)*s,d.y+Math.sin(a)*s*.7+d.hit*d.hit*160,1.4,0,TAU);ctx.fill();}}}}
   RAIR.drops=RAIR.drops.filter(d=>d.hit<.8);
   const t=performance.now()/1000;ctx.globalCompositeOperation='screen';
-  {const fg=ctx.createLinearGradient(0,420,0,768);fg.addColorStop(0,'rgba(150,175,185,0)');fg.addColorStop(1,`rgba(150,175,185,${(.16+.04*Math.sin(t*.5)).toFixed(3)})`);ctx.fillStyle=fg;ctx.fillRect(0,420,1375,348);}   /* a low pale layer over the floor */
-  for(let i=0;i<9;i++){const ph=i*1.7,x=((i*230+t*(16+i*3))%1800)-210,y=540+Math.sin(t*.25+ph)*55+(i%3)*65,r=240+(i%3)*80,a=.15+.06*Math.sin(t*.4+ph);
+  {const fg=ctx.createLinearGradient(0,200,0,768);fg.addColorStop(0,'rgba(150,175,185,0)');fg.addColorStop(.45,`rgba(150,175,185,${(.14+.04*Math.sin(t*.5)).toFixed(3)})`);fg.addColorStop(1,`rgba(155,180,190,${(.34+.06*Math.sin(t*.5)).toFixed(3)})`);ctx.fillStyle=fg;ctx.fillRect(0,200,1375,568);}   /* a thick pale layer rising off the floor */
+  ctx.fillStyle=`rgba(140,165,178,${(.1+.04*Math.sin(t*.33)).toFixed(3)})`;ctx.fillRect(0,0,1375,768);   /* a haunted haze over the whole room, breathing slowly */
+  for(let i=0;i<5;i++){const ph=i*2.3,x=((i*380-t*(9+i*2))%2000+2000)%2000-300,y=230+Math.sin(t*.2+ph)*70+i*35,r=320+(i%2)*120,a=.12+.05*Math.sin(t*.35+ph);   /* high, slow drifts going the other way */
+    ctx.save();ctx.translate(x,y);ctx.scale(1,.38);const g=ctx.createRadialGradient(0,0,0,0,0,r);g.addColorStop(0,`rgba(170,192,200,${a.toFixed(3)})`);g.addColorStop(.6,`rgba(170,192,200,${(a*.4).toFixed(3)})`);g.addColorStop(1,'rgba(170,192,200,0)');ctx.fillStyle=g;ctx.beginPath();ctx.arc(0,0,r,0,TAU);ctx.fill();ctx.restore();}
+  for(let i=0;i<16;i++){const ph=i*1.7,x=((i*150+t*(16+(i%5)*3))%1900)-260,y=470+Math.sin(t*.25+ph)*60+(i%4)*70,r=240+(i%3)*90,a=.22+.08*Math.sin(t*.4+ph);
     ctx.save();ctx.translate(x,y);ctx.scale(1,.42);const g=ctx.createRadialGradient(0,0,0,0,0,r);g.addColorStop(0,`rgba(160,185,190,${a.toFixed(3)})`);g.addColorStop(.6,`rgba(160,185,190,${(a*.45).toFixed(3)})`);g.addColorStop(1,'rgba(160,185,190,0)');ctx.fillStyle=g;ctx.beginPath();ctx.arc(0,0,r,0,TAU);ctx.fill();ctx.restore();}   /* the gradient is squashed with the oval so the wisps have no edges */
   ctx.restore();}
