@@ -1339,6 +1339,19 @@ const CASES = {
     await g_(() => { const g = window.__g; g.C2.lumaMet = 0; g.C2.maiJoined = 0; g.lumaTalk(); }); await wait(200);
     check(/not felt in a very long time/.test(await all()), 'Sage Luma should pause over someone at the ruins'); await end();
   },
+  async 'spellbook-moves'(p) {
+    // the spellbook as a book: party tabs on top, spine and page edges, and a Moves page for each hero (Lum's powders, Jak's trap, combos, guard)
+    const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop', g_ = (f, a) => p.evaluate(f, a);
+    await g_(() => { const g = window.__g; g.startChapter2(); g.c2Skip(); }); await wait(1000);
+    await g_(() => { const g = window.__g; g.C2.jak = 1; g.PARTY_ORDER.includes('jak') || g.PARTY_ORDER.push('jak'); g.openMenu(); g.MENU.page = 'char'; g.MENU.tab = 'bag'; g.MENU.who = 'lum'; }); await wait(700);
+    await p.screenshot({ path: path.join(SHOTS, `spellbook-book-${vp}.png`) });
+    for (const who of ['lum', 'jak', 'amroth']) {
+      await g_(w => { const g = window.__g; g.MENU.page = 'moves'; g.MENU.tab = 'moves'; g.MENU.who = w; }, who); await wait(300);
+      await p.screenshot({ path: path.join(SHOTS, `spellbook-moves-${who}-${vp}.png`) });
+    }
+    check(await g_(() => window.__g.MENU.hits.length > 4), 'the spellbook should have tappable tabs');
+    await g_(() => window.__g.closeMenu()); await wait(400);
+  },
   async 'jak-leaves'(p) {
     // back in Breezevale after Mai joins Lum, Jak says goodbye (off to his next hunt) and walks home; he waits in the islet house after
     const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop', g_ = (f, a) => p.evaluate(f, a);

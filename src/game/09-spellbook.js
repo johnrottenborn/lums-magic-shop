@@ -8,7 +8,7 @@ const HCOMBO={lum:'Starfall',jak:'Thunderfury',spar:'Blazing Edge',amroth:'Lion\
 const FACEIMG={lum:'face_lum',jak:'face_jak',cosmic:'face_cosmic',spar:'face_spar',amroth:'face_amroth'};
 const STATIMG={atk:'stat_atk',def:'stat_def',mag:'stat_mag',spd:'stat_spd'};
 const BK={spread:false,W:380,H:590,top:108,bot:104,r:30};
-function menuLayout(){const sp=W>H*1.15&&W>=640;BK.spread=sp;if(sp)Object.assign(BK,{W:780,H:500,top:118,bot:46,r:35});else Object.assign(BK,{W:380,H:590,top:108,bot:104,r:30});BK.task=GOAL&&GOAL.text?52:0;BK.top+=BK.task;}
+function menuLayout(){const sp=W>H*1.15&&W>=640;BK.spread=sp;if(sp)Object.assign(BK,{W:780,H:500,top:92,bot:46,r:22});else Object.assign(BK,{W:380,H:590,top:88,bot:104,r:21});BK.task=0;}   /* the party sits on the book as tabs; the task stays on the HUD */
 function wrapText(c,text,maxW){const words=text.split(' '),out=[];let cur='';for(const w_ of words){const t=cur?cur+' '+w_:w_;if(c.measureText(t).width>maxW&&cur){out.push(cur);cur=w_;}else cur=t;}out.push(cur);return out;}
 function hit(x,y,w,h,act){MENU.hits.push({x,y,w,h,act});}
 function tutRing(c,x,y,r){const p=.5+.5*Math.sin(T*6);c.save();c.strokeStyle=`rgba(232,170,60,${(.6+.4*p).toFixed(3)})`;c.lineWidth=3;c.beginPath();c.arc(x,y,r+4+p*3,0,TAU);c.stroke();c.restore();}
@@ -17,7 +17,19 @@ function tutArrow(c,x,y,dir){const b=Math.abs(Math.sin(T*4))*7;c.save();c.transl
 function drawStar5(c,x,y,r,on){c.beginPath();for(let k=0;k<10;k++){const a=k/10*TAU-Math.PI/2,q=k%2?r*.45:r;c.lineTo(x+Math.cos(a)*q,y+Math.sin(a)*q);}c.closePath();if(on){c.fillStyle='#e0b24a';c.fill();c.strokeStyle='#a87a22';}else c.strokeStyle='#c4ad7e';c.lineWidth=1.5;c.stroke();}
 function hpCol(f){return f>.5?'#6a9a4a':f>.25?'#d9a03a':'#c8642e';}
 function drawParch(c,x,y,w,h,rad){const g=c.createRadialGradient(x+w/2,y+h*.45,40,x+w/2,y+h/2,Math.max(w,h)*.68);g.addColorStop(0,'#fbf3dd');g.addColorStop(.75,'#f3e5c2');g.addColorStop(1,'#e2cc9c');c.fillStyle=g;rr(x,y,w,h,rad);c.fill();
-  c.fillStyle='rgba(160,120,60,.05)';for(let i=0;i<6;i++){c.beginPath();c.ellipse(x+hash(i,1,77+x|0)*w,y+hash(i,2,77)*h,20+hash(i,3,77)*40,14+hash(i,4,77)*24,hash(i,5,77)*3,0,TAU);c.fill();}}
+  const gp=paperGrain(c);if(gp){c.save();rr(x,y,w,h,rad);c.clip();c.fillStyle=gp;c.fillRect(x,y,w,h);c.restore();}}
+/* a fine, even paper grain (made once) */
+let PGRAIN=null;
+function paperGrain(c){if(PGRAIN&&PGRAIN.c===c)return PGRAIN.p;const cv=document.createElement('canvas');cv.width=cv.height=96;const g=cv.getContext('2d'),d=g.createImageData(96,96);
+  for(let i=0;i<d.data.length;i+=4){const v=hash(i,7,31),dk=v<.5;d.data[i]=dk?120:255;d.data[i+1]=dk?86:250;d.data[i+2]=dk?40:235;d.data[i+3]=Math.floor(Math.abs(v-.5)*2*22);}
+  g.putImageData(d,0,0);for(let k=0;k<40;k++){g.strokeStyle=`rgba(140,100,50,${(.03+hash(k,3,9)*.04).toFixed(3)})`;g.lineWidth=.6;const y_=hash(k,1,9)*96,x_=hash(k,2,9)*96;g.beginPath();g.moveTo(x_,y_);g.lineTo(x_+8+hash(k,4,9)*18,y_+hash(k,5,9)*2-1);g.stroke();}
+  PGRAIN={c,p:c.createPattern(cv,'repeat')};return PGRAIN.p;}
+/* stacked page edges peeking out under a page: side -1 = left, 1 = right */
+function pageEdges(c,x,y,w,h,side){for(let k=3;k>=1;k--){const o=k*2.2;c.fillStyle=k%2?'#d9c49a':'#eadbb6';rr(x+(side>0?o:-o),y+o*.6,w,h,8);c.fill();}
+  c.strokeStyle='rgba(120,85,45,.25)';c.lineWidth=.8;for(let k=1;k<=3;k++){const o=k*2.2,ex=side>0?x+w+o:x-o;c.beginPath();c.moveTo(ex,y+12);c.lineTo(ex,y+h-8+o*.6);c.stroke();}
+  c.beginPath();c.moveTo(x+12,y+h+6.6);c.lineTo(x+w-12,y+h+6.6);c.stroke();}
+/* the shadow where a page curves into the spine: side -1 = gutter on the page's left, 1 = on its right */
+function gutter(c,x,y,h,side,wd){const g=c.createLinearGradient(x,0,x-side*wd,0);g.addColorStop(0,'rgba(70,40,15,.38)');g.addColorStop(.35,'rgba(90,55,20,.14)');g.addColorStop(1,'rgba(90,55,20,0)');c.fillStyle=g;c.fillRect(side<0?x:x-wd,y,wd,h);}
 /* use a potion (or anything that heals) on one party member */
 function useOn(who){const P=MENU.pick;if(!P)return;const it=ITEMS[P.id],H_=HEROES[who],i=BAG.indexOf(P.id);if(i<0||!it){MENU.pick=null;MENU.sel=null;return;}
   if(H_.hp>=H_.maxHp){MENU.note=H_.name+' is already feeling great!';MENU.noteT=2;return;}
@@ -26,18 +38,20 @@ function useOn(who){const P=MENU.pick;if(!P)return;const it=ITEMS[P.id],H_=HEROE
 /* the current task, like the in-game TASK banner, above the party */
 function drawMenuTask(c){if(!BK.task)return;const w=Math.min(BK.W-20,360),x=BK.W/2-w/2,y=-BK.top+4,h=44;c.save();c.fillStyle='rgba(24,26,22,.82)';rr(x,y,w,h,12);c.fill();c.textAlign='center';c.textBaseline='alphabetic';
   c.fillStyle='#e2c27a';c.font='700 11px "Alegreya SC", Georgia, serif';c.fillText('TASK',BK.W/2,y+16);c.fillStyle='#f4ecdc';c.font='15px Alegreya, Georgia, serif';let t=GOAL.text;while(c.measureText(t).width>w-24&&t.length>4)t=t.slice(0,-2);if(t!==GOAL.text)t=t.trimEnd()+'…';c.fillText(t,BK.W/2,y+35);c.restore();}
-function drawParty(c,members,MH){drawMenuTask(c);const r=BK.r,cy=-BK.top+BK.task+10+r,gap=r*.8+12,tot=members.length*r*2+(members.length-1)*gap;let x=BK.W/2-tot/2+r;const pick=!!MENU.pick;
-  for(const id of members){const H_=HEROES[id],on=id===MH,col=HCOL[id]||'#666';
-    if(pick)drawGlow(c,x,cy,r*1.9,'255,215,120',.4+.2*Math.sin(T*5));else if(on)drawGlow(c,x,cy,r*1.7,'255,215,120',.32);
-    c.fillStyle='rgba(0,0,0,.35)';c.beginPath();c.arc(x+1,cy+3,r+3,0,TAU);c.fill();
-    c.fillStyle='#f3e6c4';c.beginPath();c.arc(x,cy,r,0,TAU);c.fill();
-    const im=IMG[FACEIMG[id]];if(ready(im)){c.save();c.beginPath();c.arc(x,cy,r-1,0,TAU);c.clip();if(!on&&!pick)c.globalAlpha=.85;c.drawImage(im,x-r,cy-r,r*2,r*2);c.restore();}
-    c.lineWidth=4;c.strokeStyle=col;c.beginPath();c.arc(x,cy,r,0,TAU);c.stroke();
-    if(on||pick){c.lineWidth=3;c.strokeStyle=pick?`rgba(240,190,80,${(.7+.3*Math.sin(T*5)).toFixed(3)})`:'#e0b24a';c.beginPath();c.arc(x,cy,r+4.5,0,TAU);c.stroke();}
-    const bw=r*1.7,by=cy+r+9,f=clamp(H_.hp/H_.maxHp,0,1);c.fillStyle='rgba(30,20,30,.8)';rr(x-bw/2,by,bw,6,3);c.fill();if(f>0){c.fillStyle=hpCol(f);rr(x-bw/2,by,Math.max(6,bw*f),6,3);c.fill();}
-    c.fillStyle=on||pick?'#fdf6e3':'rgba(230,215,190,.85)';c.font='700 14px "Alegreya SC", Georgia, serif';c.textAlign='center';c.fillText(pick?`${H_.name}  ${H_.hp}/${H_.maxHp}`:H_.name,x,by+22);
-    hit(x-r-8,cy-r-8,r*2+16,r*2+48,()=>{if(MENU.pick){useOn(id);return;}if(!on){MENU.who=id;MENU.sel=null;sfxPage(.4);}});
-    x+=r*2+gap;}}
+/* the party as leather tabs tucked into the top of the book: the open hero's tab stands taller in their colour */
+function drawParty(c,members,MH){const pick=!!MENU.pick,tw=BK.spread?66:62,gap=6;let x=(BK.spread?40:30)+tw/2;
+  for(const id of members){const H_=HEROES[id],on=id===MH,col=HCOL[id]||'#666',th=on?66:54,ty=-th,r=BK.r,fx=x,fy=ty+r+7;
+    if(pick)drawGlow(c,fx,fy,r*2.2,'255,215,120',.35+.2*Math.sin(T*5));
+    c.fillStyle='rgba(0,0,0,.3)';rr(x-tw/2+2,ty+3,tw,th+20,12);c.fill();
+    {const g=c.createLinearGradient(0,ty,0,0);if(on){g.addColorStop(0,col);g.addColorStop(1,'#2e1812');}else{g.addColorStop(0,'#6a3a2a');g.addColorStop(1,'#3a1d15');}c.fillStyle=g;rr(x-tw/2,ty,tw,th+20,12);c.fill();}
+    c.strokeStyle=on?'rgba(240,205,130,.8)':'rgba(220,180,110,.4)';c.setLineDash([4,3]);c.lineWidth=1.2;rr(x-tw/2+4,ty+4,tw-8,th+12,9);c.stroke();c.setLineDash([]);
+    c.fillStyle='#f3e6c4';c.beginPath();c.arc(fx,fy,r,0,TAU);c.fill();
+    const im=IMG[FACEIMG[id]];if(ready(im)){c.save();c.beginPath();c.arc(fx,fy,r-1,0,TAU);c.clip();if(!on&&!pick)c.globalAlpha=.8;c.drawImage(im,fx-r,fy-r,r*2,r*2);c.restore();}
+    c.lineWidth=2.5;c.strokeStyle=on?'#e8c060':pick?`rgba(240,190,80,${(.7+.3*Math.sin(T*5)).toFixed(3)})`:'rgba(200,160,100,.7)';c.beginPath();c.arc(fx,fy,r,0,TAU);c.stroke();
+    if(on||pick){const bw=tw-18,by=fy+r+6,f=clamp(H_.hp/H_.maxHp,0,1);c.fillStyle='rgba(20,10,10,.6)';rr(x-bw/2,by,bw,5,2.5);c.fill();if(f>0){c.fillStyle=hpCol(f);rr(x-bw/2,by,Math.max(5,bw*f),5,2.5);c.fill();}}
+    if(pick){c.fillStyle='#fdf6e3';c.font='700 13px "Alegreya SC", Georgia, serif';c.textAlign='center';c.fillText(`${H_.hp}/${H_.maxHp}`,x,ty-8);}
+    hit(x-tw/2,ty-(pick?22:6),tw,th+(pick?26:10),()=>{if(MENU.pick){useOn(id);return;}if(!on){MENU.who=id;MENU.sel=null;sfxPage(.4);}});
+    x+=tw+gap;}}
 /* the hero standing in a slowly turning magic circle */
 function drawDoll(c,MH,fx,fy,k){c.save();c.translate(fx,fy);c.scale(k,k);
   c.save();c.translate(0,-6);c.scale(1,.3);c.strokeStyle='rgba(90,120,190,.35)';c.lineWidth=2;c.beginPath();c.arc(0,0,74,0,TAU);c.stroke();c.lineWidth=1;c.beginPath();c.arc(0,0,62,0,TAU);c.stroke();c.rotate(T*.25);for(let q=0;q<12;q++){c.rotate(TAU/12);c.fillStyle='rgba(90,120,190,.4)';c.fillRect(64,-2,8,4);}c.restore();
@@ -76,13 +90,14 @@ function drawCharPage(c,x,y,w,h,MH,prev){const col=HCOL[MH]||'#5a3d22',H_=HEROES
   yy+=th+30;if(CH>0&&HCOMBO[MH]){c.textAlign='left';c.font='700 15px "Alegreya SC", Georgia, serif';c.fillStyle='#4a3420';c.fillText('Combo · '+HCOMBO[MH],x+18,yy);const n=comboOf(MH);for(let i=0;i<COMBO_MAX;i++)drawStar5(c,x+w-27-(COMBO_MAX-1-i)*22,yy-5,9,i<n);}}
 /* the satchel grid: everything but mixing ingredients (those have their own tab); trade goods like Fox Tail, Wisp Silk and Sea Gems show here with their count */
 function bagVis(MH){const VIS=[],seen={};BAG.forEach((b,i)=>{if(MH!=='cosmic'&&!(ITEMS[b]&&(ITEMS[b].kind!=='mat'||!ING_ORDER.includes(b))))return;if(seen[b]!==undefined)return;seen[b]=i;VIS.push(i);});return VIS;}
-function drawBagPage(c,x,y,w,h,MH){const col=HCOL[MH]||'#7a4f9a',showIng=MH!=='cosmic',tb=showIng?(MENU.tab||'bag'):'bag';
-  const ty=y+22;let tx=x+18;c.font='700 16px "Alegreya SC", Georgia, serif';
-  for(const [k,l] of (showIng?[['bag',`Satchel  ${satchelSlots()}/8`],['ing','Ingredients']]:[['bag','Satchel']])){const tw2=c.measureText(l).width+34,on=tb===k;
+function drawBagPage(c,x,y,w,h,MH){const col=HCOL[MH]||'#7a4f9a',showIng=MH!=='cosmic',mv=BK.spread&&CH>0;let tb=showIng?(MENU.tab||'bag'):'bag';if(tb==='moves'&&!mv)tb='bag';
+  const ty=y+22;let tx=x+18;c.font=mv?'700 15px "Alegreya SC", Georgia, serif':'700 16px "Alegreya SC", Georgia, serif';const tabs=showIng?[['bag',`Satchel  ${satchelSlots()}/8`],['ing','Ingredients']]:[['bag','Satchel']];if(mv)tabs.push(['moves','Moves']);
+  for(const [k,l] of tabs){const tw2=c.measureText(l).width+(mv?24:34),on=tb===k;
     if(on){c.fillStyle=col;rr(tx,ty,tw2,40,20);c.fill();}else{c.strokeStyle='#d6c39a';c.lineWidth=2;rr(tx+1,ty+1,tw2-2,38,19);c.stroke();}
     c.fillStyle=on?'#fbf3dd':'#5a3d22';c.textAlign='center';c.fillText(l,tx+tw2/2,ty+26);hit(tx,ty-4,tw2,48,()=>{MENU.tab=k;MENU.sel=null;MENU.pick=null;sfxPage(.35);});tx+=tw2+8;}
   const gy=ty+58;
   if(tb==='ing'){drawIngTab(c,x,w,gy,y+h-10);return;}
+  if(tb==='moves'){drawMoves(c,x,w,gy-6,y+h-12,MH);return;}
   /* every item is shown: a satchel pushed past 8 (pickups, swapping gear) grows extra rows instead of hiding things */
   const VIS=bagVis(MH),bagN=id=>BAG.filter(b=>b===id).length,gap=10,rows=Math.max(2,Math.ceil(VIS.length/4)),cs=Math.min(84,(w-36-gap*3)/4,(y+h-gy-48-gap*(rows-1))/rows),gx=x+(w-(cs*4+gap*3))/2;
   for(let i=0;i<rows*4;i++){const cx=gx+(i%4)*(cs+gap),cy=gy+Math.floor(i/4)*(cs+gap),bi=VIS[i],id=bi===undefined?undefined:BAG[bi],sel=bi!==undefined&&MENU.sel&&MENU.sel.kind==='bag'&&MENU.sel.i===bi;
@@ -94,6 +109,32 @@ function drawBagPage(c,x,y,w,h,MH){const col=HCOL[MH]||'#7a4f9a',showIng=MH!=='c
     hit(cx,cy,cs,cs,()=>{MENU.sel={kind:'bag',i:bi};MENU.pick=null;sfxPage(.35);if(TUT.stage===2&&id==='bucket'){TUT.stage=3;TUT.t=0;}});
     if(TUT.stage===2&&id==='bucket'){tutRing(c,cx+cs/2,cy+cs/2,cs*.55);tutArrow(c,cx+cs/2,cy-6,1);}}
   c.font='italic 14px Alegreya, Georgia, serif';c.fillStyle='#8a7050';c.textAlign='center';c.fillText(BAG.some(b=>MH==='cosmic'||(ITEMS[b]&&ITEMS[b].kind!=='mat'))?tw('Tap an item to read about it.','Click an item to read about it.'):'Your satchel is empty… for now.',x+w/2,gy+cs*rows+gap*(rows-1)+34);}
+/* what each hero can do in battle: Lum's powders, Jak's trap, everyone's attack, combo and guard */
+const PDESC={spark:"A pinch of starlight that stings a foe. It never runs out.",frost:"Light damage that can freeze a foe, so it loses its turn.",thorn:"Thorns wrap a foe and weaken its attacks for three turns.",moon:"Strong against the undead and breaks their spells. A well-timed throw can make other foes drowsy.",venom:"1–3 damage, then poisons the foe for 1–3 of its turns."};
+const MOVEDESC={
+  jak:{atk:"A swing of his axe.",combo:"Lightning gathers on his axe and leaps to every foe.",guard:"A perfect guard strikes back half the time."},
+  spar:{atk:"A quick slash of his sword.",combo:"A sweeping fire slash that burns through every foe."},
+  amroth:{atk:"A heavy blow of the Gatekeeper's Sword.",combo:"Ten rapid strikes. Tap as each ring meets the star; the last is a crushing blow.",guard:"A perfect guard earns him a combo star."},
+  lum:{combo:"Stars rain down on every foe."},cosmic:{atk:"A swing of his blade."}};
+function moveList(MH){const L=[],D=MOVEDESC[MH]||{},im=k=>(c,x,y,z)=>{const i=IMG[k];if(ready(i))c.drawImage(i,x-z/2,y-z/2,z,z);};
+  if(MH==='lum')for(const [id,name,,key] of POWDER_LIST)L.push({icon:(c,x,y,z)=>drawPowderIcon(c,id,x,y,z),title:name,tag:key?'×'+(POWDERS[key]||0):'∞',dim:key&&!(POWDERS[key]>0),desc:PDESC[id]||''});
+  else{const wpn=PARTY[MH]&&PARTY[MH].main;L.push({icon:wpn?(c,x,y,z)=>drawIcon(c,wpn,x,y,z):im('stat_atk'),title:'Attack',desc:(D.atk||'A strike at one foe.')+' Tap as the ring touches the star for extra damage.'});}
+  if(MH==='jak')L.push({icon:im('icon17_trap_beast'),title:'Beast Trap',desc:"Set a trap at a friend's feet. The next foe to attack them springs it, taking damage and losing its attack. One trap at a time."});
+  if(HCOMBO[MH]&&CH>0)L.push({icon:(c,x,y,z)=>{c.fillStyle='#e8b84a';c.strokeStyle='#8a5a1a';c.lineWidth=2;drawStar5(c,x,y,z*.42,true);},title:HCOMBO[MH],stars:comboOf(MH),desc:D.combo+' Fill all five stars with well-timed hits to use it.'});
+  L.push({icon:im('stat_def'),title:'Guard',desc:'Tap just before a foe hits to take less damage.'+(D.guard?' '+D.guard:'')});
+  return L;}
+function drawMoves(c,x,w,y0,y1,MH){const L=moveList(MH);let k=1,rows;
+  for(;k>.7;k-=.06){c.font=`${(13.5*k).toFixed(1)}px Alegreya, Georgia, serif`;const tile=44*k,dw=w-36-tile-12;rows=L.map(m=>{const ln=wrapText(c,m.desc,dw);return{m,ln,h:Math.max(tile+12,(26+ln.length*17)*k+8)};});if(rows.reduce((a,r)=>a+r.h,0)<=y1-y0)break;}
+  const tile=44*k,lh=17*k;let yy=y0;
+  rows.forEach((r,i)=>{const m=r.m,ix=x+18,tx=ix+tile+12;c.globalAlpha=m.dim?.5:1;
+    c.fillStyle='#f3e6c4';rr(ix,yy+6,tile,tile,10);c.fill();c.strokeStyle='#d6c39a';c.lineWidth=1.6;rr(ix,yy+6,tile,tile,10);c.stroke();m.icon(c,ix+tile/2,yy+6+tile/2,tile*.78);
+    c.textAlign='left';c.fillStyle='#3b2a1c';c.font=`700 ${(16*k).toFixed(1)}px "Alegreya SC", Georgia, serif`;c.fillText(m.title,tx,yy+21*k+2);
+    if(m.tag){c.textAlign='right';c.fillStyle='#6a5038';c.fillText(m.tag,x+w-18,yy+21*k+2);}
+    if(m.stars!==undefined)for(let s_=0;s_<COMBO_MAX;s_++)drawStar5(c,x+w-24-(COMBO_MAX-1-s_)*17*k,yy+16*k+2,7*k,s_<m.stars);
+    c.textAlign='left';c.fillStyle='#6a5038';c.font=`${(13.5*k).toFixed(1)}px Alegreya, Georgia, serif`;r.ln.forEach((t,j)=>c.fillText(t,tx,yy+(40+j*17)*k+2));
+    c.globalAlpha=1;yy+=r.h;if(i<rows.length-1){c.strokeStyle='rgba(150,110,60,.2)';c.lineWidth=1;c.beginPath();c.moveTo(x+18,yy);c.lineTo(x+w-18,yy);c.stroke();}});}
+function drawMovesPage(c,x,y,w,h,MH){const col=HCOL[MH]||'#5a3d22';c.textAlign='left';c.fillStyle=col;c.font='700 30px "Alegreya SC", Georgia, serif';c.fillText(HEROES[MH].name,x+18,y+42);
+  c.font='italic 13.5px Alegreya, Georgia, serif';c.fillStyle='#7a5a3a';c.fillText('Moves in battle',x+18,y+62);drawMoves(c,x,w,y+76,y+h-12,MH);}
 /* the parchment card for whatever is selected */
 function drawItemCard(c,cx,cy,cw,MH,members){let id=null,fromSlot=null;if(MENU.sel.kind==='bag')id=BAG[MENU.sel.i];else{fromSlot=MENU.sel.slot;id=PARTY[MH][fromSlot];}
   const it=id?ITEMS[id]:null,pick=!!MENU.pick;
@@ -133,7 +174,7 @@ function drawItemCard(c,cx,cy,cw,MH,members){let id=null,fromSlot=null;if(MENU.s
 function drawMenu(dt){const members=CH>0?PARTY_ORDER:[HERO];const MH=(MENU.who&&members.includes(MENU.who))?MENU.who:HERO;MENU.a=clamp(MENU.a+(MENU.open?dt*5:-dt*6),0,1);if(MENU.a<=0)return;MENU.noteT=Math.max(0,MENU.noteT-dt);
   const e=1-Math.pow(1-MENU.a,3);MENU.hits=[];menuLayout();const BW=BK.W,BH=BK.H,col=HCOL[MH]||'#7a4f9a';
   if(MENU.sel&&MENU.sel.kind==='bag'&&BAG[MENU.sel.i]===undefined)MENU.sel=null;
-  ctx.save();ctx.fillStyle=`rgba(14,12,24,${(.6*e).toFixed(3)})`;ctx.fillRect(0,0,W,H);
+  ctx.save();ctx.fillStyle=`rgba(10,8,16,${(.82*e).toFixed(3)})`;ctx.fillRect(0,0,W,H);
   const S=Math.min((W-16)/BW,(H-12)/(BH+BK.top+BK.bot),1.35);const ox=(W-BW*S)/2,oy=(H-(BH+BK.top+BK.bot)*S)/2+BK.top*S+(1-e)*40;MENU.S=S;MENU.ox=ox;MENU.oy=oy;
   ctx.globalAlpha=e;ctx.translate(ox,oy);ctx.scale(S,S);const c=ctx;
   drawParty(c,members,MH);
@@ -143,11 +184,16 @@ function drawMenu(dt){const members=CH>0?PARTY_ORDER:[HERO];const MH=(MENU.who&&
   c.strokeStyle='rgba(230,190,110,.55)';c.setLineDash([5,4]);c.lineWidth=1.4;rr(7,7,BW-14,BH-14,15);c.stroke();c.setLineDash([]);
   for(const [cx,cy,sx,sy] of [[0,0,1,1],[BW,0,-1,1],[0,BH,1,-1],[BW,BH,-1,-1]]){c.save();c.translate(cx,cy);c.scale(sx,sy);c.strokeStyle='#d8b060';c.fillStyle='#d8b060';c.lineWidth=2.4;c.beginPath();c.moveTo(10,34);c.quadraticCurveTo(10,10,34,10);c.stroke();c.beginPath();c.arc(17,17,3.4,0,TAU);c.fill();c.restore();}
   const prev=previewDelta(MH);let card=null;
-  if(BK.spread){const pw=(BW-44)/2,ph=BH-36,lx=18,rx=BW/2+4,py=18;drawParch(c,lx,py,pw,ph,8);drawParch(c,rx,py,pw,ph,8);
-    {const g=c.createLinearGradient(BW/2-10,0,BW/2+10,0);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(.5,'rgba(60,30,10,.35)');g.addColorStop(1,'rgba(0,0,0,0)');c.fillStyle=g;c.fillRect(BW/2-14,py,28,ph);}
+  if(BK.spread){const pw=(BW-52)/2,ph=BH-40,lx=20,rx=BW/2+6,py=16;
+    {const g=c.createLinearGradient(BW/2-9,0,BW/2+9,0);g.addColorStop(0,'#3a1c14');g.addColorStop(.5,'#6a3626');g.addColorStop(1,'#3a1c14');c.fillStyle=g;c.fillRect(BW/2-9,4,18,BH-8);}   /* the spine */
+    pageEdges(c,lx,py,pw,ph,-1);pageEdges(c,rx,py,pw,ph,1);drawParch(c,lx,py,pw,ph,8);drawParch(c,rx,py,pw,ph,8);gutter(c,lx+pw,py,ph,1,46);gutter(c,rx,py,ph,-1,46);
     drawCharPage(c,lx,py,pw,ph,MH,prev);drawBagPage(c,rx,py,pw,ph,MH);card=[rx+pw/2,BH/2,Math.min(pw-16,340)];}
-  else{const page=MENU.page||'char';drawParch(c,18,18,BW-36,BH-36,8);if(page==='char')drawCharPage(c,18,18,BW-36,BH-36,MH,prev);else drawBagPage(c,18,18,BW-36,BH-36,MH);card=[BW/2,BH/2,BW-52];
-    const ny=BH+14,nw=(BW-10)/2;[['char','Character'],['bag','Satchel']].forEach(([k,l],i)=>{const nx=i*(nw+10),on=page===k;if(on){c.fillStyle=col;rr(nx,ny,nw,48,24);c.fill();}else{c.strokeStyle='rgba(200,180,160,.55)';c.lineWidth=2;rr(nx+1,ny+1,nw-2,46,23);c.stroke();}
+  else{const page=(MENU.page==='moves'&&CH<1)?'char':(MENU.page||'char'),px=26,pw=BW-px-16,py=16,ph=BH-38;
+    {const g=c.createLinearGradient(0,0,22,0);g.addColorStop(0,'#2e160f');g.addColorStop(.6,'#5e2f22');g.addColorStop(1,'#43211a');c.fillStyle=g;rr(0,0,22,BH,20);c.fill();c.fillRect(12,0,10,BH);
+      c.strokeStyle='rgba(230,190,110,.35)';c.lineWidth=1.4;for(const yy of [BH*.18,BH*.5,BH*.82]){c.beginPath();c.moveTo(3,yy);c.lineTo(20,yy);c.stroke();}}   /* a sliver of the spine on the left */
+    pageEdges(c,px,py,pw,ph,1);drawParch(c,px,py,pw,ph,8);gutter(c,px,py,ph,-1,30);
+    if(page==='char')drawCharPage(c,px,py,pw,ph,MH,prev);else if(page==='moves')drawMovesPage(c,px,py,pw,ph,MH);else drawBagPage(c,px,py,pw,ph,MH);card=[px+pw/2,BH/2,pw-16];
+    const navs=CH>0?[['char','Character'],['moves','Moves'],['bag','Satchel']]:[['char','Character'],['bag','Satchel']],ny=BH+14,nw=(BW-10*(navs.length-1))/navs.length;navs.forEach(([k,l],i)=>{const nx=i*(nw+10),on=page===k;if(on){c.fillStyle=col;rr(nx,ny,nw,48,24);c.fill();}else{c.strokeStyle='rgba(200,180,160,.55)';c.lineWidth=2;rr(nx+1,ny+1,nw-2,46,23);c.stroke();}
       c.fillStyle=on?'#fbf3dd':'#e6d6be';c.font='700 18px "Alegreya SC", Georgia, serif';c.textAlign='center';c.fillText(l,nx+nw/2,ny+31);
       hit(nx,ny,nw,48,()=>{if(!on){MENU.page=k;MENU.sel=null;MENU.pick=null;sfxPage(.45);}});
       if(k==='bag'&&!on&&TUT.stage===2)tutBox(c,nx,ny,nw,48,24);});}
