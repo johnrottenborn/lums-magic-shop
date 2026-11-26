@@ -1365,6 +1365,14 @@ const CASES = {
     await wait(1500); await p.screenshot({ path: path.join(SHOTS, `prologue-bed-touch-${vp}.png`) });
     await g_(() => { window.__g.CHOICE.on = false; });
   },
+  async 'king-praise'(p) {
+    // after the Slug King, Lum is impressed and sends Cosmic looking for more hiding places in the garden (once)
+    await p.evaluate(() => { const g = window.__g; g.INTRO.on = false; g.INTRO.waiting = false; g.DLG.active = false; g.enterShop(); }); await wait(800);
+    const a = await p.evaluate(() => { const g = window.__g; g.DLG.active = false; g.STATS.kingSlain = 1; g.lumTalk(); return g.DLG.lines.map(l => l[1]).join(' '); });
+    check(/impressed/.test(a) && /hiding places/.test(a), 'Lum should praise Cosmic for the Slug King: ' + a);
+    const b = await p.evaluate(() => { const g = window.__g; g.DLG.active = false; g.DLG.onEnd && g.DLG.onEnd(); g.DLG.active = false; g.lumTalk(); return g.DLG.lines.map(l => l[1]).join(' '); });
+    check(!/impressed/.test(b), 'the praise should only play once');
+  },
   async 'jak-leaves'(p) {
     // back in Breezevale after Mai joins Lum, Jak says goodbye (off to his next hunt) and walks home; he waits in the islet house after
     const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop', g_ = (f, a) => p.evaluate(f, a);
