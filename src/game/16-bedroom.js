@@ -11,14 +11,19 @@ const BEDMOTES=[];for(let i=0;i<34;i++)BEDMOTES.push({x:rnd(380,900),y:rnd(40,56
 const BEDFLIES=[];for(let i=0;i<10;i++)BEDFLIES.push({x:rnd(90,210),y:rnd(220,400),ph:rnd(0,TAU)});
 function setupBedroom(){BEDINT.length=0;
   BEDINT.push({x:1268,y:622,reach:72,onInteract:()=>goScene(()=>{enterShop();lum.x=1250;lum.y=592;lum.face=-1;})});
-  BEDINT.push({x:900,y:740,reach:130,onInteract:()=>{if(NIGHT.on){say("I can't sleep now. The voice is waiting for me…");return;}if(BED.slept){say("All rested up! My bed is officially the comfiest place in the whole world.");return;}
-    askChoice("Rest for the night?",[["Rest",()=>talk([['Cosmic',"My bed! I could sleep for a hundred years…"],['Cosmic',"…but just one night will do. Goodnight, Master Lum."]],false,goToSleep)],["Not yet",()=>say("Maybe in a little bit. I'm not quite done with today.")]]);}});
+  BEDINT.push({x:900,y:740,reach:130,onInteract:cosBed});
   const L=(x,y,reach,lines)=>{let i=0;BEDINT.push({x,y,reach,onInteract:()=>say(lines[(i++)%lines.length])});};
   L(540,640,95,["Master Lum's bed. Every patch on her quilt has a tiny moon stitched into the corner.","She always says she's 'just resting her eyes.' She snores like a teakettle."]);
   L(205,680,100,["My treasure chest! A rock shaped like a frog, three marbles, and a feather I'm saving for a hat."]);
   L(790,640,90,["Master's reading glasses and a book called 'Quiet Magic for Loud Apprentices.' Hmm. Very funny."]);
   L(140,640,90,["Through the little window I can see the birches. They glow a bit at night, like they're dreaming too."]);
   L(1080,620,90,["Flower drawings on the shelf. Master Lum made those for me when I first came here. I pretend they're not my favorite."]);}
+/* Cosmic's bed: the rest prompt; in the Prologue it also pops up as soon as he walks into any side of the bed */
+function cosBed(){if(NIGHT.on){say("I can't sleep now. The voice is waiting for me…");return;}if(BED.slept){say("All rested up! My bed is officially the comfiest place in the whole world.");return;}
+    askChoice("Rest for the night?",[["Rest",()=>talk([['Cosmic',"My bed! I could sleep for a hundred years…"],['Cosmic',"…but just one night will do. Goodnight, Master Lum."]],false,goToSleep)],["Not yet",()=>say("Maybe in a little bit. I'm not quite done with today.")]]);}
+const COSBED_EDGE=[[736,540],[736,700],[748,726],[1030,726],[1196,602]];
+function bedTouch(){if(CH!==0||SCENE!=='bed'||BED.sleeping||BED.slept||NIGHT.on)return;let d=1e9;for(let i=1;i<COSBED_EDGE.length;i++)d=Math.min(d,segDist(lum.x,lum.y,COSBED_EDGE[i-1],COSBED_EDGE[i]));
+  if(d>44){BED.arm=1;return;}if(d<16&&BED.arm&&!DLG.active&&!CHOICE.on&&!WEVENT.on&&!FADE.dir&&!MENU.open){BED.arm=0;lum.vx=lum.vy=0;cosBed();}}
 function enterBedroom(){SCENE='bed';lum.x=1240;lum.y=650;lum.face=-1;lum.vx=lum.vy=0;lum.state='idle';WCAM.x=900;WTITLE.t=0;if(!NIGHT.on){BED.night=0;BED.sleeping=false;}setupBedroom();if(CH===1)c1Bedroom();}
 const NIGHT={on:false,cut:false,rain:false,end:0,rainSrc:null};
 function goToSleep(){WEVENT.on=true;goScene(()=>{BED.night=1;BED.sleeping=true;BED.cosAwake=false;BED.t=0;lum.vx=lum.vy=0;WCAM.x=760;NIGHT.on=true;HEROES[HERO].hp=HEROES[HERO].maxHp;
@@ -72,7 +77,7 @@ function drawSleeper(img,hx,hy,sc,rot,lump,breath,phase){const im=IMG[img];if(!r
   ctx.strokeStyle='rgba(120,100,80,.35)';ctx.beginPath();ctx.moveTo(-w*.5,8);ctx.quadraticCurveTo(0,0,w*.5,6);ctx.stroke();ctx.restore();
   // drifting z's
   ctx.save();ctx.textAlign='center';for(let i=0;i<3;i++){const t=((T*.35+phase*.1)+i/3)%1;ctx.globalAlpha=Math.sin(Math.PI*t)*.85;ctx.fillStyle='#f4ecff';ctx.font=`italic 700 ${12+t*12}px Alegreya, Georgia, serif`;ctx.fillText('z',hx+20+t*30+Math.sin(T*2+i)*6,hy-30-t*70);}ctx.restore();}
-function drawBedroom(){const im=IMG.bedroom;if(!ready(im))return;const rz=H/768*ROOMZ,n=BED.night;
+function drawBedroom(){bedTouch();const im=IMG.bedroom;if(!ready(im))return;const rz=H/768*ROOMZ,n=BED.night;
   ctx.setTransform(DPR,0,0,DPR,0,0);ctx.fillStyle='#231c18';ctx.fillRect(0,0,W,H);
   ctx.setTransform(DPR*rz,0,0,DPR*rz,DPR*(W/2-WCAM.x*rz),DPR*WOFF.y);ctx.drawImage(im,0,0,1375,768);
   if(n){ctx.fillStyle='rgba(18,26,62,.58)';ctx.fillRect(0,0,1375,768);}

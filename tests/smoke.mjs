@@ -1352,6 +1352,19 @@ const CASES = {
     check(await g_(() => window.__g.MENU.hits.length > 4), 'the spellbook should have tappable tabs');
     await g_(() => window.__g.closeMenu()); await wait(400);
   },
+  async 'prologue-bed-touch'(p) {
+    // in the Prologue, walking into any side of Cosmic's bed pops up "Rest for the night?"
+    const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop', g_ = (f, a) => p.evaluate(f, a);
+    await g_(() => { const g = window.__g; g.INTRO.on = false; g.INTRO.waiting = false; g.DLG.active = false; }); await wait(500);
+    for (const [x, y] of [[740, 620], [1100, 680], [900, 740]]) {
+      await g_(([x, y]) => { const g = window.__g; g.CHOICE.on = false; g.enterBedroom(); g.becomeCosmic(1240, 700, -1); }, [x, y]); await wait(300);
+      check(await g_(() => !window.__g.CHOICE.on), 'no prompt away from the bed');
+      await g_(([x, y]) => { const g = window.__g; g.lum.x = x; g.lum.y = y; }, [x, y]); await wait(300);
+      check(await g_(() => window.__g.CHOICE.on && /Rest/.test(window.__g.CHOICE.q)), `touching the bed at ${x},${y} should ask to rest`);
+    }
+    await wait(1500); await p.screenshot({ path: path.join(SHOTS, `prologue-bed-touch-${vp}.png`) });
+    await g_(() => { window.__g.CHOICE.on = false; });
+  },
   async 'jak-leaves'(p) {
     // back in Breezevale after Mai joins Lum, Jak says goodbye (off to his next hunt) and walks home; he waits in the islet house after
     const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop', g_ = (f, a) => p.evaluate(f, a);
