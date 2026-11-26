@@ -965,6 +965,7 @@ const CASES = {
     await p.screenshot({ path: path.join(SHOTS, `breezevale-townsgirl-${vp}.png`) });
     await g_(() => { window.__g.DLG.active = false; });
     for (const [i, room, who] of [[2, 25, 'Breezevale Merchant'], [3, 26, 'Townsman'], [4, 27, null], [0, 28, 'Fisherman']]) {
+      await g_(i => { const g = window.__g; if (i === 4) g.C2.lumaMet = 1; }, i);   // Jak's door is "Gone Fishing" until Lum has met Sage Luma
       await g_(i => { const g = window.__g, t = g.THINTS().find(o => o.door && Math.abs(o.y - (g.BVY + g.BVHOUSES[i].y + 24)) < 2 && o.reach > 0 && Math.abs(o.x - g.BVX - g.BVHOUSES[i].x) < g.BVHOUSES[i].w / 2); g.lum.x = t.x; g.lum.y = t.y + 20; }, i); await wait(500);
       await g_(() => window.__g.NEAR.onInteract()); await wait(1300);
       check(await g_(r => window.__g.SCENE === 'dun' && window.__g.DUNX.room === r, room), 'a clam house door did not lead inside (room ' + room + ')');
@@ -1372,6 +1373,19 @@ const CASES = {
     check(/impressed/.test(a) && /hiding places/.test(a), 'Lum should praise Cosmic for the Slug King: ' + a);
     const b = await p.evaluate(() => { const g = window.__g; g.DLG.active = false; g.DLG.onEnd && g.DLG.onEnd(); g.DLG.active = false; g.lumTalk(); return g.DLG.lines.map(l => l[1]).join(' '); });
     check(!/impressed/.test(b), 'the praise should only play once');
+  },
+  async 'jak-door-gone-fishing'(p) {
+    // Jak's islet house is locked ("Gone Fishing") until Sage Luma has told Lum not to go alone; she mentions a trapper in town
+    const g_ = (f, a) => p.evaluate(f, a);
+    await g_(() => { const g = window.__g; g.startChapter2(); g.c2Skip(); }); await wait(1000);
+    await g_(() => { const g = window.__g; g.WB10.st = 2; g.chPlaytestBreezeway(); Object.assign(g.C2, { lumaMet: 0, jak: 0 }); setInterval(() => g.THFOES.forEach(f => f.calm = 99), 50); g.enterBreezevale(); }); await wait(1200);
+    const door = () => g_(() => { const g = window.__g, h = g.BVHOUSES[4], x = g.BVX + g.bvDoorX(h), d = g.THINTS().find(o => o.door && Math.abs(o.x - x) < 2); g.DLG.active = false; const sc = g.SCENE; d.onInteract(); return { sc, quip: g.lum.quip || '', dlg: g.DLG.active ? g.DLG.lines[0][1] : '' }; });
+    const r = await door(); check(/Gone Fishing/.test(r.quip + r.dlg), 'Jak\'s door should be locked with "Gone Fishing": ' + JSON.stringify(r));
+    const l = await g_(() => { const g = window.__g; g.DLG.active = false; g.lumaTalk(); return g.DLG.lines.map(x => x[1]).join(' '); });
+    check(/trapper/.test(l), 'Sage Luma should mention a trapper in town');
+    await g_(() => { const g = window.__g; g.DLG.active = false; g.DLG.onEnd && g.DLG.onEnd(); g.DLG.active = false; g.lum.quip = ''; });
+    const r2 = await door(); check(!/Gone Fishing/.test(r2.quip + r2.dlg), 'Jak\'s door should open after meeting Sage Luma');
+    await wait(900);
   },
   async 'jak-leaves'(p) {
     // back in Breezevale after Mai joins Lum, Jak says goodbye (off to his next hunt) and walks home; he waits in the islet house after
