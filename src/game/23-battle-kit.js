@@ -240,3 +240,21 @@ function drawBattleViper(f){const S=bS(),B=BATTLE,me=B.foes[B.foeI]===f,x=f.x+f.
   else{const im=IMG.viper_coil;if(ready(im)){const w=Hb*im.naturalWidth/im.naturalHeight,sw=Math.sin(T*1.8+(f.ph||0));ctx.translate(x,y);ctx.transform(1,0,sw*.03,1,0,0);if(fl)ctx.filter='brightness(1.8)';ctx.drawImage(im,-w/2,-Hb*(1+.01*sw),w,Hb*(1+.01*sw));ctx.filter='none';}}   /* a slow sway while it waits */
   ctx.restore();
   if(f.showHp>0&&!f.dead){const bw=60*S,bx=x-bw/2,by=y+14*S;ctx.save();ctx.globalAlpha=Math.min(1,f.showHp*3);ctx.fillStyle='rgba(20,20,30,.55)';rr(bx-2,by-2,bw+4,10,5);ctx.fill();ctx.fillStyle='#7ee08a';rr(bx,by,bw*f.hp/f.max,6,3);ctx.fill();ctx.restore();}}
+
+/* ---- the Patchwork Goblin (placeholder name and stats; not on a map yet). The designer's watercolours kept at full detail: the standing painting
+   `goblin_hd` (faces right, so flipped) at rest, and the sheet `goblin` (`C1ATL.goblin`, 260x250 cells, all facing right so flipped:
+   walk 4, run 4, act 6 = two dagger slashes, a lunge, a startled flinch, knocked back, sitting dazed) ---- */
+C1ATL.goblin={"cw":260,"ch":250,"rows":{"walk":[0,4],"run":[1,4],"act":[2,6]}};
+FOE_TYPES.goblin={name:'Patchwork Goblin',hp:14,atk:4,def:1,drop:null};
+function drawBattleGoblin(f){const S=bS(),B=BATTLE,me=B.foes[B.foeI]===f,x=f.x+f.ox,y=f.y+f.oy,Hb=Math.min(175*S,W*.34)*(f.s||1);const ph=B.phase,fl=f.hit>0?Math.min(1,f.hit*3):0;
+  let an=null,fi=0,flip=true,al=1;
+  if(f.dead){an='act';fi=f.dead<.25?4:5;al=Math.max(0,1-Math.max(0,f.dead-.35)/.6);if(al<=0)return;}   /* knocked back, then sits down dazed and fades */
+  else if(me&&ph==='foeWind'){an='act';fi=2;}
+  else if(me&&ph==='foeLeap'){const u=Math.min(1,B.t/(B.leapD||.4));an=u<.75?'run':'act';fi=u<.75?Math.floor(B.t*12)%4:(u<.9?0:1);}   /* dashes in, then two dagger slashes */
+  else if(me&&ph==='foeBack'){an='walk';fi=Math.floor(T*10)%4;flip=false;}   /* walking back to its place, away from the heroes */
+  else if(f.hit>.05){an='act';fi=3;}   /* startled when struck */
+  bshadow(x,y,Hb*.28,Hb*.07,.3*al);ctx.save();ctx.globalAlpha=al;
+  if(an)c1Frame(ctx,'goblin',an,fi,x,y,Hb*250/236,flip,al,fl);
+  else{const im=IMG.goblin_hd;if(ready(im)){const w=Hb*im.naturalWidth/im.naturalHeight,br=Math.sin(T*2.2+(f.ph||0))*.012;ctx.translate(x,y);ctx.scale(-1,1+br);if(fl)ctx.filter='brightness(1.8)';ctx.drawImage(im,-w/2,-Hb,w,Hb);ctx.filter='none';}}   /* breathing, shifting from foot to foot */
+  ctx.restore();
+  if(f.showHp>0&&!f.dead){const bw=56*S,bx=x-bw/2,by=y+14*S;ctx.save();ctx.globalAlpha=Math.min(1,f.showHp*3);ctx.fillStyle='rgba(20,20,30,.55)';rr(bx-2,by-2,bw+4,10,5);ctx.fill();ctx.fillStyle='#7ee08a';rr(bx,by,bw*f.hp/f.max,6,3);ctx.fill();ctx.restore();}}
