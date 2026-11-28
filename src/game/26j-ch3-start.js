@@ -132,7 +132,7 @@ Object.defineProperty(HSUB,'spar',{get(){return CH>=3?"A boy who grows too fast 
 /* from Chapter 3 the boy is Sariel (Alma's name for him; his true identity comes out later): no fire, a wooden sword, Amroth's strength and a multi-hit combo Amroth taught him */
 Object.defineProperty(HEROES.spar,'name',{get(){return CH>=3?'Sariel':'Spar';},set(){},enumerable:true});
 Object.defineProperty(HCOMBO,'spar',{get(){return CH>=3?"Cub's Fury":'Blazing Edge';},enumerable:true});
-{const D=MOVEDESC.spar;MOVEDESC.spar={get atk(){return CH>=3?"A swing of his wooden sword, as strong as Amroth's.":D.atk;},get combo(){return CH>=3?"Ten rapid strikes Amroth taught him. Tap as each ring meets the star; the last is a crushing blow.":D.combo;}};}
+{const D=MOVEDESC.spar;MOVEDESC.spar={get atk(){return CH>=3?"A swing of his wooden sword, as strong as Amroth's.":D.atk;},get combo(){return CH>=3?"Five rapid strikes Amroth taught him (tap as each ring meets the star), then Amroth steps in with one heavy blow.":D.combo;}};}
 MOVEDESC.alma={atk:"A light swat. Her strength is healing.",combo:"A wave of healing water washes over the whole party and cures poison."};
 const MENU_OPTS_AL=[['heal','Heal'],['bonk','Attack'],['items','Items'],['run','Run']],MENU_OPTS_ALB=[['burst','Mending Tide'],...MENU_OPTS_AL];
 /* Heal: one friend (chosen like Jak's trap); every heal earns a combo star */
@@ -163,3 +163,10 @@ function drawStump(o){const r=Math.max(9,o.w*.05);ctx.save();ctx.fillStyle='rgba
   ctx.strokeStyle='rgba(120,80,40,.55)';ctx.lineWidth=1;ctx.beginPath();ctx.ellipse(o.x,o.y-r*1.4,r*.55,r*.2,0,0,TAU);ctx.stroke();ctx.restore();}
 function c3EastDoor(){talk([['Amroth',"This way leads east, down to the river."],['Lum',"(The next area is still to come.)"]]);}
 THINT.push({get x(){return HOMEX+C3EAST[0];},get y(){return HOMEY+C3EAST[1];},get reach(){return CH>=3&&C3.party&&inHome()?85:0;},door:true,onInteract:c3EastDoor});
+
+/* Cub's Fury: after Sariel's five beats, Amroth dashes in and lands one heavy blow (if he can still stand), then steps back; returns true while it plays */
+function cubFinish(dt){const B=BATTLE,a=B.af,f=aflurryTarget(),am=B.heroes.find(h=>h.id==='amroth'&&!h.ko);if(!f||!am||a.finDone){if(am)am.cubT=0;return false;}
+  if(!a.fin){a.fin={t:0,hit:0,dx:Math.max(0,foeCenter(f).x-am.x-110*bS())};pop(am.x,am.y-200*bS(),'Amroth!','info');}
+  const F=a.fin;F.t+=dt;am.cubT=F.t;const go=Math.min(1,F.t/.22),back=Math.max(0,Math.min(1,(F.t-.7)/.3));am.ox=F.dx*(go-back);
+  if(F.t>.3&&!F.hit){F.hit=1;const st=heroStats('amroth'),dmg=Math.max(4,st.atk*2+2-(f.def||0));hurtFoe(f,dmg,true,"CUB'S FURY!");shake=12;B.hitstop=.14;B.fx.push({k:'flash',x:W/2,y:H*.45,r:W*.6,col:'255,225,150',t:0,max:.6,soft:1});try{sfxGuard();}catch(e){}}
+  if(F.t>=1){am.ox=0;am.cubT=0;a.finDone=1;return false;}return true;}

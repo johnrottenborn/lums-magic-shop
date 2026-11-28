@@ -123,7 +123,7 @@ function nextFoe(){const B=BATTLE;B.foeI++;while(B.foeI<B.foes.length&&B.foes[B.
 function chooseMenu(i){const B=BATTLE,o=menuOpts()[i][0];sfxPage(.6);
   if(o==='powder'){B.phase='powders';B.itemSel=0;return;}
   if(o==='burst'&&B.heroes[B.cur].id==='amroth'){C1.comboA=0;B.phase='aflurry';B.t=0;B.af={i:0,bt:0,hits:0,hit:-1,pressed:0,swing:0};sfxNice&&sfxNice();return;}
-  if(o==='burst'&&B.heroes[B.cur].id==='spar'&&CH>=3){C1.comboS=0;B.phase='aflurry';B.t=0;B.af={i:0,bt:0,hits:0,hit:-1,pressed:0,swing:0};sfxNice&&sfxNice();return;}   /* Sariel: Amroth's ten-beat flurry */
+  if(o==='burst'&&B.heroes[B.cur].id==='spar'&&CH>=3){C1.comboS=0;B.phase='aflurry';B.t=0;B.af={i:0,bt:0,hits:0,hit:-1,pressed:0,swing:0,n:5,cub:1};sfxNice&&sfxNice();return;}   /* Sariel's Cub's Fury: five beats, then Amroth's finishing blow (cubFinish in 26j) */
   if(o==='burst'&&B.heroes[B.cur].id==='spar'){C1.comboS=0;B.phase='sflame';B.t=0;B.burstDone=0;sfxNice&&sfxNice();return;}
   if(o==='burst'&&B.heroes[B.cur].id==='alma'){almaTide();return;}
   if(o==='heal'){B.phase='tpick';B.tpFor='heal';const al=B.heroes.map((h,i)=>i).filter(i=>!B.heroes[i].ko);let lo=al[0];for(const i of al)if(HEROES[B.heroes[i].id].hp/HEROES[B.heroes[i].id].maxHp<HEROES[B.heroes[lo].id].hp/HEROES[B.heroes[lo].id].maxHp)lo=i;B.tpick=lo;return;}   /* Alma's Heal: choose who (the most hurt first) */
@@ -143,7 +143,7 @@ function hurtFoe(f,dmg,nice,label){f.hp=Math.max(BATTLE.field&&BATTLE.field.scri
   if(f.hp<=0){f.dead=.001;STATS.kills++;setTimeout(sfxSlimePop,150);}
   else{const hh=BATTLE.heroes&&BATTLE.heroes[BATTLE.cur];if(hh&&PARTY[hh.id]&&(PARTY[hh.id].charm==='serpentcharm'||PARTY[hh.id].charm==='serpentmedal')&&Math.random()<.5){const was=f.poison>0;f.poison=Math.max(f.poison||0,1+Math.floor(Math.random()*3));if(!was){const c_=foeCenter(f);pop(c_.x,c_.top-60*bS(),'Poisoned!','nice');for(let i=0;i<8;i++)BATTLE.fx.push({k:'bub',x:c_.x+rnd(-25,25)*bS(),y:c_.top+rnd(0,60)*bS(),t:0,max:rnd(.5,.9)});}}}}   /* the Serpent Charm: the wearer's hits poison half the time (1–3 foe turns) */
 function battleAction(){const B=BATTLE,c=B.cmd;    // the tap used for action commands
-  if(B.phase==='aflurry'&&B.af&&!B.af.pressed&&B.af.i<AF_N){aflurryPress();return true;}
+  if(B.phase==='aflurry'&&B.af&&!B.af.pressed&&B.af.i<(B.af.n||AF_N)){aflurryPress();return true;}
   if(B.phase==='bonkWind'&&c&&!c.done){c.done=true;const w=B.t/B.windD;if(w>.8&&w<=1.02){c.nice=true;}else c.early=true;return true;}
   if((B.phase==='foeWind'||B.phase==='foeLeap')&&c&&!c.tried){c.tried=true;if(B.phase==='foeLeap'&&B.t>B.leapD-(BATTLE.foes[B.foeI]&&isGhostly(BATTLE.foes[B.foeI])?.15:.24))c.guard=true;return true;}
   if(B.phase==='run'&&c){c.fill=Math.min(1,c.fill+.11);sfxStep(true);return true;}
@@ -263,10 +263,10 @@ function renderBattle(){const B=BATTLE,S=bS();ctx.setTransform(DPR,0,0,DPR,0,0);
 const AF_N=10,AF_BEAT=.52,AF_WIN=[.64,.9];
 function aflurryTarget(){return aliveFoes()[0]||null;}
 function aflurryPress(){const B=BATTLE,a=B.af,u=a.bt/AF_BEAT;a.pressed=1;const h=B.heroes[B.cur],f=aflurryTarget();if(!f)return;
-  if(u>=AF_WIN[0]&&u<=AF_WIN[1]){a.hits++;a.hit=1;a.swing=.25;const st=heroStats(h.id),last=a.i===AF_N-1,dmg=last?Math.max(4,st.atk*2+2-(f.def||0)):Math.max(1,Math.round(st.atk*.5));hurtFoe(f,dmg,last,last?(h.id==='spar'?"CUB'S FURY!":"LION'S FURY!"):undefined);shake=last?12:4;BATTLE.hitstop=last?.14:.03;if(last)B.fx.push({k:'flash',x:W/2,y:H*.45,r:W*.6,col:'255,225,150',t:0,max:.6,soft:1});try{sfxGuard();}catch(e){}}   /* the tenth beat is the heavy finishing blow */
+  if(u>=AF_WIN[0]&&u<=AF_WIN[1]){a.hits++;a.hit=1;a.swing=.25;const st=heroStats(h.id),last=!a.cub&&a.i===(a.n||AF_N)-1,dmg=last?Math.max(4,st.atk*2+2-(f.def||0)):Math.max(1,Math.round(st.atk*.5));hurtFoe(f,dmg,last,last?(h.id==='spar'?"CUB'S FURY!":"LION'S FURY!"):undefined);shake=last?12:4;BATTLE.hitstop=last?.14:.03;if(last)B.fx.push({k:'flash',x:W/2,y:H*.45,r:W*.6,col:'255,225,150',t:0,max:.6,soft:1});try{sfxGuard();}catch(e){}}   /* the tenth beat is the heavy finishing blow */
   else{a.hit=0;pop(foeCenter(f).x,foeCenter(f).top-10*bS(),'Miss','dmg');}}
 function updateAflurry(h,dt){const B=BATTLE,a=B.af;if(!a)return;a.swing=Math.max(0,a.swing-dt);
-  if(a.i>=AF_N||!aflurryTarget()){if(!a.done){a.done=1;a.t2=0;const f=aflurryTarget()||B.foes[0];if(f){const c_=foeCenter(f);pop(c_.x,c_.top-40*bS(),a.hits+(a.hits===1?' HIT!':' HITS!'),'nice');}if(a.hits>=AF_N){B.fx.push({k:'flash',x:W/2,y:H*.45,r:W*.6,col:'210,220,255',t:0,max:.7,soft:1});shake=10;}}
+  if(a.i>=(a.n||AF_N)||!aflurryTarget()){if(a.cub&&cubFinish(dt))return;if(!a.done){a.done=1;a.t2=0;const f=aflurryTarget()||B.foes[0];if(f){const c_=foeCenter(f);pop(c_.x,c_.top-40*bS(),a.hits+(a.hits===1?' HIT!':' HITS!'),'nice');}if(a.hits>=(a.n||AF_N)&&!a.cub){B.fx.push({k:'flash',x:W/2,y:H*.45,r:W*.6,col:'210,220,255',t:0,max:.7,soft:1});shake=10;}}
     a.t2+=dt;if(a.t2>1.4){B.phase='pause';B.t=.5;B.after='nextHero';}return;}
   a.bt+=dt;if(a.bt>=AF_BEAT){a.bt-=AF_BEAT;a.i++;a.pressed=0;a.hit=-1;}}
 function drawAflurry(){const B=BATTLE,a=B.af;if(B.phase!=='aflurry'||!a||a.done)return;const f=aflurryTarget();if(!f)return;const S=bS(),c_=foeCenter(f),x=c_.x,y=c_.y,u=a.bt/AF_BEAT,R=26*S;
@@ -277,13 +277,14 @@ function drawAflurry(){const B=BATTLE,a=B.af;if(B.phase!=='aflurry'||!a||a.done)
   if(!a.pressed){const rr_=R*(1+3.2*(1-u/AF_WIN[1]));if(u<1){ctx.strokeStyle=inWin?'rgba(255,250,210,.95)':'rgba(200,215,255,.8)';ctx.lineWidth=3*S;ctx.beginPath();ctx.arc(x,y,Math.max(R*.6,rr_),0,TAU);ctx.stroke();}}
   if(a.hit===1){ctx.globalCompositeOperation='lighter';drawGlow(ctx,x,y,R*2.4,'255,240,180',.7*(1-u));}
   ctx.restore();ctx.save();ctx.fillStyle='#fdf6e4';ctx.strokeStyle='rgba(20,10,30,.7)';ctx.lineWidth=4;ctx.font='700 '+Math.round(20*S)+'px "Alegreya SC", Georgia, serif';ctx.textAlign='center';
-  const txt=a.hits+' / '+AF_N;ctx.strokeText(txt,x,c_.top-26*S);ctx.fillText(txt,x,c_.top-26*S);ctx.restore();}
+  const txt=a.hits+' / '+(a.n||AF_N);ctx.strokeText(txt,x,c_.top-26*S);ctx.fillText(txt,x,c_.top-26*S);ctx.restore();}
 function drawBattleAmroth(h){const S=bS(),B=BATTLE,x=h.x+h.ox+Math.max(0,62*S-h.x-h.ox+20*S)*(h.ox<=0?1:0),y=h.y+h.oy,me=B.heroes[B.cur]===h,ph=B.phase,t=B.t,H_=AMR_BH*S;let sh='amroth_atk',an='swing',fi=4,flip=false,rot=0,guard=true,lean=0;   /* in battle he stands in the swing sheet's recovery pose: sword forward over the shield, facing right toward the foes */
   if(me&&(ph==='bonkRun'||ph==='bonkBack'||ph==='run'||ph==='fled')){guard=false;sh='amroth';an='run';fi=Math.floor(t*12)%6;flip=ph==='bonkRun';}   /* his run row faces left */
   else if(me&&ph==='bonkWind'){guard=false;fi=t<B.windD*.45?0:1;lean=-6*S*Math.min(1,t/B.windD);}   /* the wind-up: sword drawn back, then raised overhead */
   else if(me&&ph==='bonkHit'){guard=false;   /* the strike: overhead, down through the arc, follow-through, then recovery */
     fi=t<.06?1:t<.15?2:t<.34?3:4;lean=t<.34?10*S*Math.min(1,t/.15):10*S*(1-Math.min(1,(t-.34)/.2));}
-  else if(me&&ph==='aflurry'){guard=false;const a=B.af||{};fi=a.swing>.2?1:a.swing>.1?2:a.swing>0?3:4;lean=a.swing>0?6*S:0;}   /* Lion's Fury: each beat a fresh overhead-to-arc slash */
+  else if(me&&ph==='aflurry'){guard=false;const a=B.af||{};fi=a.swing>.2?1:a.swing>.1?2:a.swing>0?3:4;lean=a.swing>0?6*S:0;}
+  else if(h.cubT>0){guard=false;fi=h.cubT<.22?0:h.cubT<.3?1:h.cubT<.38?2:h.cubT<.6?3:4;lean=h.cubT<.6?8*S:0;}   /* Cub's Fury: Amroth steps in for the last blow */   /* Lion's Fury: each beat a fresh overhead-to-arc slash */
   bshadow(x,y+2,40*S,11*S,.35);ctx.save();ctx.translate(x+lean,y+3);if(h.hurt>0)ctx.translate(Math.sin(h.hurt*60)*4,0);ctx.rotate(flip?-rot:rot);ctx.scale(.92,1);
   if(guard){const b=Math.sin(T*1.5);ctx.scale(1-.004*b,1+.01*b);}
   c1Frame(ctx,sh,an,fi,0,0,H_,flip,1,h.hurt>.3?1:0);ctx.restore();}

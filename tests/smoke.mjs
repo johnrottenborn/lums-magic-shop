@@ -1455,6 +1455,8 @@ const CASES = {
     // Sariel: Amroth's strength, no fire, and a ten-beat combo Amroth taught him
     const sr = await g_(() => { const g = window.__g, B = g.BATTLE; B.phase = 'heroMenu'; B.cur = 3; g.C1X.comboS = 5; const name = g.HEROES.spar.name, opts = g.menuOpts().map(o => o[1]).join(','), atk = g.heroStats('spar').atk, amr = g.heroStats('amroth').atk; g.chooseMenu(0); return { name, opts, atk, amr, ph: B.phase }; });
     check(sr.name === 'Sariel' && /Cub's Fury/.test(sr.opts) && sr.atk === sr.amr && sr.ph === 'aflurry', 'Sariel should hit like Amroth and use a multi-hit combo: ' + JSON.stringify(sr));
+    const cf = await g_(async () => { const g = window.__g, B = g.BATTLE, f = B.foes[0], hp0 = f.hp; B.af.i = 5; await new Promise(r => setTimeout(r, 450)); const mid = B.heroes.find(h => h.id === 'amroth').ox; await new Promise(r => setTimeout(r, 1200)); return { n: B.af.n, dmg: hp0 - f.hp, mid, end: B.heroes.find(h => h.id === 'amroth').ox, low: Math.min(...g.PARTY_ORDER.map(id => g.HEROES[id].maxHp)) === g.HEROES.spar.maxHp }; });
+    check(cf.n === 5 && cf.dmg >= 4 && cf.mid > 20 && cf.end === 0 && cf.low, "Cub's Fury: five beats, then Amroth dashes in for one heavy blow; Sariel has the lowest HP: " + JSON.stringify(cf));
     await wait(400); await p.screenshot({ path: path.join(SHOTS, `ch3-heal-${vp}.png`) });
   },
   async 'jak-leaves'(p) {
