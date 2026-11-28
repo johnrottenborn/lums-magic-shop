@@ -187,15 +187,15 @@ function readProg(){try{return JSON.parse(localStorage.getItem(PROG_KEY)||'{}')|
 function recordPrologue(stars,badges,keep){try{const p=readProg();p.prologue=p.prologue||{};p.prologue.done=1;p.prologue.best=Math.max(p.prologue.best||0,stars);p.prologue.badges=p.prologue.badges||{};for(const b of badges||[])if(b.got)p.prologue.badges[b.id]=1;const KR={duskflower:1,moonmint:2,mooncharm:3},cur=p.prologue.keepsake&&KR[p.prologue.keepsake.id]?p.prologue.keepsake:null;if(keep&&(!cur||KR[cur.id]<KR[keep.id]))p.prologue.keepsake=keep;else p.prologue.keepsake=cur;localStorage.setItem(PROG_KEY,JSON.stringify(p));}catch(e){}}
 const PLAYTEST=true; // New Game always opens chapter select; Chapter 1 stays locked (greyed) until the Prologue is finished
 const CHSEL={on:false,sel:0,confirm:null,note:'',noteT:0,hits:[],t:0};
-const CHAPTERS=[{id:'prologue',title:'Prologue'},{id:'ch1',title:'Chapter 1',art:'ch1_card'},{id:'ch2',title:'Chapter 2',art:'ch2_card'}];   /* the Chapter 2 playtest cards were removed from the menu; tests still reach them with chPlaytestBreezeway()/chPlaytestIsle() */
+const CHAPTERS=[{id:'prologue',title:'Prologue'},{id:'ch1',title:'Chapter 1',art:'ch1_card'},{id:'ch2',title:'Chapter 2',art:'ch2_card'},{id:'ch3',title:'Chapter 3',get sub(){return chLocked(this)?'Finish Chapter 2 to unlock':'';}}];   /* no card art or name yet */   /* the Chapter 2 playtest cards were removed from the menu; tests still reach them with chPlaytestBreezeway()/chPlaytestIsle() */
 /* each chapter opens once the one before it is finished */
-const CH_NEEDS={ch1:['prologue','Prologue'],ch2:['ch1','Chapter 1']};
+const CH_NEEDS={ch1:['prologue','Prologue'],ch2:['ch1','Chapter 1'],ch3:['ch2','Chapter 2']};
 const chLocked=c=>{const n=CH_NEEDS[c.id];if(!n)return false;const p=readProg();return !(p[n[0]]&&p[n[0]].done);};
 function openChapterSelect(){CHSEL.on=true;CHSEL.sel=0;CHSEL.confirm=null;CHSEL.t=0;sfxPage&&sfxPage(.8);}
 function chselPick(i){CHSEL.sel=i;if(chLocked(CHAPTERS[i])){CHSEL.note='Finish the '+CH_NEEDS[CHAPTERS[i].id][1]+' to unlock '+CHAPTERS[i].title;CHSEL.noteT=2.6;return;}CHSEL.confirm=i;sfxPage&&sfxPage(.6);}
 function chselStart(){const c=CHAPTERS[CHSEL.confirm];CHSEL.confirm=null;
   if(c.id==='prologue'){CHSEL.on=false;newGame();return;}
-  if(chLocked(c))return;CHSEL.on=false;if(c.id==='ch2home'){startChapter2();c2Skip();WB10.st=2;chPlaytestBreezeway();return;}if(c.id==='ch2isle'){startChapter2();c2Skip();WB10.st=2;chPlaytestIsle();return;}if(c.id==='ch2')startChapter2();else startChapter1();}
+  if(chLocked(c))return;CHSEL.on=false;if(c.id==='ch2home'){startChapter2();c2Skip();WB10.st=2;chPlaytestBreezeway();return;}if(c.id==='ch2isle'){startChapter2();c2Skip();WB10.st=2;chPlaytestIsle();return;}if(c.id==='ch3')startChapter3();else if(c.id==='ch2')startChapter2();else startChapter1();}
 function chselTap(x,y){for(const h of CHSEL.hits)if(x>h.x&&x<h.x+h.w&&y>h.y&&y<h.y+h.h){h.act();return;}if(CHSEL.confirm!==null)CHSEL.confirm=null;}
 function chselKey(code){if(CHSEL.confirm!==null){if(code==='Enter'||code==='Space'||code==='KeyE')chselStart();if(code==='Escape'||code==='Backspace')CHSEL.confirm=null;return;}
   if(code==='ArrowUp'||code==='KeyW')CHSEL.sel=Math.max(0,CHSEL.sel-1);if(code==='ArrowDown'||code==='KeyS')CHSEL.sel=Math.min(CHAPTERS.length-1,CHSEL.sel+1);

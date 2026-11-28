@@ -59,12 +59,12 @@ function hsHug(){
     ['Alma',"Amroth is outside. Go and speak with him before you leave."]],false,()=>{HST.st=6;WEVENT.on=false;GOAL.tag='';GOAL.text='';}),400);}
 /* outside in the morning: Amroth by the pond */
 const HSAMR={x:0,y:0};
-function hsAmrPos(){const [x,y]=pierPt(330,118);return [HOMEX+x,HOMEY+y];}   /* out at the end of the fishing pier */
-function hsAmrTalk(){if(HST.st<6)return;if(HST.st>6){say("Follow the coast east to Breezevale Cove.");return;}
+function hsAmrPos(){if(CH>=3)return c3AmrPos();const [x,y]=pierPt(330,118);return [HOMEX+x,HOMEY+y];}   /* out at the end of the fishing pier */
+function hsAmrTalk(){if(CH>=3){c3AmrTalk();return;}if(HST.st<6)return;if(HST.st>6){say("Follow the coast east to Breezevale Cove.");return;}
   talk([['Amroth',"Good morning, Lum."],['Amroth',"I must stay here and protect Alma and the baby, in case the demons come."],
     ['Amroth',"You are more than capable. You can make it to Breezevale on your own and seek guidance from Sage Luma."],
     ['Amroth',"I’ve opened the gate. The grove beyond it is a good place to gather what you need before the long road."],['Amroth',"Come back and rest whenever you like. Then follow the coast east."]],false,()=>{HST.st=7;hsGoal('Follow the coast east to Breezevale Cove');});}
-function updateHomeStory(dt){HST.t+=dt;
+function updateHomeStory(dt){HST.t+=dt;updateC3(dt);
   if(SCENE==='thorn'&&inHome()&&C2.joined&&!HST.st)hsArrive();
   /* chimney smoke */
   if(SCENE==='thorn'&&inHome()&&Math.random()<dt*7){const [cx,cy]=[HOMEX+HOME.cot.x+31,HOMEY+HOME.cot.y-352];HST.smoke.push({x:cx+rnd(-5,5),y:cy,vx:rnd(4,14),vy:rnd(-28,-18),r:rnd(9,14),t:0});}
@@ -77,7 +77,7 @@ function updateHomeStory(dt){HST.t+=dt;
   if(SCENE==='dun'&&DUN.room===21&&HST.st===3&&HST.almaGo&&!DLG.active){if(almaWalk(AMR.x+80,AMR.y+2,70,dt)){ALMA.face=-1;ALMA.dir='side';HST.almaGo=0;}}   /* Alma goes to stand beside Amroth */
   if(SCENE==='dun'&&DUN.room===21&&HST.st>=4&&ALMA.on&&!ALMA.moving&&!ALMA.sit){ALMA.dir='side';ALMA.face=lum.x<ALMA.x?-1:1;}   /* she stays by the fire and turns to follow Lum */
   if(hsHome2()&&SCENE==='dun'&&DUN.room===21){AMR.x=872;AMR.y=700;AMR.moving=0;AMR.dir='side';AMR.face=-1;}   /* inside beside Alma's chair */
-  if(HST.amrOut&&SCENE==='thorn'){const [x,y]=hsAmrPos();AMR.x=x;AMR.y=y;AMR.moving=0;AMR.dir='side';AMR.face=1;}   /* looking out over the water */
+  if(HST.amrOut&&SCENE==='thorn'&&CH<3){const [x,y]=hsAmrPos();AMR.x=x;AMR.y=y;AMR.moving=0;AMR.dir='side';AMR.face=1;}   /* looking out over the water */
   if(HST.heart>0&&!DLG.active&&!HST.meet&&!HST.walk&&HST.st!==5)HST.heart=Math.max(0,HST.heart-dt);}
 /* night over the home (screen space), with warm windows and door; the chimney smoke in world space */
 function drawHomeSky(){if(SCENE!=='thorn'||!inHome())return;drawHomeNight();if(!HST.smoke.length)return;ctx.save();ctx.setTransform(DPR,0,0,DPR,0,0);for(const s of HST.smoke){const x=(s.x-cam.x)*zoom+W/2,y=(s.y-cam.y)*zoom+H/2;ctx.globalAlpha=Math.max(0,.32*(1-s.t/4))*(hsNight()?.8:1);ctx.fillStyle=hsNight()?'#9aa0ab':'#cfd2d6';ctx.beginPath();ctx.arc(x,y,s.r*zoom,0,TAU);ctx.fill();}ctx.restore();}
@@ -94,7 +94,7 @@ function hsBabyAdmire(){WEVENT.on=true;lum.state='idle';lum.vx=lum.vy=0;
   talk([['Alma',"Look at him, Amroth. Such a sweet little face."],['Amroth',"And those eyes… I have never seen eyes so bright and kind."],
     ['Alma',"He’s fast asleep now. You should be too, Lum. Go and rest upstairs."],['Amroth',"Rest well, Lum. We will be right here."]],false,()=>{WEVENT.on=false;});}
 /* back home with Jak in the party: Amroth is inside beside Alma, and they talk about the baby */
-function hsHome2(){return HST.st>=7&&typeof jak2In==='function'&&jak2In();}
+function hsHome2(){return HST.st>=7&&(typeof jak2In==='function'&&jak2In()||CH>=3&&C3.amrIn);}   /* Amroth waits inside (Chapter 2 with Jak; Chapter 3 once he asks Lum in) */
 /* the baby grows far too fast: after each Chapter 2 milestone Alma (and Amroth, once he is home) have something new to say, and they are still deciding on his name.
    Only the newest unlocked stage plays (`C2.babyN` = stages seen). Placeholder lines for the designer to revise */
 const BABY=[

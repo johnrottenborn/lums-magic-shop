@@ -8,7 +8,7 @@ function snapshot(){if(C1.jak)C1.jakHp=HEROES.jak.hp;return {v:1,sv:SAVE_VER,t:D
   f:{kingState,bucketTaken,gotEquip,slimesDone,slimesSpawned,wellVisited,gardenDone,sslimesSpawned,mimicState,studyVisited,shedChestOpen,shedSpawned,shedVisited,pondSlimesSpawned,pondDone,shroudTaken,pondVisited,shopTalk,restTalk,skelDone,sayCount,slugTalk,slimeTalk,poolTalk},
   left:{well:WSLIMES.length,study:SSLIMES.length,shed:SHSLIMES.length,pond:PSLIMES.length,slugs:SLUGS.filter(g=>g.kind!=='slugking').length,skels:WSKELS.length},
   ch:CH,c1:{...C1,endCard:0,title:0},powders:{...POWDERS},wf:WFOES.map(g=>g.id),c1built:woodsC1Built,
-  night:{on:NIGHT.on,cut:NIGHT.cut,rain:NIGHT.rain,nudged:NIGHT.nudged||0},stats:STATS,wev:{mid:WEV.mid,circle:WEV.circle,cem:WEV.cem,entered:WEV.entered||0},shopDoor,pondReturn,c2:CH>=2?c2Snapshot():null};}
+  night:{on:NIGHT.on,cut:NIGHT.cut,rain:NIGHT.rain,nudged:NIGHT.nudged||0},stats:STATS,wev:{mid:WEV.mid,circle:WEV.circle,cem:WEV.cem,entered:WEV.entered||0},shopDoor,pondReturn,c2:CH>=2?c2Snapshot():null,c3:CH>=3?savePrim(C3):null};}
 /* a finished chapter leaves no save behind, so the title menu drops Continue. Call finishChapter() at the end of every chapter. */
 function clearSave(){try{localStorage.removeItem(SAVE_KEY);}catch(e){}}
 function finishChapter(id){try{const p=readProg();p[id]=Object.assign(p[id]||{},{done:1});localStorage.setItem(PROG_KEY,JSON.stringify(p));}catch(e){}clearSave();SAVEC.finished=1;}
@@ -39,7 +39,7 @@ function applySaveC2(d){const s=d.c2||{};startChapter2();c2Skip();SAVEC.finished
   GVT.t=99;BWT.t=99;BVT.t=99;IST.t=99;   /* no area title on a continued game */
   if(C2.joined)resetAmrFollow();if(C2.jak)resetJak2Follow();
   GOAL.tag='TASK';GOAL.text=(d.goal&&d.goal.text)||'';HINT.goalT=0;}
-function applySave(d){if(d.ch===2&&d.c2){applySaveC2(d);return;}if(d.ch===1){applySaveC1(d);return;}const f=d.f||{};if(d.stats)Object.assign(STATS,d.stats,{found:Object.assign({},d.stats.found||{})});
+function applySave(d){if(d.ch===3&&d.c2){applySaveC2(d);CH=3;Object.assign(C3,d.c3||{},{title:0});C3.boy.x=0;C3.boy.mode=C3.amrIn?'practice':'idle';NIGHT.rain=false;return;}if(d.ch===2&&d.c2){applySaveC2(d);return;}if(d.ch===1){applySaveC1(d);return;}const f=d.f||{};if(d.stats)Object.assign(STATS,d.stats,{found:Object.assign({},d.stats.found||{})});
   ({bucketTaken,gotEquip,slimesDone,wellVisited,gardenDone,mimicState,studyVisited,shedChestOpen,shedVisited,pondDone,shroudTaken,pondVisited,shopTalk,restTalk,skelDone,sayCount,slugTalk,slimeTalk,poolTalk}=Object.assign({bucketTaken,gotEquip,slimesDone,wellVisited,gardenDone,mimicState,studyVisited,shedChestOpen,shedVisited,pondDone,shroudTaken,pondVisited,shopTalk,restTalk,skelDone,sayCount,slugTalk,slimeTalk,poolTalk},f));
   BAG.length=0;BAG.push(...(d.bag||[]));for(const k in MATS)delete MATS[k];Object.assign(MATS,d.mats||{});dropRetiredMats();if(d.party&&d.party.cosmic)Object.assign(PARTY[HERO],d.party.cosmic);HEROES[HERO].hp=clamp(d.hp||HEROES[HERO].maxHp,1,HEROES[HERO].maxHp);
   if(gardenDone>=5&&!BAG.includes('shedkey')&&!shedChestOpen)BAG.push('shedkey');

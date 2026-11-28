@@ -1408,6 +1408,29 @@ const CASES = {
     const r2 = await g_(async () => { const g = window.__g, L = [['Lum', 'Seen line one.'], ['Lum', 'Seen line two.']]; g.talk(L, false, null); g.dlgSkip(); await new Promise(r => setTimeout(r, 50)); g.talk(L, false, null); const can = g.canSkipDlg(); let ended = 0; g.DLG.onEnd = () => { ended = 1; }; g.dlgSkip(); await new Promise(r => setTimeout(r, 50)); return { can, ended, active: g.DLG.active }; });
     check(r2.can && r2.ended, 'a conversation read before should offer Skip and skipping should finish it: ' + JSON.stringify(r2));
   },
+  async 'ch3-opening'(p) {
+    // Chapter 3: Sage Luma sends Lum to King Bramt in Noma; Jak's door is "Gone Fishing"; at Amroth's home the boy swings a wooden sword and Amroth asks Lum inside
+    const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop', g_ = (f, a) => p.evaluate(f, a);
+    const end = async () => { for (let i = 0; i < 8; i++) { if (!await g_(() => window.__g.DLG.active)) break; await g_(() => { const g = window.__g; g.DLG.active = false; const cb = g.DLG.onEnd; g.DLG.onEnd = null; cb && cb(); }); await wait(250); } };
+    await g_(() => window.__g.startChapter3()); await wait(2600);
+    const l = await g_(() => window.__g.DLG.active ? window.__g.DLG.lines.map(x => x[1]).join(' ') : '');
+    check(/Noma/.test(l) && /King Bramt/.test(l), 'Sage Luma should send Lum to King Bramt in Noma: ' + l.slice(0, 80));
+    await p.screenshot({ path: path.join(SHOTS, `ch3-luma-${vp}.png`) });
+    await end(); await wait(300);
+    check(await g_(() => { const g = window.__g; return g.C3.st === 2 && g.CH === 3 && /friends/.test(g.GOAL.text) && g.PARTY_ORDER.join() === 'lum'; }), 'after Sage Luma: task to ask friends, Lum alone');
+    await g_(() => { const g = window.__g; setInterval(() => g.THFOES.forEach(f => f.calm = 99), 50); g.enterBreezevale(); }); await wait(900);
+    const r = await g_(() => { const g = window.__g, h = g.BVHOUSES[4], x = g.BVX + g.bvDoorX(h), d = g.THINTS().find(o => o.door && Math.abs(o.x - x) < 2); g.DLG.active = false; g.lum.quip = ''; d.onInteract(); return (g.lum.quip || '') + (g.DLG.active ? g.DLG.lines[0][1] : ''); });
+    check(/Gone Fishing/.test(r), "Jak's door should be locked in Chapter 3: " + r);
+    await g_(() => { const g = window.__g; g.DLG.active = false; g.enterHome(); const [x, y] = g.c3Pt(g.C3YARD.amr); g.lum.x = x - 200; g.lum.y = y + 40; g.cam.x = g.lum.x; g.cam.y = g.lum.y; }); await wait(1500);
+    const a = await g_(() => window.__g.DLG.active ? window.__g.DLG.lines.map(x => x[1]).join(' ') : '');
+    check(/better with a blade/.test(a), 'Amroth should talk about the boy when Lum walks up: ' + a.slice(0, 80));
+    await p.screenshot({ path: path.join(SHOTS, `ch3-yard-${vp}.png`) });
+    await end(); await wait(1200);
+    check(await g_(() => window.__g.AMR.moving === 1 || window.__g.C3.walk === 1), 'Amroth should walk to the door');
+    for (let i = 0; i < 30 && !await g_(() => window.__g.C3.amrIn); i++) await wait(250);
+    check(await g_(() => { const g = window.__g; return g.C3.amrIn && g.C3.boy.mode === 'practice' && /inside/.test(g.GOAL.text) && g.hsHome2(); }), 'the boy should practice at the tree and Amroth go inside');
+    await p.screenshot({ path: path.join(SHOTS, `ch3-practice-${vp}.png`) });
+  },
   async 'jak-leaves'(p) {
     // back in Breezevale after Mai joins Lum, Jak sends Lum to Sage Luma, plans to trade the serpent skin in the harbor town, and walks home; he waits in the islet house after
     const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop', g_ = (f, a) => p.evaluate(f, a);
@@ -1548,7 +1571,7 @@ const CASES = {
   async 'chapter-select-lock'(p) {
     const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop';
     await p.evaluate(() => { localStorage.removeItem('lums-magic-shop-progress'); window.__g.openChapterSelect(); }); await wait(900);
-    check(await p.evaluate(() => window.__g.CHAPTERS.map(c => c.id).filter(id => id !== 'ch2home' && id !== 'ch2isle').join(',')) === 'prologue,ch1,ch2', 'chapter list should be Prologue, Chapter 1, Chapter 2');
+    check(await p.evaluate(() => window.__g.CHAPTERS.map(c => c.id).filter(id => id !== 'ch2home' && id !== 'ch2isle').join(',')) === 'prologue,ch1,ch2,ch3', 'chapter list should be Prologue, Chapter 1, Chapter 2, Chapter 3');
     await p.screenshot({ path: path.join(SHOTS, `chapter-select-locked-${vp}.png`) });
     check(await p.evaluate(() => { const g = window.__g; g.chselPick(1); return g.CHSEL.confirm === null && /unlock/.test(g.CHSEL.note); }), 'Chapter 1 could be picked before finishing the Prologue');
     await p.evaluate(() => { localStorage.setItem('lums-magic-shop-progress', JSON.stringify({ prologue: { done: 1, best: 5 } })); const g = window.__g; g.CHSEL.noteT = 0; g.CHSEL.confirm = null; });
@@ -1558,6 +1581,7 @@ const CASES = {
     await p.screenshot({ path: path.join(SHOTS, `chapter-select-open-${vp}.png`) });
     check(await p.evaluate(() => { const g = window.__g; g.chselPick(1); return g.CHSEL.confirm === 1; }), 'Chapter 1 stayed locked after finishing the Prologue');
     check(await p.evaluate(() => { const g = window.__g; g.CHSEL.confirm = null; g.chselPick(2); return g.CHSEL.confirm === 2; }), 'Chapter 2 stayed locked after finishing Chapter 1');
+    check(await p.evaluate(() => { const g = window.__g; g.CHSEL.confirm = null; g.chselPick(3); return g.CHSEL.confirm === null && /Chapter 2/.test(g.CHSEL.note); }), 'Chapter 3 should stay locked until Chapter 2 is finished');
   },
   async 'ch2-lose-respawn'(p) {
     // losing a battle in Chapter 2 wakes Lum at the way into the area she was in, never back in Chapter 1's Stranglethorn
