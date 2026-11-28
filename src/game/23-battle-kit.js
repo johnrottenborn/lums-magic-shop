@@ -25,7 +25,7 @@ function foeAbility(f,h,dmg,c){const B=BATTLE,S=bS(),t=f.type,fc=foeCenter(f),hx
   if(t==='bat'&&dmg>0){const heal=Math.min(dmg,f.max-f.hp);f.hp+=heal;f.showHp=1;pop(fc.x,fc.top-50*S,'Life Leech!','info');if(heal>0)setTimeout(()=>{if(BATTLE.on)pop(fc.x+20*S,fc.y,'+'+heal,'heal');},350);
     for(let i=0;i<12;i++)B.fx.push({k:'drain',sx:hx+rnd(-14,14)*S,sy:hy+rnd(-30,30)*S,tx:fc.x,ty:fc.y,t:-i*.035,max:.6,a:rnd(-1,1)});}
   if(f.web){f.web=0;if(!c.guard&&!h.ko){h.stuck=1;pop(hx,h.y-230*S,'Webbed!','info');for(let i=0;i<10;i++)B.fx.push({k:'shard',x:hx,y:hy,vx:rnd(-120,120)*S,vy:rnd(-90,60)*S,rot:rnd(0,TAU),s:rnd(5,9)*S,t:0,max:rnd(.5,.8)});}}
-  if((t==='spider'||t==='bigspider')&&dmg>0&&!c.guard){h.poison=3;pop(hx,h.y-200*S,'Poisoned!','info');for(let i=0;i<10;i++)B.fx.push({k:'bub',x:hx+rnd(-20,20)*S,y:hy+rnd(0,40)*S,vy:-rnd(40,90)*S,s:rnd(3,6)*S,t:-rnd(0,.3),max:rnd(.6,1)});}
+  if((t==='spider'||t==='bigspider'||t==='viper')&&dmg>0&&!c.guard){h.poison=3;pop(hx,h.y-200*S,'Poisoned!','info');for(let i=0;i<10;i++)B.fx.push({k:'bub',x:hx+rnd(-20,20)*S,y:hy+rnd(0,40)*S,vy:-rnd(40,90)*S,s:rnd(3,6)*S,t:-rnd(0,.3),max:rnd(.6,1)});}
   if(SLIMEY(t)&&dmg>=1&&!h.stuckImm){h.stuck=1;pop(hx,h.y-200*S,'Stuck!','info');for(let i=0;i<12;i++)B.fx.push({k:'goo',x:hx+rnd(-10,10)*S,y:h.y-60*S,vx:rnd(-120,120)*S,vy:-rnd(60,200)*S,s:rnd(3,7)*S,t:0,max:rnd(.5,.8)});}
   if((t==='ffox'||t==='gwisp')&&dmg>0&&!c.guard&&!h.ko){h.poison=Math.min(6,(h.poison||0)+2);pop(hx,h.y-200*S,h.poison>2?'Poison ×'+h.poison+'!':'Poisoned!','info');for(let i=0;i<10;i++)B.fx.push({k:'bub',x:hx+rnd(-20,20)*S,y:hy+rnd(0,40)*S,vy:-rnd(40,90)*S,s:rnd(3,6)*S,t:-rnd(0,.3),max:rnd(.6,1)});}   /* the grove's foes: poison that stacks (2 turns a hit, up to 6) */
   if((t==='vixen'||t==='bigvixen'||t==='rvixen'||t==='ffox')&&!c.guard){const have=ING_ORDER.filter(id=>(MATS[id]||0)>0);
@@ -224,3 +224,19 @@ function drawBattleTurtle(f){const S=bS(),B=BATTLE,me=B.foes[B.foeI]===f,x=f.x+f
   else{const im=IMG.turtle_hd;if(ready(im)){const w=Hb*im.naturalWidth/im.naturalHeight;if(fl)ctx.filter='brightness(1.8)';ctx.drawImage(im,x-w/2,y-Hb-6*S+bob,w,Hb);ctx.filter='none';}}
   ctx.restore();
   if(f.showHp>0&&!f.dead){const bw=70*S,bx=x-bw/2,by=y+14*S;ctx.save();ctx.globalAlpha=Math.min(1,f.showHp*3);ctx.fillStyle='rgba(20,20,30,.55)';rr(bx-2,by-2,bw+4,10,5);ctx.fill();ctx.fillStyle='#7ee08a';rr(bx,by,bw*f.hp/f.max,6,3);ctx.fill();ctx.restore();}}
+
+/* ---- the Jade Viper (placeholder name and stats; not on a map yet; its bite poisons like a spider's). The designer's watercolours kept at full detail:
+   the coiled painting `viper_coil` (faces left) at rest, the slithering painting `viper_slither` (faces left) for later map use, and the sheet `viper`
+   (`C1ATL.viper`, 400x190 cells: slide, slide2 face left; slider faces right; coil rears up facing right, frame 3 the open-mouthed strike) ---- */
+C1ATL.viper={"cw":400,"ch":190,"rows":{"slide":[0,4],"slide2":[1,4],"slider":[2,4],"coil":[3,5]}};
+FOE_TYPES.viper={name:'Jade Viper',hp:16,atk:5,def:1,drop:null};
+function drawBattleViper(f){const S=bS(),B=BATTLE,me=B.foes[B.foeI]===f,x=f.x+f.ox,y=f.y+f.oy,Hb=Math.min(165*S,W*.3)*(f.s||1);let al=1;if(f.dead){al=Math.max(0,1-f.dead/.7);if(al<=0)return;}
+  const ph=B.phase,fl=f.hit>0?Math.min(1,f.hit*3):0;bshadow(x,y,Hb*.6,Hb*.1,.3*al);let an=null,fi=0,flip=false;
+  if(me&&ph==='foeWind'){an='coil';fi=Math.floor(T*5)%3;flip=true;}   /* rearing up, ready to strike */
+  else if(me&&ph==='foeLeap'){an='coil';fi=3;flip=true;}   /* the strike: jaws open */
+  else if(me&&ph==='foeBack'){an='slide2';fi=Math.floor(T*8)%4;}
+  ctx.save();ctx.globalAlpha=al;
+  if(an)c1Frame(ctx,'viper',an,fi,x,y,Hb*1.25,flip,al,fl);
+  else{const im=IMG.viper_coil;if(ready(im)){const w=Hb*im.naturalWidth/im.naturalHeight,sw=Math.sin(T*1.8+(f.ph||0));ctx.translate(x,y);ctx.transform(1,0,sw*.03,1,0,0);if(fl)ctx.filter='brightness(1.8)';ctx.drawImage(im,-w/2,-Hb*(1+.01*sw),w,Hb*(1+.01*sw));ctx.filter='none';}}   /* a slow sway while it waits */
+  ctx.restore();
+  if(f.showHp>0&&!f.dead){const bw=60*S,bx=x-bw/2,by=y+14*S;ctx.save();ctx.globalAlpha=Math.min(1,f.showHp*3);ctx.fillStyle='rgba(20,20,30,.55)';rr(bx-2,by-2,bw+4,10,5);ctx.fill();ctx.fillStyle='#7ee08a';rr(bx,by,bw*f.hp/f.max,6,3);ctx.fill();ctx.restore();}}

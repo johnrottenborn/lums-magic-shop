@@ -1471,6 +1471,17 @@ const CASES = {
     await g_(() => { const B = window.__g.BATTLE; B.foes[0].hit = .3; }); await wait(60);
     await p.screenshot({ path: path.join(SHOTS, `turtle-shell-${vp}.png`) });
   },
+  async 'viper-foe'(p) {
+    // the Jade Viper enemy: the detailed coiled painting at rest, rearing and striking from its sheet (placeholder stats; not on a map yet)
+    const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop', g_ = f => p.evaluate(f);
+    await g_(() => { window.__g.startChapter2(); window.__g.c2Skip(); }); await wait(1500);
+    await g_(() => window.__g.startEncounter({ kind: 'viper', scene: 'thorn', x: 0, y: 0, s: 1, pack: 1, calm: 0 }, 'normal'));
+    for (let i = 0; i < 60; i++) { await wait(150); if (await g_(() => window.__g.BATTLE.phase) === 'heroMenu') break; }
+    check(await g_(() => window.__g.BATTLE.foes[0].name) === 'Jade Viper', 'the viper should be in battle'); await wait(1800);
+    await p.screenshot({ path: path.join(SHOTS, `viper-idle-${vp}.png`) });
+    await g_(() => { const B = window.__g.BATTLE; B.foeI = 0; B.phase = 'foeLeap'; B.t = 0; B.leapD = 9; B.foes[0].tgt = B.heroes[0]; }); await wait(80);
+    await p.screenshot({ path: path.join(SHOTS, `viper-strike-${vp}.png`) });
+  },
   async 'jak-leaves'(p) {
     // back in Breezevale after Mai joins Lum, Jak sends Lum to Sage Luma, plans to trade the serpent skin in the harbor town, and walks home; he waits in the islet house after
     const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop', g_ = (f, a) => p.evaluate(f, a);
