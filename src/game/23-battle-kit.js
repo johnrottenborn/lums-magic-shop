@@ -246,7 +246,7 @@ function drawBattleViper(f){const S=bS(),B=BATTLE,me=B.foes[B.foeI]===f,x=f.x+f.
    walk 4, run 4, act 6 = two dagger slashes, a lunge, a startled flinch, knocked back, sitting dazed) ---- */
 C1ATL.goblin={"cw":260,"ch":250,"rows":{"walk":[0,4],"run":[1,4],"act":[2,6]}};
 FOE_TYPES.goblin={name:'Patchwork Goblin',hp:14,atk:4,def:1,drop:null};
-function drawBattleGoblin(f){const S=bS(),B=BATTLE,me=B.foes[B.foeI]===f,x=f.x+f.ox,y=f.y+f.oy,Hb=Math.min(175*S,W*.34)*(f.s||1);const ph=B.phase,fl=f.hit>0?Math.min(1,f.hit*3):0;
+function drawBattleGoblin(f){const S=bS(),B=BATTLE,me=B.foes[B.foeI]===f,x=f.x+f.ox,y=f.y+f.oy,Hb=Math.min(112*S,W*.27)*(f.s||1);const ph=B.phase,fl=f.hit>0?Math.min(1,f.hit*3):0;
   let an=null,fi=0,flip=true,al=1;
   if(f.dead){an='act';fi=f.dead<.25?4:5;al=Math.max(0,1-Math.max(0,f.dead-.35)/.6);if(al<=0)return;}   /* knocked back, then sits down dazed and fades */
   else if(me&&ph==='foeWind'){an='act';fi=2;}
