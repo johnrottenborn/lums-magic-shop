@@ -1484,6 +1484,8 @@ const CASES = {
     // wading through a river
     await g_(() => { const g = window.__g; for (let y = g.VFY + 2500; y > g.VFY + 1500; y -= 6) { const x = g.VFX + 900; if (g.vfRiverDist(x, y) < 10 && g.vfFree(x, y)) { g.lum.x = x; g.lum.y = y; break; } } g.cam.x = g.lum.x; g.cam.y = g.lum.y; }); await wait(900);
     check(await g_(() => window.__g.vfRiverDist(window.__g.lum.x, window.__g.lum.y) < 36), 'Lum should be able to stand in a river');
+    check(await g_(() => /flooded the forest/.test((window.__g.DLG.lines || []).map(l => l[1]).join(' ')) && window.__g.DLG.lines[0][0] === 'Alma'), 'Alma should remark that the rains flooded the forest');
+    await p.screenshot({ path: path.join(SHOTS, `vf-alma-flood-${vp}.png`) }); await end(); await wait(300);
     await p.screenshot({ path: path.join(SHOTS, `vf-river-${vp}.png`) });
     await g_(() => { const g = window.__g; g.lum.x = g.VFX + g.VF_OUT.x - 60; g.lum.y = g.VFY + g.VF_OUT.y + 40; g.cam.x = g.lum.x; g.cam.y = g.lum.y; }); await wait(900);
     await p.screenshot({ path: path.join(SHOTS, `vf-meet-${vp}.png`) });

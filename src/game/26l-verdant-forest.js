@@ -66,3 +66,6 @@ function addVFFoes(){if(CH<3||typeof VFX==='undefined'||THFOES.some(g=>g.vf))ret
   for(const [lx,ly,kind,pack] of [[700,2300,'ffox',1],[1300,2000,'gwisp',1],[1900,2600,'ffox',2],[600,1500,'gwisp',2],[1500,1500,'dryad',1],[1100,600,'ffox',1],[1900,1100,'gwisp',1],[2100,700,'dryad',1]]){
     const x=VFX+lx,y=VFY+ly,myid=id++;if(dead.has(myid)||!vfFree(x,y))continue;
     THFOES.push({kind,vf:1,scene:'thorn',x,y,hx:x,hy:y,tx:x,ty:y,cx:x-TCW/2,cy:y-TCH/2,s:1,pack,calm:1,dead:0,t:rnd(0,4),ph:rnd(0,TAU),face:-1,id:myid,bl:0});}}
+/* the first time the party reach one of the little rivers, Alma sees the rains have flooded the forest (placeholder lines) */
+function updateVF(){if(!inVF()||SCENE!=='thorn'||CH<3||!C3.party||C3.vfFlood||DLG.active||FADE.dir||BATTLE.on||BATTLE.pending||WEVENT.on||MENU.open)return;
+  if(vfRiverDist(lum.x,lum.y)<VF_RW+110){C3.vfFlood=1;lum.vx=lum.vy=0;talk([['Alma',"Oh my… look at all these little streams running through the trees."],['Alma',"The heavy rains must have flooded the forest. These were never here before."]]);}}
