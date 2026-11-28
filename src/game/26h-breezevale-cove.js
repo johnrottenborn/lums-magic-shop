@@ -192,6 +192,19 @@ const BVNPC=[{room:25,atlas:'breeze_boy',x:850,y:525,name:'Breezevale Merchant',
   {room:31,atlas:'luma',x:688,y:618,name:'Sage Luma',slim:1,idle:1,back:1,sc:.92,lines:[]},   /* Alma's older sister; she talks in lumaTalk */
   {room:27,atlas:'jak2',x:960,y:700,name:'Jak',sc:.97,slim:1,gone:()=>jak2In()||!C2.lumaMet,lines:[["…"]]},   /* home only once Lum has met Sage Luma, until he joins her */
   {room:26,atlas:'breeze_girl',x:205,y:694,name:'Townswoman',lines:[["Would you like some tea? The kettle's still warm."]],rain:[["The tea tastes better with the sun in the window, don't you think?"]],pre:[["Listen to that rain. So calming… perfect sleeping weather."],["It's been raining a whole week now!"]],preDry:[["A whole week of rain, and now not a cloud. Strange weather we've had."]],post:[["Jak lives in the shell house across the little bridge. He might be able to help you."]]}];
+/* ---- townsfolk variety (for the Chapter 3 port town): the two Breezevale sheets recoloured and resized.
+   folkSheet(base,look) makes (once) a copy of the sheet whose clothes and hair are hue-shifted, leaving skin tones alone, and registers it as its own
+   atlas; an NPC entry can then use atlas:folkSheet('breeze_boy','teal') and sc for height. FOLK_LOOKS are the presets. ---- */
+const FOLK_LOOKS={rose:{hue:-40,sat:1.1,lit:1},teal:{hue:150,sat:1,lit:1},moss:{hue:75,sat:.8,lit:.95},plum:{hue:-90,sat:.9,lit:.9},
+  gold:{hue:25,sat:1.25,lit:1.05},slate:{hue:180,sat:.35,lit:.9},rust:{hue:-15,sat:1.2,lit:.85},sky:{hue:110,sat:.9,lit:1.08}};
+function folkSheet(base,look){const key=base+'_'+look;if(IMG[key])return key;const L=FOLK_LOOKS[look],src=IMG[base];if(!L||!ready(src))return base;
+  const cv=document.createElement('canvas');cv.width=src.naturalWidth;cv.height=src.naturalHeight;const g=cv.getContext('2d');g.drawImage(src,0,0);const d=g.getImageData(0,0,cv.width,cv.height),px=d.data;
+  for(let i=0;i<px.length;i+=4){if(px[i+3]<8)continue;let r=px[i]/255,gg=px[i+1]/255,b=px[i+2]/255;const mx=Math.max(r,gg,b),mn=Math.min(r,gg,b),l=(mx+mn)/2,dl=mx-mn;if(dl<.06)continue;
+    const sa=dl/(1-Math.abs(2*l-1));let h=mx===r?((gg-b)/dl)%6:mx===gg?(b-r)/dl+2:(r-gg)/dl+4;h*=60;if(h<0)h+=360;
+    if((h>=335||h<52)&&sa>.12&&(l>.52||(h<42&&sa>.22&&l>.4)))continue;   /* skin and blush: leave them */
+    h=(h+L.hue+360)%360;const s2=Math.min(1,sa*L.sat),l2=Math.min(1,l*L.lit),c=(1-Math.abs(2*l2-1))*s2,x=c*(1-Math.abs((h/60)%2-1)),m=l2-c/2;
+    const [R,G,B]=h<60?[c,x,0]:h<120?[x,c,0]:h<180?[0,c,x]:h<240?[0,x,c]:h<300?[x,0,c]:[c,0,x];px[i]=(R+m)*255;px[i+1]=(G+m)*255;px[i+2]=(B+m)*255;}
+  g.putImageData(d,0,0);const im=new Image();im.src=cv.toDataURL();IMG[key]=im;C1ATL[key]=C1ATL[base];return key;}
 function drawBVNpc(n){const k=dunH(n.y)/151,face=lum.x>n.x;ctx.save();ctx.fillStyle='rgba(10,10,20,.25)';ctx.beginPath();ctx.ellipse(n.x,n.y,22*k,7*k,0,0,TAU);ctx.fill();ctx.restore();
   const talking=DLG.active&&DLG.lines&&DLG.lines[DLG.i||0]&&DLG.lines[DLG.i||0][0]===n.name,an=talking&&Math.abs(lum.x-n.x)>60?'side':talking&&n.back&&lum.y<n.y?'up':n.back&&!talking?'up':'down';   /* back: stands facing north, turns to Lum when she speaks with her */ctx.save();ctx.translate(n.x,0);ctx.scale(n.slim?1:.86,1);ctx.translate(-n.x,0);c1Frame(ctx,n.atlas,an==='down'&&n.idle?'idle':an,0,n.x,n.y,n.h||BVFOLK_H*k*(n.sc||1),an==='side'&&face,1,0);ctx.restore();}   /* townsfolk: a little taller than Lum, slim */
 /* the Breezevale Merchant's trades */
