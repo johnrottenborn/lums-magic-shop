@@ -1452,6 +1452,9 @@ const CASES = {
     await p.screenshot({ path: path.join(SHOTS, `ch3-battle-${vp}.png`) });
     const healed = await g_(() => { const g = window.__g; g.chooseMenu(0); g.setTrap(g.BATTLE.tpick); return g.HEROES.lum.hp; });
     check(healed > 4, 'Heal should mend the most hurt friend (Lum): ' + healed);
+    // Sariel: Amroth's strength, no fire, and a ten-beat combo Amroth taught him
+    const sr = await g_(() => { const g = window.__g, B = g.BATTLE; B.phase = 'heroMenu'; B.cur = 3; g.C1X.comboS = 5; const name = g.HEROES.spar.name, opts = g.menuOpts().map(o => o[1]).join(','), atk = g.heroStats('spar').atk, amr = g.heroStats('amroth').atk; g.chooseMenu(0); return { name, opts, atk, amr, ph: B.phase }; });
+    check(sr.name === 'Sariel' && /Cub's Fury/.test(sr.opts) && sr.atk === sr.amr && sr.ph === 'aflurry', 'Sariel should hit like Amroth and use a multi-hit combo: ' + JSON.stringify(sr));
     await wait(400); await p.screenshot({ path: path.join(SHOTS, `ch3-heal-${vp}.png`) });
   },
   async 'jak-leaves'(p) {

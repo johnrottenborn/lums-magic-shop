@@ -45,11 +45,13 @@ function c3AmrTalk(){if(C3.st!==2){if(C3.st===3)talk([['Amroth',"Inside, Lum. I'
   C3.st=3;WEVENT.on=true;lum.state='idle';lum.vx=lum.vy=0;lum.face=lum.x<AMR.x?1:-1;C3.boy.mode='show';C3.boy.t=0;
   talk([['Amroth',"Lum! You're back. Come here, you have to see this."],
     ['Lum',"Is that… the baby?"],
-    ['Amroth',"Aye. Not only walking, mind you. Watch him with that wooden sword."],
+    ['Amroth',"Aye. Sariel, Alma named him. We promised to tell you when you came home."],
+    ['Lum',"Sariel… it suits him."],
+    ['Amroth',"Not only walking, mind you. Watch him with that wooden sword."],
     ['Amroth',"He's better with a blade than I am! And I've guarded the Worldbind gate for twenty years."],
     ['Amroth',"I've never seen anything like him. Never."],
     ['Amroth',"Come inside, Lum. There's something I must speak with you about… away from this little whirlwind."],
-    ['Amroth',"You there, lad! Go and practice your swings against that tree. Fifty more, and mind your footwork!"]],false,()=>{
+    ['Amroth',"Sariel! Go and practice your swings against that tree. Fifty more, and mind your footwork!"],['Sariel',"Yes, sir!"]],false,()=>{
       C3.boy.mode='run';C3.boy.t=0;C3.walk=1;WEVENT.on=false;hsGoal('Speak with Amroth inside');});}
 /* inside, beside Alma's chair: what he tells Lum is still to be written with the designer */
 function c3AmrInside(){lum.state='idle';lum.vx=lum.vy=0;lum.face=lum.x<AMR.x?1:-1;
@@ -58,7 +60,7 @@ function c3AmrInside(){lum.state='idle';lum.vx=lum.vy=0;lum.face=lum.x<AMR.x?1:-
   C3.st=4;WEVENT.on=true;
   talk([['Amroth',"Lum… that boy is not natural."],
     ['Amroth',"A babe in a basket one week, swinging a sword the next. I fear he may be kin to the demons."],
-    ['Alma',"Amroth! Look at his eyes. They're angelic… and so kind."],
+    ['Alma',"Amroth! Look at Sariel's eyes. They're angelic… and so kind."],
     ['Amroth',"Aye… his eyes, his manner. I see no darkness in him."],
     ['Amroth',"But no child grows like this. None."],
     ['Lum',"I met your sister, Alma. Sage Luma."],
@@ -70,13 +72,13 @@ function c3AmrInside(){lum.state='idle';lum.vx=lum.vy=0;lum.face=lum.x<AMR.x?1:-
 /* a crash outside: the boy has felled the trees */
 function c3Commotion(){C3.felled=1;try{sfxCrumble();setTimeout(()=>{try{sfxCrumble();}catch(e){}},380);setTimeout(()=>{try{sfxCrumble();}catch(e){}},760);}catch(e){}if(typeof shake!=='undefined')shake=14;
   setTimeout(()=>talk([['Amroth',"What was that?!"],['Alma',"The boy!"]],false,()=>{C3.st=5;WEVENT.on=false;hsGoal('See what happened outside');}),1100);}
-function c3AlmaTalk(){if(C3.st===3)talk([['Alma',"Amroth wants a word with you, Lum. Go on, I'll listen."]]);else if(C3.st>=5&&C3.st<7)talk([['Alma',"Quickly, Lum!"]]);else talk([['Alma',"The boy is a blessing, Lum. I'm sure of it."]]);}
+function c3AlmaTalk(){if(C3.st===3)talk([['Alma',"Amroth wants a word with you, Lum. Go on, I'll listen."]]);else if(C3.st>=5&&C3.st<7)talk([['Alma',"Quickly, Lum!"]]);else talk([['Alma',"Sariel is a blessing, Lum. I'm sure of it."]]);}
 /* outside again: Amroth and Alma come out with Lum and see what he has done */
 function c3OutsideStart(){if(C3.st!==5||C3.out)return;C3.out=1;C3.amrIn=0;HST.amrOut=0;ALMA.on=0;
   const dx=HOMEX+HOME.cot.x+HOME.cot.door,dy=HOMEY+HOME.cot.y+30;AMR.x=dx-60;AMR.y=dy+10;AMR.dir='down';AMR.moving=0;Object.assign(ALMF,{x:dx+60,y:dy+10,dir:'down',moving:0,face:-1,on:1});
   const b=C3.boy;b.mode='idle';[b.x,b.y]=c3Pt([C3YARD.swing[0]+20,C3YARD.swing[1]+40]);
   WEVENT.on=true;lum.state='idle';lum.vx=lum.vy=0;
-  setTimeout(()=>talk([['Lum',"Oh my…"],['Amroth',"He felled them. With a wooden sword."],['Alma',"Are you hurt, little one?"],['Boy',"Fifty swings! …I think the trees got tired."],
+  setTimeout(()=>talk([['Lum',"Oh my…"],['Amroth',"He felled them. With a wooden sword."],['Alma',"Sariel! Are you hurt, little one?"],['Sariel',"Fifty swings! …I think the trees got tired."],
     ['Amroth',"This is not natural for any child… but by the gods, I'm impressed."],
     ['Amroth',"That settles it. We leave together, all of us. I'll not leave him here alone, and I'll not let you go alone either, Lum."],
     ['Alma',"To the river, then."]],false,c3PartyJoins),900);}
@@ -95,7 +97,7 @@ function updateC3Follow(dt){if(!C3.party||(SCENE!=='thorn'&&SCENE!=='dun'))retur
 function drawAlmaOW(k){const F=ALMF,an=F.moving?(F.dir==='side'?'side':F.dir):(F.dir==='up'?'up':F.dir==='side'?'side':'idle'),n=C1ATL.alma.rows[an][1],fi=F.moving?Math.floor(F.ph/16)%n:an==='side'?3:0;
   ctx.save();ctx.translate(F.x,F.y);ctx.scale(k,k);ctx.fillStyle='rgba(10,10,20,.25)';ctx.beginPath();ctx.ellipse(0,2,26,8,0,0,TAU);ctx.fill();c1Frame(ctx,'alma',an,fi,0,0,ALMA_H,an==='side'&&F.face<0,1,0);ctx.restore();}
 function c3DunProps(L){if(!C3.party||CH<3)return;const ka=dunH(ALMF.y,ALMF.x)/151,kb=dunH(C3.boy.y,C3.boy.x)/151;L.push([ALMF.y-2,()=>drawAlmaOW(ka)]);L.push([C3.boy.y-3,()=>{ctx.save();ctx.translate(C3.boy.x,C3.boy.y);ctx.scale(kb,kb);ctx.translate(-C3.boy.x,-C3.boy.y);drawBoyOW();ctx.restore();}]);}
-function c3BoyTalk(){const b=C3.boy;b.face=lum.x<b.x?-1:1;talk([['Lum',"Hello there!"],['Boy',"Hyah! Hyah! …Forty-one!"]]);}
+function c3BoyTalk(){const b=C3.boy;b.face=lum.x<b.x?-1:1;talk([['Lum',"Hello, Sariel!"],['Sariel',"Hyah! Hyah! …Forty-one!"]]);}
 /* the practice tree and the boy, sorted into the Stranglethorn draw list (22) */
 const C3TREES=[[925,1035,250,0],[860,985,220,1],[995,975,235,0]];   /* the practice tree and two neighbours; the boy fells all three */
 function c3Props(L){if(CH<3)return;
@@ -127,6 +129,10 @@ PARTY.alma={main:null,off:null,head:null,chest:null,boots:null,charm:null};
 HCOL.alma='#3f8a86';HSUB.alma="Amroth's wife  ·  healer";HCOMBO.alma='Mending Tide';FACEIMG.alma='face_alma';
 Object.defineProperty(FACEIMG,'spar',{get(){return CH>=3?'face_boy':'face_spar';},enumerable:true});   /* from Chapter 3 Spar is the boy */
 Object.defineProperty(HSUB,'spar',{get(){return CH>=3?"A boy who grows too fast  ·  wooden sword":"Young swordsman  ·  fire blade";},enumerable:true});
+/* from Chapter 3 the boy is Sariel (Alma's name for him; his true identity comes out later): no fire, a wooden sword, Amroth's strength and a multi-hit combo Amroth taught him */
+Object.defineProperty(HEROES.spar,'name',{get(){return CH>=3?'Sariel':'Spar';},set(){},enumerable:true});
+Object.defineProperty(HCOMBO,'spar',{get(){return CH>=3?"Cub's Fury":'Blazing Edge';},enumerable:true});
+{const D=MOVEDESC.spar;MOVEDESC.spar={get atk(){return CH>=3?"A swing of his wooden sword, as strong as Amroth's.":D.atk;},get combo(){return CH>=3?"Ten rapid strikes Amroth taught him. Tap as each ring meets the star; the last is a crushing blow.":D.combo;}};}
 MOVEDESC.alma={atk:"A light swat. Her strength is healing.",combo:"A wave of healing water washes over the whole party and cures poison."};
 const MENU_OPTS_AL=[['heal','Heal'],['bonk','Attack'],['items','Items'],['run','Run']],MENU_OPTS_ALB=[['burst','Mending Tide'],...MENU_OPTS_AL];
 /* Heal: one friend (chosen like Jak's trap); every heal earns a combo star */
@@ -145,9 +151,9 @@ function drawBattleBoy(h){const S=bS(),B=BATTLE,x=h.x+h.ox,y=h.y+h.oy,me=B.heroe
   if(me&&(ph==='bonkRun'||ph==='bonkBack'||ph==='run'||ph==='fled')){an='run';fi=Math.floor(t*12)%6;flip=ph!=='bonkRun';}
   else if(me&&ph==='bonkWind'){an='swing';fi=t<B.windD*.5?2:3;}
   else if(me&&ph==='bonkHit'){an='swing';fi=t<.12?4:5;}
-  else if(me&&ph==='sflame'){an='swing';fi=3;}
+  else if(me&&ph==='aflurry'){const a=B.af||{};an='swing';fi=a.swing>.18?4:a.swing>.08?5:a.swing>0?3:0;}   /* Cub's Fury: a fresh slash each beat */
   bshadow(x,y+2,30*S,9*S,.35);ctx.save();ctx.translate(x,y+3);if(h.hurt>0)ctx.translate(Math.sin(h.hurt*60)*4,0);c1Frame(ctx,'boy',an,fi,0,0,128*S,flip,1,h.hurt>.3?1:0);ctx.restore();
-  if(me&&ph==='sflame')drawFlames(ctx,x+40*S,y-118*S,30*S,1);}
+}
 
 /* Chapter 3: the woods east of the cottage have been cleared (stumps left), and a new way east opens there for the party of four */
 const C3CLEAR={x0:1560,x1:1960,y0:480,y1:1240},C3EAST=[1850,1000];
