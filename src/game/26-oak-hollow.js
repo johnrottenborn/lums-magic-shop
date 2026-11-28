@@ -56,6 +56,12 @@ const DROOMS={
   /* 40: the side room off ruins room 1 (the designer's tall painting, centred with blurred mirrored sides): a dead end, a still pool under dripping stone; Lum comes in at the front */
   40:{name:'',dark:0,wide:1,tall:[476,898],hk:.9,hd:.2,floor:[[480,768],[480,600],[522,575],[600,590],[640,615],[578,650],[562,676],[640,692],[770,688],[802,662],[792,640],[850,630],[894,650],[894,768]]},
   /* 41: through room 3's dark right arch (the designer's painting, centred with blurred mirrored sides): a crumbling vault with old chests and barrels; Lum comes in at the front */
+  /* 42: the abandoned goblin fortress, its yard seen from the trail (the designer's painting): the trail comes up through the spiked gate; the dark cave under the bridge leads inside */
+  42:{name:'Goblin Fortress',dark:0,wide:1,hk:.54,hp:.0022,floor:[[440,768],[480,722],[560,676],[626,654],[630,560],[628,500],[640,452],[690,437],[800,440],[880,450],[950,462],[960,482],[900,492],[770,492],[738,520],[738,640],[720,690],[760,768]]},
+  /* 43: the first hall inside the fortress (the designer's painting): the gate to the yard on the left; stairs, a tunnel, a door and a ladder lead on (still to come) */
+  43:{name:'',dark:0,wide:1,hk:.95,hd:.37,floor:[[110,600],[200,586],[330,580],[430,560],[500,520],[560,500],[700,500],[850,495],[930,495],[1000,505],[1100,560],[1190,610],[1240,640],[1290,768],[220,768],[200,650],[105,640]],
+     block:[{x0:925,y0:688,x1:1200,y1:769},{x0:730,y0:705,x1:900,y1:769},{x0:830,y0:552,x1:990,y1:606},{x0:955,y0:535,x1:1100,y1:600},{x0:545,y0:503,x1:690,y1:548}],
+     fg:[{y:769,poly:[[920,650],[1200,650],[1200,768],[920,768]]},{y:769,poly:[[725,680],[905,680],[905,768],[725,768]]},{y:604,poly:[[825,520],[995,520],[995,604],[825,604]]},{y:600,poly:[[950,505],[1105,505],[1105,600],[950,600]]}]},
   41:{name:'',dark:0,fill:[275,0,1100,768],hk:.75,hp:.004,floor:[[569,768],[470,700],[420,662],[398,640],[440,628],[477,590],[591,553],[733,544],[840,559],[945,598],[978,622],[890,655],[869,768]]},
   /* 38: inside the top-right shell house (it replaced the Mayor's; the designer's painting): a long vaulted hall with a stone hearth, long tables, a bar of barrels and a stair to a loft; Lum comes in at the front */
   38:{name:'',dark:0,home:1,hk:1.35,floor:[[300,600],[400,560],[520,522],[640,500],[790,500],[790,565],[1100,565],[1100,546],[1200,546],[1230,575],[1300,640],[1310,768],[80,768],[80,700],[300,690]],
@@ -155,6 +161,8 @@ function setupDun(){DUNINT.length=0;const r=DUN.room,D=(x,y,reach,fn)=>DUNINT.pu
   if(r===36){D(660,738,80,()=>dunGo(35,728,525,1));D(412,560,55,()=>goScene(enterIsland));D(820,526,75,()=>dunGo(37,740,712,1));}   /* back to the long hall; the stairs up to the island ruins (still to come); the gap to room 6 */
   if(r===35){D(660,738,80,()=>dunGo(34,650,530,1));D(728,512,45,()=>dunGo(36,660,712,1));}   /* back to the crypt; the tunnel at the far end to room 5 */
   if(r===34){D(660,738,80,()=>dunGo(33,470,560,1));D(650,516,50,()=>dunGo(35,660,712,1));D(1100,535,55,()=>dunGo(41,905,626,-1));}   /* back to the hydra room; the passage ahead to room 4; the right arch to the vault (room 41) */
+  if(r===42){D(585,758,80,()=>goScene(leaveFortressYard));D(668,440,70,()=>dunGo(43,180,612,1));}   /* back down the trail; the cave into the fortress */
+  if(r===43){D(150,585,75,()=>dunGo(42,668,462,1));L(765,505,70,["The stairs climb up into the dark."]);L(955,500,65,["A tunnel winds deeper into the mountain."]);L(1055,505,60,["A heavy wooden door. It won't budge."]);L(1215,625,70,["A rickety ladder up to the lookout."]);}   /* placeholder: where these lead is still to come */
   if(r===41){D(925,606,60,()=>dunGo(34,1090,560,-1));DUNINT.push({x:395,y:632,reach:80,onInteract:vaultChest});}   /* back to the crypt, inside the right arch; the locked chest on the far left */
   if(r===33){D(660,758,80,()=>dunGo(32,840,525,-1));D(470,540,55,()=>dunGo(34,660,712,1));DUNINT.push({x:770,y:618,reach:85,onInteract:ruinsBook});DUNINT.push({x:885,y:612,reach:70,onInteract:hydraBase});}   /* back to the tunnel; the doorway to room 3; the old book on the altar */
   if(r===39){D(720,752,90,()=>goScene(leaveHiddenGrove));DUNINT.push({x:660,y:566,reach:85,onInteract:hiddenStream});}   /* the way back to Evergreen Grove; the stream, where the Serpent Charm glints */

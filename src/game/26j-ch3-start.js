@@ -161,7 +161,7 @@ function c3Cleared(o){if(o.c3cut===undefined){const lx=o.x-HOMEX,ly=o.y-HOMEY;o.
 function drawStump(o){const r=Math.max(9,o.w*.05);ctx.save();ctx.fillStyle='rgba(10,10,20,.22)';ctx.beginPath();ctx.ellipse(o.x,o.y+3,r*1.8,r*.6,0,0,TAU);ctx.fill();
   ctx.fillStyle='#6a4a30';ctx.fillRect(o.x-r,o.y-r*1.4,r*2,r*1.5);ctx.fillStyle='#c8a070';ctx.beginPath();ctx.ellipse(o.x,o.y-r*1.4,r,r*.38,0,0,TAU);ctx.fill();
   ctx.strokeStyle='rgba(120,80,40,.55)';ctx.lineWidth=1;ctx.beginPath();ctx.ellipse(o.x,o.y-r*1.4,r*.55,r*.2,0,0,TAU);ctx.stroke();ctx.restore();}
-function c3EastDoor(){talk([['Amroth',"This way leads east, down to the river."],['Lum',"(The next area is still to come.)"]]);}
+function c3EastDoor(){goScene(()=>enterMT(false));}   /* the way east: the Mountainside Trail (26k) */
 THINT.push({get x(){return HOMEX+C3EAST[0];},get y(){return HOMEY+C3EAST[1];},get reach(){return CH>=3&&C3.party&&inHome()?85:0;},door:true,onInteract:c3EastDoor});
 
 /* Cub's Fury: after Sariel's five beats, Amroth dashes in and lands one heavy blow (if he can still stand), then steps back; returns true while it plays */

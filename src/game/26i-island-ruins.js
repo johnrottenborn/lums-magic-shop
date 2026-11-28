@@ -4,7 +4,7 @@
    (the way back down) top-right beside a whole goddess statue, the old font in the middle, a fallen goddess along the south shore,
    boulders round the edge. Cobbled ground, dead plants, everything washed blue, thick white fog. First layout pass for review. ===== */
 const ISX=BVX+4200,ISY=500,ISW=2800,ISH=2250,IST={t:99};
-const inIS=()=>lum.x>ISX-300;
+const inIS=()=>lum.x>ISX-300&&lum.x<ISX+3300;   /* (the Mountainside Trail lies further east) */
 const IS_TOP=330,IS_ARCHY=500;   /* the mountain's foot; the line of the archways (nothing walkable behind them) */
 const ISLAND=(()=>{const P=[[170,IS_TOP]];for(let a=Math.PI;a>=0;a-=.05){const w=1+.035*Math.sin(a*7)+.025*Math.sin(a*13+1);P.push([1400+Math.cos(a)*1250*w,IS_TOP+Math.sin(a)*1560*w]);}P.push([2630,IS_TOP]);return P.reverse();})();   /* the shore: round on the sea sides, flat against the mountain */
 const ISH_=(i,s)=>{const x=Math.sin(i*127.1+s*311.7)*43758.5453;return x-Math.floor(x);};

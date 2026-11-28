@@ -1468,6 +1468,49 @@ const CASES = {
     check(cf.n === 5 && cf.dmg >= 4 && cf.mid > 20 && cf.end === 0 && cf.low, "Cub's Fury: five beats, then Amroth dashes in for one heavy blow; Sariel has the lowest HP: " + JSON.stringify(cf));
     await wait(400); await p.screenshot({ path: path.join(SHOTS, `ch3-heal-${vp}.png`) });
   },
+  async 'mountain-trail'(p) {
+    // Chapter 3: through the east door, the river trail fades out and the party is lost; the river ends at a waterfall; behind it, the goblin fortress yard and first hall
+    const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop', g_ = (f, a) => p.evaluate(f, a);
+    const end = async () => { for (let i = 0; i < 8; i++) { if (!await g_(() => window.__g.DLG.active)) break; await g_(() => { const g = window.__g; g.DLG.active = false; const cb = g.DLG.onEnd; g.DLG.onEnd = null; cb && cb(); }); await wait(250); } };
+    await g_(() => window.__g.startChapter3()); await wait(2000); await end();
+    await g_(() => { const g = window.__g; g.enterHome(); g.c3PartyJoins(); setInterval(() => g.THFOES.forEach(f => f.calm = 99), 50); }); await wait(500); await end();
+    await g_(() => window.__g.c3EastDoor()); await wait(1600);
+    check(await g_(() => window.__g.inMT() && window.__g.mtFree(window.__g.lum.x, window.__g.lum.y)), 'the east door should lead to the Mountainside Trail');
+    for (let i = 0; i < 20 && !await g_(() => window.__g.DLG.active); i++) await wait(200);
+    const intro = await g_(() => { const g = window.__g; return (g.DLG.active ? g.DLG.lines.map(l => l[1]).join(' ') : 'none') + ' / ' + JSON.stringify({ t: g.C3.mtIn, scene: g.SCENE, x: g.lum.x - g.MTX, b: g.BATTLE.on, w: g.WEVX.on, f: g.FADEX.dir, mt: g.MTT.t, m: g.MENU.open, ch: g.CH, pend: g.BATTLE.pending }); });
+    check(/harbor/.test(intro), 'Amroth should say the trail follows the river to the harbor: ' + intro);
+    await p.screenshot({ path: path.join(SHOTS, `mt-start-${vp}.png`) }); await end(); await p.keyboard.down('ArrowRight'); await wait(1600); await p.keyboard.up('ArrowRight'); await wait(900);
+    await p.screenshot({ path: path.join(SHOTS, `mt-party-${vp}.png`) });
+    // the whole valley can be walked from the way in to the ledge behind the falls
+    const reach = await g_(() => { const g = window.__g, S = 24, sx = Math.round((g.MTX + g.MT_IN.x + 80) / S), sy = Math.round((g.MTY + g.MT_IN.y) / S), tx = g.MTX + g.MT_DOOR.x, ty = g.MTY + g.MT_DOOR.y, seen = new Set([sx + ',' + sy]), q = [[sx, sy]]; let best = 1e9;
+      while (q.length) { const [x, y] = q.shift(); best = Math.min(best, Math.hypot(x * S - tx, y * S - ty)); for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) { const k = (x + dx) + ',' + (y + dy); if (seen.has(k) || !g.mtFree((x + dx) * S, (y + dy) * S)) continue; seen.add(k); q.push([x + dx, y + dy]); } } return best; });
+    check(reach < 60, 'the ledge behind the falls should be reachable from the way in: ' + Math.round(reach));
+    await g_(() => { const g = window.__g; g.lum.x = g.MTX + g.MT_LOST; g.lum.y = g.MTY + 1100; let k = 0; while (!g.mtFree(g.lum.x, g.lum.y) && k++ < 60) g.lum.y -= 10; g.cam.x = g.lum.x; g.cam.y = g.lum.y; }); await wait(800);
+    check(await g_(() => /stops/.test((window.__g.DLG.lines || []).map(l => l[1]).join(' '))), 'the party should find the trail gives out');
+    await p.screenshot({ path: path.join(SHOTS, `mt-lost-${vp}.png`) }); await end();
+    await g_(() => { const g = window.__g; g.lum.x = g.MTX + g.MT_POOL.x - 420; g.lum.y = g.MTY + 760; let k = 0; while (!g.mtFree(g.lum.x, g.lum.y) && k++ < 60) g.lum.y -= 10; g.cam.x = g.lum.x; g.cam.y = g.lum.y; }); await wait(800);
+    check(await g_(() => /waterfall/.test((window.__g.DLG.lines || []).map(l => l[1]).join(' '))), 'the party should find the waterfall');
+    await end(); await wait(900);
+    await p.screenshot({ path: path.join(SHOTS, `mt-falls-${vp}.png`) });
+    await g_(() => { const g = window.__g; g.lum.x = g.MTX + g.MT_DOOR.x; g.lum.y = g.MTY + g.MT_DOOR.y + 22; }); await wait(700);
+    await p.screenshot({ path: path.join(SHOTS, `mt-behind-falls-${vp}.png`) });
+    await g_(() => window.__g.NEAR.onInteract()); await wait(1500);
+    check(await g_(() => window.__g.SCENE === 'dun' && window.__g.DUNX.room === 42 && window.__g.dunFree(window.__g.lum.x, window.__g.lum.y)), 'behind the falls should lead to the fortress yard');
+    await p.keyboard.down('ArrowUp'); await wait(1400); await p.keyboard.up('ArrowUp'); await wait(500);
+    await p.screenshot({ path: path.join(SHOTS, `fortress-yard-${vp}.png`) });
+    await g_(() => { const g = window.__g; g.lum.x = 668; g.lum.y = 455; }); await wait(600);
+    await g_(() => window.__g.NEAR.onInteract()); await wait(1500);
+    check(await g_(() => window.__g.DUNX.room === 43 && window.__g.dunFree(window.__g.lum.x, window.__g.lum.y)), 'the cave should lead into the fortress hall');
+    await p.keyboard.down('ArrowRight'); await wait(1500); await p.keyboard.up('ArrowRight'); await wait(600);
+    await p.screenshot({ path: path.join(SHOTS, `fortress-hall-${vp}.png`) });
+    await g_(() => { const g = window.__g; g.lum.x = 160; g.lum.y = 600; }); await wait(600);
+    await g_(() => window.__g.NEAR.onInteract()); await wait(1500);
+    check(await g_(() => window.__g.DUNX.room === 42), 'the hall gate should lead back to the yard');
+    // a trail foe in battle
+    await g_(() => window.__g.startEncounter({ kind: 'dryad', scene: 'thorn', x: 0, y: 0, s: 1, pack: 1, calm: 0 }, 'normal'));
+    for (let i = 0; i < 60; i++) { await wait(150); if (await g_(() => window.__g.BATTLE.phase) === 'heroMenu') break; }
+    await wait(1800); await p.screenshot({ path: path.join(SHOTS, `mt-battle-${vp}.png`) });
+  },
   async 'turtle-foe'(p) {
     // the turtle enemy: the detailed painting at rest, sheet frames when it lunges or pulls into its shell (placeholder stats; not on a map yet)
     const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop', g_ = f => p.evaluate(f);
