@@ -1468,13 +1468,40 @@ const CASES = {
     check(cf.n === 5 && cf.dmg >= 4 && cf.mid > 20 && cf.end === 0 && cf.low, "Cub's Fury: five beats, then Amroth dashes in for one heavy blow; Sariel has the lowest HP: " + JSON.stringify(cf));
     await wait(400); await p.screenshot({ path: path.join(SHOTS, `ch3-heal-${vp}.png`) });
   },
+  async 'verdant-forest'(p) {
+    // Chapter 3: the east door of Amroth's home opens on the Verdant Forest (south-west corner); shallow rivers wind through it and meet in the top-right corner, where a door leads to the riverside trail
+    const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop', g_ = (f, a) => p.evaluate(f, a);
+    const end = async () => { for (let i = 0; i < 8; i++) { if (!await g_(() => window.__g.DLG.active)) break; await g_(() => { const g = window.__g; g.DLG.active = false; const cb = g.DLG.onEnd; g.DLG.onEnd = null; cb && cb(); }); await wait(250); } };
+    await g_(() => window.__g.startChapter3()); await wait(2000); await end();
+    await g_(() => { const g = window.__g; g.enterHome(); g.c3PartyJoins(); setInterval(() => g.THFOES.forEach(f => f.calm = 99), 50); }); await wait(500); await end();
+    await g_(() => window.__g.c3EastDoor()); await wait(1600);
+    check(await g_(() => { const g = window.__g; return g.inVF() && g.vfFree(g.lum.x, g.lum.y) && g.lum.x - g.VFX < 500 && g.lum.y - g.VFY > 2400; }), 'the east door should lead into the Verdant Forest, south-west corner');
+    await p.keyboard.down('ArrowUp'); await wait(1400); await p.keyboard.up('ArrowUp'); await wait(800);
+    await p.screenshot({ path: path.join(SHOTS, `vf-enter-${vp}.png`) });
+    const reach = await g_(() => { const g = window.__g, S = 24, sx = Math.round((g.VFX + g.VF_IN.x + 60) / S), sy = Math.round((g.VFY + g.VF_IN.y - 60) / S), tx = g.VFX + g.VF_OUT.x, ty = g.VFY + g.VF_OUT.y, seen = new Set([sx + ',' + sy]), q = [[sx, sy]]; let best = 1e9, n = 0;
+      while (q.length) { const [x, y] = q.shift(); n++; best = Math.min(best, Math.hypot(x * S - tx, y * S - ty)); for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) { const k = (x + dx) + ',' + (y + dy); if (seen.has(k) || !g.vfFree((x + dx) * S, (y + dy) * S)) continue; seen.add(k); q.push([x + dx, y + dy]); } } return [best, n]; });
+    check(reach[0] < 60 && reach[1] > 6000, 'the whole forest should be walkable from the way in to the top-right door: ' + reach);
+    // wading through a river
+    await g_(() => { const g = window.__g; for (let y = g.VFY + 2500; y > g.VFY + 1500; y -= 6) { const x = g.VFX + 900; if (g.vfRiverDist(x, y) < 10 && g.vfFree(x, y)) { g.lum.x = x; g.lum.y = y; break; } } g.cam.x = g.lum.x; g.cam.y = g.lum.y; }); await wait(900);
+    check(await g_(() => window.__g.vfRiverDist(window.__g.lum.x, window.__g.lum.y) < 36), 'Lum should be able to stand in a river');
+    await p.screenshot({ path: path.join(SHOTS, `vf-river-${vp}.png`) });
+    await g_(() => { const g = window.__g; g.lum.x = g.VFX + g.VF_OUT.x - 60; g.lum.y = g.VFY + g.VF_OUT.y + 40; g.cam.x = g.lum.x; g.cam.y = g.lum.y; }); await wait(900);
+    await p.screenshot({ path: path.join(SHOTS, `vf-meet-${vp}.png`) });
+    await g_(() => { const g = window.__g; g.lum.x = g.VFX + g.VF_OUT.x - 20; g.lum.y = g.VFY + g.VF_OUT.y + 20; }); await wait(500);
+    check(await g_(() => !!(window.__g.NEAR && window.__g.NEAR.door)), 'the top-right door should show');
+    await g_(() => window.__g.NEAR.onInteract()); await wait(1600);
+    check(await g_(() => window.__g.inMT() && window.__g.mtFree(window.__g.lum.x, window.__g.lum.y)), 'the top-right door should lead to the riverside trail');
+    await end(); await g_(() => { const g = window.__g; g.lum.x = g.MTX + g.MT_IN.x + 20; g.lum.y = g.MTY + g.MT_IN.y; }); await wait(500);
+    await g_(() => window.__g.NEAR.onInteract()); await wait(1600);
+    check(await g_(() => window.__g.inVF() && window.__g.lum.x - window.__g.VFX > 2000 && window.__g.vfFree(window.__g.lum.x, window.__g.lum.y)), 'the trail door should lead back to the forest, top-right');
+  },
   async 'mountain-trail'(p) {
     // Chapter 3: through the east door, the river trail fades out and the party is lost; the river ends at a waterfall; behind it, the goblin fortress yard and first hall
     const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop', g_ = (f, a) => p.evaluate(f, a);
     const end = async () => { for (let i = 0; i < 8; i++) { if (!await g_(() => window.__g.DLG.active)) break; await g_(() => { const g = window.__g; g.DLG.active = false; const cb = g.DLG.onEnd; g.DLG.onEnd = null; cb && cb(); }); await wait(250); } };
     await g_(() => window.__g.startChapter3()); await wait(2000); await end();
     await g_(() => { const g = window.__g; g.enterHome(); g.c3PartyJoins(); setInterval(() => g.THFOES.forEach(f => f.calm = 99), 50); }); await wait(500); await end();
-    await g_(() => window.__g.c3EastDoor()); await wait(1600);
+    await g_(() => window.__g.enterMT(false)); await wait(1600);
     check(await g_(() => window.__g.inMT() && window.__g.mtFree(window.__g.lum.x, window.__g.lum.y)), 'the east door should lead to the Mountainside Trail');
     for (let i = 0; i < 20 && !await g_(() => window.__g.DLG.active); i++) await wait(200);
     const intro = await g_(() => { const g = window.__g; return (g.DLG.active ? g.DLG.lines.map(l => l[1]).join(' ') : 'none') + ' / ' + JSON.stringify({ t: g.C3.mtIn, scene: g.SCENE, x: g.lum.x - g.MTX, b: g.BATTLE.on, w: g.WEVX.on, f: g.FADEX.dir, mt: g.MTT.t, m: g.MENU.open, ch: g.CH, pend: g.BATTLE.pending }); });

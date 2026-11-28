@@ -100,6 +100,7 @@ function drawAmrOW(F,alpha){if(!F||alpha<=0)return;drawnAmr.n++;const an=F.dir==
 /* after a lost battle in Chapter 2: everyone is healed and Lum wakes at the way into the area she was in (never back in Chapter 1's Stranglethorn) */
 function ch2Respawn(){for(const id of PARTY_ORDER)HEROES[id].hp=HEROES[id].maxHp;const calm=a=>{for(const f_ of a||[])f_.calm=4;};calm(THFOES);calm(DFOES);
   if(SCENE==='dun'){const e=DUN.entry||[11,238,250,1];enterDun(...e);}
+  else if(inVF()){enterVF(false);VFT.t=99;}
   else if(inMT()){enterMT(false);MTT.t=99;}
   else if(inIS()){enterIsland();IST.t=99;}
   else if(inBV()){enterBreezevale();BVT.t=99;}

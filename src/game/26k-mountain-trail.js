@@ -6,7 +6,7 @@
    Walkable: the valley floor on the river's north bank (`mtFree`), less the crags; the ledge round the pool. Foes: Jade Vipers,
    Forest Dryads and Tidegold Turtles. Built as another region of the Stranglethorn world, east of the Island Ruins. Placeholder lines. */
 const MTX=ISX+3600,MTY=500,MTW=4000,MTH=1700,MTT={t:99},MTS={said:0};
-const inMT=()=>lum.x>MTX-300;
+const inMT=()=>lum.x>MTX-300&&lum.x<MTX+4200;   /* (the Verdant Forest lies further east) */
 const MTH_=(i,s)=>{const x=Math.sin(i*127.1+s*311.7)*43758.5453;return x-Math.floor(x);};
 const MT_POOL={x:3450,y:830,rx:230,ry:130},MT_FALL={x:3450,top:250,w:170},MT_RW=72;   /* the pool under the falls; the falls; half the river's width */
 const MRIV_L=[[-300,1360],[300,1390],[800,1310],[1300,1360],[1800,1270],[2300,1230],[2750,1130],[3100,1000],[3330,900],[3450,840]];
@@ -92,7 +92,7 @@ function updateMT(dt){if(inMT())MTS.t=(MTS.t||0)+(dt||0);if(!inMT()||SCENE!=='th
 function enterMT(fromFalls){SCENE='thorn';if(fromFalls){lum.x=MTX+MT_DOOR.x-40;lum.y=MTY+MT_DOOR.y+40;lum.dir='down';lum.face=-1;}else{lum.x=MTX+MT_IN.x+80;lum.y=MTY+MT_IN.y;lum.dir='side';lum.face=1;}lum.state='idle';lum.vx=lum.vy=0;cam.x=lum.x;cam.y=lum.y-50;THORN.t=99;MTT.t=fromFalls?99:0;MTS.t=0;}
 function enterHomeFromMT(){SCENE='thorn';lum.x=HOMEX+C3EAST[0]-80;lum.y=HOMEY+C3EAST[1];lum.face=-1;lum.dir='side';lum.state='idle';lum.vx=lum.vy=0;cam.x=lum.x;cam.y=lum.y-50;THORN.t=99;}
 function leaveFortressYard(){enterMT(true);}
-THINT.push({get x(){return MTX+MT_IN.x;},get y(){return MTY+MT_IN.y-20;},get reach(){return inMT()?80:-1;},door:true,onInteract:()=>goScene(enterHomeFromMT)},
+THINT.push({get x(){return MTX+MT_IN.x;},get y(){return MTY+MT_IN.y-20;},get reach(){return inMT()?80:-1;},door:true,onInteract:()=>goScene(()=>enterVF(true))},   /* back to the Verdant Forest */
   {get x(){return MTX+MT_DOOR.x;},get y(){return MTY+MT_DOOR.y;},get reach(){return inMT()?80:-1;},door:true,onInteract:()=>dunGo(42,590,735,1)});   /* behind the falls: for now, on to the goblin fortress */
 /* roaming foes in the valley (ids 5600+, kept dead in C1.thDead) */
 const MT_FOES=[[700,-200,'viper'],[1200,-230,'turtle'],[1650,-180,'dryad'],[2150,-230,'viper'],[2500,-200,'turtle'],[2850,-210,'dryad'],[3150,-160,'viper']];
