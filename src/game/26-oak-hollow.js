@@ -240,7 +240,7 @@ function drawDun(){const R=DROOMS[DUN.room],im=IMG['dun'+DUN.room];if(!ready(im)
     for(const n of BVNPC)if(n.room===DUN.room&&!(n.gone&&n.gone()))L.push([n.y,()=>drawBVNpc(n)]);
     if(jak2In()){const kj=dunH(JK2.y,JK2.x)/151;L.push([JK2.y-1,()=>{ctx.save();ctx.translate(JK2.x,JK2.y);ctx.scale(kj,kj);ctx.translate(-JK2.x,-JK2.y);drawJak2OW();ctx.restore();}]);}   /* Jak follows Lum into rooms once he joins in Chapter 2 */
     if(DUN.room===21){L.push([ALMA.y,()=>{drawAlmaRoom();}]);if(HST.heart>0)L.push([9999,()=>drawHearts((lum.x+ALMA.x)/2,Math.min(lum.y,ALMA.y)-150*dunH(lum.y)/151)]);}
-    if(CH>=2&&(C2.joined||((HST.amrIn||hsHome2())&&DUN.room===21))){const ka=dunH(AMR.y,AMR.x)/151;L.push([AMR.y-1,()=>{ctx.save();ctx.translate(AMR.x,AMR.y);ctx.scale(ka,ka);ctx.translate(-AMR.x,-AMR.y);drawAmrOW(AMR,1);ctx.restore();}]);}
+    if(CH>=2&&(C2.joined||((HST.amrIn||hsHome2())&&DUN.room===21))){const ka=dunH(AMR.y,AMR.x)/151;L.push([AMR.y-1,()=>{ctx.save();ctx.translate(AMR.x,AMR.y);ctx.scale(ka,ka);ctx.translate(-AMR.x,-AMR.y);drawAmrOW(AMR,1);ctx.restore();}]);}c3DunProps(L);
     if(DUN.room===7)L.push([614,()=>{const t=IMG.dun7_table;if(!ready(t))return;const hid=lum.y<614&&Math.abs(lum.x-945)<240;ctx.save();ctx.globalAlpha=hid?.62:1;ctx.drawImage(t,730,425);ctx.restore();}]);
     if(DUN.room===14){for(const d of BO.ow)L.push([d.y,()=>drawDemonOW(d.x,d.y,d.face,d.a,d.mv,0,d)]);const g=BO.chaser;if(g)L.push([g.y,()=>drawDemonOW(g.x,g.y,g.face,g.a,g.mv,0,g)]);}
     if(DUN.room===20&&(WB10.chest||WB10.spark>0)){const cy=WB10.chest?WB10.chest.y:WB10.sy;L.push([cy,drawWB10Chest]);}

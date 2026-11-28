@@ -59,7 +59,8 @@ function drawDoll(c,MH,fx,fy,k){c.save();c.translate(fx,fy);c.scale(k,k);
   drawGlow(c,0,-90,90,'180,210,255',.18+.05*Math.sin(T*1.6));const b=Math.sin(T*2.2);c.scale(1-.004*b,1+.009*b);
   if(MH==='lum'&&ready(atlas)){const sp=.64,dw=FW*sp,dh=FH*sp;c.drawImage(atlas,37*FW,0,FW,FH,-dw/2,-dh*(274/280),dw,dh);}
   else if(MH==='jak'){c1Frame(c,'jak2','down',0,0,0,190,false,1,0);}
-  else if(MH==='spar'){c1Frame(c,'spar','bidle',0,0,0,200,false,1,0);}
+  else if(MH==='spar'){if(CH>=3)c1Frame(c,'boy','down',0,0,0,150,false,1,0);else c1Frame(c,'spar','bidle',0,0,0,200,false,1,0);}
+  else if(MH==='alma'){c1Frame(c,'alma','idle',0,0,0,196,false,1,0);}
   else if(MH==='amroth'){c1Frame(c,'amroth','down',0,0,0,196,false,1,0);}
   else if(ready(catlas)){const sp=.74,dw=CFW*sp,dh=CFH*sp,fr=bladeFr(16);c.translate(-dw/2,-dh*(264/270));c.drawImage(cosSheet(),fr*CFW,0,CFW,CFH,0,0,dw,dh);c.scale(sp,sp);if(PARTY[MH].head==='bucket')drawBucketHat(c,fr);}
   c.restore();}
@@ -122,6 +123,7 @@ const MOVEDESC={
 function moveList(MH){const L=[],D=MOVEDESC[MH]||{},im=k=>(c,x,y,z)=>{const i=IMG[k];if(ready(i))c.drawImage(i,x-z/2,y-z/2,z,z);};
   if(MH==='lum')for(const [id,name,,key] of POWDER_LIST)L.push({icon:(c,x,y,z)=>drawPowderIcon(c,id,x,y,z),title:name,tag:key?'×'+(POWDERS[key]||0):'∞',dim:key&&!(POWDERS[key]>0),desc:PDESC[id]||''});
   else{const wpn=PARTY[MH]&&PARTY[MH].main;L.push({icon:wpn?(c,x,y,z)=>drawIcon(c,wpn,x,y,z):im('stat_atk'),title:'Attack',desc:(D.atk||'A strike at one foe.')+' Tap as the ring touches the star for extra damage.'});}
+  if(MH==='alma')L.push({icon:im('icon9_bottle_heart'),title:'Heal',desc:"Mends one friend's wounds. Every heal earns a combo star."});
   if(MH==='jak')L.push({icon:im('icon17_trap_beast'),title:'Beast Trap',desc:"Set a trap at a friend's feet. The next foe to attack them springs it, taking damage and losing its attack. One trap at a time."});
   if(HCOMBO[MH]&&CH>0)L.push({icon:(c,x,y,z)=>{c.fillStyle='#e8b84a';c.strokeStyle='#8a5a1a';c.lineWidth=2;drawStar5(c,x,y,z*.42,true);},title:HCOMBO[MH],stars:comboOf(MH),desc:D.combo+' Fill all five stars with well-timed hits to use it.'});
   L.push({icon:im('stat_def'),title:'Guard',desc:'Tap just before a foe hits to take less damage.'+(D.guard?' '+D.guard:'')});

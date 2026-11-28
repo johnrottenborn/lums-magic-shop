@@ -36,6 +36,7 @@ function homeFree(x,y){const lx=x-HOMEX,ly=y-HOMEY;if(lx<30||lx>HW-30||ly<400||l
   if(hpathDist(x,y)<62)return true;
   if(inEll(lx,ly,{x:HOME.arch.x,y:HOME.arch.y+70,rx:150,ry:90}))return true;
   if(ly<HOME.arch.y+40)return false;   /* the mountain face */
+  if(CH>=3&&Math.hypot(lx-C3EAST[0],ly-C3EAST[1])<110)return true;   /* Chapter 3: the cleared way to the east door */
   for(const [tx,ty] of HTRUNKS)if(Math.abs(lx-tx)<34&&ly-ty<14&&ty-ly<22)return false;   /* walk among the trees, not through their trunks */
   return true;}
 /* the region's scenery, added to Stranglethorn's prop list (21) */

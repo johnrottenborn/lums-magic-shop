@@ -1430,6 +1430,29 @@ const CASES = {
     for (let i = 0; i < 30 && !await g_(() => window.__g.C3.amrIn); i++) await wait(250);
     check(await g_(() => { const g = window.__g; return g.C3.amrIn && g.C3.boy.mode === 'practice' && /inside/.test(g.GOAL.text) && g.hsHome2(); }), 'the boy should practice at the tree and Amroth go inside');
     await p.screenshot({ path: path.join(SHOTS, `ch3-practice-${vp}.png`) });
+    // inside: Amroth and Alma talk about the boy and the journey; a crash outside
+    await g_(() => { const g = window.__g; g.c3AmrInside(); }); await wait(200);
+    check(await g_(() => /demons/.test(window.__g.DLG.lines.map(x => x[1]).join(' ')) && /river/.test(window.__g.DLG.lines.map(x => x[1]).join(' '))), 'the inside talk should cover the boy and the river to the port');
+    await end(); await wait(1500); await end(); await wait(300);
+    check(await g_(() => { const g = window.__g; return g.C3.st === 5 && g.C3.felled && /outside/.test(g.GOAL.text); }), 'after the crash: see what happened outside');
+    // outside: the felled trees, and all four set out together
+    await g_(() => window.__g.leaveCottage()); await wait(1600);
+    check(await g_(() => /felled them/.test((window.__g.DLG.lines || []).map(x => x[1]).join(' '))), 'Amroth should see the felled trees');
+    await p.screenshot({ path: path.join(SHOTS, `ch3-felled-${vp}.png`) });
+    await end(); await wait(400);
+    check(await g_(() => { const g = window.__g; return g.PARTY_ORDER.join() === 'lum,amroth,alma,spar' && g.C2.basement === 1; }), 'the party should be Lum, Amroth, Alma and Spar, and the basement open');
+    await g_(() => { const g = window.__g; g.lum.x -= 160; }); await wait(900);
+    await p.screenshot({ path: path.join(SHOTS, `ch3-party-walk-${vp}.png`) });
+    // a battle with all four: Alma heals
+    await g_(() => window.__g.startEncounter({ kind: 'spider', scene: 'thorn', x: 0, y: 0, s: 1, pack: 1, calm: 0, over: { hp: 60 } }, 'normal'));
+    for (let i = 0; i < 60; i++) { await wait(150); if (await g_(() => window.__g.BATTLE.phase) === 'heroMenu') break; }
+    check(await g_(() => window.__g.BATTLE.heroes.map(h => h.id).join(',')) === 'lum,amroth,alma,spar', 'all four should fight');
+    await g_(() => { const g = window.__g, B = g.BATTLE; B.cur = 2; g.HEROES.lum.hp = 4; }); await wait(300);
+    check(await g_(() => window.__g.menuOpts().map(o => o[1]).join(',').startsWith('Heal')), 'Alma should have Heal');
+    await p.screenshot({ path: path.join(SHOTS, `ch3-battle-${vp}.png`) });
+    const healed = await g_(() => { const g = window.__g; g.chooseMenu(0); g.setTrap(g.BATTLE.tpick); return g.HEROES.lum.hp; });
+    check(healed > 4, 'Heal should mend the most hurt friend (Lum): ' + healed);
+    await wait(400); await p.screenshot({ path: path.join(SHOTS, `ch3-heal-${vp}.png`) });
   },
   async 'jak-leaves'(p) {
     // back in Breezevale after Mai joins Lum, Jak sends Lum to Sage Luma, plans to trade the serpent skin in the harbor town, and walks home; he waits in the islet house after

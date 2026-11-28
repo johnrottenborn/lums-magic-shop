@@ -108,7 +108,7 @@ function babyNext(){if(C2.babyN==null)C2.babyN=C2.homeMai?6:C2.babyGrow?3:0;for(
 function babyTalk(i){lum.state='idle';lum.vx=lum.vy=0;const b=BABY[i];talk(b.lines.filter(l=>l[0]!=='Amroth'&&l[0]!=='Jak'||hsHome2()),false,()=>{C2.babyN=i+1;b.done&&b.done();});}
 function hsBabyGrow(){lum.state='idle';lum.vx=lum.vy=0;const i=babyNext();if(i>=0){babyTalk(i);return;}
   talk([['Amroth',C2.maiJoined?"Sage Luma is waiting for you. Go safely.":"Take care out there, both of you."]]);}
-function almaTalk(){if(HST.st===3){hsBabyAdmire();return;}if(HST.st===5){hsMorningAlma();return;}if(HST.st<6)return;if(hsHome2()&&!(!C2.venom&&(MATS.venomvine||0)>0)){hsBabyGrow();return;}if(!C2.venom&&(MATS.venomvine||0)>0){WEVENT.on=true;ALMA.face=lum.x<ALMA.x?-1:1;lum.face=-ALMA.face;
+function almaTalk(){if(CH>=3){c3AlmaTalk();return;}if(HST.st===3){hsBabyAdmire();return;}if(HST.st===5){hsMorningAlma();return;}if(HST.st<6)return;if(hsHome2()&&!(!C2.venom&&(MATS.venomvine||0)>0)){hsBabyGrow();return;}if(!C2.venom&&(MATS.venomvine||0)>0){WEVENT.on=true;ALMA.face=lum.x<ALMA.x?-1:1;lum.face=-ALMA.face;
     talk([['Alma',"Is that Venomvine? Careful, its sap stings."],['Alma',"My sister taught me a trick with it when we were young. Grind the vine fine at a fire and it makes a powder that strikes, then leaves a poison behind."],
       ['Alma',"Here, let me show you."]],false,()=>{learnVenom();setTimeout(()=>talk([['Lum',"Poison Powder… Thank you, Alma!"],['Alma',"Feel free to mix it by the fire, right here."]],false,()=>{WEVENT.on=false;}),900);});return;}
   {const bi=babyNext();if(bi>=0){babyTalk(bi);return;}}
