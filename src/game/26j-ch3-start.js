@@ -84,7 +84,7 @@ function c3OutsideStart(){if(C3.st!==5||C3.out)return;C3.out=1;C3.amrIn=0;HST.am
     ['Alma',"To the river, then."]],false,c3PartyJoins),900);}
 function c3PartyJoins(){C3.st=7;WEVENT.on=false;C3.party=1;
   PARTY_ORDER.length=0;PARTY_ORDER.push('lum','amroth','alma','spar');for(const id of PARTY_ORDER){syncMaxHp(id);HEROES[id].hp=HEROES[id].maxHp;}
-  PARTY.spar.main=null;   /* he fights with his wooden sword (no item icon for it yet) */
+  PARTY.spar.main='woodsword';   /* his wooden sword: +1 ATK, as strong as Amroth with his */
   C2.joined=1;C2.basement=1;resetAmrFollow();c3ResetFollow();C3.boy.mode='follow';hsGoal('Set out for the river with your companions');}
 /* Alma and the boy follow Lum on the map, further back along the same trail as Amroth */
 const ALMF={x:0,y:0,dir:'down',face:1,moving:0,ph:0,on:0};

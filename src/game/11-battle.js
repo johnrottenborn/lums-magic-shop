@@ -11,7 +11,7 @@ const FOE_TYPES={slime:{name:'Slime',hp:5,atk:3,def:0,drop:null},slug:{name:'Slu
 const BATTLE={on:false,phase:'',t:0,heroes:[],foes:[],cur:0,menu:0,target:0,cmd:null,pops:[],msg:'',msgT:0,field:null,first:true,tut:{bonk:0,guard:0},items:null,spark:[],fx:[],hitstop:0};
 const WIPE={p:0,dir:0,cb:null};
 const BMUS={on:false};
-function heroStats(id){const h=HEROES[id],t={...h.base};if(id==='spar'&&CH>=3)t.atk+=1;   /* Sariel hits as hard as Amroth */const eq=PARTY[id]||{};for(const k in eq){const it=eq[k]&&ITEMS[eq[k]];if(it&&it.stats)for(const s in it.stats)t[s]=(t[s]||0)+it.stats[s];}return t;}
+function heroStats(id){const h=HEROES[id],t={...h.base};const eq=PARTY[id]||{};for(const k in eq){const it=eq[k]&&ITEMS[eq[k]];if(it&&it.stats)for(const s in it.stats)t[s]=(t[s]||0)+it.stats[s];}return t;}
 function pageTurn(cb){if(WIPE.dir)return;WIPE.dir=1;WIPE.cb=cb;sfxPage(1.4);}
 function updateWipe(dt){if(WIPE.dir===1){WIPE.p=Math.min(1,WIPE.p+dt/.5);if(WIPE.p>=1&&WIPE.label&&(WIPE.hold=(WIPE.hold||0)+dt)<.7)return;if(WIPE.p>=1){WIPE.hold=0;const cb=WIPE.cb;WIPE.cb=null;cb&&cb();WIPE.label='';WIPE.dir=-1;}}else if(WIPE.dir===-1){WIPE.p=Math.max(0,WIPE.p-dt/.55);if(WIPE.p<=0)WIPE.dir=0;}}
 function drawWipe(){if(WIPE.p<=0)return;const e=WIPE.p<1?(1-Math.cos(Math.PI*WIPE.p))/2:1;ctx.save();ctx.setTransform(DPR,0,0,DPR,0,0);
