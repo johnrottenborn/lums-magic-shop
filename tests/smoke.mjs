@@ -1459,6 +1459,18 @@ const CASES = {
     check(cf.n === 5 && cf.dmg >= 4 && cf.mid > 20 && cf.end === 0 && cf.low, "Cub's Fury: five beats, then Amroth dashes in for one heavy blow; Sariel has the lowest HP: " + JSON.stringify(cf));
     await wait(400); await p.screenshot({ path: path.join(SHOTS, `ch3-heal-${vp}.png`) });
   },
+  async 'turtle-foe'(p) {
+    // the turtle enemy: the detailed painting at rest, sheet frames when it lunges or pulls into its shell (placeholder stats; not on a map yet)
+    const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop', g_ = f => p.evaluate(f);
+    await g_(() => { window.__g.startChapter2(); window.__g.c2Skip(); }); await wait(1500);
+    await g_(() => window.__g.startEncounter({ kind: 'turtle', scene: 'thorn', x: 0, y: 0, s: 1, pack: 1, calm: 0 }, 'normal'));
+    for (let i = 0; i < 60; i++) { await wait(150); if (await g_(() => window.__g.BATTLE.phase) === 'heroMenu') break; }
+    check(await g_(() => window.__g.BATTLE.foes[0].name) === 'Tidegold Turtle', 'the turtle should be in battle');
+    await wait(1800);
+    await p.screenshot({ path: path.join(SHOTS, `turtle-idle-${vp}.png`) });
+    await g_(() => { const B = window.__g.BATTLE; B.foes[0].hit = .3; }); await wait(60);
+    await p.screenshot({ path: path.join(SHOTS, `turtle-shell-${vp}.png`) });
+  },
   async 'jak-leaves'(p) {
     // back in Breezevale after Mai joins Lum, Jak sends Lum to Sage Luma, plans to trade the serpent skin in the harbor town, and walks home; he waits in the islet house after
     const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop', g_ = (f, a) => p.evaluate(f, a);

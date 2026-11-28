@@ -207,3 +207,20 @@ function drawBattleNymph(f){const S=bS(),B=BATTLE,me=B.foes[B.foeI]===f,x=f.x+f.
     for(let k=0;k<8;k++){const v=u-k*.045;if(v<0)continue;const px=hx+(tx-hx)*v,py=hy+(ty-hy)*v-Math.sin(Math.PI*v)*50*S;drawGlow(ctx,px,py,(22-k*2.4)*S,k<3?'150,215,255':'70,140,230',.75-k*.08);}
     const px=hx+(tx-hx)*u,py=hy+(ty-hy)*u-Math.sin(Math.PI*u)*50*S;drawGlow(ctx,px,py,26*S,'235,250,255',.95);ctx.restore();}
   if(f.showHp>0&&!f.dead){const bw=60*S,bx=x-bw/2,by=y+16*S;ctx.save();ctx.globalAlpha=Math.min(1,f.showHp*3);ctx.fillStyle='rgba(20,20,30,.55)';rr(bx-2,by-2,bw+4,10,5);ctx.fill();ctx.fillStyle='#7ee08a';rr(bx,by,bw*f.hp/f.max,6,3);ctx.fill();ctx.restore();}}
+
+/* ---- the turtle (the designer's watercolour sheet, kept at full detail: atlas `turtle`, 320x200 cells, facing right so flipped to face left;
+   and the large painting `turtle_hd`, which already faces left, for its idle pose). Placeholder name and stats; not placed on a map yet ---- */
+C1ATL.turtle={"cw":320,"ch":200,"rows":{"swim":[0,5],"walk":[1,6],"lunge":[2,5],"shell":[3,5]}};
+FOE_TYPES.turtle={name:'Tidegold Turtle',hp:30,atk:5,def:3,drop:null};
+function drawBattleTurtle(f){const S=bS(),B=BATTLE,me=B.foes[B.foeI]===f,x=f.x+f.ox,y=f.y+f.oy,Hb=Math.min(190*S,W*.34)*(f.s||1);let al=1;if(f.dead){al=Math.max(0,1-f.dead/.7);if(al<=0)return;}
+  const ph=B.phase,bob=Math.sin(T*1.3+(f.ph||0))*4*S,fl=f.hit>0?Math.min(1,f.hit*3):0;bshadow(x,y,Hb*.55,Hb*.1,.3*al);
+  let an=null,fi=0;
+  if(me&&ph==='foeLeap'){an='lunge';fi=Math.min(4,Math.floor(Math.min(1,B.t/(B.leapD||.4))*5));}
+  else if(me&&(ph==='foeWind'||ph==='foeCharge')){an='swim';fi=Math.floor(T*8)%5;}
+  else if(me&&ph==='foeBack'){an='walk';fi=Math.floor(T*10)%6;}
+  else if(f.hit>.05){an='shell';fi=Math.min(4,Math.floor((.4-f.hit)*12));}   /* struck: it pulls into its shell */
+  ctx.save();ctx.globalAlpha=al;
+  if(an)c1Frame(ctx,'turtle',an,fi,x,y+(an==='shell'?0:bob),Hb*200/170,true,al,fl);   /* sheet rows face right: flipped to face the heroes */
+  else{const im=IMG.turtle_hd;if(ready(im)){const w=Hb*im.naturalWidth/im.naturalHeight;if(fl)ctx.filter='brightness(1.8)';ctx.drawImage(im,x-w/2,y-Hb-6*S+bob,w,Hb);ctx.filter='none';}}
+  ctx.restore();
+  if(f.showHp>0&&!f.dead){const bw=70*S,bx=x-bw/2,by=y+14*S;ctx.save();ctx.globalAlpha=Math.min(1,f.showHp*3);ctx.fillStyle='rgba(20,20,30,.55)';rr(bx-2,by-2,bw+4,10,5);ctx.fill();ctx.fillStyle='#7ee08a';rr(bx,by,bw*f.hp/f.max,6,3);ctx.fill();ctx.restore();}}
