@@ -13,7 +13,7 @@ function audioInit(){if(SND.ctx){if(SND.ctx.state==='suspended')SND.ctx.resume()
   SND.verb=c.createConvolver();SND.verb.buffer=ir;SND.verbOut=mk(.9,SND.master);SND.verb.connect(SND.verbOut);
   SND.music=mk(.3,SND.master);SND.musicVerb=mk(.55,SND.verb);SND.music.connect(SND.musicVerb);
   SND.sfx=mk(.7,SND.master);SND.sfxVerb=mk(.35,SND.verb);SND.sfx.connect(SND.sfxVerb);
-  SND.amb=mk(.55,SND.master);
+  SND.amb=mk(.55,SND.master);setTimeout(applyVolumes,0);
   // noise sources
   const nb=(sec,brown)=>{const b=c.createBuffer(1,c.sampleRate*sec,c.sampleRate),d=b.getChannelData(0);let last=0;for(let i=0;i<d.length;i++){const w=Math.random()*2-1;if(brown){last=(last+.02*w)/1.02;d[i]=last*3.5;}else d[i]=w;}return b;};
   SND.white=nb(2,false);SND.brown=nb(5,true);
@@ -134,7 +134,7 @@ function audioUpdate(dt){if(!SND.ready||!SND.on)return;scheduleMusic();const c=S
   const gust=SCENE!=='garden'?0:Math.max(0,wind(T,cam.x,cam.y)-.15);SND.windG.gain.setTargetAtTime(!OUT?0:NIGHT.on?.009:.006+gust*.04,now,.6);SND.leafG.gain.setTargetAtTime(!OUT?0:NIGHT.on?.001:.0008+gust*.006,now,.5);
   if(SND.sfxVerb)SND.sfxVerb.gain.setTargetAtTime(SCENE==='well'?.95:SCENE==='study'?.6:.35,now,.4);
   SND.birdT-=dt;if(SND.birdT<=0&&SCENE==='garden'&&!NIGHT.on){bird();SND.birdT=1.2+Math.random()*4.5;}}
-function drawSoundBtn(){const x=W-28,y=28,r=17;ctx.save();ctx.globalAlpha=.75;ctx.fillStyle=INTRO.waiting?'rgba(47,42,58,.6)':'rgba(30,44,30,.35)';ctx.beginPath();ctx.arc(x,y,r,0,TAU);ctx.fill();
+function drawSoundBtn(){drawGearBtn();drawSkipBtn();const x=W-28,y=28,r=17;ctx.save();ctx.globalAlpha=.75;ctx.fillStyle=INTRO.waiting?'rgba(47,42,58,.6)':'rgba(30,44,30,.35)';ctx.beginPath();ctx.arc(x,y,r,0,TAU);ctx.fill();
   ctx.fillStyle='#fdf8ec';ctx.strokeStyle='#fdf8ec';ctx.lineWidth=1.6;ctx.lineCap='round';
   ctx.beginPath();ctx.moveTo(x-8,y-3);ctx.lineTo(x-4,y-3);ctx.lineTo(x+1,y-8);ctx.lineTo(x+1,y+8);ctx.lineTo(x-4,y+3);ctx.lineTo(x-8,y+3);ctx.closePath();ctx.fill();
   if(SND.on){ctx.beginPath();ctx.arc(x+2,y,5,-.9,.9);ctx.stroke();ctx.beginPath();ctx.arc(x+2,y,9,-.9,.9);ctx.stroke();}

@@ -93,7 +93,7 @@ function drawWellSlime(g,kO){if(CAPTURE.on&&g===BATTLE.capG)return;if(g.kind==='
   if(g.alert>0){const a=Math.min(1,g.alert*4);ctx.save();ctx.globalAlpha=a;ctx.textAlign='center';ctx.font='700 30px "Alegreya SC", Georgia, serif';ctx.lineWidth=4;ctx.strokeStyle='#3a2a1a';ctx.fillStyle='#ffe27a';const yy=y-z-r*1.9-(1-a)*8;ctx.strokeText('!',x,yy);ctx.fillText('!',x,yy);ctx.restore();}}
 function drawWellDust(){for(const d of WDUST){const a=Math.min(1,d.life*3)*(d.rock?.9:.5);if(d.rock){ctx.fillStyle=`rgba(110,104,96,${a})`;ctx.beginPath();ctx.ellipse(d.x,d.y,d.s,d.s*.8,0,0,TAU);ctx.fill();}else drawGlow(ctx,d.x,d.y,d.s*3,'210,200,180',a*.5);}}
 function drawGooPart(p){const q=p.life/p.max;ctx.fillStyle=`rgba(${p.col},${(.85*(1-q*q)).toFixed(3)})`;ctx.beginPath();ctx.arc(p.x,p.y-p.z,p.s*(1-q*.4),0,TAU);ctx.fill();ctx.fillStyle=`rgba(255,255,255,${(.6*(1-q)).toFixed(3)})`;ctx.beginPath();ctx.arc(p.x-p.s*.3,p.y-p.z-p.s*.3,p.s*.25,0,TAU);ctx.fill();}
-function drawEerie(text,t){const n=Math.min(text.length,Math.floor(t*22));ctx.save();ctx.textAlign='center';ctx.font='italic 20px Alegreya, Georgia, serif';
+function drawEerie(text,t){const n=Math.min(text.length,Math.floor(t*TXTRATE()));ctx.save();ctx.textAlign='center';ctx.font='italic 20px Alegreya, Georgia, serif';
   const words=wrapText(ctx,text,Math.min(320,W-50));const y0=H*.24;
   ctx.fillStyle=`rgba(20,8,36,${Math.min(.55,t*.8).toFixed(3)})`;ctx.fillRect(0,y0-46,W,words.length*28+70);
   let c=0;words.forEach((l,li)=>{const w=ctx.measureText(l).width;let x=W/2-w/2;for(const ch of l){const show=c<n;c++;const cw=ctx.measureText(ch).width;if(show){const age=(n-c)/22;ctx.globalAlpha=Math.min(1,age*3+.2);const dy=Math.sin(T*3+c*.6)*2;

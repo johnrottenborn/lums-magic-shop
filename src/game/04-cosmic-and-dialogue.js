@@ -42,8 +42,8 @@ function drawCosmic(){
 
 /* ---------- conversations: B advances, lines auto-advance after a while ---------- */
 const DLG={active:false,lines:[],i:0,t:0,withCosmic:false};
-function talk(lines,withCosmic=false,onEnd=null){DLG.onEnd=onEnd;DLG.active=true;DLG.lines=lines;DLG.i=0;DLG.t=0;sfxBlip(lines[0][0]);DLG.withCosmic=withCosmic;lum.bubble=0;}
-function dlgNext(){if(DLG.active&&DLG.lines[DLG.i]&&(DLG.lines[DLG.i][0]==='???'||DLG.lines[DLG.i][0]==='Fokalur')&&DLG.t*22<DLG.lines[DLG.i][1].length+6)return;DLG.i++;DLG.t=0;if(DLG.i>=DLG.lines.length&&typeof SAVEC!=='undefined')SAVEC.t=99;if(DLG.i>=DLG.lines.length&&DLG.onEnd){const cb=DLG.onEnd;DLG.onEnd=null;setTimeout(cb,0);}if(DLG.i<DLG.lines.length)sfxBlip(DLG.lines[DLG.i][0]);if(DLG.i>=DLG.lines.length){DLG.active=false;DLG.withCosmic=false;}}
+function talk(lines,withCosmic=false,onEnd=null){DLG.onEnd=onEnd;DLG.h=dlgHash(lines);DLG.seen=SEEN.has(DLG.h);DLG.active=true;DLG.lines=lines;DLG.i=0;DLG.t=0;sfxBlip(lines[0][0]);DLG.withCosmic=withCosmic;lum.bubble=0;}
+function dlgNext(){if(DLG.active&&DLG.lines[DLG.i]&&(DLG.lines[DLG.i][0]==='???'||DLG.lines[DLG.i][0]==='Fokalur')&&DLG.t*TXTRATE()<DLG.lines[DLG.i][1].length+6)return;DLG.i++;DLG.t=0;if(DLG.i>=DLG.lines.length)markSeen(DLG.h);if(DLG.i>=DLG.lines.length&&typeof SAVEC!=='undefined')SAVEC.t=99;if(DLG.i>=DLG.lines.length&&DLG.onEnd){const cb=DLG.onEnd;DLG.onEnd=null;setTimeout(cb,0);}if(DLG.i<DLG.lines.length)sfxBlip(DLG.lines[DLG.i][0]);if(DLG.i>=DLG.lines.length){DLG.active=false;DLG.withCosmic=false;}}
 function say(t){if(typeof t!=='string'||!t)return;talk([[PC==='cosmic'?'Cosmic':'Lum',t]]);}
 function playerQuip(t){if(typeof t!=="string"||!t)return;lum.quip=t;lum.quipT=2.4;}
 function talkCosmic(){

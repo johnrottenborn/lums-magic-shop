@@ -1391,6 +1391,23 @@ const CASES = {
     const r2 = await door(); check(!/Gone Fishing/.test(r2.quip + r2.dlg), 'Jak\'s door should open after meeting Sage Luma');
     await wait(900);
   },
+  async 'settings'(p) {
+    // the gear button opens Settings (music, sound, text speed, skip seen dialogue); the game pauses under it; a conversation read once can be skipped
+    const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop', g_ = (f, a) => p.evaluate(f, a);
+    await g_(() => { const g = window.__g; g.startChapter2(); g.c2Skip(); }); await wait(1000);
+    const W = p.viewportSize().width;
+    await p.mouse.click(W - 68, 28); await wait(400);
+    check(await g_(() => window.__g.SETUI.on), 'the gear button should open Settings');
+    await p.screenshot({ path: path.join(SHOTS, `settings-open-${vp}.png`) });
+    await g_(() => { const g = window.__g, h = g.SETUI.hits[14]; h.f(); }); await wait(100);   // text speed row: Fast
+    check(await g_(() => window.__g.SET.text === 'fast'), 'tapping Fast should set the text speed');
+    await g_(() => { window.__g.SET.text = 'normal'; window.__g.closeSettings(); }); await wait(200);
+    check(await g_(() => !window.__g.SETUI.on && JSON.parse(localStorage.getItem('lum_settings')).text === 'normal'), 'settings should close and be saved');
+    const r = await g_(() => { const g = window.__g, L = [['Lum', 'Skip test one.'], ['Lum', 'Skip test two.']]; let ended = 0; g.talk(L, false, () => {}); const first = g.canSkipDlg(); g.DLG.i = 2; g.dlgNext && 0; g.DLG.active = false; g.SEEN.add && 0; return first; });
+    check(r === false, 'a new conversation should not offer Skip');
+    const r2 = await g_(async () => { const g = window.__g, L = [['Lum', 'Seen line one.'], ['Lum', 'Seen line two.']]; g.talk(L, false, null); g.dlgSkip(); await new Promise(r => setTimeout(r, 50)); g.talk(L, false, null); const can = g.canSkipDlg(); let ended = 0; g.DLG.onEnd = () => { ended = 1; }; g.dlgSkip(); await new Promise(r => setTimeout(r, 50)); return { can, ended, active: g.DLG.active }; });
+    check(r2.can && r2.ended, 'a conversation read before should offer Skip and skipping should finish it: ' + JSON.stringify(r2));
+  },
   async 'jak-leaves'(p) {
     // back in Breezevale after Mai joins Lum, Jak says goodbye (off to his next hunt) and walks home; he waits in the islet house after
     const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop', g_ = (f, a) => p.evaluate(f, a);
@@ -1534,9 +1551,13 @@ const CASES = {
     check(await p.evaluate(() => window.__g.CHAPTERS.map(c => c.id).filter(id => id !== 'ch2home' && id !== 'ch2isle').join(',')) === 'prologue,ch1,ch2', 'chapter list should be Prologue, Chapter 1, Chapter 2');
     await p.screenshot({ path: path.join(SHOTS, `chapter-select-locked-${vp}.png`) });
     check(await p.evaluate(() => { const g = window.__g; g.chselPick(1); return g.CHSEL.confirm === null && /unlock/.test(g.CHSEL.note); }), 'Chapter 1 could be picked before finishing the Prologue');
+    await p.evaluate(() => { localStorage.setItem('lums-magic-shop-progress', JSON.stringify({ prologue: { done: 1, best: 5 } })); const g = window.__g; g.CHSEL.noteT = 0; g.CHSEL.confirm = null; });
+    check(await p.evaluate(() => { const g = window.__g; g.chselPick(2); return g.CHSEL.confirm === null && /Chapter 1/.test(g.CHSEL.note); }), 'Chapter 2 should stay locked until Chapter 1 is finished');
+    await p.evaluate(() => { const g = window.__g; g.CHSEL.confirm = null; });
     await p.evaluate(() => { localStorage.setItem('lums-magic-shop-progress', JSON.stringify({ prologue: { done: 1, best: 5 }, ch1: { done: 1, best: 4 } })); const g = window.__g; g.CHSEL.noteT = 0; g.CHSEL.t = 1; }); await wait(700);
     await p.screenshot({ path: path.join(SHOTS, `chapter-select-open-${vp}.png`) });
     check(await p.evaluate(() => { const g = window.__g; g.chselPick(1); return g.CHSEL.confirm === 1; }), 'Chapter 1 stayed locked after finishing the Prologue');
+    check(await p.evaluate(() => { const g = window.__g; g.CHSEL.confirm = null; g.chselPick(2); return g.CHSEL.confirm === 2; }), 'Chapter 2 stayed locked after finishing Chapter 1');
   },
   async 'ch2-lose-respawn'(p) {
     // losing a battle in Chapter 2 wakes Lum at the way into the area she was in, never back in Chapter 1's Stranglethorn
