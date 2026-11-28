@@ -258,3 +258,22 @@ function drawBattleGoblin(f){const S=bS(),B=BATTLE,me=B.foes[B.foeI]===f,x=f.x+f
   else{const im=IMG.goblin_hd;if(ready(im)){const w=Hb*im.naturalWidth/im.naturalHeight,br=Math.sin(T*2.2+(f.ph||0))*.012;ctx.translate(x,y);ctx.scale(-1,1+br);if(fl)ctx.filter='brightness(1.8)';ctx.drawImage(im,-w/2,-Hb,w,Hb);ctx.filter='none';}}   /* breathing, shifting from foot to foot */
   ctx.restore();
   if(f.showHp>0&&!f.dead){const bw=56*S,bx=x-bw/2,by=y+14*S;ctx.save();ctx.globalAlpha=Math.min(1,f.showHp*3);ctx.fillStyle='rgba(20,20,30,.55)';rr(bx-2,by-2,bw+4,10,5);ctx.fill();ctx.fillStyle='#7ee08a';rr(bx,by,bw*f.hp/f.max,6,3);ctx.fill();ctx.restore();}}
+
+/* ---- the Forest Dryad (placeholder name and stats; not on a map yet). The designer's watercolours: the large painting `dryad_hd` (front, floating)
+   at rest with a slow drift and sway, and the sheet `dryad` (`C1ATL.dryad`, 272x196 cells, side frames face right, so flipped:
+   idle 9 front, walk 9, run 6, jump 4 (the last one kneeling, used as she falls), cast 8 = arms raised, gathering, then a burst of flowers
+   from her outstretched hand). She casts from where she stands, like the nymph. Masters `art/hq/dryad_*` ---- */
+C1ATL.dryad={"cw":272,"ch":196,"rows":{"idle":[0,9],"walk":[1,9],"run":[2,6],"jump":[3,4],"cast":[4,8]}};
+FOE_TYPES.dryad={name:'Forest Dryad',hp:20,atk:4,def:1,drop:null};
+function drawBattleDryad(f){const S=bS(),B=BATTLE,me=B.foes[B.foeI]===f,x=f.x+f.ox,y=f.y+f.oy,Hb=Math.min(150*S,W*.34)*(f.s||1);const ph=B.phase,fl=f.hit>0?Math.min(1,f.hit*3):0;
+  let an=null,fi=0,flip=true,al=1;
+  if(f.dead){an='jump';fi=3;al=Math.max(0,1-f.dead/.8);if(al<=0)return;}   /* sinks to her knees and fades */
+  else if(me&&ph==='foeWind'){an='cast';fi=Math.min(2,Math.floor(B.t*6));}   /* arms raised, gathering the magic */
+  else if(me&&ph==='foeLeap'){const u=clamp(B.t/(B.leapD||.4),0,1);an='cast';fi=3+Math.min(4,Math.floor(u*5));}   /* the flowers burst from her hand */
+  else if(me&&ph==='foeBack'){an='cast';fi=B.t<.2?7:1;}
+  bshadow(x,y,Hb*.26,Hb*.06,.28*al);ctx.save();ctx.globalAlpha=al;
+  if(an)c1Frame(ctx,'dryad',an,fi,x,y,Hb*196/178,flip,al,fl);
+  else{const im=IMG.dryad_hd;if(ready(im)){const w=Hb*im.naturalWidth/im.naturalHeight,ph2=T*1.3+(f.ph||0),bob=Math.sin(ph2)*3*S,sw=Math.sin(ph2*.7)*.025,lean=f.hit>.05?-.06:0;
+    ctx.translate(x,y-4*S+bob);ctx.transform(1,0,sw+lean,1,0,0);ctx.scale(-1,1);if(fl)ctx.filter='brightness(1.8)';ctx.drawImage(im,-w/2,-Hb,w,Hb);ctx.filter='none';}}   /* floats, her branches swaying */
+  ctx.restore();
+  if(f.showHp>0&&!f.dead){const bw=56*S,bx=x-bw/2,by=y+14*S;ctx.save();ctx.globalAlpha=Math.min(1,f.showHp*3);ctx.fillStyle='rgba(20,20,30,.55)';rr(bx-2,by-2,bw+4,10,5);ctx.fill();ctx.fillStyle='#7ee08a';rr(bx,by,bw*f.hp/f.max,6,3);ctx.fill();ctx.restore();}}
