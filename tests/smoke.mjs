@@ -1443,6 +1443,15 @@ const CASES = {
     check(await g_(() => { const g = window.__g; return g.PARTY_ORDER.join() === 'lum,amroth,alma,spar' && g.C2.basement === 1; }), 'the party should be Lum, Amroth, Alma and Spar, and the basement open');
     await g_(() => { const g = window.__g; g.lum.x -= 160; }); await wait(900);
     await p.screenshot({ path: path.join(SHOTS, `ch3-party-walk-${vp}.png`) });
+    // once the party has formed, the bookshelf left of the fireplace leads down to the basement, and the party comes along
+    await g_(() => window.__g.enterDun(21, 690, 630, 1)); await wait(700);
+    await p.screenshot({ path: path.join(SHOTS, `ch3-bookshelf-${vp}.png`) });
+    check(await g_(() => !!(window.__g.NEAR && window.__g.NEAR.door)), 'the bookshelf door should show in Chapter 3');
+    await g_(() => window.__g.NEAR.onInteract()); await wait(1400);
+    check(await g_(() => window.__g.DUNX.room === 23), 'the bookshelf should lead down to the basement in Chapter 3');
+    await p.keyboard.down('ArrowRight'); await wait(1000); await p.keyboard.up('ArrowRight'); await wait(600);
+    await p.screenshot({ path: path.join(SHOTS, `ch3-basement-${vp}.png`) });
+    check(await g_(() => { const g = window.__g; return Math.hypot(g.ALMF.x - g.lum.x, g.ALMF.y - g.lum.y) < 400 && Math.hypot(g.C3.boy.x - g.lum.x, g.C3.boy.y - g.lum.y) < 400; }), 'Alma and Sariel should follow Lum down into the basement');
     // a battle with all four: Alma heals
     await g_(() => window.__g.startEncounter({ kind: 'spider', scene: 'thorn', x: 0, y: 0, s: 1, pack: 1, calm: 0, over: { hp: 60 } }, 'normal'));
     for (let i = 0; i < 60; i++) { await wait(150); if (await g_(() => window.__g.BATTLE.phase) === 'heroMenu') break; }

@@ -60,7 +60,7 @@ function c2Finish(){if(!BAG.includes('baby'))BAG.push('baby');if(!PARTY_ORDER.in
   AMR.moving=0;AMR.a=1;GOAL.tag='NEW TASK';GOAL.text='Pass through the mountain to Amroth’s home';HINT.goalT=0;}
 /* once he has joined, Amroth walks behind Lum along the exact path she took (breadcrumbs, like Spar), so he never cuts through walls */
 const AMRCRUMB=[];
-function resetAmrFollow(){AMR.x=lum.x;AMR.y=lum.y;AMR.moving=0;AMR.face=lum.face;AMRCRUMB.length=0;}
+function resetAmrFollow(){AMR.x=lum.x;AMR.y=lum.y;AMR.moving=0;AMR.face=lum.face;AMRCRUMB.length=0;if(CH>=3&&typeof C3!=='undefined'&&C3.party&&C3.boy.mode==='follow')c3ResetFollow();}   /* Chapter 3: Alma and Sariel come along too */
 function updateAmrFollow(dt){updateC2Torch(dt);updateHomeStory(dt);if(!C2.joined||CH<2||(SCENE!=='thorn'&&SCENE!=='dun')||C2.torchWalk||(C2.torchScene&&!C2.torchLit)||(BO.st>=1&&BO.st<10)||(HST.st===2&&SCENE==='dun'&&DUN.room===21)||(WEVENT.on&&C2.torchScene&&DLG.active))return;const lc=AMRCRUMB[AMRCRUMB.length-1];
   if(!lc||Math.hypot(lc[0]-lum.x,lc[1]-lum.y)>6){AMRCRUMB.push([lum.x,lum.y]);if(AMRCRUMB.length>80)AMRCRUMB.shift();}
   let acc=0,tx=AMR.x,ty=AMR.y,px=lum.x,py=lum.y,found=false;for(let i=AMRCRUMB.length-1;i>=0;i--){const [cx,cy]=AMRCRUMB[i];acc+=Math.hypot(cx-px,cy-py);px=cx;py=cy;if(acc>=64){tx=cx;ty=cy;found=true;break;}}
