@@ -1351,6 +1351,10 @@ const CASES = {
       await p.screenshot({ path: path.join(SHOTS, `spellbook-moves-${who}-${vp}.png`) });
     }
     check(await g_(() => window.__g.MENU.hits.length > 4), 'the spellbook should have tappable tabs');
+    // satchel with an item open: on the phone the card sits under the grid instead of covering it
+    await g_(() => { const g = window.__g; g.MENU.page = 'bag'; g.MENU.tab = 'bag'; g.MENU.who = 'lum'; const i = g.BAG.findIndex(b => g.ITEMS[b] && g.ITEMS[b].kind !== 'mat'); g.MENU.sel = { kind: 'bag', i }; }); await wait(300);
+    await p.screenshot({ path: path.join(SHOTS, `spellbook-satchel-card-${vp}.png`) });
+    await g_(() => { window.__g.MENU.sel = null; window.__g.MENU.page = 'char'; }); await wait(200);
     await g_(() => window.__g.closeMenu()); await wait(400);
   },
   async 'prologue-bed-touch'(p) {
