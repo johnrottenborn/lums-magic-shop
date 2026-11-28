@@ -1409,19 +1409,19 @@ const CASES = {
     check(r2.can && r2.ended, 'a conversation read before should offer Skip and skipping should finish it: ' + JSON.stringify(r2));
   },
   async 'jak-leaves'(p) {
-    // back in Breezevale after Mai joins Lum, Jak says goodbye (off to his next hunt) and walks home; he waits in the islet house after
+    // back in Breezevale after Mai joins Lum, Jak sends Lum to Sage Luma, plans to trade the serpent skin in the harbor town, and walks home; he waits in the islet house after
     const vp = p.viewportSize().width < 600 ? 'phone' : 'desktop', g_ = (f, a) => p.evaluate(f, a);
     const end = async () => { for (let i = 0; i < 8; i++) { if (!await g_(() => window.__g.DLG.active)) break; await g_(() => { const g = window.__g; g.DLG.active = false; g.DLG.onEnd && g.DLG.onEnd(); }); await wait(250); } };
     await g_(() => { const g = window.__g; g.startChapter2(); g.c2Skip(); }); await wait(1000);
     await g_(() => { const g = window.__g; g.WB10.st = 2; g.chPlaytestBreezeway(); Object.assign(g.C2, { lumaMet: 1, jak: 1, maiJoined: 1, jakLeft: 0 }); g.PARTY_ORDER.includes('jak') || g.PARTY_ORDER.push('jak'); setInterval(() => g.THFOES.forEach(f => f.calm = 99), 50); g.enterBreezevale(); });
     for (let i = 0; i < 30 && !await g_(() => window.__g.DLG.active); i++) await wait(250);
-    check(await g_(() => window.__g.DLG.active && /next hunt/.test(window.__g.DLG.lines.map(l => l[1]).join(' '))), 'Jak should say he is off to the next hunt');
+    check(await g_(() => window.__g.DLG.active && /Sage Luma/.test(window.__g.DLG.lines.map(l => l[1]).join(' ')) && /harbor/.test(window.__g.DLG.lines.map(l => l[1]).join(' '))), 'Jak should send Lum to Sage Luma and talk of the harbor town');
     await p.screenshot({ path: path.join(SHOTS, `jak-leaves-${vp}.png`) });
     await end(); await wait(1200);
     check(await g_(() => { const g = window.__g; return g.C2.jakLeft && !g.jak2In() && !g.PARTY_ORDER.includes('jak') && g.JKLEAVE.t > 0; }), 'Jak should leave the party and walk off');
     await p.screenshot({ path: path.join(SHOTS, `jak-walks-home-${vp}.png`) });
     await g_(() => window.__g.jakTalk()); await wait(200);
-    check(await g_(() => /next hunt/.test(window.__g.DLG.lines[0][1])), 'at home Jak should talk about the next hunt'); await end();
+    check(await g_(() => /harbor/.test(window.__g.DLG.lines[0][1])), 'at home Jak should talk about the harbor town'); await end();
   },
   async 'world-reactions'(p) {
     // after the rain stops the townsfolk have new lines; Amroth and Alma greet Jak, then react after the ruins
